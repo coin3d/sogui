@@ -18,19 +18,12 @@
  *
  **************************************************************************/
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif
-
-#ifdef SOQT_INTERNAL
 #include <qmetaobject.h>
 #include <moc_SoQtObject.cpp>
-#endif // SOQT_INTERNAL
 
 #if HAVE_CONFIG_H
 #include <config.h>
-#endif
+#endif // HAVE_CONFIG_H
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Object.h>
@@ -56,12 +49,6 @@ static const char rcsid[] =
 */
 
 SoType So@Gui@Object::classTypeId; // static
-
-/*!
-  \fn void So@Gui@Object::init(void)
-
-  FIXME: write doc
-*/
 
 /*!
   FIXME: write doc
@@ -98,4 +85,13 @@ So@Gui@Object::getClassTypeId(// static
   return So@Gui@Object::classTypeId;
 } // getClassTypeId()
 
-// *************************************************************************
+/*!
+  FIXME: write doc
+*/
+void
+So@Gui@Object::init(void)
+{
+  So@Gui@Object::initClass();
+  So@Gui@Device::initClasses();
+  So@Gui@Component::initClasses();
+}
