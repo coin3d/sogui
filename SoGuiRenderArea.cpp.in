@@ -58,6 +58,10 @@ static const char rcsid[] =
 #include <qmetaobject.h>
 #include <moc_SoQtRenderArea.cpp>
 #endif // SOQT_INTERNAL
+#if SOQT_DEBUG // For the "soinfo" debugging backdoor.
+#include <qgl.h>
+#include <qapplication.h>
+#endif // SOQT_DEBUG
 
 #include <Inventor/@Gui@/common/gl.h> // glDrawBuffer()
 
@@ -226,8 +230,16 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
 #endif // !SO@GUI@_MAKE_DLL
 
   // FIXME: include information about the underlying toolkit library,
-  // if possible (ie Qt version, Gtk version, Motif implementation,
-  // MSWindows version, ...).  20010927 mortene.
+  // if possible, like we do for Qt below (ie Gtk version, Motif
+  // implementation, MSWindows version, ...).  20010927 mortene.
+
+#ifdef SOQT_INTERNAL
+  info += "\nQt version: ";
+  info += qVersion();
+  info += "\nQGL version: ";
+  info += qGLVersion();
+  info += "\n";
+#endif // SOQT_INTERNAL
 
   // FIXME: information about DLL path(s) (both for the So@Gui@ and
   // Coin/Inventor library) would be _extremely_ useful for debugging
