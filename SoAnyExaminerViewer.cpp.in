@@ -829,7 +829,19 @@ SoAnyExaminerViewer::processSoEvent(
 
   this->lastmouseposition = posn;
 
+  // Set to TRUE if any event processing happened. Note that it is not
+  // necessary to restrict ourselves to only do one "action" for an
+  // event, we only need this flag to see if any processing happened
+  // at all.
   SbBool processed = FALSE;
+
+
+  // Mismatches in state of the Ctrl key happens if the user presses
+  // or releases it outside the viewer window.
+  if ( this->controldown != ev->wasCtrlDown() ) {
+    this->controldown = ev->wasCtrlDown();
+    processed = TRUE;
+  }
 
   // Mouse Button / Spaceball Button handling
 
