@@ -533,7 +533,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
         SbTime delta = (PRIVATE(this)->log.time[0] - PRIVATE(this)->log.time[2]);
         double deltatime = delta.getValue();
         rot.invert();
-        rot.scaleAngle(0.200 / deltatime);
+        rot.scaleAngle(float(0.200 / deltatime));
 
         SbVec3f axis;
         float radians;
@@ -668,7 +668,7 @@ So@Gui@ExaminerViewer::actualRedraw(void)
 
   if (this->isAnimating()) {
     SbRotation deltaRotation = PRIVATE(this)->spinRotation;
-    deltaRotation.scaleAngle(secs * 5.0);
+    deltaRotation.scaleAngle(float(secs * 5.0));
     PRIVATE(this)->reorientCamera(deltaRotation);
   }
 
@@ -963,7 +963,7 @@ SoGuiExaminerViewerP::drawAxisCross(void)
 
   const float NEARVAL = 0.1f;
   const float FARVAL = 10.0f;
-  const float dim = NEARVAL * tan(M_PI/8.0f); // FOV is 45° (45/360 = 1/8)
+  const float dim = NEARVAL * float(tan(M_PI / 8.0)); // FOV is 45° (45/360 = 1/8)
   glFrustum(-dim, dim, -dim, dim, NEARVAL, FARVAL);
 
 
@@ -1171,7 +1171,7 @@ SoGuiExaminerViewerP::zoom(const float diffvalue)
   SoType t = cam->getTypeId();
 
   // This will be in the range of <0, ->>.
-  float multiplicator = exp(diffvalue);
+  float multiplicator = float(exp(diffvalue));
 
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
 

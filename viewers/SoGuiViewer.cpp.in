@@ -562,7 +562,7 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
 
   // focalDistance==0.0f happens for empty scenes.
   if (focaldist != 0.0f) {
-    out->heightAngle = 2.0f * atan(in->height.getValue() / 2.0f / focaldist);
+    out->heightAngle = 2.0f * (float)atan(in->height.getValue() / 2.0 / focaldist);
   }
   else {
     // 45° is the default value of this field in SoPerspectiveCamera.
@@ -582,7 +582,7 @@ So@Gui@ViewerP::convertPerspective2Ortho(const SoPerspectiveCamera * in,
 
   float focaldist = in->focalDistance.getValue();
 
-  out->height = 2 * focaldist * tan(in->heightAngle.getValue() / 2.0f);
+  out->height = 2.0f * focaldist * (float)tan(in->heightAngle.getValue() / 2.0);
 }
 
 void
@@ -1130,7 +1130,7 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
   SoTimerSensor * sensor = (SoTimerSensor *)s;
 
   float t =
-    (currenttime - sensor->getBaseTime()).getValue() / PRIVATE(thisp)->seekperiod;
+    float((currenttime - sensor->getBaseTime()).getValue()) / PRIVATE(thisp)->seekperiod;
   if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
   SbBool end = (t == 1.0f);
   
@@ -1178,17 +1178,17 @@ So@Gui@ViewerP::addFrametime(const double ft)
 
   int arrayptr = (this->framecount - 1) % FRAMESARRAY_SIZE;
 
-  this->totalcoin += (ft - this->frames[arrayptr][0]);
+  this->totalcoin += (float(ft) - this->frames[arrayptr][0]);
   float coinfps =
     this->totalcoin / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
 
   double timeofday = SbTime::getTimeOfDay().getValue();
   double ct = timeofday - this->lastgettimeofday;
-  this->totaldraw += (ct - this->frames[arrayptr][1]);
+  this->totaldraw += (float(ct) - this->frames[arrayptr][1]);
   float drawfps =
     this->totaldraw / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
 
-  this->frames[arrayptr] = SbVec2f(ft, ct);
+  this->frames[arrayptr] = SbVec2f((float)ft, (float)ct);
   this->lastgettimeofday = timeofday;
 
   return SbVec2f(1.0f / coinfps, 1.0f / drawfps);

@@ -785,7 +785,7 @@ SoGuiPlaneViewerP::zoom(const float difference) const
   if (! camera) return; // probably a scene-less viewer
 
   SoType type = camera->getTypeId();
-  float multiplicator = exp(difference); // in the range of <0, ->>
+  float multiplicator = float(exp(difference)); // in the range of <0, ->>
 
   if (type.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
     SoOrthographicCamera * orthocam = (SoOrthographicCamera *) camera;
@@ -834,13 +834,13 @@ SoGuiPlaneViewerP::getPointerOrigoAngle(void) const
   now[0] -= this->canvas[0] / 2;
   now[1] -= this->canvas[1] / 2;
 
-  float nowradval = (now != SbVec2s(0, 0)) ?
-    atan(fabs((float) now[1] / (float) now[0])) : 0.0f;
+  double nowradval = (now != SbVec2s(0, 0)) ?
+    atan(fabs(now[1] / now[0])) : 0.0;
 
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
-  return nowradval;
+  return (float)nowradval;
 }
 
 float
@@ -857,18 +857,18 @@ SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
   then[0] -= this->canvas[0] / 2;
   then[1] -= this->canvas[1] / 2;
 
-  float nowradval = (now != SbVec2s(0, 0)) ?
-    atan(fabs((float) now[1] / (float) now[0])) : 0.0f;
+  double nowradval = (now != SbVec2s(0, 0)) ?
+    atan(fabs(now[1] / now[0])) : 0.0;
 
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
-  float thenradval = (then != SbVec2s(0, 0)) ? 
-    atan(fabs((float) then[1] / (float) then[0])) : 0.0f;
+  double thenradval = (then != SbVec2s(0, 0)) ? 
+    atan(fabs(then[1] / then[0])) : 0.0;
   if (then[0] < 0) thenradval = M_PI - thenradval;
   if (then[1] < 0) thenradval = 2 * M_PI - thenradval;
 
-  return nowradval - thenradval;
+  return (float)(nowradval - thenradval);
 }
 
 // This method updates the contents of the scenegraph which renders
