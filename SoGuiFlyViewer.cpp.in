@@ -440,6 +440,9 @@ SbBool
 So@Gui@FlyViewer::processSoEvent( // virtual
   const SoEvent * const event )
 {
+  if ( !this->isViewing() )
+    return inherited::processSoEvent(event);
+
   // Keyboard handling
   if ( event->isOfType(SoKeyboardEvent::getClassTypeId()) ) {
     // FIXME: only in fly mode
@@ -589,6 +592,11 @@ void
 So@Gui@FlyViewer::actualRedraw( // virtual
   void )
 {
+  if ( !this->isViewing() ) {
+    inherited::actualRedraw();
+    return;
+  }
+
   switch ( PRIVATE(this)->getMode() ) {
   case So@Gui@FlyViewerP::FLYING:
     do {
