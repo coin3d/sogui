@@ -168,15 +168,17 @@ ColorEditor::scenegraph[] = {
   "      = DEF windowgeometry Calculator {",
   "        A 0 0 0 = USE pane.objectSize",
   "        expression [",
-  "          \"oB = vec3f(10, A[1] - 30, 0)\"",
+  "          \"ta = floor(A[1] / 14)\"",                    // slider height
+  "          \"tb = floor(((A[1] / 2) - (4 * ta)) / 5)\"",  // inter-slider height
+  "          \"oA = vec3f(tb, A[1] - 20 - tb, 0)\"",        // clickcounter pos
   "        ]",
-  "      } . oB",
+  "      } . oA",
   "    }",
   "    DEF switcher SoGuiClickCounter {",
   "      size 50 20 0",
-  "      first 2",
-  "      last 6",
-  "      value 3",
+  "      first 2", // the INTENSITY sliders
+  "      last 6",  // the RGB_HSV sliders
+  "      value 5", // start with the RGB_V group
   "    }",
   //   the initial bottom-left positioning is done right here (position = [...] . oB)
   "    SoGuiPosition {",
@@ -333,7 +335,6 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
       PRIVATE(this)->sensor_v->setPriority(0);
       PRIVATE(this)->sensor_v->attach(&(PRIVATE(this)->slider_v->value));
     }
-    this->setCurrentSliders(So@Gui@ColorEditor::RGB);
     this->setSceneGraph(root);
     root->unref();
   }
