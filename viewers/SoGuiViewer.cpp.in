@@ -263,9 +263,10 @@ public:
   int framecount;
 
   // Stereo-related
-  SbBool stereoviewing;
+  SbBool stereoviewing, stereotypesetexplicit;
   float stereooffset;
   So@Gui@Viewer::StereoType stereotype;
+  SbBool stereoanaglyphmask[2][3];
   SbVec2s stereostencilmasksize;
   GLubyte * stereostencilmask;
   enum StencilType { ROWS, COLUMNS, NONE };
@@ -349,9 +350,14 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->autoclipcb = NULL;
 
   this->stereotype = So@Gui@Viewer::STEREO_NONE;
+  this->stereotypesetexplicit = FALSE;
   this->stereostencilmasksize = SbVec2s(0, 0);
   this->stereostencilmask = NULL;
   this->stereostenciltype = So@Gui@Viewer::STEREO_NONE;
+  this->stereoanaglyphmask[0][0] = TRUE;
+  this->stereoanaglyphmask[0][1] = this->stereoanaglyphmask[0][2] = FALSE;
+  this->stereoanaglyphmask[1][0] = FALSE;
+  this->stereoanaglyphmask[1][1] = this->stereoanaglyphmask[1][2] = TRUE;
 }
 
 So@Gui@ViewerP::~So@Gui@ViewerP()
@@ -2405,8 +2411,7 @@ So@Gui@Viewer::setAutoClippingStrategy(const AutoClippingStrategy strategy,
 */
 
 SbBool
-So@Gui@Viewer::isAutoClipping(
-  void) const
+So@Gui@Viewer::isAutoClipping(void) const
 {
   return PRIVATE(this)->adjustclipplanes;
 }
@@ -2414,7 +2419,11 @@ So@Gui@Viewer::isAutoClipping(
 // *************************************************************************
 
 /*!
+
   Turn stereo viewing on or off.
+
+  Note: this function is being obsoleted, you should use the
+  setStereoType() function instead.
 
   Coin does "correct" stereo rendering, using the method known as
   "parallel axis asymmetric frustum perspective projection". For more
@@ -2450,16 +2459,75 @@ So@Gui@Viewer::isStereoViewing(void) const
 
 // *************************************************************************
 
-// FIXME: _really_ need to document the So@Gui@Viewer::StereoType
-// values properly. 20040618 mortene.
+/*!
+  \enum So@Gui@Viewer::StereoType
+
+  Contains list of supported stereo rendering techniques.
+
+  \sa So@Gui@Viewer::setStereoType()
+*/
+/*!
+  \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_NONE
+
+  Use monoscopic rendering.
+*/
+/*!
+  \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_ANAGLYPH
+
+  Render stereo by superimposing two images of the same scene, but with
+  different color filters over the left and right view (or "eye").
+
+  This is a way of rendering stereo which works on any display, using
+  color-filter glasses. Such glasses are usually cheap and easy to
+  come by.
+
+  \sa setAnaglyphStereoColorMasks()
+*/
+/*!
+  \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_QUADBUFFER
+
+  Render stereo by using OpenGL quad-buffers. This is the most common
+  interface for stereo rendering for more expensive hardware devices,
+  such as shutter glasses and polarized glasses.
+
+  The well known Crystal Eyes glasses are commonly used with this type
+  of stereo display.
+*/
+/*!
+  \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_INTERLEAVED_ROWS
+
+  Interleaving / interlacing rows from the left and right eye is
+  another stereo rendering method requiring special hardware. One
+  example of a provider of shutter glasses working with interleaved
+  glasses is VRex:
+
+    http://www.vrex.com/
+*/
+/*!
+  \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS
+
+  Same basic technique as So@Gui@Viewer::STEREO_INTERLEAVED_ROWS, only
+  it is vertical lines that are interleaved / interlaced, instead of
+  horizontal lines.
+*/
 
 /*!
   Set up stereo rendering.
 
-  It is prefered that one uses this function for control of which type
-  of stereo rendering to use, instead of the older
+  Coin does "correct" stereo rendering, using the method known as
+  "parallel axis asymmetric frustum perspective projection". For more
+  information, see this link:
+
+    http://astronomy.swin.edu.au/~pbourke/opengl/stereogl/
+
+
+  Note: it is prefered that one uses this function for control of
+  which type of stereo rendering to use, instead of the older
   So@Gui@Viewer::setStereoViewing() and
   So@Gui@GLWidget::setQuadBufferStereo() functions.
+
+  The default is to do monoscopic rendering, i.e. the default
+  So@Gui@Viewer::StereoType value is So@Gui@Viewer::STEREO_NONE.
 
   \sa So@Gui@Viewer::StereoType
 */
@@ -2467,6 +2535,11 @@ SbBool
 So@Gui@Viewer::setStereoType(So@Gui@Viewer::StereoType s)
 {
   if (s == this->getStereoType()) { return TRUE; }
+
+  // We need to know this to keep compatibility with older client
+  // code, which controlled stereo rendering with setStereoViewing()
+  // and setQuadBufferStereo() only.
+  PRIVATE(this)->stereotypesetexplicit = TRUE;
 
   switch (s) {
   case So@Gui@Viewer::STEREO_NONE:
@@ -2520,13 +2593,57 @@ So@Gui@Viewer::setStereoType(So@Gui@Viewer::StereoType s)
 So@Gui@Viewer::StereoType
 So@Gui@Viewer::getStereoType(void) const
 {
-  // This can be set up outside of setStereoType(), so we need to
-  // check for it separately.
-  if (this->isQuadBufferStereo()) {
-    PRIVATE(this)->stereotype = So@Gui@Viewer::STEREO_QUADBUFFER;
+  // Stereo can be set up without using setStereoType() through the
+  // older functions setStereoViewing() and setQuadBufferStereo(), so
+  // we need to check for this separately.
+  if (!PRIVATE(this)->stereotypesetexplicit) {
+    if (this->isQuadBufferStereo()) {
+      PRIVATE(this)->stereotype = So@Gui@Viewer::STEREO_QUADBUFFER;
+    }
+    else if (this->isStereoViewing()) {
+      PRIVATE(this)->stereotype = So@Gui@Viewer::STEREO_ANAGLYPH;
+    }
   }
 
   return PRIVATE(this)->stereotype;
+}
+
+// *************************************************************************
+
+/*!
+  If display is configured to render in anaglyph stereo, this function
+  can be used to control which filter is used for each eye.
+
+  The default filters are red (i.e. color vector [TRUE,FALSE,FALSE])
+  for the left eye, and cyan (color vector [FALSE,TRUE,TRUE]) for the
+  right eye.
+
+  \sa So@Gui@Viewer::StereoType, setStereoType()
+*/
+void
+So@Gui@Viewer::setAnaglyphStereoColorMasks(const SbBool left[3], const SbBool right[3])
+{
+  for (unsigned int i = 0; i < 3; i++) {
+    PRIVATE(this)->stereoanaglyphmask[0][i] = left[i];
+    PRIVATE(this)->stereoanaglyphmask[1][i] = right[i];
+  }
+
+  this->scheduleRedraw();
+}
+
+/*!
+  Returns color masks for left and right eye filters in anaglyph
+  stereo.
+
+  \sa setAnaglyphStereoColorMasks()
+*/
+void
+So@Gui@Viewer::getAnaglyphStereoColorMasks(SbBool left[3], SbBool right[3])
+{
+  for (unsigned int i = 0; i < 3; i++) {
+    left[i] = PRIVATE(this)->stereoanaglyphmask[0][i];
+    right[i] = PRIVATE(this)->stereoanaglyphmask[1][i];
+  }
 }
 
 // *************************************************************************
@@ -3171,7 +3288,10 @@ So@Gui@Viewer::actualRedraw(void)
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
       glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-      glColorMask(1,0,0,1); // draw red-only
+      glColorMask(PRIVATE(this)->stereoanaglyphmask[0][0] ? GL_TRUE : GL_FALSE,
+                  PRIVATE(this)->stereoanaglyphmask[0][1] ? GL_TRUE : GL_FALSE,
+                  PRIVATE(this)->stereoanaglyphmask[0][2] ? GL_TRUE : GL_FALSE,
+                  GL_TRUE);
       PRIVATE(this)->reallyRedraw(FALSE, FALSE);
       break;
     case So@Gui@Viewer::STEREO_QUADBUFFER:
@@ -3197,7 +3317,10 @@ So@Gui@Viewer::actualRedraw(void)
 
     switch (stereotype) {
     case So@Gui@Viewer::STEREO_ANAGLYPH:
-      glColorMask(0,1,1,1); // draw green and blue
+      glColorMask(PRIVATE(this)->stereoanaglyphmask[1][0] ? GL_TRUE : GL_FALSE,
+                  PRIVATE(this)->stereoanaglyphmask[1][1] ? GL_TRUE : GL_FALSE,
+                  PRIVATE(this)->stereoanaglyphmask[1][2] ? GL_TRUE : GL_FALSE,
+                  GL_TRUE);
       PRIVATE(this)->reallyRedraw(FALSE, TRUE);
       break;
     case So@Gui@Viewer::STEREO_QUADBUFFER:
@@ -3212,13 +3335,13 @@ So@Gui@Viewer::actualRedraw(void)
     default: assert(FALSE); break;
     }
 
-    // Post clean-up, after rendering:
+    // Clean-up, post-rendering:
 
     PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::RESTORE, tmpstorage);
 
     switch (stereotype) {
     case So@Gui@Viewer::STEREO_ANAGLYPH:
-      glColorMask(1,1,1,1); // restore GL color mask
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // restore GL color mask
       break;
     case So@Gui@Viewer::STEREO_QUADBUFFER:
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
@@ -3231,7 +3354,7 @@ So@Gui@Viewer::actualRedraw(void)
     default: assert(FALSE); break;
     }
   }
-  else {
+  else { // No stereo:
     PRIVATE(this)->reallyRedraw(clearcol);
   }
 

@@ -164,6 +164,9 @@ public:
   SbBool setStereoType(So@Gui@Viewer::StereoType s);
   So@Gui@Viewer::StereoType getStereoType(void) const;
 
+  void setAnaglyphStereoColorMasks(const SbBool left[3], const SbBool right[3]);
+  void getAnaglyphStereoColorMasks(SbBool left[3], SbBool right[3]);
+
   void setDetailSeek(const SbBool enable);
   SbBool isDetailSeek(void) const;
 
