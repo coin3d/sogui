@@ -49,6 +49,19 @@ static const char rcsid[] =
 
 // *************************************************************************
 
+// Documentation for abstract methods.
+
+/*!
+  \fn void So@Gui@PopupMenu::popUp(@WIDGET@ inside, int x, int y)
+
+  Invokes this popup menu instance.
+
+  The coordinates for the popup will be used relative to the origo of
+  the widget argument.
+*/
+
+// *************************************************************************
+
 // The private data for the So@Gui@PopupMenu.
 
 class So@Gui@PopupMenuP {
