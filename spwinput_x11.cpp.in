@@ -27,7 +27,7 @@
 
 #include "spwinput.h"
 
-#if X_DISPLAY_MISSING
+#ifdef X_DISPLAY_MISSING
 /* just provide empty methods if X is not available */
 int 
 SPW_CheckForSpaceballX11(void *, int, char *)
