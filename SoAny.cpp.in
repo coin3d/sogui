@@ -251,6 +251,13 @@ SoAny::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
   If no handler was set up, a dialog box with the error string will be
   shown and then the application will exit.
 
+  A very important issue to be aware of for "client code" around in
+  the So*-libraries is that this function will not return if the
+  application programmer has set up a fatal error handler which throws
+  an exception. Because of this, the "as good as possible" clean-up
+  code around the points of fatal error failures needs to be executed
+  \e before calling this function.
+
   \sa SoAny::setFatalErrorHandler()
  */
 SbBool
