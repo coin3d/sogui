@@ -25,8 +25,6 @@ static const char rcsid[] =
 #include <Inventor/SoLists.h>
 #include <Inventor/errors/SoDebugError.h>
 
-#include <Inventor/@GUI@/widgets/So@GUI@PopupMenu.h>
-
 #include <Inventor/@GUI@/widgets/SoAnyPopupMenu.h>
 
 /*!
@@ -44,9 +42,9 @@ static const char rcsid[] =
 
 SoAnyPopupMenu::SoAnyPopupMenu(
   void )
+: callbacks( NULL )
+, userdata( NULL )
 {
-  this->menu = new So@GUI@PopupMenu( this );
-  assert( this->menu != NULL );
   this->menuitems = new SbIntList;
   this->radiogroups = new SbIntList;
   assert( this->menuitems != NULL && this->radiogroups != NULL );
@@ -58,89 +56,15 @@ SoAnyPopupMenu::SoAnyPopupMenu(
 SoAnyPopupMenu::~SoAnyPopupMenu(
   void )
 {
-  delete this->menu;
   delete this->menuitems;
   delete this->radiogroups;
+  delete this->callbacks;
+  delete this->userdata;
 } // ~SoAnyPopupMenu()
 
 // *************************************************************************
 
-int
-SoAnyPopupMenu::NewMenu(
-  char * name,
-  int menuid )
-{
-  return this->menu->NewMenu( name, menuid );
-} // NewMenu()
-
-int
-SoAnyPopupMenu::GetMenu(
-  char * name )
-{
-  return this->menu->GetMenu( name );
-} // GetMenu()
-
-void
-SoAnyPopupMenu::SetMenuTitle(
-  int menuid,
-  char * title )
-{
-  this->menu->SetMenuTitle( menuid, title );
-} // SetMenuTitle()
-
-char *
-SoAnyPopupMenu::GetMenuTitle(
-  int menuid )
-{
-  return this->menu->GetMenuTitle( menuid );
-} // GetMenuTitle()
-
-// *************************************************************************
-
-int
-SoAnyPopupMenu::NewMenuItem(
-  char * name, int itemid )
-{
-  return this->menu->NewMenuItem( name, itemid );
-} // NewMenuItem()
-
-int
-SoAnyPopupMenu::GetMenuItem(
-  char * name )
-{
-  return this->menu->GetMenuItem( name );
-} // GetMenuItem()
-
-void
-SoAnyPopupMenu::SetMenuItemTitle(
-  int itemid,
-  char * title )
-{
-  this->menu->SetMenuItemTitle( itemid, title );
-} // SetMenuItemTitle()
-
-char *
-SoAnyPopupMenu::GetMenuItemTitle(
-  int itemid )
-{
-  return this->menu->GetMenuItemTitle( itemid );
-} // GetMenuItemTitle()
-
-void
-SoAnyPopupMenu::SetMenuItemEnabled(
-  int itemid,
-  SbBool enabled )
-{
-  this->menu->SetMenuItemEnabled( itemid, enabled );
-} // SetMenuItemEnabled()
-
-SbBool
-SoAnyPopupMenu::GetMenuItemEnabled(
-  int itemid )
-{
-  return this->menu->GetMenuItemEnabled( itemid );
-} // GetMenuItemEnabled()
-
+/*
 void
 SoAnyPopupMenu::SetMenuItemMarked(
   int itemid,
@@ -186,55 +110,7 @@ SoAnyPopupMenu::SetMenuItemMarked(
 #endif // SO@uGUI@_DEBUG
   }
 } // SetMenuItemEnabled()
-
-SbBool
-SoAnyPopupMenu::GetMenuItemMarked(
-  int itemid )
-{
-  return this->menu->GetMenuItemMarked( itemid );
-} // GetMenuItemMarked()
-
-// *************************************************************************
-
-void
-SoAnyPopupMenu::AddMenu(
-  int menuid,
-  int submenuid,
-  int pos )
-{
-  this->menu->AddMenu( menuid, submenuid, pos );
-} // AddMenu()
-
-void
-SoAnyPopupMenu::AddMenuItem(
-  int menuid,
-  int itemid,
-  int pos )
-{
-  this->menu->AddMenuItem( menuid, itemid, pos );
-} // AddMenuItem()
-
-void
-SoAnyPopupMenu::AddSeparator(
-  int menuid,
-  int pos )
-{
-  this->menu->AddSeparator( menuid, pos );
-} // AddSeparator()
-
-void
-SoAnyPopupMenu::RemoveMenu(
-  int menuid )
-{
-  this->menu->RemoveMenu( menuid );
-} // RemoveMenu()
-
-void
-SoAnyPopupMenu::RemoveMenuItem(
-  int itemid )
-{
-  this->menu->RemoveMenuItem( itemid );
-} // RemoveMenuItem()
+*/
 
 // *************************************************************************
 
@@ -300,6 +176,24 @@ SoAnyPopupMenu::GetRadioGroup(
 /*!
 */
 
+int
+SoAnyPopupMenu::GetRadioGroupSize(
+  int groupid )
+{
+  int count = 0;
+  const int numItems = this->radiogroups->getLength();
+  int i;
+  for ( i = 0; i < numItems; i++ ) {
+    if ( (*this->radiogroups)[i] == groupid &&
+         (*this->menuitems)[i] != -1 )
+      count++;
+  }
+  return count;
+} // GetRadioGroupSize()
+
+/*!
+*/
+
 void
 SoAnyPopupMenu::AddRadioGroupItem(
   int groupid,
@@ -328,19 +222,121 @@ SoAnyPopupMenu::RemoveRadioGroupItem(
   }
 } // RemoveRadioGroupItem()
 
+void
+SoAnyPopupMenu::SetRadioGroupMarkedItem(
+  int itemid )
+{
+  const int numItems = this->menuitems->getLength();
+  int i;
+  int groupid = -1;
+  for ( i = 0; i < numItems && groupid == -1; i++ ) {
+    if ( (*this->menuitems)[i] == itemid )
+      groupid = (*this->radiogroups)[i];
+  }
+  if ( groupid == -1 )
+    return;
+  for ( i = 0; i < numItems; i++ ) {
+    if ( (*this->radiogroups)[i] == groupid ) {
+      int item = (*this->menuitems)[i];
+      if ( item != -1 && item != itemid )
+        this->SetMenuItemMarked( item, FALSE );
+    }
+  }
+} // SetRadioGroupItemEnabled()
+
+int
+SoAnyPopupMenu::GetRadioGroupMarkedItem(
+  int groupid )
+{
+  const int numItems = this->menuitems->getLength();
+  int i;
+  for ( i = 0; i < numItems; i++ ) {
+    if ( (*this->radiogroups)[i] == groupid ) {
+      int item = (*this->menuitems)[i];
+      if ( item != -1 && this->GetMenuItemMarked( item ) )
+        return item;
+    }
+  }
+  return -1;
+} // SetRadioGroupItemEnabled()
+
 // *************************************************************************
 
 /*!
 */
 
-int
-SoAnyPopupMenu::PopUp(
-  int screenx,
-  int screeny )
+void
+SoAnyPopupMenu::AddMenuSelectionCallback(
+  SoAnyMenuSelectionCallback * callback,
+  void * user )
 {
-  int itemid = this->menu->PopUp( screenx, screeny );
-  if ( itemid == -1 )
-    return itemid;
+  if ( this->callbacks == NULL ) {
+    this->callbacks = new SbPList;
+    this->userdata = new SbPList;
+  }
+  this->callbacks->append( (void *) callback );
+  this->userdata->append( user );
+} // AddMenuSelectionCallback()
+
+/*!
+*/
+
+void
+SoAnyPopupMenu::RemoveMenuSelectionCallback(
+  SoAnyMenuSelectionCallback * callback,
+  void * user )
+{
+  if ( this->callbacks == NULL ) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo( "SoAnyPopupMenu::RemoveMenuSelectionCallback",
+      "no callbacks at all" );
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+  int numCallbacks = this->callbacks->getLength();
+  int i;
+  for ( i = 0; i < numCallbacks; i++ ) {
+    if ( (*this->callbacks)[i] == (void *) callback &&
+         (*this->userdata)[i] == user ) {
+      this->callbacks->remove(i);
+      this->userdata->remove(i);
+      i--;
+      numCallbacks--;
+    }
+  }
+} // RemoveMenuSelectionCallback()
+
+/*!
+*/
+
+void
+SoAnyPopupMenu::InvokeMenuSelection(
+  int itemid )
+{
+  if ( this->callbacks == NULL )
+    return;
+  const int numCallbacks = this->callbacks->getLength();
+  int i;
+  for ( i = 0; i < numCallbacks; i++ ) {
+    SoAnyMenuSelectionCallback * cb = (SoAnyMenuSelectionCallback *)
+      (*this->callbacks)[i];
+    (*cb)( itemid, (*this->userdata)[i] );
+  }
+} // InvokeMenuSelection()
+
+// *************************************************************************
+
+/*!
+*/
+
+/*
+void
+SoAnyPopupMenu::PopUp(
+  @WIDGET@ inside,
+  int x,
+  int y )
+{
+//  this->menu->PopUp( inside, x, y );
   int groupid = this->GetRadioGroup( itemid );
   if ( groupid == -1 )
     return itemid;
@@ -364,13 +360,10 @@ SoAnyPopupMenu::PopUp(
   }
   return itemid;
 } // PopUp()
+*/
 
 // *************************************************************************
 
 // silence some compilers
-const char *
-getSoAnyPopupMenuRCSId(void)
-{
-  return rcsid;
-}
+static const char * getSoAnyPopupMenuRCSId(void) { return rcsid; }
 

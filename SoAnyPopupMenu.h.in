@@ -24,51 +24,64 @@
 
 #include <Inventor/SbBasic.h>
 
+#include <Inventor/@GUI@/So@GUI@Component.h>
+
 class SbIntList;
-class So@GUI@PopupMenu;
+class SbPList;
 
 // *************************************************************************
 
-class SoAnyPopupMenu {
+typedef void SoAnyMenuSelectionCallback( int itemid, void * user );
+
+class SoAnyPopupMenu { // abstract interface class
 public:
   SoAnyPopupMenu(void);
-  ~SoAnyPopupMenu(void);
+  virtual ~SoAnyPopupMenu(void);
 
-#define SOANY_POPUPMENU_INTERFACE                                 \
-  int NewMenu( char * name, int menuid = -1 );                    \
-  int GetMenu( char * name );                                     \
-  void SetMenuTitle( int id, char * title );                      \
-  char * GetMenuTitle( int id );                                  \
-                                                                  \
-  int NewMenuItem( char * name, int itemid = -1 );                \
-  int GetMenuItem( char * name );                                 \
-  void SetMenuItemTitle( int itemid, char * title );              \
-  char * GetMenuItemTitle( int itemid );                          \
-  void SetMenuItemEnabled( int itemid, SbBool enabled );          \
-  SbBool GetMenuItemEnabled( int itemid );                        \
-  void SetMenuItemMarked( int itemid, SbBool marked );            \
-  SbBool GetMenuItemMarked( int itemid );                         \
-                                                                  \
-  void AddMenu( int menuid, int submenuid, int pos = -1 );        \
-  void AddMenuItem( int menuid, int itemid, int pos = -1 );       \
-  void AddSeparator( int menuid, int pos = -1 );                  \
-  void RemoveMenu( int menuid );                                  \
-  void RemoveMenuItem( int itemid );                              \
-                                                                  \
-  int PopUp( int screenx, int screeny );                          \
+  virtual int NewMenu( char * name, int menuid = -1 ) = 0;
+  virtual int GetMenu( char * name ) = 0;
+  virtual void SetMenuTitle( int id, char * title ) = 0;
+  virtual char * GetMenuTitle( int id ) = 0;
 
-  SOANY_POPUPMENU_INTERFACE
+  virtual int NewMenuItem( char * name, int itemid = -1 ) = 0;
+  virtual int GetMenuItem( char * name ) = 0;
+  virtual void SetMenuItemTitle( int itemid, char * title ) = 0;
+  virtual char * GetMenuItemTitle( int itemid ) = 0;
+  virtual void SetMenuItemEnabled( int itemid, SbBool enabled ) = 0;
+  virtual SbBool GetMenuItemEnabled( int itemid ) = 0;
+  virtual void SetMenuItemMarked( int itemid, SbBool marked ) = 0;
+  virtual SbBool GetMenuItemMarked( int itemid ) = 0;
+
+  virtual void AddMenu( int menuid, int submenuid, int pos = -1 ) = 0;
+  virtual void AddMenuItem( int menuid, int itemid, int pos = -1 ) = 0;
+  virtual void AddSeparator( int menuid, int pos = -1 ) = 0;
+  virtual void RemoveMenu( int menuid ) = 0;
+  virtual void RemoveMenuItem( int itemid ) = 0;
+
+  virtual void PopUp( @WIDGET@ inside, int x, int y ) = 0;
 
   int NewRadioGroup( int groupid = -1 );
   int GetRadioGroup( int itemid );
+  int GetRadioGroupSize( int groupid );
   void AddRadioGroupItem( int groupid, int itemid );
   void RemoveRadioGroupItem( int itemid );
 
-private:
-  So@GUI@PopupMenu * menu;
+  void SetRadioGroupMarkedItem( int itemid );
+  int GetRadioGroupMarkedItem( int groupid );
 
+  void AddMenuSelectionCallback(
+    SoAnyMenuSelectionCallback * callback, void * data );
+  void RemoveMenuSelectionCallback(
+    SoAnyMenuSelectionCallback * callback, void * data );
+
+protected:
+  void InvokeMenuSelection( int itemid );
+
+private:
   SbIntList * menuitems;
   SbIntList * radiogroups;
+  SbPList * callbacks;
+  SbPList * userdata;
 
 }; // class SoAnyPopupMenu
 
