@@ -216,8 +216,9 @@ public:
 
   SbBool autoRedraw;
 
-  SoSelection * normalSelection;
-  SoSelection * overlaySelection;
+  void replaceSoSelectionMonitor(SoSelection * newsel, SoSelection * oldsel) const;
+  SoSelection * normalselection;
+  SoSelection * overlayselection;
 
   static const int GL_DEFAULT_MODE;
 
@@ -569,9 +570,9 @@ void
 So@Gui@RenderAreaP::selection_redraw_cb(void * closure, SoSelection * sel)
 {
   So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
-  if (sel == PRIVATE(ra)->normalSelection)
+  if (sel == PRIVATE(ra)->normalselection)
     ra->scheduleRedraw();
-  else if (sel == PRIVATE(ra)->overlaySelection)
+  else if (sel == PRIVATE(ra)->overlayselection)
     ra->scheduleOverlayRedraw();
   else
     assert(0 && "callback on unknown SoSelection node");
@@ -595,8 +596,8 @@ So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * api)
   this->clearOverlay = TRUE;
   this->autoRedraw = TRUE;
 
-  this->normalSelection = NULL;
-  this->overlaySelection = NULL;
+  this->normalselection = NULL;
+  this->overlayselection = NULL;
 
   this->devices.mouse = NULL;
   this->devices.keyboard = NULL;
@@ -718,6 +719,11 @@ So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
 */
 So@Gui@RenderArea::~So@Gui@RenderArea()
 {
+  // Clean out any callbacks we may have registered with SoSelection
+  // nodes.
+  this->redrawOverlayOnSelectionChange(NULL);
+  this->redrawOnSelectionChange(NULL);
+
   for (int i = PRIVATE(this)->devicelist->getLength() - 1; i >= 0; i--) {
     So@Gui@Device * device = (So@Gui@Device *) ((*PRIVATE(this)->devicelist)[i]);
     this->unregisterDevice(device);
@@ -1252,6 +1258,27 @@ So@Gui@RenderArea::scheduleOverlayRedraw(void)
   PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
 }
 
+void
+So@Gui@RenderAreaP::replaceSoSelectionMonitor(SoSelection * newsel,
+                                              SoSelection * oldsel) const
+{
+  if (newsel) { newsel->ref(); }
+
+  if (oldsel) {
+    oldsel->removeChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb,
+                                 PUBLIC(this));
+    oldsel->unref();
+  }
+
+  if (newsel) {
+    newsel->addChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb,
+                              PUBLIC(this));
+  }
+}
+
+// FIXME: the interface below is badly designed, see the comment in
+// the function documentation. 20001002 mortene.
+
 /*!
   Do automatic redraw of the scenegraph when a selection under the
   SoSelection node is changed.
@@ -1266,20 +1293,8 @@ So@Gui@RenderArea::scheduleOverlayRedraw(void)
 void
 So@Gui@RenderArea::redrawOnSelectionChange(SoSelection * selection)
 {
-  // FIXME: this interface is badly designed, see the comment above in
-  // the function documentation. 20001002 mortene.
-
-  if (PRIVATE(this)->normalSelection) {
-    // FIXME: should we ref() and unref() to make sure we can't get a
-    // crash here? 20001002 mortene.
-    PRIVATE(this)->normalSelection->removeChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
-  }
-
-  PRIVATE(this)->normalSelection = selection;
-
-  if (selection)
-    selection->addChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
-
+  PRIVATE(this)->replaceSoSelectionMonitor(selection, PRIVATE(this)->normalselection);
+  PRIVATE(this)->normalselection = selection;
 }
 
 /*!
@@ -1293,20 +1308,8 @@ So@Gui@RenderArea::redrawOnSelectionChange(SoSelection * selection)
 void
 So@Gui@RenderArea::redrawOverlayOnSelectionChange(SoSelection * selection)
 {
-  // FIXME: this interface is badly designed, see the comment above in
-  // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
-
-  if (PRIVATE(this)->overlaySelection) {
-    // FIXME: should we ref() and unref() to make sure we can't get a
-    // crash here? 20001002 mortene.
-    PRIVATE(this)->overlaySelection->removeChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
-  }
-
-  PRIVATE(this)->overlaySelection = selection;
-
-  if (selection)
-    selection->addChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
-
+  PRIVATE(this)->replaceSoSelectionMonitor(selection, PRIVATE(this)->overlayselection);
+  PRIVATE(this)->overlayselection = selection;
 }
 
 /*!
