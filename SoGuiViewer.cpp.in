@@ -75,10 +75,10 @@ static const char rcsid[] =
 #if HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoPolygonOffset.h>
 #endif // HAVE_SOPOLYGONOFFSET
-#include <Inventor/nodes/SoResetTransform.h>
 #include <Inventor/nodes/SoRotation.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
+#include <Inventor/nodes/SoResetTransform.h>
 
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <Inventor/actions/SoSearchAction.h>
@@ -434,15 +434,22 @@ So@GUI@Viewer::getCamera(void) const
 void
 So@GUI@Viewer::setCameraType(SoType t)
 {
-  if ( t == this->cameratype ) return;
+  SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
+  SoType orthotype = SoOrthographicCamera::getClassTypeId();
+  SbBool oldisperspective = this->cameratype.isDerivedFrom(perspectivetype);
+  SbBool newisperspective = t.isDerivedFrom(perspectivetype);
+
+  if ( ( oldisperspective && newisperspective ) ||
+       ( !oldisperspective && !newisperspective ) ) // Same old, same old..
+    return;
 
 #if SO@uGUI@_DEBUG
   SbBool valid = TRUE;
   if (t == SoType::badType()) valid = FALSE;
   if (valid) {
     valid = FALSE;
-    if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) valid = TRUE;
-    if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) valid = TRUE;
+    if ( newisperspective ) valid = TRUE;
+    if ( t.isDerivedFrom( orthotype ) ) valid = TRUE;
   }
 
   if (!valid) {
@@ -462,18 +469,26 @@ So@GUI@Viewer::setCameraType(SoType t)
     newcamera->position.setValue( this->camera->position.getValue() );
     newcamera->viewportMapping.setValue( this->camera->viewportMapping.getValue() );
 
-    if ( this->cameratype.isDerivedFrom( SoPerspectiveCamera::getClassTypeId() ) ) {
-      ((SoOrthographicCamera *)newcamera)->height =
-        2 * this->camera->focalDistance.getValue() *
-        tan(((SoPerspectiveCamera *)this->camera)->heightAngle.getValue()/2.0f);
-    }
-    else if ( this->cameratype.isDerivedFrom( SoOrthographicCamera::getClassTypeId() ) ) {
-      ((SoPerspectiveCamera *)newcamera)->heightAngle = 2.0f *
-        atan(((SoOrthographicCamera *)this->camera)->height.getValue() / 2.0f /
-             this->camera->focalDistance.getValue());
+    SoPerspectiveCamera * newpcam = NULL, * oldpcam = NULL;
+    SoOrthographicCamera * newocam = NULL, * oldocam = NULL;
+
+    float focaldist = this->camera->focalDistance.getValue();
+
+    if ( newisperspective ) {
+      newpcam = (SoPerspectiveCamera *)newcamera;
+      oldocam = (SoOrthographicCamera *)this->camera;
+
+      if ( focaldist != 0.0f ) // focalDistance==0.0f happens for empty scenes.
+        newpcam->heightAngle =
+          2.0f * atan( oldocam->height.getValue() / 2.0f / focaldist );
+      else
+        newpcam->heightAngle = 0.0f;
     }
     else {
-      assert( FALSE && "Not a supported camera type" );
+      newocam = (SoOrthographicCamera *)newcamera;
+      oldpcam = (SoPerspectiveCamera *)this->camera;
+      newocam->height =
+        2 * focaldist * tan(oldpcam->heightAngle.getValue() / 2.0f);
     }
 
     SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
