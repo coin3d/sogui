@@ -95,7 +95,14 @@ protected:
                    const SbBool embed = TRUE);
 
   virtual void afterRealizeHook(void);
+
+  // About the wrapping below: this variable was added after SoQt 1.0,
+  // and before SoXt 1.1. To be able to release SoQt 1.1 from this
+  // same branch, sizeof(SoQtComponent) needs to be the same as for
+  // SoQt 1.0, which means we can't add this variable for SoQt.
+#ifndef __COIN_SOQT__
   SbBool firstRealize;
+#endif // __COIN_SOQT__
 
   void setClassName(const char * const name);
   void setBaseWidget(@WIDGET@ widget);
