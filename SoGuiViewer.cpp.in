@@ -1718,6 +1718,56 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 
 // *************************************************************************
 
+
+void 
+So@Gui@Viewer::reallyRedraw(const SbBool clearcol, const SbBool clearz)
+{
+  if ( this->drawAsHiddenLine() ) {
+
+    // First pass: render as filled, but with the background color.
+
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    // textureQuality field of socomplexity node is always 0.0
+
+    this->sobasecolor->rgb.setValue(this->getBackgroundColor());
+    this->sobasecolor->rgb.setIgnored(FALSE);
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
+    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+
+    this->getSceneManager()->render(clearcol, clearz);
+
+
+    // Second pass, render wireframe on top.
+
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
+    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
+    this->somaterialbinding->value.setIgnored(TRUE); // as-is
+    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    
+    this->getSceneManager()->render(FALSE, FALSE);
+
+    return;
+  }
+
+
+  SbBool clearzbuffer = TRUE;
+  DrawStyle style = this->currentDrawStyle();
+  switch (style) {
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+  case VIEW_BBOX:
+    clearzbuffer = FALSE;
+  default: break; // Include "default:" case to avoid compiler warning.
+  }
+
+  this->getSceneManager()->render(clearcol, clearzbuffer && clearz);
+}
+
+
 /*!
   Overloaded from parent class to be able to do the necessary two-pass
   rendering e.g. if the drawing style is \e hidden \e line.
@@ -1730,13 +1780,11 @@ So@Gui@Viewer::actualRedraw(void)
   if ( this->isAutoClipping() )
     this->setClippingPlanes();
 
-  if (this->isStereoViewing()) {
-    // FIXME: 1) stereo viewing will not work with hidden line drawmode. 
-    // FIXME: 2) stereo viewing is currently hardcoded to Red/Cyan anaglyph mode.
-    // we'll have to sit down and design an interface to support different types
-    // of stereo (and non-stereo) rendering. pederb 20000808
+  SbBool clearcol = this->isClearBeforeRender();
 
-    SbBool parallel = FALSE; // parallel stereo didn't look too good. Always pitch camera.
+  if (this->isStereoViewing()) {
+    SbBool quadstereo = this->isQuadBufferStereo();
+#ifndef HAVE_SOCAMERA_SET_STEREO_MODE
     SoCamera * camera = this->getCamera();  
     SbVec3f camerapos = camera->position.getValue();
     SbVec3f cameradir(0.0f, 0.0f, -1.0f);
@@ -1754,26 +1802,36 @@ So@Gui@Viewer::actualRedraw(void)
     camera->enableNotify(FALSE);
     camera->position.enableNotify(FALSE);
     camera->orientation.enableNotify(FALSE);
-    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-    glColorMask(1,0,0,1); // draw red-only
 
     camera->position = camerapos - offsetvec * offset;
-    if (!parallel) {
-      SbVec3f dir = focalpoint - camera->position.getValue();
-      SbRotation rot(cameradir, dir);
-      camera->orientation = camerarot * rot;
+    SbVec3f dir = focalpoint - camera->position.getValue();
+    SbRotation rot(cameradir, dir);
+    camera->orientation = camerarot * rot;
+    if (quadstereo) {
+      glDrawBuffer(GL_BACK_LEFT);
+      this->reallyRedraw(clearcol);
     }
-    this->getSceneManager()->render(FALSE, FALSE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glColorMask(0,1,1,1); // draw green and blue
-
+    else { // red/cyan
+      glDrawBuffer(GL_BACK);
+      glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+      glColorMask(1,0,0,1); // draw red-only
+      this->reallyRedraw(FALSE, FALSE);
+    }
+    
+    // right eye
     camera->position = camerapos + offsetvec * offset;
-    if (!parallel) {
-      SbVec3f dir = focalpoint - camera->position.getValue();
-      SbRotation rot(cameradir, dir);
-      camera->orientation = camerarot * rot;
+    dir = focalpoint - camera->position.getValue();
+    rot.setValue(cameradir, dir);
+    camera->orientation = camerarot * rot;
+
+    if (quadstereo) {
+      glDrawBuffer(GL_BACK_RIGHT);
+      this->reallyRedraw(clearcol);
     }
-    this->getSceneManager()->render(FALSE, FALSE);
+    else {
+      glColorMask(0,1,1,1); // draw green and blue
+      this->reallyRedraw(FALSE, TRUE);
+    }
     
     // restore camera values and enable notification
     camera->position = camerapos;
@@ -1781,54 +1839,44 @@ So@Gui@Viewer::actualRedraw(void)
     camera->position.enableNotify(positionstore);
     camera->orientation.enableNotify(orientationstore);
     camera->enableNotify(notifystore);
+    if (quadstereo) {
+      glDrawBuffer(GL_BACK);
+    }
+    else {
+      glColorMask(1,1,1,1); // restore GL color mask
+    }
+#else // HAVE_SOCAMERA_SET_STEREO_MODE
 
-    glColorMask(1,1,1,1); // restore GL color mask
-    return;
+    if (!quadstereo) {
+      SoCamera * camera = this->getCamera();  
+      glDrawBuffer(GL_BACK);
+      glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+      glColorMask(1,0,0,1); // draw red-only
+      camera->setStereoAdjustment(this->getStereoOffset());
+      camera->setStereoMode(SoCamera::LEFT_VIEW);
+      this->reallyRedraw(FALSE, FALSE);
+      
+      camera->setStereoMode(SoCamera::RIGHT_VIEW);
+      glColorMask(0,1,1,1); // draw green and blue
+      this->reallyRedraw(FALSE, TRUE);
+      camera->setStereoMode(SoCamera::MONOSCOPIC);
+      glColorMask(1,1,1,1); // restore GL color mask
+    }
+    else {
+      SoCamera * camera = this->getCamera();  
+      glDrawBuffer(GL_BACK_LEFT);
+      camera->setStereoAdjustment(this->getStereoOffset());
+      camera->setStereoMode(SoCamera::LEFT_VIEW);
+      this->reallyRedraw(clearcol);
+      camera->setStereoMode(SoCamera::RIGHT_VIEW);
+      glDrawBuffer(GL_BACK_RIGHT);
+      this->reallyRedraw(clearcol);
+      camera->setStereoMode(SoCamera::MONOSCOPIC);
+      glDrawBuffer(GL_BACK);
+    }
+#endif // HAVE_SOCAMERA_SET_STEREO_MODE
   }
-
-  if ( this->drawAsHiddenLine() ) {
-
-    // First pass: render as filled, but with the background color.
-
-    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
-    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
-    // textureQuality field of socomplexity node is always 0.0
-
-    this->sobasecolor->rgb.setValue(this->getBackgroundColor());
-    this->sobasecolor->rgb.setIgnored(FALSE);
-    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
-    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
-
-    this->getSceneManager()->render(this->isClearBeforeRender(), TRUE);
-
-
-    // Second pass, render wireframe on top.
-
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force lines
-    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
-    this->somaterialbinding->value.setIgnored(TRUE); // as-is
-    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
-
-    this->getSceneManager()->render(FALSE, FALSE);
-
-    return;
-  }
-
-
-  SbBool clearzbuffer = TRUE;
-  DrawStyle style = this->currentDrawStyle();
-  switch (style) {
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-  case VIEW_BBOX:
-    clearzbuffer = FALSE;
-  default: break; // Include "default:" case to avoid compiler warning.
-  }
-
-  this->getSceneManager()->render(isClearBeforeRender(), clearzbuffer);
+  else this->reallyRedraw(clearcol);
 } // actualRedraw()
 
 // *************************************************************************

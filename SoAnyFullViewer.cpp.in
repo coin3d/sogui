@@ -248,15 +248,19 @@ SoAnyFullViewer::setupStandardPopupMenu(
 
   menu->newMenuItem( "stereooff", STEREO_OFF_ITEM );
   menu->newMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
+  menu->newMenuItem( "stereoquadbuffer", STEREO_QUADBUFFER_ITEM );
   menu->setMenuItemTitle( STEREO_OFF_ITEM, "Off" );
   menu->setMenuItemTitle( STEREO_ANAGLYPH_ITEM, "Red/Cyan" );
+  menu->setMenuItemTitle( STEREO_QUADBUFFER_ITEM, "Quad buffer" );
 
   menu->newRadioGroup( STEREO_GROUP );
   menu->addRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
   menu->addRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
+  menu->addRadioGroupItem( STEREO_GROUP, STEREO_QUADBUFFER_ITEM );
 
   menu->addMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
   menu->addMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
+  menu->addMenuItem( STEREO_MENU, STEREO_QUADBUFFER_ITEM );
 
   menu->newMenu( "renderbuffertype", RENDER_BUFFER_TYPE_MENU );
   menu->setMenuTitle( RENDER_BUFFER_TYPE_MENU, "Render Buffer Type" );
@@ -341,8 +345,10 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
 
   //// Stereo viewing. ////////////////////////////////////////////////
   SbBool stereo = this->viewer->isStereoViewing();
+  SbBool quadbuffer = this->viewer->isQuadBufferStereo();
   menu->setMenuItemMarked( STEREO_OFF_ITEM, !stereo );
-  menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, stereo );
+  menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, stereo && !quadbuffer);
+  menu->setMenuItemMarked( STEREO_QUADBUFFER_ITEM, stereo && quadbuffer);
 
   //// GL canvas settings. ////////////////////////////////////////////
   switch ( this->viewer->getBufferingType() ) {
@@ -452,9 +458,19 @@ SoAnyFullViewer::menuSelection( // virtual
 
   case STEREO_OFF_ITEM:    
     this->viewer->setStereoViewing(FALSE);
+    this->viewer->setQuadBufferStereo(FALSE);
     break;
   case STEREO_ANAGLYPH_ITEM:
     this->viewer->setStereoViewing(TRUE);
+    this->viewer->setQuadBufferStereo(FALSE);
+    break;
+  case STEREO_QUADBUFFER_ITEM:
+    this->viewer->setStereoViewing(TRUE);
+    this->viewer->setQuadBufferStereo(TRUE);
+    if (!this->viewer->isQuadBufferStereo()) {
+      this->viewer->setStereoViewing(FALSE);
+      this->prefmenu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+    }
     break;
     
   default:

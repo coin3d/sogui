@@ -84,7 +84,8 @@ enum SoAnyFullViewerPopupMenuItem {
 
   STEREO_MENU,
   STEREO_OFF_ITEM,
-  STEREO_ANAGLYPH_ITEM
+  STEREO_ANAGLYPH_ITEM,
+  STEREO_QUADBUFFER_ITEM
 }; // enum SoViewerPopupMenuItem
 
 enum SoViewerPopupMenuRadioGroup {
