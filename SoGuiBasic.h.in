@@ -147,6 +147,8 @@ enum So@Gui@ABIError {
   SO@GUI@_LINKTIME_MISMATCH, SO@GUI@_LINKSTYLE_MISMATCH,
   SO@GUI@_RUNTIME_MISMATCH };
 
+// FIXME: use an "is-this-a-DLL-capable-platform" configure check
+// and remove the system "#if defined" tests below. 20011203 mortene.
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define SO@GUI@_SANITY_CHECK(forward_call)                  \
   if (So@Gui@::isDebugLibrary() &&                       \
