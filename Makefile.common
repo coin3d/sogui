@@ -152,7 +152,7 @@ SoGuiAllBuiltFiles = \
   $(SoGuiBuiltMetaFiles)
 
 SoGuiCommonDistFiles = \
-  LICENSE.LGPL \
+  LICENSE.GPL \
   HACKING \
   \
   cfg/m4/errors.txt \
