@@ -68,6 +68,15 @@
   of the render canvas will "flip" the current camera direction around
   it's focal point to point along the selected axis (towards negative
   infinity).
+
+  Note that a common faulty assumption about all the viewer-classes is
+  that user interaction (in the "examine"-mode, not the
+  scenegraph-interaction mode) influences the model or 3D-scene in the
+  view. This is not correct, as it is always the viewer's \e camera
+  that is translated and rotated.
+
+  The initial position of the camera is placed such that all of the
+  scenegraph's geometry fits within it's view.
 */
 
 // *************************************************************************
@@ -844,13 +853,13 @@ SoGuiPlaneViewerP::updateAnchorScenegraph(void) const
 
   SbVec3f xarrow(-0.02, -0.1, 0.0);
   r.multVec(xarrow, xarrow);
-  p = vv.getPlanePoint(1.0, SbVec2f(x + xarrow[0], y + xarrow[1]));
-  this->super.coords->point.set1Value(2, SbVec3f(p[0], p[1], 0));
+  SbVec3f pa = SbVec3f(p[0] + xarrow[0], p[1] + xarrow[1], 0);
+  this->super.coords->point.set1Value(2, SbVec3f(pa[0], pa[1], 0));
 
   SbVec3f yarrow(-0.02, 0.1, 0.0);
   r.multVec(yarrow, yarrow);
-  p = vv.getPlanePoint(1.0, SbVec2f(x + yarrow[0], y + yarrow[1]));
-  this->super.coords->point.set1Value(3, SbVec3f(p[0], p[1], 0));
+  pa = SbVec3f(p[0] + yarrow[0], p[1] + yarrow[1], 0);
+  this->super.coords->point.set1Value(3, SbVec3f(pa[0], pa[1], 0));
 }
 
 // Set cursor graphics according to mode.
