@@ -105,9 +105,6 @@ protected:
 
 private:
   void constructor(const SbBool build);
-  // friends and family
-  class SoGtkWalkViewerP * pimpl;
-  friend class SoGtkWalkViewerP;
 #endif // ! __COIN_SOGTK__
 };
 
