@@ -30,22 +30,45 @@ static const char rcsid[] =
   \brief The So@Gui@FlyViewer class implements controls for moving the camera in a "flying" motion.
   \ingroup so@gui@viewers
 
-  FIXME: document (mouse controls, keyboard controls, ...)
+  Controls:
+  <ul>
+
+  <li>"s" puts the viewer in seek mode. Click some geometry with the
+      left mouse button to start the seek zoom animation. </li>
+
+  </ul>
+
+  FIXME: document (all mouse controls, all keyboard controls, ...)
 */
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
 #include <Inventor/nodes/SoCamera.h>
+#if SO@GUI@_DEBUG
+#include <Inventor/errors/SoDebugError.h>
+#endif // SO@GUI@_DEBUG
 
 // ************************************************************************
 
 class So@Gui@FlyViewerP {
 public:
-  So@Gui@FlyViewerP( So@Gui@FlyViewer * owner ) { this->viewer = owner; }
+  So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
+  {
+    this->viewer = owner;
+    this->viewermode = FLYING;
+  }
+
+  enum ViewerMode {
+    FLYING, WAITING_FOR_SEEK
+  };
+
   void dolly( const float delta ) const;
+  void updateCursorRepresentation( void ); // in SoNativeFlyViewer.cpp
+  void setMode( ViewerMode newmode );
 
 private:
   So@Gui@FlyViewer * viewer;
+  int viewermode;
 };
 
 #define PRIVATE( o ) ( o->pimpl )
@@ -157,7 +180,7 @@ So@Gui@FlyViewer::setCursorEnabled( // virtual
   SbBool enable )
 {
   inherited::setCursorEnabled( enable );
-  // FIXME: what else? 20010907 mortene.
+  PRIVATE( this )->updateCursorRepresentation( );
 } // setCursorEnabled()
 
 // ************************************************************************
@@ -223,8 +246,22 @@ void
 So@Gui@FlyViewer::setSeekMode( // virtual
   SbBool enable )
 {
-  inherited::setSeekMode( enable );
-  // FIXME: what else? 20010907 mortene.
+  // Note: this method is almost identical to the setSeekMode() in the
+  // So@Gui@ExaminerViewer, so migrate any changes.
+
+#if SO@GUI@_DEBUG
+  if (enable == this->isSeekMode()) {
+    SoDebugError::postWarning("So@Gui@FlyViewer::setSeekMode",
+                              "seek mode already %sset", enable ? "" : "un");
+    return;
+  }
+#endif // SO@GUI@_DEBUG
+
+  // FIXME: what if we're in the middle of a seek already? 20010910 mortene.
+
+  inherited::setSeekMode(enable);
+  PRIVATE( this )->setMode( enable ? So@Gui@FlyViewerP::WAITING_FOR_SEEK :
+                            So@Gui@FlyViewerP::FLYING );
 } // setSeekMode()
 
 // ************************************************************************
@@ -296,3 +333,34 @@ So@Gui@FlyViewerP::dolly(
 } // dolly()
 
 // ************************************************************************
+
+// doc in super
+void
+So@Gui@FlyViewer::afterRealizeHook( // protected virtual
+  void )
+{
+  PRIVATE( this )->updateCursorRepresentation( );
+  inherited::afterRealizeHook();
+} // afterRealizeHook()
+
+// ************************************************************************
+
+// The viewer is a state machine, and all changes to the current state
+// are made through this call.
+void
+So@Gui@FlyViewerP::setMode( ViewerMode newmode )
+{
+  switch ( newmode ) {
+    // Assuming interesting things will happen here..
+  default:
+    break;
+  }
+
+  this->viewermode = newmode;
+  this->updateCursorRepresentation( );
+} // setMode()
+
+// ************************************************************************
+
+// Contains the toolkit-specific code.
+#include <SoNativeFlyViewer.cpp>
