@@ -36,10 +36,6 @@ static const char rcsid[] =
  *
 \**************************************************************************/
 
-#if HAVE_CONFIG_H
-#include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
-#endif // HAVE_CONFIG_H
-
 #include <math.h>
 
 #ifdef _WIN32
@@ -58,9 +54,6 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoMaterialBinding.h>
 #include <Inventor/nodes/SoOrthographicCamera.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
-#if HAVE_SOPOLYGONOFFSET
-#include <Inventor/nodes/SoPolygonOffset.h>
-#endif // HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoRotation.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
@@ -79,6 +72,14 @@ static const char rcsid[] =
 
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
+
+#if HAVE_CONFIG_H
+#include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
+#endif // HAVE_CONFIG_H
+
+#if HAVE_SOPOLYGONOFFSET
+#include <Inventor/nodes/SoPolygonOffset.h>
+#endif // HAVE_SOPOLYGONOFFSET
 
 #ifndef M_PI
 #define M_PI 3.1415926535f
