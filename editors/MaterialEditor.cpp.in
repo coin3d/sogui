@@ -35,7 +35,7 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@MaterialEditor);
 So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * name, SbBool embed)
   : inherited(parent, name, embed)
 {
-  PRIVATE(this) = new MaterialEditorComponent;
+  this->internals = new MaterialEditorComponent;
   this->setSize(SbVec2s(550,300));
   this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
 }
@@ -43,7 +43,7 @@ So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * name,
 So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * const name, SbBool embed, SbBool build)
 : inherited(parent, name, embed)
 {
-  PRIVATE(this) = new MaterialEditorComponent;
+  this->internals = new MaterialEditorComponent;
   this->setSize(SbVec2s(550,300));
   this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
 }
