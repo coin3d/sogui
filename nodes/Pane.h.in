@@ -28,9 +28,11 @@
 #error this is a private header file
 #endif /* !SO@GUI@_INTERNAL */
 
-#include <Inventor/SbVec2f.h>
+#include <Inventor/SbLinear.h>
 #include <Inventor/fields/SoSFVec3f.h>
 #include <Inventor/nodes/SoSeparator.h>
+
+class SoState;
 
 class SoGuiPane : public SoSeparator {
   typedef SoSeparator inherited;

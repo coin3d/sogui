@@ -31,7 +31,9 @@
 #include <Inventor/fields/SoSFString.h>
 #include <Inventor/fields/SoSFFloat.h>
 #include <Inventor/engines/SoSubEngine.h>
+#ifdef __COIN__
 #include <Inventor/engines/SoEngineOutput.h>
+#endif // __COIN__
 #include <Inventor/engines/SoEngine.h>
 
 class SoGuiFormat : public SoEngine {

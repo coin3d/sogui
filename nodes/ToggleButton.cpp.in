@@ -54,7 +54,7 @@ public:
 void
 SoGuiToggleButton::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiToggleButton, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiToggleButton, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiToggleButton);

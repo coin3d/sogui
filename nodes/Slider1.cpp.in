@@ -34,7 +34,7 @@
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoLocation2Event.h>
 #include <Inventor/SoPickedPoint.h>
-#include <Inventor/lists/SoPickedPointList.h>
+#include <Inventor/SoLists.h>
 
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoMaterial.h>
@@ -49,6 +49,7 @@
 
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+#include <assert.h>
 
 // *************************************************************************
 
@@ -168,7 +169,7 @@ Slider1::maxChangeCB(void * closure, SoSensor * sensor)
 void
 SoGuiSlider1::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiSlider1, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiSlider1, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiSlider1);

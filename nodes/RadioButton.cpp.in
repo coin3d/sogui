@@ -54,7 +54,7 @@ public:
 void
 SoGuiRadioButton::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiRadioButton, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiRadioButton, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiRadioButton);

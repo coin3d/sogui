@@ -41,7 +41,7 @@ SO_NODE_SOURCE(SoGuiTranslation);
 void
 SoGuiTranslation::initClass(void)
 {
-  SO_NODE_INIT_CLASS(SoGuiTranslation, SoTransformation, SoTransformation);
+  SO_NODE_INIT_CLASS(SoGuiTranslation, SoTransformation, "Transformation");
 }
 
 SoGuiTranslation::SoGuiTranslation(void)

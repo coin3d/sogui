@@ -30,7 +30,9 @@
 
 #include <Inventor/fields/SoSFBool.h>
 #include <Inventor/engines/SoSubEngine.h>
+#ifdef __COIN__
 #include <Inventor/engines/SoEngineOutput.h>
+#endif // __COIN__
 #include <Inventor/engines/SoEngine.h>
 
 class SoGuiRadioGroup : public SoEngine {

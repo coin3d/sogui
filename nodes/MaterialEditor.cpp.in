@@ -122,7 +122,7 @@ public:
 void
 SoGuiMaterialEditor::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiMaterialEditor, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiMaterialEditor, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiMaterialEditor);

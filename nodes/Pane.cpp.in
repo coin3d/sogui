@@ -25,9 +25,7 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <Inventor/SbMatrix.h>
-#include <Inventor/SbPlane.h>
-#include <Inventor/SbLine.h>
+#include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/bundles/SoMaterialBundle.h>
 #include <Inventor/actions/SoGLRenderAction.h>
@@ -68,7 +66,7 @@ SO_NODE_SOURCE(SoGuiPane);
 void
 SoGuiPane::initClass(void)
 {
-  SO_NODE_INIT_CLASS(SoGuiPane, SoSeparator, SoSeparator);
+  SO_NODE_INIT_CLASS(SoGuiPane, SoSeparator, "Separator");
 }
 
 SoGuiPane::SoGuiPane(void)

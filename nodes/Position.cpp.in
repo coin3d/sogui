@@ -41,7 +41,7 @@ SO_NODE_SOURCE(SoGuiPosition);
 void
 SoGuiPosition::initClass(void)
 {
-  SO_NODE_INIT_CLASS(SoGuiPosition, SoTransformation, SoTransformation);
+  SO_NODE_INIT_CLASS(SoGuiPosition, SoTransformation, "Transformation");
 }
 
 SoGuiPosition::SoGuiPosition(void)

@@ -147,7 +147,7 @@ public:
 void
 SoGuiColorEditor::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiColorEditor, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiColorEditor, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiColorEditor);
@@ -529,7 +529,7 @@ ColorEditor::update_wheel_cb(void * closure, SoSensor * sensor)
   if ( value[0] < 0.0f ) h += M_PI; 
   if ( h < 0.0f ) h += (2.0 * M_PI);
   h /= 2.0f * M_PI; 
-  float s = SbMin(value.length(), 1.0f); // float precision bugfix
+  float s = So@Gui@Min(value.length(), 1.0f); // float precision bugfix
 
   float a = 0.0f, b = 0.0f, v = 1.0f;
   SbColor existing = PUBLIC(me)->color.getValue();

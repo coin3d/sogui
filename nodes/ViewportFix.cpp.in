@@ -24,7 +24,7 @@
 #include <assert.h>
 
 #include <Inventor/SbViewportRegion.h>
-#include <Inventor/SbMatrix.h>
+#include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 #include <Inventor/actions/SoPickAction.h>
@@ -41,7 +41,7 @@ SO_NODE_SOURCE(SoGuiViewportFix);
 void
 SoGuiViewportFix::initClass(void)
 {
-  SO_NODE_INIT_CLASS(SoGuiViewportFix, SoTransformation, SoTransformation);
+  SO_NODE_INIT_CLASS(SoGuiViewportFix, SoTransformation, "Transformation");
 }
 
 SoGuiViewportFix::SoGuiViewportFix(void)

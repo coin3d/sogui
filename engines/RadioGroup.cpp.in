@@ -22,13 +22,14 @@
 \**************************************************************************/
 
 #include <Inventor/@Gui@/engines/SoGuiRadioGroup.h>
+#include <assert.h>
 
 SO_ENGINE_SOURCE(SoGuiRadioGroup);
 
 void
 SoGuiRadioGroup::initClass(void)
 {
-  SO_ENGINE_INIT_CLASS(SoGuiRadioGroup, SoEngine, SoEngine);
+  SO_ENGINE_INIT_CLASS(SoGuiRadioGroup, SoEngine, "Engine");
 }
 
 SoGuiRadioGroup::SoGuiRadioGroup(void)

@@ -67,7 +67,7 @@ public:
 void
 SoGuiSceneTexture2::initClass(void)
 {
-  SO_NODE_INIT_CLASS(SoGuiSceneTexture2, SoTexture2, SoTexture2);
+  SO_NODE_INIT_CLASS(SoGuiSceneTexture2, SoTexture2, "Texture2");
 }
 
 SO_NODE_SOURCE(SoGuiSceneTexture2);
@@ -78,7 +78,7 @@ SoGuiSceneTexture2::SoGuiSceneTexture2(void)
   PRIVATE(this)->api = this;
 
   SO_NODE_CONSTRUCTOR(SoGuiSceneTexture2);
-  SO_NODE_ADD_FIELD(size, (SbVec2s(256, 256)));
+  SO_NODE_ADD_FIELD(size, (SbVec2f(256.0f, 256.0f)));
   SO_NODE_ADD_FIELD(scene, (NULL));
 
   PRIVATE(this)->size_sensor = new SoFieldSensor(SceneTexture2::size_updated_cb, PRIVATE(this));
@@ -141,7 +141,10 @@ SceneTexture2::size_updated_cb(void * closure, SoSensor * sensor)
 {
   assert(closure);
   SceneTexture2 * me = (SceneTexture2 *) closure;
-  SbVec2s size = PUBLIC(me)->size.getValue();
+  SbVec2f tempsize = PUBLIC(me)->size.getValue();
+  SbVec2s size;
+  size[0] = (short) tempsize[0];
+  size[1] = (short) tempsize[1];
   if ( size != me->prevsize ) {
     if ( me->renderer != NULL ) {
       me->renderer->setViewportRegion(SbViewportRegion(size));
@@ -157,7 +160,10 @@ SceneTexture2::render_cb(void * closure, SoSensor * sensor)
 {
   assert(closure);
   SceneTexture2 * me = (SceneTexture2 *) closure;
-  SbVec2s size = PUBLIC(me)->size.getValue();
+  SbVec2f tempsize = PUBLIC(me)->size.getValue();
+  SbVec2s size;
+  size[0] = (short) tempsize[0];
+  size[1] = (short) tempsize[1];
   int nc = 3;
   SoNode * scene = PUBLIC(me)->scene.getValue();
   SbBool save = PUBLIC(me)->image.enableNotify(FALSE);

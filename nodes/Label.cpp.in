@@ -55,7 +55,7 @@ public:
 void
 SoGuiLabel::initClass(void)
 {
-  SO_KIT_INIT_CLASS(SoGuiLabel, SoBaseKit, SoBaseKit);
+  SO_KIT_INIT_CLASS(SoGuiLabel, SoBaseKit, "BaseKit");
 }
 
 SO_KIT_SOURCE(SoGuiLabel);
