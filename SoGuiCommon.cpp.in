@@ -62,6 +62,7 @@ main(int argc, char **argv)
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/SoAny.h>
 
