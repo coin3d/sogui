@@ -106,7 +106,7 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   this->log.time = new SbTime [ 16 ];
   this->log.historysize = 0;
   this->button1Down = FALSE;
-  this->button2Down = FALSE;
+  this->button3Down = FALSE;
   this->controlDown = FALSE;
   this->motion3OnCamera = TRUE;
 } // SoAnyExaminerViewer()
@@ -784,11 +784,11 @@ SoAnyExaminerViewer::processSoEvent(
         this->button1Down = TRUE;
         return TRUE; 
       }
-      if ( button == SoMouseButtonEvent::BUTTON2 ) {
+      if ( button == SoMouseButtonEvent::BUTTON3 ) {
         if ( this->isAnimating() )
           this->stopAnimating();
         viewer->interactiveCountInc();
-        this->button2Down = TRUE;
+        this->button3Down = TRUE;
         SoCamera * const camera = viewer->getCamera();
         SbViewVolume volume = camera->getViewVolume( viewer->getGLAspectRatio() );
         this->panningplane = volume.getPlane( camera->focalDistance.getValue() );
@@ -839,8 +839,8 @@ SoAnyExaminerViewer::processSoEvent(
         this->spinanimating = TRUE;
         return TRUE; 
       }
-      if ( button == SoMouseButtonEvent::BUTTON2 ) {
-        this->button2Down = FALSE;
+      if ( button == SoMouseButtonEvent::BUTTON3 ) {
+        this->button3Down = FALSE;
         viewer->interactiveCountDec();
         return TRUE;
       }
@@ -858,7 +858,7 @@ SoAnyExaminerViewer::processSoEvent(
   // Mouse Movement handling
   if ( type.isDerivedFrom( LOCATION2_EVENT ) ) {
     SoLocation2Event * const event = (SoLocation2Event *) ev;
-    if ( this->button1Down && this->button2Down ) {
+    if ( this->button1Down && this->button3Down ) {
       this->zoomByCursor( normalized, prevnormalized );
       return TRUE;
     }
@@ -867,7 +867,7 @@ SoAnyExaminerViewer::processSoEvent(
       this->spin( normalized );
       return TRUE;
     }
-    if ( this->button2Down ) {
+    if ( this->button3Down ) {
       this->pan( normalized, prevnormalized );
       return TRUE;
     }

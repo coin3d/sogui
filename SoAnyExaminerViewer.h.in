@@ -97,7 +97,7 @@ protected:
   } log;
 
   SbBool button1Down;
-  SbBool button2Down;
+  SbBool button3Down;
   SbBool controlDown;
 
   void clearLog(void);
