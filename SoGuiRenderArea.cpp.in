@@ -972,6 +972,11 @@ void
 So@Gui@RenderArea::sizeChanged( // virtual, protected
   const SbVec2s size )
 {
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo( "So@Gui@RenderArea::sizeChanged",
+                          "invoked, <%d, %d>", size[0], size[1] );
+#endif // SO@GUI@_DEBUG
+
   if ( size[0] == -1 )
     return;
   inherited::sizeChanged( size );
@@ -983,10 +988,6 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
 
   if ( glsize[0] <= 0 || glsize[1] <= 0 ) 
     return;
-
-#if SOXT_DEBUG && 0
-  SoDebugError::postInfo( "So@Gui@RenderArea::sizeChanged", "invoked" );
-#endif // SOXT_DEBUG
 
   this->normalManager->setWindowSize( glsize );
   this->normalManager->setSize( glsize );
