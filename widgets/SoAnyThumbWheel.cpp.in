@@ -76,7 +76,7 @@ SoAnyThumbWheel::SoAnyThumbWheel(
 : diameter(0)
 , width(0)
 , byteorder(ABGR)
-, boundaryhandling(MODULATE)
+, boundaryhandling(ACCUMULATE)
 , movement(AUTHENTIC)
 , dirtyTables(1)
 , dirtyVariables(1)
