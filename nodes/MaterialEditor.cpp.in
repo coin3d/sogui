@@ -41,6 +41,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
 #include <Inventor/@Gui@/nodes/SoGuiToggleButton.h>
 #include <Inventor/@Gui@/nodes/SoGuiRadioButton.h>
+#include <Inventor/@Gui@/nodes/SoGuiColorEditor.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
 
@@ -49,6 +50,7 @@
 class MaterialEditor {
 public:
   MaterialEditor(void);
+  ~MaterialEditor(void);
 
   SoGuiMaterialEditor * api;
 
@@ -94,6 +96,20 @@ public:
   static void emissive_slider_cb(void * closure, SoSensor * sensor);
   static void shininess_slider_cb(void * closure, SoSensor * sensor);
   static void transparency_slider_cb(void * closure, SoSensor * sensor);
+
+  SoGuiColorEditorOpenCB * openeditorcb;
+  SoGuiColorEditorCloseCB * closeeditorcb;
+  void * cbclosure;
+
+  static SoGuiColorEditor * coloreditoropen_cb(void * closure);
+  static void coloreditorclose_cb(void * closure, SoGuiColorEditor * editor);
+
+  SbBool coloreditoropen;
+  SoGuiColorEditor * coloreditor;
+  SoFieldSensor * coloreditor_sensor;
+  static void coloreditor_cb(void * closure, SoSensor * sensor);
+
+  void checkColorEditorOpenStatus(void);
 
   static const char * texturescene[];
   static const char * editorscene[];
@@ -224,6 +240,8 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
 
   PRIVATE(this)->material_field_sensor = new SoFieldSensor(MaterialEditor::material_field_cb, PRIVATE(this));
   PRIVATE(this)->material_field_sensor->attach(&(this->material));
+
+  this->setColorEditorCallbacks(MaterialEditor::coloreditoropen_cb, MaterialEditor::coloreditorclose_cb, PRIVATE(this));
 }
 
 SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
@@ -232,7 +250,22 @@ SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
   delete obj;
 }
 
-#undef PRIVATE
+void
+SoGuiMaterialEditor::setColorEditorCallbacks(
+  SoGuiColorEditorOpenCB * open,
+  SoGuiColorEditorCloseCB * close,
+  void * closure)
+{
+  PRIVATE(this)->openeditorcb = open;
+  PRIVATE(this)->closeeditorcb = close;
+  PRIVATE(this)->cbclosure = closure;
+}
+
+SoMaterial *
+SoGuiMaterialEditor::getSphereMaterialNode(void) const
+{
+  return PRIVATE(this)->material;
+}
 
 // *************************************************************************
 // MaterialEditor
@@ -492,6 +525,14 @@ MaterialEditor::MaterialEditor(void)
   this->emissive_slider_sensor = NULL;
   this->shininess_slider_sensor = NULL;
   this->transparency_slider_sensor = NULL;
+  this->coloreditoropen = FALSE;
+  this->coloreditor = NULL;
+  this->coloreditor_sensor = NULL;
+}
+
+MaterialEditor::~MaterialEditor(void)
+{
+  if ( this->coloreditor_sensor ) delete this->coloreditor_sensor;
 }
 
 void
@@ -583,6 +624,31 @@ MaterialEditor::transparency_slider_cb(void * closure, SoSensor * sensor)
 }
 
 void
+MaterialEditor::checkColorEditorOpenStatus(void)
+{
+  if ( this->button1->on.getValue() ||
+       this->button2->on.getValue() ||
+       this->button3->on.getValue() ||
+       this->button4->on.getValue() ) {
+    if ( !this->coloreditoropen && this->openeditorcb ) {
+      this->coloreditor = this->openeditorcb(this->cbclosure);
+      this->coloreditoropen = TRUE;
+      if ( this->coloreditor_sensor == NULL )
+        this->coloreditor_sensor = new SoFieldSensor(MaterialEditor::coloreditor_cb, this);
+      if ( this->coloreditor )
+        this->coloreditor_sensor->attach(&(this->coloreditor->color));
+    }
+  } else {
+    if ( this->coloreditoropen && this->closeeditorcb ) {
+      if ( this->coloreditor_sensor ) this->coloreditor_sensor->detach();
+      this->closeeditorcb(this->cbclosure, this->coloreditor);
+      this->coloreditor = NULL;
+      this->coloreditoropen = FALSE;
+    }
+  }
+}
+
+void
 MaterialEditor::button1_cb(void * closure, SoSensor * sensor)
 {
   assert(closure);
@@ -612,6 +678,7 @@ MaterialEditor::button1_cb(void * closure, SoSensor * sensor)
          !me->button4->on.getValue() &&
          !me->radio1->on.getValue() ) me->radio1->on.setValue(TRUE);
   }
+  me->checkColorEditorOpenStatus();
 }
 
 void
@@ -643,6 +710,7 @@ MaterialEditor::button2_cb(void * closure, SoSensor * sensor)
          !me->button4->on.getValue() &&
          !me->radio2->on.getValue() ) me->radio2->on.setValue(TRUE);
   }
+  me->checkColorEditorOpenStatus();
 }
 
 void
@@ -675,12 +743,12 @@ MaterialEditor::button3_cb(void * closure, SoSensor * sensor)
          !me->button4->on.getValue() &&
          !me->radio3->on.getValue() ) me->radio3->on.setValue(TRUE);
   }
+  me->checkColorEditorOpenStatus();
 }
 
 void
 MaterialEditor::button4_cb(void * closure, SoSensor * sensor)
 {
-  assert(closure);
   assert(closure);
   MaterialEditor * me = (MaterialEditor *) closure;
   SbBool down = me->button4->on.getValue();
@@ -707,8 +775,25 @@ MaterialEditor::button4_cb(void * closure, SoSensor * sensor)
          !me->button3->on.getValue() &&
          !me->radio4->on.getValue() ) me->radio4->on.setValue(TRUE);
   }
+  me->checkColorEditorOpenStatus();
 }
 
+void
+MaterialEditor::coloreditor_cb(void * closure, SoSensor * sensor)
+{
+  // coloreditor is being interacted with - so update material editor sliders
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  if ( me->button1->on.getValue() )
+    me->material->ambientColor.setValue(me->coloreditor->color.getValue());
+  if ( me->button2->on.getValue() )
+    me->material->diffuseColor.setValue(me->coloreditor->color.getValue());
+  if ( me->button3->on.getValue() )
+    me->material->specularColor.setValue(me->coloreditor->color.getValue());
+  if ( me->button4->on.getValue() )
+    me->material->emissiveColor.setValue(me->coloreditor->color.getValue());
+}
+  
 void
 MaterialEditor::material_cb(void * closure, SoSensor * sensor)
 {
@@ -784,6 +869,19 @@ MaterialEditor::material_field_cb(void * closure, SoSensor * sensor)
     mat2->shininess.set1Value(0, mat1->shininess[0]);
   if ( mat1->transparency[0] != mat2->transparency[0] )
     mat2->transparency.set1Value(0, mat1->transparency[0]);
+}
+
+SoGuiColorEditor *
+MaterialEditor::coloreditoropen_cb(void * closure)
+{
+  SoDebugError::postInfo("MaterialEditor::coloreditoropen_cb", "default callback invoked - not implemented yet");
+  return NULL;
+}
+
+void
+MaterialEditor::coloreditorclose_cb(void * closure, SoGuiColorEditor * editor)
+{
+  SoDebugError::postInfo("MaterialEditor::coloreditorclose_cb", "default callback invoked - not implemented yet");
 }
 
 #undef PUBLIC

@@ -29,6 +29,12 @@
 #include <Inventor/fields/SoSFNode.h>
 #include <Inventor/nodekits/SoBaseKit.h>
 
+class SoMaterial;
+class SoGuiColorEditor;
+
+typedef SoGuiColorEditor * SoGuiColorEditorOpenCB(void * closure);
+typedef void SoGuiColorEditorCloseCB(void * closure, SoGuiColorEditor * editor);
+
 class SoGuiMaterialEditor : public SoBaseKit {
   typedef SoBaseKit inherited;
   SO_KIT_HEADER(SoGuiMaterialEditor);
@@ -46,6 +52,9 @@ public:
   SoSFNode material;
   SoSFShort index;
   SoSFEnum update;
+
+  void setColorEditorCallbacks(SoGuiColorEditorOpenCB * open, SoGuiColorEditorCloseCB * close, void * closure);
+  SoMaterial * getSphereMaterialNode(void) const;
 
 protected:
   ~SoGuiMaterialEditor(void);
