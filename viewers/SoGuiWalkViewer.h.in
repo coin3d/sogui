@@ -64,7 +64,6 @@ protected:
 
   virtual @WIDGET@ buildLeftTrim(@WIDGET@ parent);
 
-  virtual void createPrefSheet(void);
   virtual void openViewerHelpCard(void);
 
 private:
@@ -85,9 +84,6 @@ protected:
 private:
   void constructor(SbBool build);
 
-  Widget * prefparts;
-  int numprefparts;
-
   Widget heightwheel;
   float heightvalue;
 
@@ -100,9 +96,6 @@ private:
 #endif // ! __COIN_SOXT__
 
 #ifdef __COIN_SOGTK__
-protected:
-  virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
-
 private:
   void constructor(const SbBool build);
 #endif // ! __COIN_SOGTK__

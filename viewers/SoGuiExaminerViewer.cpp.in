@@ -1108,8 +1108,8 @@ So@Gui@ExaminerViewer::openViewerHelpCard(void)
 // *************************************************************************
 
 // Documented in superclass. Overrides this method to be able to draw
-// the axis cross if selected in the preferences sheet, and to keep a
-// continuous animation upon spin.
+// the axis cross, if selected, and to keep a continuous animation
+// upon spin.
 void
 So@Gui@ExaminerViewer::actualRedraw(void)
 {

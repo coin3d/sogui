@@ -105,31 +105,6 @@
 
 // ************************************************************************
 
-// Note: common documentation for all subclasses aswell.
-/*!
-  \fn void So@Gui@FullViewer::createPrefSheet(void)
-
-  Create preferences sheet.
-
-  This is a hook for constructing the preferences window in the
-  derived viewer classes.
-
-  Basically, derived classes will do the following in this method:
-
-  \code
-    if (! this->prefshell) {
-      createPrefSheetShellAndForm(this->prefshell, this->prefsheet);
-      createDefaultPrefSheetParts(this->prefparts, this->numprefparts,
-        this->prefsheet);
-      // add parts specific for derived viewer
-    }
-    layoutPartsAndMapPrefSheet(this->prefparts, this->numprefparts,
-                               this->prefsheet, this->prefshell);
-  \endcode
-*/
-
-// ************************************************************************
-
 // Note: the following function documentation blocks for thumbwheel
 // handling will also be used for all the miscellaneous viewer
 // subclasses, so keep'em general.
@@ -499,8 +474,6 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->setMenuItemTitle(HEADLIGHT_ITEM, _("Headlight"));
   menu->newMenuItem("fullscreen", FULLSCREEN_ITEM);
   menu->setMenuItemTitle(FULLSCREEN_ITEM, _("Fullscreen"));
-  menu->newMenuItem("preferences", PREFERENCES_ITEM);
-  menu->setMenuItemTitle(PREFERENCES_ITEM, _("Preferences..."));
 
   menu->addMenu(ROOT_MENU, FUNCTIONS_MENU);
   menu->addMenu(ROOT_MENU, DRAWSTYLES_MENU);
@@ -509,8 +482,6 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->addMenuItem(ROOT_MENU, DECORATION_ITEM);
   menu->addMenuItem(ROOT_MENU, HEADLIGHT_ITEM);
   menu->addMenuItem(ROOT_MENU, FULLSCREEN_ITEM);
-  menu->addSeparator(ROOT_MENU);
-  menu->addMenuItem(ROOT_MENU, PREFERENCES_ITEM);
 
   menu->newMenuItem("help", HELP_ITEM);
   menu->setMenuItemTitle(HELP_ITEM, _("Help"));
@@ -811,9 +782,6 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     break;
   case FULLSCREEN_ITEM:
     (void)PUBLIC(this)->setFullScreen(PUBLIC(this)->isFullScreen() ? FALSE : TRUE);
-    break;
-  case PREFERENCES_ITEM:
-    ((So@Gui@FullViewerP *)this)->selectedPrefs();
     break;
 
   case HELP_ITEM:

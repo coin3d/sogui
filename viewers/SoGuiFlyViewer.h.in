@@ -66,7 +66,6 @@ protected:
 
   virtual void rightWheelMotion(float value);
 
-  virtual void createPrefSheet(void);
   virtual void openViewerHelpCard(void);
 
   virtual void afterRealizeHook(void);

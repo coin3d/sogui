@@ -73,8 +73,6 @@ protected:
   virtual void rightWheelMotion(float value);
   virtual void rightWheelFinish(void);
 
-  virtual void createPrefSheet(void);
-
   virtual void createViewerButtons(@WIDGET@ parent, SbPList * buttons);
   virtual void openViewerHelpCard(void);
 

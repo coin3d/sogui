@@ -75,7 +75,6 @@ protected:
   virtual void bottomWheelMotion(float val);
   virtual void rightWheelMotion(float val);
 
-  virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
   virtual void createViewerButtons(@WIDGET@ parent, SbPList * buttonlist);
 
   virtual const char * getDefaultWidgetName(void) const;
@@ -89,7 +88,6 @@ protected:
   virtual void actualRedraw(void);
 
   virtual void afterRealizeHook(void);
-  virtual void createPrefSheet(void);
 
 private:
   class So@Gui@ExaminerViewerP * pimpl;
