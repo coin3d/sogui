@@ -30,9 +30,6 @@
 // and/or So@Gui@ includes, in case there are any dependency bugs in
 // the underlying native toolkit set of include files versus the
 // compiler environment's include files.
-//
-// (We've had reports of these with at least GCC 3.1 in combination
-// with Qt 3.0.  20020705 mortene.)
 
 #include <Inventor/@Gui@/So@Gui@Basic.h> // Contains __COIN_SO@GUI@__ define.
 
