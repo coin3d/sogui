@@ -20,7 +20,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#ifdef HAVE_WIN32_API
+#ifdef HAVE_WIN32_API /* Only compile this file when the Win32 API is available */
 
 #define SPW_DEFINE_COPYRIGHT
 #define SPW_DEFINE_GLOBALS

@@ -355,23 +355,7 @@ typedef struct                /* SpaceWare event handlers */
    SiEventHandler exception;  /* Exception event handler */
    } SiSpwHandlers;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 enum SpwRetVal SiAndTypeMask (SiTypeMask *pTMaskA, SiTypeMask *pTMaskB);
-int SiGetPortList (SiDevPort **ppPort);
-void SiFreePortList (SiDevPort *pPort);
-void SiTune2003 (SiSpwEvent *pEvent);
-void SiTuneSC (SiSpwEvent *pEvent);
-
-
-
-#ifdef __cplusplus
-}
-#endif
-
 
 enum SpwRetVal             /* Error return values.                           */
    {
@@ -397,14 +381,6 @@ enum SpwRetVal             /* Error return values.                           */
    };
 
 typedef enum SpwRetVal SpwReturnValue;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
 
 /* interface specifications define parameter passing to DLL functions */
 
@@ -466,9 +442,16 @@ PFNSI_GETLIBRARYINFO    pfnSiGetLibraryInfo;
 PFNSI_GETDEVICEINFO     pfnSiGetDeviceInfo;
 PFNSPW_ERRORSTRING      pfnSpwErrorString;
 
-
 /* externally used functions */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int SiGetPortList (SiDevPort **ppPort);
+void SiFreePortList (SiDevPort *pPort);
+void SiTune2003 (SiSpwEvent *pEvent);
+void SiTuneSC (SiSpwEvent *pEvent);
 
 enum SpwRetVal SiInitialize(void);
 void           SiTerminate(void);
@@ -497,6 +480,12 @@ enum           SpwRetVal SiGetDriverInfo (SiVerInfo *pInfo);
 void           SiGetLibraryInfo (SiVerInfo *pInfo);
 enum           SpwRetVal SiGetDeviceInfo (SiHdl hdl, SiDevInfo *pInfo);
 char * SpwErrorString (enum SpwRetVal val);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif /* #ifndef SIAPP_H */
 
