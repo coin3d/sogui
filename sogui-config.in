@@ -52,6 +52,7 @@ Options:
   --compile <sourcefile> [<sourcefile>]...
   --link <program> <object> [<object>]...
   --build <program> <sourcefile> [<sourcefile>]...
+  --setup | --setup-front
   --version
   --usage | --help"
 
@@ -271,6 +272,20 @@ do
         fi
         ;;
       esac
+      exit 0
+      ;;
+    --setup)
+      # FIXME: scan variables and only modify variables that need modification
+      echo "PATH=\$PATH:$prefix/bin"
+      echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$prefix/lib"
+      echo "export PATH LD_LIBRARY_PATH"
+      exit 0
+      ;;
+    --setup-front)
+      # FIXME: scan variables and only modify variables that need modification
+      echo "PATH=$prefix/bin:\$PATH"
+      echo "LD_LIBRARY_PATH=$prefix/lib:\$LD_LIBRARY_PATH"
+      echo "export PATH LD_LIBRARY_PATH"
       exit 0
       ;;
     # ignore some options
