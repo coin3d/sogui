@@ -51,6 +51,7 @@
 #if SO@GUI@_DEBUG
 
 #include <stdio.h> // sprintf()
+#include <Inventor/errors/SoDebugError.h>
 
 /*
   This stupid thing is here to silence some compilers that complain on
