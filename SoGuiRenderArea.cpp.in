@@ -1094,6 +1094,9 @@ So@Gui@RenderArea::initOverlayGraphic( // virtual, protected
     mgr->setRGBMode(FALSE);
   }
   // FIXME: load colormap
+
+  // FIXME: shouldn't we do inherited::initOverlayGraphic() ? 20010831 mortene.
+
 } // initOverlayGraphic()
 
 /*!
@@ -1255,9 +1258,15 @@ So@Gui@RenderArea::invokeAppCB( // protected
 // *************************************************************************
 
 /*!
-  FIXME: write doc
-*/
+  Toolkit-native events are attempted converted to Coin-generic events
+  in the So@Gui@RenderArea::processEvent() method.  If this succeeds,
+  they are forwarded to this method, which again will forward them to
+  the scenegraph.
 
+  This is a virtual method, and is overloaded in it's subclasses to
+  catch events of particular interest to the viewer classes, for
+  instance.
+*/
 SbBool
 So@Gui@RenderArea::processSoEvent( // virtual
   const SoEvent * const event )
@@ -1272,9 +1281,10 @@ So@Gui@RenderArea::processSoEvent( // virtual
 // *************************************************************************
 
 /*!
-  FIXME: write doc
-*/
-
+  Overrides So@Gui@GLWidget::processEvent() to attempt to convert
+  toolkit-native events to Coin-generic events.  If this succeeds, the
+  generic SoEvent is forwarded to So@Gui@RenderArea::processSoEvent().
+ */
 void
 So@Gui@RenderArea::processEvent( // virtual, protected
   @EVENT@ event )
@@ -1343,10 +1353,6 @@ So@Gui@RenderArea::setDevicesWindowSize(
 } // setDevicesWindowSize()
 
 // *************************************************************************
-
-/*!
-  FIXME: write doc
-*/
 
 void
 So@Gui@RenderArea::renderCB( // static
