@@ -216,6 +216,10 @@ So@Gui@RenderAreaP::showToolkitInformation( void )
 
   // FIXME: dump rcsid strings for all components. 20010927 mortene.
 
+  // FIXME: information about the native OpenGL widget format, along
+  // with the generic format flags (SO_GL_DOUBLE etc), could be
+  // useful.  20010927 mortene.
+
   info += "\n";
   info += "Inventor implementation: "; info += SoDB::getVersion();
   So@Gui@::createSimpleErrorDialog( NULL, "So@Gui@ implementation info",
