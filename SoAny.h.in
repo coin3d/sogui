@@ -44,8 +44,8 @@ public:
 
 
   typedef void InternalFatalErrorCB(void * userdata);
-  void registerInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
-                                         void * userdata);
+  void addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
+                                    void * ud);
 
 private:
   SoAny(void);

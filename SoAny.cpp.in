@@ -295,8 +295,8 @@ SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
   after a fatal error hits.
 */
 void
-SoAny::registerInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
-                                         void * userdata)
+SoAny::addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
+                                    void * userdata)
 {
   this->internalfehandlers.append((void *)cb);
   this->internalfedata.append(userdata);
