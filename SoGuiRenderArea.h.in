@@ -59,7 +59,7 @@ class So@Gui@Mouse;
 
 typedef SbBool So@Gui@RenderAreaEventCB( void * user, @EVENT@ event );
 
-class SO@GUI@_DLL_EXPORT So@Gui@RenderArea : public So@Gui@GLWidget {
+class SO@GUI@_DLL_API So@Gui@RenderArea : public So@Gui@GLWidget {
   SO@GUI@_OBJECT_HEADER(So@Gui@RenderArea, So@Gui@GLWidget);
   @COMPONENTHEADER@
 
