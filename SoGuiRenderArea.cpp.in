@@ -143,6 +143,10 @@
 
 // *************************************************************************
 
+#include <Inventor/@Gui@/So@Gui@RenderArea.h>
+
+#include <string.h> // strchr()
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
@@ -155,10 +159,13 @@
 #include <Inventor/@Gui@/common/gl.h> // glDrawBuffer()
 
 #include <Inventor/SoSceneManager.h>
+#include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoWriteAction.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/misc/SoBasic.h>
+#include <Inventor/nodekits/SoBaseKit.h>
+#include <Inventor/nodes/SoCamera.h>
 #include <Inventor/nodes/SoSelection.h>
 
 #include <so@gui@defs.h>
@@ -171,11 +178,8 @@
 #include <Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h>
 #endif // HAVE_JOYSTICK_LINUX
 
-#include <Inventor/@Gui@/So@Gui@RenderArea.h>
 #include <Inventor/@Gui@/So@Gui@GLWidgetP.h>
 #include <Inventor/@Gui@/SoAny.h>
-
-#include <string.h> // strchr()
 
 #define RENDERAREA_DEBUG_REDRAWS 0
 
@@ -229,12 +233,13 @@ public:
   void setDevicesWindowSize(const SbVec2s size);
 
   // OpenGL info-window hack.
-  enum { NONE, OPENGL, INVENTOR, TOOLKIT, DUMPSCENEGRAPH };
+  enum { NONE, OPENGL, INVENTOR, TOOLKIT, DUMPSCENEGRAPH, DUMPCAMERAS };
   int checkMagicSequences(const char c);
   void showOpenGLDriverInformation(void);
   void showInventorInformation(void);
   void showToolkitInformation(void);
   void dumpScenegraph(void);
+  void dumpCameras(void);
 
   SbBool invokeAppCB(@EVENT@ event);
   const SoEvent * getSoEvent(@EVENT@ event);
@@ -498,6 +503,50 @@ So@Gui@RenderAreaP::dumpScenegraph(void)
 #endif // DEBUGGING_EGGS
 }
 
+void
+So@Gui@RenderAreaP::dumpCameras(void)
+{
+#ifdef DEBUGGING_EGGS
+  const SbBool kitsearch = SoBaseKit::isSearchingChildren();
+  SoBaseKit::setSearchingChildren(TRUE);
+
+  SoSearchAction search;
+  search.setType(SoCamera::getClassTypeId());
+  search.setInterest(SoSearchAction::ALL);
+  search.setSearchingAll(TRUE);
+  search.apply(this->normalManager->getSceneGraph());
+
+  SoBaseKit::setSearchingChildren(kitsearch);
+
+  const SoPathList & pl = search.getPaths();
+  const unsigned int numcams = pl.getLength();
+  SoDebugError::postInfo("So@Gui@RenderAreaP::dumpCameras",
+                         "Number of cameras in scene graph: %d",
+                         numcams);
+
+  for (unsigned int i = 0; i < numcams; i++) {
+    const SoPath * p = pl[i];
+    SoNode * n = p->getTail();
+    assert(n->isOfType(SoCamera::getClassTypeId()));
+    SoCamera * cam = (SoCamera *)n;
+
+    const SbVec3f pos = cam->position.getValue();
+    const SbRotation rot = cam->orientation.getValue();
+    SbVec3f axis;
+    float angle;
+    rot.getValue(axis, angle);
+
+    SoDebugError::postInfo("So@Gui@RenderAreaP::dumpCameras",
+                           "type==%s, name=='%s', position==<%f, %f, %f>, "
+                           "orientation-rotation==<%f, %f, %f>--%f",
+                           cam->getTypeId().getName().getString(),
+                           cam->getName().getString(),
+                           pos[0], pos[1], pos[2],
+                           axis[0], axis[1], axis[2], angle);
+  }
+#endif // DEBUGGING_EGGS
+}
+
 int
 So@Gui@RenderAreaP::checkMagicSequences(const char c)
 {
@@ -512,13 +561,14 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   const int cl = this->currentinput.getLength();
 
   static const char * keyseq[] = {
-    "glinfo", "ivinfo", "soinfo", "dumpiv"
+    "glinfo", "ivinfo", "soinfo", "dumpiv", "cameras"
   };
   static const int id[] = {
     So@Gui@RenderAreaP::OPENGL,
     So@Gui@RenderAreaP::INVENTOR,
     So@Gui@RenderAreaP::TOOLKIT,
-    So@Gui@RenderAreaP::DUMPSCENEGRAPH
+    So@Gui@RenderAreaP::DUMPSCENEGRAPH,
+    So@Gui@RenderAreaP::DUMPCAMERAS
   };
 
   for (unsigned int i = 0; i < (sizeof(keyseq) / sizeof(keyseq[0])); i++) {
@@ -1956,6 +2006,9 @@ So@Gui@RenderArea::processEvent(@EVENT@ event)
           break;
         case So@Gui@RenderAreaP::DUMPSCENEGRAPH:  // "dumpiv"
           PRIVATE(this)->dumpScenegraph();
+          break;
+        case So@Gui@RenderAreaP::DUMPCAMERAS:  // "cameras"
+          PRIVATE(this)->dumpCameras();
           break;
         default:
           assert(FALSE && "unknown debug key sequence");
