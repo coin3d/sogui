@@ -25,6 +25,8 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <math.h>
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
@@ -35,6 +37,8 @@
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/SoPickedPoint.h>
 #include <Inventor/lists/SoPickedPointList.h>
+
+#include <Inventor/SbColor.h>
 
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoMaterial.h>
@@ -64,22 +68,6 @@
     orientation - not supported yet
     size
 */
-
-#if 0
-#Inventor V2.1 ascii
-
-DEF topSeparator Separator {
-  DEF surfaceGeometry Separator {
-    Material {}
-    Texture2 {}
-    TexCoord2 {}
-    Coordinate3 {}
-    IndexedFaceSet {}
-  }
-  DEF knobGeometry Separator {
-  }
-}
-#endif
 
 // *************************************************************************
 
@@ -156,37 +144,25 @@ SoGuiSlider2::SoGuiSlider2(void)
 
   SO_KIT_CONSTRUCTOR(SoGuiSlider2);
 
-  SO_KIT_ADD_FIELD(orientation, (SoGuiSlider2::X));
-  SO_KIT_ADD_FIELD(min, (0.0f));
-  SO_KIT_ADD_FIELD(max, (1.0f));
-  SO_KIT_ADD_FIELD(value, (0.0f));
   SO_KIT_ADD_FIELD(size, (SbVec3f(1.0f, 1.0f, 0.0f)));
 
-  SO_KIT_DEFINE_ENUM_VALUE(Orientation, X);
-  SO_KIT_DEFINE_ENUM_VALUE(Orientation, Y);
+  SO_KIT_ADD_FIELD(min, (SbVec2f(0.0f, 0.0f)));
+  SO_KIT_ADD_FIELD(max, (SbVec2f(1.0f, 1.0f)));
+  SO_KIT_ADD_FIELD(value, (SbVec2f(0.0f, 0.0f)));
 
-  SO_KIT_SET_SF_ENUM_TYPE(orientation, Orientation);
+  SO_KIT_ADD_FIELD(alwaysHook, (TRUE));
 
-  SO_KIT_ADD_CATALOG_ENTRY(topSeparator, SoSeparator, FALSE, this, "", FALSE);
-
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceGeometry, SoSeparator, FALSE, topSeparator, knobGeometry, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceMaterial, SoMaterial, TRUE, surfaceGeometry, surfaceTexture, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexture, SoTexture2, TRUE, surfaceGeometry, surfaceTexCoords, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexCoords, SoTextureCoordinate2, FALSE, surfaceGeometry, surfaceCoords, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceCoords, SoCoordinate3, FALSE, surfaceGeometry, surfaceFaceSet, FALSE);
   SO_KIT_ADD_CATALOG_ENTRY(surfaceFaceSet, SoIndexedFaceSet, FALSE, surfaceGeometry, "", FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobGeometry, SoSeparator, FALSE, topSeparator, "", FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobCoords, SoCoordinate3, FALSE, knobGeometry, knobMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobMaterial, SoMaterial, FALSE, knobGeometry, knobFaceSet, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobFaceSet, SoIndexedFaceSet, FALSE, knobGeometry, knobShadeMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobShadeMaterial, SoMaterial, FALSE, knobGeometry, knobShadeLineSet, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobShadeLineSet, SoIndexedLineSet, FALSE, knobGeometry, knobLightMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobLightMaterial, SoMaterial, FALSE, knobGeometry, knobLightLineSet, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobLightLineSet, SoIndexedLineSet, FALSE, knobGeometry, "", FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceCoords, SoCoordinate3, FALSE, surfaceGeometry, surfaceFaceSet, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexCoords, SoTextureCoordinate2, FALSE, surfaceGeometry, surfaceCoords, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexture, SoTexture2, TRUE, surfaceGeometry, surfaceTexCoords, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceMaterial, SoMaterial, TRUE, surfaceGeometry, surfaceTexture, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceGeometry, SoSeparator, FALSE, topSeparator, "", FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(topSeparator, SoSeparator, FALSE, this, "", FALSE);
 
   SO_KIT_INIT_INSTANCE();
 
-  static float surfacetexturecoordinates[][2] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f} };
+  static float surfacetexturecoordinates[][2] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
   SoTextureCoordinate2 * surfacetexcoords = SO_GET_ANY_PART(this, "surfaceTexCoords", SoTextureCoordinate2);
   assert(surfacetexcoords);
   surfacetexcoords->point.setValues(0, 4, surfacetexturecoordinates);
@@ -197,51 +173,53 @@ SoGuiSlider2::SoGuiSlider2(void)
   surfacefaceset->textureCoordIndex.setValues(0, 8, surfaceindices);
   surfacefaceset->coordIndex.setValues(0, 8, surfaceindices);
  
-  static int knobindices[] = {
-    0, 1, 2, -1, 0, 2, 3, -1,
-    4, 5, 6, -1, 4, 6, 7, -1,
-    8, 2, 5, -1, 8, 5, 9, -1,
-    3, 11, 10, -1, 3, 10, 4, -1
-  };
-  SoIndexedFaceSet * knobfaceset = SO_GET_ANY_PART(this, "knobFaceSet", SoIndexedFaceSet);
-  assert(knobfaceset);
-  knobfaceset->coordIndex.setValues(0, sizeof(knobindices)/sizeof(knobindices[0]), knobindices);
+  // static int knobindices[] = {
+  //   0, 1, 2, -1, 0, 2, 3, -1,
+  //   4, 5, 6, -1, 4, 6, 7, -1,
+  //   8, 2, 5, -1, 8, 5, 9, -1,
+  //   3, 11, 10, -1, 3, 10, 4, -1
+  // };
+  // SoIndexedFaceSet * knobfaceset = SO_GET_ANY_PART(this, "knobFaceSet", SoIndexedFaceSet);
+  // assert(knobfaceset);
+  // knobfaceset->coordIndex.setValues(0, sizeof(knobindices)/sizeof(knobindices[0]), knobindices);
 
   this->sizeUpdate();
 
-  SoMaterial * knobmaterial = SO_GET_ANY_PART(this, "knobMaterial", SoMaterial);
-  assert(knobmaterial);
-  knobmaterial->ambientColor.setValue(0.6f, 0.6f, 0.6f);
-  knobmaterial->diffuseColor.setValue(0.6f, 0.6f, 0.6f);
-  knobmaterial->emissiveColor.setValue(0.6f, 0.6f, 0.6f);
+  // SoMaterial * knobmaterial = SO_GET_ANY_PART(this, "knobMaterial", SoMaterial);
+  // assert(knobmaterial);
+  // knobmaterial->ambientColor.setValue(0.6f, 0.6f, 0.6f);
+  // knobmaterial->diffuseColor.setValue(0.6f, 0.6f, 0.6f);
+  // knobmaterial->emissiveColor.setValue(0.6f, 0.6f, 0.6f);
 
-  SoMaterial * knoblightmaterial = SO_GET_ANY_PART(this, "knobLightMaterial", SoMaterial);
-  assert(knoblightmaterial);
-  knoblightmaterial->ambientColor.setValue(0.75f, 0.75f, 0.75f);
-  knoblightmaterial->diffuseColor.setValue(0.75f, 0.75f, 0.75f);
-  knoblightmaterial->emissiveColor.setValue(0.75f, 0.75f, 0.75f);
+  // SoMaterial * knoblightmaterial = SO_GET_ANY_PART(this, "knobLightMaterial", SoMaterial);
+  // assert(knoblightmaterial);
+  // knoblightmaterial->ambientColor.setValue(0.75f, 0.75f, 0.75f);
+  // knoblightmaterial->diffuseColor.setValue(0.75f, 0.75f, 0.75f);
+  // knoblightmaterial->emissiveColor.setValue(0.75f, 0.75f, 0.75f);
 
-  SoMaterial * knobshadowmaterial = SO_GET_ANY_PART(this, "knobShadeMaterial", SoMaterial);
-  assert(knobshadowmaterial);
-  knobshadowmaterial->ambientColor.setValue(0.4, 0.4, 0.4);
-  knobshadowmaterial->diffuseColor.setValue(0.4, 0.4, 0.4);
-  knobshadowmaterial->emissiveColor.setValue(0.4, 0.4, 0.4);
+  // SoMaterial * knobshadowmaterial = SO_GET_ANY_PART(this, "knobShadeMaterial", SoMaterial);
+  // assert(knobshadowmaterial);
+  // knobshadowmaterial->ambientColor.setValue(0.4, 0.4, 0.4);
+  // knobshadowmaterial->diffuseColor.setValue(0.4, 0.4, 0.4);
+  // knobshadowmaterial->emissiveColor.setValue(0.4, 0.4, 0.4);
 
   // FIXME: move these to correct coordinates
-  SoIndexedLineSet * lightlineset = SO_GET_ANY_PART(this, "knobLightLineSet", SoIndexedLineSet);
-  assert(lightlineset);
-  static int lightindices[] = { 16, 17, 18, -1, 12, 15, 14, -1 };
-  lightlineset->coordIndex.setValues(0, sizeof(lightindices) / sizeof(lightindices[0]), lightindices);
+  // SoIndexedLineSet * lightlineset = SO_GET_ANY_PART(this, "knobLightLineSet", SoIndexedLineSet);
+  // assert(lightlineset);
+  // static int lightindices[] = { 16, 17, 18, -1, 12, 15, 14, -1 };
+  // lightlineset->coordIndex.setValues(0, sizeof(lightindices) / sizeof(lightindices[0]), lightindices);
 
-  SoIndexedLineSet * shadelineset = SO_GET_ANY_PART(this, "knobShadeLineSet", SoIndexedLineSet);
-  assert(shadelineset);
-  static int shadeindices[] = { 12, 13, 14, -1, 16, 19, 18, -1 };
-  shadelineset->coordIndex.setValues(0, sizeof(shadeindices) / sizeof(shadeindices[0]), shadeindices);
+  // SoIndexedLineSet * shadelineset = SO_GET_ANY_PART(this, "knobShadeLineSet", SoIndexedLineSet);
+  // assert(shadelineset);
+  // static int shadeindices[] = { 12, 13, 14, -1, 16, 19, 18, -1 };
+  // shadelineset->coordIndex.setValues(0, sizeof(shadeindices) / sizeof(shadeindices[0]), shadeindices);
 
   // set up sensors
   PRIVATE(this)->sizeSensor = new SoFieldSensor(Slider2::sizeChangeCB, PRIVATE(this));
+  PRIVATE(this)->sizeSensor->setPriority(0);
   PRIVATE(this)->sizeSensor->attach(&(this->size));
   PRIVATE(this)->valueSensor = new SoFieldSensor(Slider2::valueChangeCB, PRIVATE(this));
+  PRIVATE(this)->valueSensor->setPriority(0);
   PRIVATE(this)->valueSensor->attach(&(this->value));
 }
 
@@ -263,16 +241,8 @@ SoGuiSlider2::setDefaultOnNonWritingFields(void)
 void
 SoGuiSlider2::setSurfaceColor(const SbColor & value)
 {
-  // FIXME:
-}
-
-void
-SoGuiSlider2::setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue)
-{
-  // FIXME:
-  // - store values in private
-
-  // 
+#if 0
+  // FIXME
   this->setPart("surfaceMaterial", NULL);
 
   SoTexture2 * texturenode = SO_GET_ANY_PART(this, "surfaceTexture", SoTexture2);
@@ -284,12 +254,12 @@ SoGuiSlider2::setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue
   SbVec2s size;
   int nc;
   unsigned char * buf = texturenode->image.startEditing(size, nc);
-  float rmin = minvalue[0];
-  float gmin = minvalue[1];
-  float bmin = minvalue[2];
-  float rmax = maxvalue[0];
-  float gmax = maxvalue[1];
-  float bmax = maxvalue[2];
+  float rmin = value[0];
+  float gmin = value[1];
+  float bmin = value[2];
+  float rmax = value[0];
+  float gmax = value[1];
+  float bmax = value[2];
   for ( int x = 0; x < size[0]; x += 1 ) {
     buf[x*nc+0] = (unsigned char) ((rmin + ((float) x / (float) (size[0]-1)) * (rmax - rmin)) * 255.0f);
     buf[x*nc+1] = (unsigned char) ((gmin + ((float) x / (float) (size[0]-1)) * (gmax - gmin)) * 255.0f);
@@ -301,13 +271,7 @@ SoGuiSlider2::setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue
     }
   }
   texturenode->image.finishEditing();
-}
-
-SbColor
-SoGuiSlider2::getValueAsColor(void) const
-{
-  // FIXME:
-  return SbColor(0, 0, 0);
+#endif
 }
 
 void
@@ -326,6 +290,7 @@ SoGuiSlider2::sizeUpdate(void)
 void
 SoGuiSlider2::valueUpdate(void)
 {
+#if 0
   SbVec3f size = this->size.getValue();
   float value = this->value.getValue();
   float min = this->min.getValue();
@@ -364,11 +329,13 @@ SoGuiSlider2::valueUpdate(void)
   SoCoordinate3 * knobcoords = SO_GET_ANY_PART(this, "knobCoords", SoCoordinate3);
   assert(knobcoords);
   knobcoords->point.setValues(0, sizeof(knobcoordinates) / sizeof(knobcoordinates[0]), knobcoordinates);
+#endif
 }
 
 void
 SoGuiSlider2::handleEvent(SoHandleEventAction * action)
 {
+#if 0
   const SoEvent * event = action->getEvent();
   if ( action->isHandled() ) {
     SoDebugError::postInfo("SoGuiSlider2::handleEvent", "already handled");
@@ -377,8 +344,7 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
   if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
     SoMouseButtonEvent * mbevent = (SoMouseButtonEvent *) event;
     if ( mbevent->getState() == SoButtonEvent::DOWN && 
-
-        mbevent->getMButton() == SoMouseButtonEvent::BUTTON1 ) {
+         mbevent->getButton() == SoMouseButtonEvent::BUTTON1 ) {
 
       action->setPickRadius(0);
       const SoPickedPointList & pplist = action->getPickedPointList();
@@ -414,16 +380,8 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
     }
   }
 
-/*
-  void setHandled(void);
-  SbBool isHandled(void) const;
-  void setGrabber(SoNode * node);
-  void releaseGrabber(void);
-  SoNode * getGrabber(void) const;
-*/
-
-  
   // ugh - another state machine
   // SoDebugError::postInfo("SoGuiSlider2::handleEvent", "received %s event", event->getTypeId().getName().getString());
+#endif
 }
 
