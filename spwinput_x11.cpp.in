@@ -17,6 +17,14 @@
  * SbBool SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent);
  */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#if SO@GUI@_DEBUG && 0 // debug
+#define SPW_DEBUG 1
+#endif // debug
+
 #if X_DISPLAY_MISSING
 /* just provide empty methods if X is not available */
 SbBool 
@@ -32,10 +40,6 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 }
 
 #else /* ! X_DISPLAY_MISSING */
-
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif /* HAVE_CONFIG_H */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -775,32 +779,6 @@ static SbBool FindXCM (Display *display)
 
 /*-----------------------------------------------------------------------------
  *
- * static void ConvertToUppercase (char *string)
- *
- * Args:
- *    string      (r/w)  The string to be converted
- *
- * Return Value:
- *     None.
- *
- * Description:
- *     Convert the entire string to upper case.
- *
- * Notes:
- *     None.
- *
- *---------------------------------------------------------------------------*/
-static void ConvertToUppercase (char *string)
-{
-  while (*string != '\0')
-    {
-      *string = toupper (*string);
-      string++;
-    }
-} /* end of ConvertToUppercase */
-
-/*-----------------------------------------------------------------------------
- *
  * SbBool SPW_FindXIE (Display *display)
  *
  * Args:
@@ -855,25 +833,11 @@ SbBool SPW_FindXIE (Display *display)
 
   /* Try to find the Spaceball device in the list */
   for (i = 0; i < nDev; i++) {
-    char *atomName;
 #ifdef SPW_DEBUG
     fprintf (stderr, "SPW_FindXIE()  device %s\n", pDev[i].name);
 #endif
-    atomName = XGetAtomName(display, pDev[i].type);
-    ConvertToUppercase (pDev[i].name);
-    
-    if (atomName != NULL) {
-      ConvertToUppercase (atomName);
-    }
-    
-    /* Compare against atom name and type name per device */
-    if ((strncmp (pDev[i].name, "SPACEBALL", 9) == 0) ||
-        (strncmp (atomName, "SPACEBALL", 9) == 0)) {
-      if (atomName != NULL) {
-        free(atomName);
-      }
-      break;
-    }
+    /* Compare against type name per device */
+    if (strcmp(pDev[i].name, XI_SPACEBALL) == 0) break;
   }
 
   /*
@@ -966,7 +930,7 @@ static void InitializeSpaceball (Display *display, char *version)
     fprintf(stderr, "Spaceball (R) device found,");
     fprintf(stderr, " using SpaceWare (R) XIE interface.\n");
     fprintf(stderr, "SpaceWare Version %s\n", version);
-    fprintf(stderr, "Copyright (c) %s Spacetec IMC Corporation\n", YEAR);
+    fprintf(stderr, "Copyright (c) 1998 Spacetec IMC Corporation\n");
     fprintf(stderr, "All Rights Reserved\n");
 #endif
   }  
@@ -978,7 +942,7 @@ static void InitializeSpaceball (Display *display, char *version)
     fprintf(stderr, "Spaceball (R) device found,");
     fprintf(stderr, " using SpaceWare (R) XCM interface.\n");
     fprintf(stderr, "SpaceWare Version %s\n", version);
-    fprintf(stderr, "Copyright (c) %s Spacetec IMC Corporation\n", YEAR);
+    fprintf(stderr, "Copyright (c) 1998 Spacetec IMC Corporation\n");
     fprintf(stderr, "All Rights Reserved\n");
 #endif
   }  
@@ -1631,7 +1595,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
   continue_loop=TRUE;
 
 #ifdef SPW_DEBUG
-  fprintf(stderr,"SPW_InputDispatch\n");    /* show where we are */
+  fprintf(stderr,"SPW_InputDispatch\n");   /* show where we are */
 #endif
 
   /* if dispatch struct is empty, return to caller */
@@ -1848,7 +1812,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
   continue_loop=TRUE;
 
 #ifdef SPW_DEBUG
-  fprintf(stderr,"SPW_InputDispatch\n");    /* show where we are */
+  fprintf(stderr,"SPW_InputDispatch\n");  /* show where we are */
 #endif
 
   /* if dispatch struct is empty, return to caller */
@@ -1984,8 +1948,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
     } /* end of while loop */
 
 #if defined(SPW_DEBUG) && 0 
-  fprintf(stderr,"   event_pending %d motion_events %d all_zero_event
-%d\n",
+  fprintf(stderr,"   event_pending %d motion_events %d all_zero_event %d\n",
           event_pending, motion_events, all_zero_event);
 #endif
 
