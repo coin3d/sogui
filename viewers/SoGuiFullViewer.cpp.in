@@ -31,12 +31,17 @@
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
-#include <Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h>
 #include <so@gui@defs.h>
 
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/errors/SoDebugError.h>
+
+#ifdef __COIN_SOGTK__
+#include <Inventor/Gtk/widgets/gtkthumbwheel.h>
+#else // SoXt, SoWin, SoQt
+#include <Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h>
+#endif
 
 // ************************************************************************
 
@@ -147,7 +152,9 @@ So@Gui@FullViewer::leftWheelFinish(void)
 
 #ifdef __COIN_SOXT__
 #define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) SoXtThumbWheelSetValue(wheel, val)
-#else // SoQt, SoGtk, SoWin
+#elif defined(__COIN_SOGTK__)
+#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) gtk_thumbwheel_set_value(GTK_THUMBWHEEL(wheel), val)
+#else // SoQt, SoWin
 #define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) ((So@Gui@ThumbWheel *)wheel)->setValue(val)
 #endif
 
