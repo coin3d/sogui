@@ -143,7 +143,7 @@ public:
                                           int eventType, XtEventHandler proc,
                                           XtPointer clientData);
 
-  static void selectBestVisual(Display * & dpy, Visual * & visual,
+  static void selectBestVisual(Display * dpy, Visual * & visual,
                                Colormap & cmap, int & depth);
 
   static const char * getAppName(void);
