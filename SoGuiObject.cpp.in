@@ -53,17 +53,10 @@ static const char rcsid[] =
 SoType So@Gui@Object::classTypeId; // static
 
 /*!
+  \fn void So@Gui@Object::init(void)
+
   FIXME: write doc
 */
-
-void
-So@Gui@Object::init( // static
-  void )
-{
-  So@Gui@Object::initClass();
-  So@Gui@Device::initClasses();
-  So@Gui@Component::initClasses();
-} // init()
 
 /*!
   FIXME: write doc
