@@ -9,8 +9,6 @@ INCLUDES = -I.
 LIBS = 
 
 libSoCommon_la_SOURCES = \
-	SoAnyViewer.cpp \
-	SoAnyViewer.h \
 	SoAnyFullViewer.cpp \
 	SoAnyFullViewer.h \
 	SoAnyExaminerViewer.cpp \
