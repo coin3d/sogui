@@ -23,6 +23,8 @@
 
 #include <Inventor/@Gui@/nodes/SoGuiNodes.h>
 
+// *************************************************************************
+
 void
 SoGuiNodes::initClasses(void)
 {
@@ -31,9 +33,12 @@ SoGuiNodes::initClasses(void)
   SoGuiPosition::initClass();
   SoGuiTranslation::initClass();
   SoGuiFrame::initClass();
+  SoGuiToggleButton::initClass();
   SoGuiClickCounter::initClass();
   SoGuiSlider1::initClass();
   SoGuiSlider2::initClass();
   SoGuiColorEditor::initClass();
+  SoGuiMaterialEditor::initClass();
 }
 
+// *************************************************************************
