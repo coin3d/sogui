@@ -1784,7 +1784,7 @@ So@Gui@Viewer::actualRedraw(void)
 
   if (this->isStereoViewing()) {
     SbBool quadstereo = this->isQuadBufferStereo();
-#ifndef HAVE_SOCAMERA_SET_STEREO_MODE
+#ifndef HAVE_SOCAMERA_SETSTEREOMODE
     SoCamera * camera = this->getCamera();  
     SbVec3f camerapos = camera->position.getValue();
     SbVec3f cameradir(0.0f, 0.0f, -1.0f);
@@ -1845,7 +1845,7 @@ So@Gui@Viewer::actualRedraw(void)
     else {
       glColorMask(1,1,1,1); // restore GL color mask
     }
-#else // HAVE_SOCAMERA_SET_STEREO_MODE
+#else // HAVE_SOCAMERA_SETSTEREOMODE
 
     if (!quadstereo) {
       SoCamera * camera = this->getCamera();  
@@ -1874,7 +1874,7 @@ So@Gui@Viewer::actualRedraw(void)
       camera->setStereoMode(SoCamera::MONOSCOPIC);
       glDrawBuffer(GL_BACK);
     }
-#endif // HAVE_SOCAMERA_SET_STEREO_MODE
+#endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
   else this->reallyRedraw(clearcol);
 } // actualRedraw()
