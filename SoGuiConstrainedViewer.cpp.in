@@ -102,7 +102,7 @@ So@Gui@ConstrainedViewer::setUpDirection(
   const SbVec3f & dir )
 {
   this->upVector = dir;
-  // FIXME: re-set camera orientation if necessary here? 20010907 mortene.
+  this->checkForCameraUpConstrain();
 }
 
 // ************************************************************************
@@ -124,7 +124,7 @@ So@Gui@ConstrainedViewer::setCamera( // virtual
   SoCamera * newcam )
 {
   inherited::setCamera( newcam );
-  // FIXME: enforce upvector. 20010905 mortene.
+  this->checkForCameraUpConstrain();
 }
 
 // ************************************************************************
@@ -186,9 +186,7 @@ So@Gui@ConstrainedViewer::tiltCamera( // virtual, protected
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@ConstrainedViewer::bottomWheelMotion( // virtual, protected
   float value )
@@ -199,9 +197,7 @@ So@Gui@ConstrainedViewer::bottomWheelMotion( // virtual, protected
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@ConstrainedViewer::leftWheelMotion( // virtual, protected
   float value )
@@ -212,14 +208,13 @@ So@Gui@ConstrainedViewer::leftWheelMotion( // virtual, protected
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
   SoCamera * camera )
 {
-  SO@GUI@_STUB();
+  inherited::changeCameraValues(camera);
+  this->checkForCameraUpConstrain();
 }
 
 // ************************************************************************
@@ -238,25 +233,29 @@ So@Gui@ConstrainedViewer::findUpDirection(
 // ************************************************************************
 
 /*!
-  FIXME: doc
+  If necessary, "tilts" the camera sideways so the up-direction is
+  heeded.
 */
 void
-So@Gui@ConstrainedViewer::checkForCameraUpConstrain(
+So@Gui@ConstrainedViewer::checkForCameraUpConstrain( // protected
   void )
 {
-  SO@GUI@_STUB();
-}
+  SoCamera * cam = this->getCamera();
+  assert(cam);
 
-// ************************************************************************
+  SbRotation camorient = cam->orientation.getValue();
 
-/*!
-  FIXME: doc
-*/
-void
-So@Gui@ConstrainedViewer::computeSeekFinalOrientation( // virtual, protected
-  void )
-{
-  SO@GUI@_STUB();
+  SbVec3f campointdir;
+  camorient.multVec(SbVec3f(0, 0, -1), campointdir);
+  SbVec3f camrightdir;
+  camorient.multVec(SbVec3f(1, 0, 0), camrightdir);
+
+  SbVec3f correctrightdir = campointdir.cross(this->upVector);
+  if (correctrightdir.length() == 0.0f) { return; } // upvector == pointdir
+
+  SbRotation r(camrightdir, correctrightdir);
+  SbRotation newcamorient = camorient * r;
+  cam->orientation = newcamorient;
 }
 
 // ************************************************************************

@@ -62,7 +62,6 @@ protected:
   virtual void changeCameraValues( SoCamera * camera );
   void findUpDirection( SbVec2s mouselocation );
   void checkForCameraUpConstrain(void);
-  virtual void computeSeekFinalOrientation(void);
 
 private:
   class So@Gui@ConstrainedViewerP * pimpl;
