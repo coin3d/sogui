@@ -2162,26 +2162,20 @@ So@Gui@Viewer::actualRedraw(void)
   if ( PRIVATE(this)->superimpositions != NULL ) {
     SoGLRenderAction * raaction = this->getSceneManager()->getGLRenderAction();
     SbBool first = TRUE;
-    SbBool zenabled = FALSE;
-    GLfloat depthrange[2];
+    SbBool zWasEnabled = FALSE;
     for ( int i = 0; i < PRIVATE(this)->superimpositions->getLength(); i++ ) {
       if ( (*PRIVATE(this)->superimpositionsenabled)[i] != FALSE ) {
 	if ( first ) {
 	  // save Z buffer state and disable
-	  glGetFloatv(GL_DEPTH_RANGE, depthrange);
-	  glDepthFunc(GL_ALWAYS);
-	  glDepthMask(GL_TRUE);
-	  glDepthRange(0, 0);
-	  glEnable(GL_DEPTH_TEST);
+          zWasEnabled = glIsEnabled(GL_DEPTH_TEST) ? TRUE : FALSE;
+	  glDisable(GL_DEPTH_TEST);
+          first = FALSE;
 	}
 	SoNode * scene = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
 	raaction->apply(scene);
       }
     }
-    if ( ! first ) {
-      // restore Z buffer state
-      glDepthRange(depthrange[0], depthrange[1]);
-    }
+    if ( !first && zWasEnabled ) glEnable(GL_DEPTH_TEST);
   }
 
   if ( this->getInteractiveCount() > 0 )
