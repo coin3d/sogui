@@ -532,3 +532,27 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 }
 
 // ************************************************************************
+
+// documented in superclass
+void
+So@Gui@PlaneViewer::setSeekMode(SbBool on)
+{
+  // Note: this method is almost identical to the setSeekMode() in the
+  // So@Gui@FlyViewer and So@Gui@ExaminerViewer, so migrate any
+  // changes.
+
+#if SO@GUI@_DEBUG
+  if (on == this->isSeekMode()) {
+    SoDebugError::postWarning("So@Gui@PlaneViewer::setSeekMode",
+                              "seek mode already %sset", on ? "" : "un");
+    return;
+  }
+#endif // SO@GUI@_DEBUG
+
+  inherited::setSeekMode(on);
+  this->setMode(on ?
+                So@Gui@PlaneViewer::SEEK_WAIT_MODE :
+                So@Gui@PlaneViewer::IDLE_MODE);
+}
+
+// *************************************************************************
