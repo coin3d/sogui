@@ -25,9 +25,9 @@
   \brief The SoAny class is a collection of common toolkit methods.
   \ingroup common
 
-  SoAny will contain internal (ie not accessible to the application
-  programmer) functionality that should be "globally" visible to all
-  parts of the toolkit.
+  SoAny contains internal (ie not accessible to the application
+  programmer) functionality which needs to be "globally" visible to
+  all parts of the toolkit.
 */
 
 #include <Inventor/@Gui@/SoAny.h>
@@ -263,6 +263,16 @@ SoAny::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
 SbBool
 SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
 {
+  // First trigger the internal clean-up routines.
+  int internals = this->internalfehandlers.getLength();
+  for (int idx = 0; idx < internals; idx++) {
+    SoAny::InternalFatalErrorCB * cb =
+      (SoAny::InternalFatalErrorCB *)this->internalfehandlers[idx];
+    (*cb)(this->internalfedata[idx]);
+  }
+
+  // If no app-programmer registered callback, throw up our own
+  // message dialog.
   if (this->fatalcb == NULL) {
     So@Gui@::createSimpleErrorDialog(NULL,
                                      "Fatal application error",
@@ -273,4 +283,21 @@ SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
 
   fatalcb(errmsg, errcode, this->userdata);
   return TRUE;
+}
+
+
+/*!
+  Lets us register an internal callback to run when a fatal error is
+  detected.
+
+  Internal clean-up functions is sometimes necessary because we set up
+  external references to internal resources which may not be valid
+  after a fatal error hits.
+*/
+void
+SoAny::registerInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
+                                         void * userdata)
+{
+  this->internalfehandlers.append((void *)cb);
+  this->internalfedata.append(userdata);
 }
