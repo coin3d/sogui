@@ -466,10 +466,12 @@ So@Gui@FlyViewerP::updateCursorRepresentation(void)
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
     break;
 
+  case So@Gui@FlyViewerP::TILTING:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getPanCursor());
+    break;
+
   default:
-    // FIXME: enable again when implementation completed. 20010910 mortene.
-//      assert(0);
-    SO@GUI@_STUB();
+    assert(0 && "unknown mode");
     break;
   }
 }
