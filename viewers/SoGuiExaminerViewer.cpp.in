@@ -1171,7 +1171,7 @@ So@Gui@ExaminerViewer::actualRedraw(void)
 
 // doc in super
 void
-SoQtExaminerViewer::afterRealizeHook(void)
+So@Gui@ExaminerViewer::afterRealizeHook(void)
 {
   inherited::afterRealizeHook();
   PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->currentmode);
