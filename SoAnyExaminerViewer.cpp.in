@@ -280,11 +280,15 @@ SoAnyExaminerViewer::setMode(const ViewerMode mode)
   switch (mode) {
   case INTERACT:
     if (this->isAnimating()) this->stopAnimating();
+    // FIXME: this looks like someone fixed the symptom instead of
+    // fixing the cause? 20010709 mortene.
     while (this->viewer->getInteractiveCount())
       this->viewer->interactiveCountDec();
     break;
 
   case DRAGGING:
+    // Set up initial projection point for the projector object when
+    // first starting a drag operation.
     this->spinprojector->project( this->lastmouseposition );
     break;
 
@@ -601,17 +605,8 @@ SoAnyExaminerViewer::reorientCamera(
   SbVec3f focalpoint = cam->position.getValue() +
     cam->focalDistance.getValue() * direction;
 
-//  SoDebugError::postWarning("SoAnyExaminerViewer::reorientCamera", "A" );
   // Set new orientation value by accumulating the new rotation.
-
-//  fprintf( stdout, "\nrotation : " );
-//  rot.print( stdout );
-//  fprintf( stdout, "\ncamera   : " );
-//  cam->orientation.getValue().print( stdout );
-//  fprintf( stdout, "\n" );
-//  SoDebugError::postWarning("SoAnyExaminerViewer::reorientCamera", "A" );
   cam->orientation = rot * cam->orientation.getValue();
-//  SoDebugError::postWarning("SoAnyExaminerViewer::reorientCamera", "B" );
 
   // Reposition camera so we are still pointing at the same old focal point.
   cam->orientation.getValue().multVec( SbVec3f(0, 0, -1), direction );
@@ -897,8 +892,8 @@ SoAnyExaminerViewer::processSoEvent(
         this->zoom( 0.1f );
         processed = TRUE;
         break;
-
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
+
       default:
         break;
       } // switch ( button )
@@ -910,6 +905,11 @@ SoAnyExaminerViewer::processSoEvent(
           this->spinanimating = FALSE;
           if ( ! viewer->isSeekMode() ) {
             if ( ! this->isAnimationEnabled() || this->log.historysize < 3 ) {
+              // FIXME: attention: here lies dragons! This will f*ck
+              // up the interactioncounter if a mouse release "just
+              // happens", as can be the case (dependent on the native
+              // UI toolkit). At least Win32 can give us a release
+              // event with no press event in advance. 20010709 mortene.
               viewer->interactiveCountDec();
             }
             else {
@@ -967,8 +967,8 @@ SoAnyExaminerViewer::processSoEvent(
       case SoMouseButtonEvent::BUTTON5:
         processed = TRUE; // don't pass on
         break;
-
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
+
       default:
         break;
       } // switch ( button )
