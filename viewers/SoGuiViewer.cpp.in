@@ -242,9 +242,9 @@ public:
   // Keep track of the frames-per-second counter.
   // Const value trick for old compilers.
   enum Constants { FRAMESARRAY_SIZE = 100 };
-  double frames[FRAMESARRAY_SIZE];
-  double totalval;
-  double currentframetime;
+  SbVec2f frames[FRAMESARRAY_SIZE];
+  float totalcoin, totaldraw;
+  double lastgettimeofday;
   int framecount;
 
   // Misc
@@ -274,7 +274,7 @@ public:
 
   // Methods to keep track of frames-per-second value.
   void resetFrameCounter(void);
-  void addFrametime(const double ft);
+  SbVec2f addFrametime(const double ft);
   void recordFPS(const double rendertime);
 
   // Misc
@@ -1162,29 +1162,40 @@ So@Gui@ViewerP::resetFrameCounter(void)
 {
   this->framecount = 0;
   for (int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++)
-    this->frames[i] = 0.0;
-  this->totalval = 0.0;
-  this->currentframetime = 0.0;
+    this->frames[i] = SbVec2f(0.0f, 0.0f);
+  this->totalcoin = 0.0f;
+  this->totaldraw = 0.0f;
+  this->lastgettimeofday = SbTime::getTimeOfDay().getValue();
 }
 
 // Adds the time spent drawing the last frame to the array of past
-// frame times.
+// frame times. Returns the current averaged fps-value.
 //
 // The methods for recording FPS values are Coin extensions, not
 // available in the original Open Inventor API.
 //
 // \sa resetFrameCounter(), recordFPS()
-void
+SbVec2f
 So@Gui@ViewerP::addFrametime(const double ft)
 {
   this->framecount++;
 
   int arrayptr = (this->framecount - 1) % FRAMESARRAY_SIZE;
-  double oldval = this->frames[arrayptr];
-  this->frames[arrayptr] = ft;
-  this->totalval += (ft - oldval);
-  this->currentframetime =
-    this->totalval / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
+
+  this->totalcoin += (ft - this->frames[arrayptr][0]);
+  float coinfps =
+    this->totalcoin / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
+
+  double timeofday = SbTime::getTimeOfDay().getValue();
+  double ct = timeofday - this->lastgettimeofday;
+  this->totaldraw += (ct - this->frames[arrayptr][1]);
+  float drawfps =
+    this->totaldraw / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
+
+  this->frames[arrayptr] = SbVec2f(ft, ct);
+  this->lastgettimeofday = timeofday;
+
+  return SbVec2f(1.0f / coinfps, 1.0f / drawfps);
 }
 
 static unsigned char fps2dfont[][12] = {
@@ -1364,10 +1375,10 @@ So@Gui@ViewerP::recordFPS(const double rendertime)
   }
 
   if (COIN_SHOW_FPS_COUNTER) {
-    this->addFrametime(rendertime);
+    SbVec2f fps = this->addFrametime(rendertime);
 
     char buffer[64];
-    int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
+    int nr = sprintf(buffer, "%.1f/%.1f fps", fps[0], fps[1]);
     assert(nr < 64);
     Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
   }
