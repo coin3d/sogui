@@ -33,6 +33,11 @@
 #include <X11/Intrinsic.h>
 #include <Xm/Xm.h>
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+#include <gtk/gtk.h>
+class SoGtkComponent;
+class SbPList;
+#endif // __COIN_SOGTK__
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
@@ -47,6 +52,32 @@ class SO@GUI@_DLL_API So@Gui@
   @COMPONENTHEADER@
 
 public:
+  static @WIDGET@ init(const char * const appName,
+                       const char * const className = "So@Gui@");
+
+  static @WIDGET@ init(int & argc, char ** argv,
+                       const char * const appName,
+                       const char * const className = "So@Gui@");
+
+  static void init(@WIDGET@ const topLevelWidget);
+
+  static void mainLoop(void);
+  static void exitMainLoop(void);
+
+  static @WIDGET@ getTopLevelWidget(void);
+  static @WIDGET@ getShellWidget(const @WIDGET@ w);
+
+  static void show(@WIDGET@ const widget);
+  static void hide(@WIDGET@ const widget);
+
+  static void setWidgetSize(@WIDGET@ const widget, const SbVec2s size);
+  static SbVec2s getWidgetSize(const @WIDGET@ widget);
+
+  static void createSimpleErrorDialog(@WIDGET@ widget,
+                                      const char * dialogTitle,
+                                      const char * errorStr1,
+                                      const char * errorStr2 = NULL);
+
 #ifdef __COIN_SOQT__
   enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
   static class QApplication * getApplication(void);
@@ -83,32 +114,18 @@ public:
   static const char * getAppName(void);
   static const char * getAppClass(void);
 #endif // __COIN_SOXT__
-  
-  static @WIDGET@ init(const char * const appName,
-                       const char * const className = "So@Gui@");
 
-  static @WIDGET@ init(int & argc, char ** argv,
-                       const char * const appName,
-                       const char * const className = "So@Gui@");
+#ifdef __COIN_SOGTK__
+  friend class SoGtkComponent;
+  enum SoGtkComponentAction { CREATION, DESTRUCTION, CHANGE };
+  typedef void SoGtkComponentActionCallback(SoGtkComponent *, SoGtk::SoGtkComponentAction, void *);
 
-  static void init(@WIDGET@ const topLevelWidget);
+  static void addComponentActionCallback(SoGtkComponentActionCallback *, void *);
+  static void removeComponentActionCallback(SoGtkComponentActionCallback *, void *);
 
-  static void mainLoop(void);
-  static void exitMainLoop(void);
+  static int getComponents(SbPList & components);
+#endif // __COIN_SOGTK__
 
-  static @WIDGET@ getTopLevelWidget(void);
-  static @WIDGET@ getShellWidget(const @WIDGET@ w);
-
-  static void show(@WIDGET@ const widget);
-  static void hide(@WIDGET@ const widget);
-
-  static void setWidgetSize(@WIDGET@ const widget, const SbVec2s size);
-  static SbVec2s getWidgetSize(const @WIDGET@ widget);
-
-  static void createSimpleErrorDialog(@WIDGET@ widget,
-                                      const char * dialogTitle,
-                                      const char * errorStr1,
-                                      const char * errorStr2 = NULL);
 
 protected:
 #ifdef __COIN_SOQT__
@@ -119,6 +136,15 @@ protected:
                                        XtEventHandler & proc,
                                        XtPointer & clientData);
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+  static void invokeComponentActionCallbacks(SoGtkComponent * component,
+                                             SoGtkComponentAction action);
+
+  static gint componentCreation(SoGtkComponent * component);
+  static gint componentDestruction(SoGtkComponent * component);
+  static gint componentChange(SoGtkComponent * component);
+#endif // __COIN_SOGTK__
+
 
 #ifdef __COIN_SOQT__
 private slots:
@@ -135,6 +161,15 @@ private:
   static void delaySensorCB(XtPointer, XtIntervalId *);
   static Boolean idleSensorCB(XtPointer);
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+  static gint timerSensorCB(gpointer data);
+  static gint idleSensorCB(gpointer data);
+  static gint delaySensorCB(gpointer data);
+
+  static GtkWidget * mainWidget;
+  static SbPList * components;
+  static SbPList * component_callbacks;
+#endif // __COIN_SOGTK__
 
 }; // class So@Gui@
 
