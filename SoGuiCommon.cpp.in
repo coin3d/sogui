@@ -190,6 +190,23 @@ So@Gui@::init(const char * appname, const char * classname)
   It doesn't return until application exit is somehow forced, either
   programmatically from the relevant API-call of the native toolkit,
   or when the user closes the application's main widget.
+
+  An important note: be careful about how you handle
+  So@Gui@Component-derived objects after the application control returns
+  from mainLoop(), as So@Gui@ will then have been "cleaned up" with
+  regards to various internal resources. So doing for instance
+  something like this:
+
+  \code
+  So@Gui@::mainLoop();
+  viewer->hide();
+  \endcode
+
+  ..spells "undefined behavior, expect a crash".
+
+  \e Deleting a component after mainLoop() returns is allowed, though,
+  and also necessary to avoid getting reports of possible memory leaks
+  from memleak checkers.
 */
 
 /*!
