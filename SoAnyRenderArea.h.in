@@ -59,13 +59,17 @@ typedef SbBool So@GUI@RenderAreaEventCB( void * user, @EVENT@ event );
 
 class So@GUI@RenderArea : public So@GUI@GLWidget {
   typedef So@GUI@GLWidget inherited;
-
   @COMPONENTHEADER@
 
 public:
   So@GUI@RenderArea( @WIDGET@ parent = NULL, const char * name = NULL,
       SbBool inParent = TRUE, SbBool mouseInput = TRUE,
       SbBool keyboardInput = TRUE );
+#if SO@uGUI@_HAVE_WINWIDGET
+  So@GUI@RenderArea( @WINWIDGET@ parent = NULL, const char * name = NULL,
+      SbBool inParent = TRUE, SbBool mouseInput = TRUE,
+      SbBool keyboardInput = TRUE );
+#endif // SO@uGUI@_HAVE_WINWIDGET
   ~So@GUI@RenderArea(void);
 
   virtual void setSceneGraph( SoNode * scene );
@@ -117,6 +121,10 @@ public:
 protected:
   So@GUI@RenderArea( @WIDGET@ parent, const char * name, SbBool inParent,
       SbBool mouseInput, SbBool keyboardInput, SbBool build );
+#if SO@uGUI@_HAVE_WINWIDGET
+  So@GUI@RenderArea( @WINWIDGET@ parent, const char * name, SbBool inParent,
+      SbBool mouseInput, SbBool keyboardInput, SbBool build );
+#endif // SO@uGUI@_HAVE_WINWIDGET
 
   virtual void redraw(void);
   virtual void actualRedraw(void);
@@ -130,6 +138,10 @@ protected:
   virtual void widgetChanged( @WIDGET@ widget );
 
   @WIDGET@ buildWidget( @WIDGET@ parent );
+#if SO@uGUI@_HAVE_WINWIDGET
+  @WIDGET@ buildWidget( @WINWIDGET@ parent );
+#endif // SO@uGUI@_HAVE_WINWIDGET
+
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
   virtual const char * getDefaultIconTitle(void) const;

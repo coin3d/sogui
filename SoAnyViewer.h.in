@@ -76,7 +76,6 @@ typedef void So@GUI@ViewerDecimationPercentageCB(
 
 class So@GUI@Viewer : public So@GUI@RenderArea {
   typedef So@GUI@RenderArea inherited;
-
   @COMPONENTHEADER@
 
 public:
@@ -193,7 +192,6 @@ public:
       So@GUI@ViewerDecimationPercentageCB * cb, void * data = NULL );
   float getCurrentDecimationPercentage(void) const;
 
-
   // Overloaded from parent class.
   virtual void setDoubleBuffer( SbBool enable );
 
@@ -207,7 +205,14 @@ protected:
     SbBool buildInsideParent,
     Type type,
     SbBool buildNow );
-
+#if SO@uGUI@_HAVE_WINWIDGET
+  So@GUI@Viewer(
+    @WINWIDGET@ parent,
+    const char * name,
+    SbBool buildInsideParent,
+    Type type,
+    SbBool buildNow );
+#endif // SO@uGUI@_HAVE_WINWIDGET
   ~So@GUI@Viewer( void );
 
   virtual void setSeekMode( SbBool enable );
