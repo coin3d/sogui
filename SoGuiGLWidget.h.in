@@ -72,6 +72,12 @@ public:
   void setQuadBufferStereo(const SbBool enable);
   SbBool isQuadBufferStereo(void) const;
 
+  void setAccumulationBuffer(const SbBool enable);
+  SbBool getAccumulationBuffer(void) const;
+
+  void setStencilBuffer(const SbBool enable);
+  SbBool getStencilBuffer(void) const;
+
   void setOverlayRender(const SbBool onoff);
   SbBool isOverlayRender(void) const;
 
