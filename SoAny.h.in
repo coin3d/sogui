@@ -26,6 +26,15 @@
 #ifndef SOANY_H
 #define SOANY_H
 
+// This file contains definitions which should _only_ be used during
+// library build. It is not installed for use by the application
+// programmer.
+#ifndef SO@GUI@_INTERNAL
+#error Only for internal use during library build.
+#endif /* !SO@GUI@_INTERNAL */
+
+// ************************************************************************
+
 #include <Inventor/SbPList.h>
 #include <Inventor/@Gui@/So@Gui@.h>
 
