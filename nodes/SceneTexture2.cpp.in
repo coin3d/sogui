@@ -25,9 +25,9 @@
 #include <string.h>
 
 #include <Inventor/errors/SoDebugError.h>
-#include <Inventor/sensors/SoNodeSensor.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/SoOffscreenRenderer.h>
+#include <Inventor/actions/SoGLRenderAction.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
 
@@ -39,12 +39,11 @@ public:
 
   SoGuiSceneTexture2 * api;
 
+  SbVec2s prevsize;
   SoOffscreenRenderer * renderer;
 
   SoFieldSensor * size_sensor;
-  SoFieldSensor * field_sensor;
-  static void field_updated_cb(void * closure, SoSensor * sensor);
-  SoNodeSensor * scene_sensor;
+  SoFieldSensor * scene_sensor;
   static void scene_updated_cb(void * closure, SoSensor * sensor);
 };
 
@@ -66,22 +65,19 @@ SoGuiSceneTexture2::SoGuiSceneTexture2(void)
   PRIVATE(this)->api = this;
 
   SO_NODE_CONSTRUCTOR(SoGuiSceneTexture2);
-  SO_NODE_ADD_FIELD(size, (SbVec2s(512, 512)));
+  SO_NODE_ADD_FIELD(size, (SbVec2s(256, 256)));
   SO_NODE_ADD_FIELD(scene, (NULL));
 
   PRIVATE(this)->size_sensor = new SoFieldSensor(SceneTexture2::scene_updated_cb, PRIVATE(this));
   PRIVATE(this)->size_sensor->attach(&(this->size));
-  PRIVATE(this)->field_sensor = new SoFieldSensor(SceneTexture2::field_updated_cb, PRIVATE(this));
-  PRIVATE(this)->field_sensor->attach(&(this->scene));
+  PRIVATE(this)->scene_sensor = new SoFieldSensor(SceneTexture2::scene_updated_cb, PRIVATE(this));
+  PRIVATE(this)->scene_sensor->attach(&(this->scene));
 }
 
 SoGuiSceneTexture2::~SoGuiSceneTexture2(void)
 {
-  if ( PRIVATE(this)->scene_sensor != NULL ) {
-    delete PRIVATE(this)->scene_sensor;
-  }
   delete PRIVATE(this)->size_sensor;
-  delete PRIVATE(this)->field_sensor;
+  delete PRIVATE(this)->scene_sensor;
   if ( PRIVATE(this)->renderer != NULL ) {
     delete PRIVATE(this)->renderer;
   }
@@ -97,63 +93,49 @@ SceneTexture2::SceneTexture2(void)
 {
   this->api = NULL;
   this->size_sensor = NULL;
-  this->field_sensor = NULL;
   this->scene_sensor = NULL;
   this->renderer = NULL;
+  this->prevsize = SbVec2s(-1, -1);
 }
 
-void
-SceneTexture2::field_updated_cb(void * closure, SoSensor * sensor)
-{
-  assert(closure);
-  SceneTexture2 * me = (SceneTexture2 *) closure;
-  if ( me->scene_sensor ) {
-    delete me->scene_sensor;
-    me->scene_sensor = NULL;
-  }
-  SoNode * scene = PUBLIC(me)->scene.getValue();
-  if ( scene != NULL ) {
-    me->scene_sensor = new SoNodeSensor(SceneTexture2::scene_updated_cb, me);
-    me->scene_sensor->attach(scene);
-    // scene->touch();
-  }
-  SceneTexture2::scene_updated_cb(closure, sensor);
-}
+// This rendering is terribly slow.  Some 
+
 
 void
 SceneTexture2::scene_updated_cb(void * closure, SoSensor * sensor)
 {
-  SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "");
+  // SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "");
   assert(closure);
   SceneTexture2 * me = (SceneTexture2 *) closure;
-
-  SbVec2s size = PUBLIC(me)->size.getValue();
+  SbVec2s size = PUBLIC(me)->size.getValue(), dummy;
+  int dummync;
   SoNode * scene = PUBLIC(me)->scene.getValue();
+  SbBool save = PUBLIC(me)->image.enableNotify(FALSE);
   if ( scene != NULL ) {
     if ( me->renderer == NULL ) {
       me->renderer = new SoOffscreenRenderer(SbViewportRegion(size));
       me->renderer->setComponents(SoOffscreenRenderer::RGB);
-    } else {
-      me->renderer->setViewportRegion(SbViewportRegion(size));
+      me->renderer->getGLRenderAction()->setTransparencyType(SoGLRenderAction::ADD);
+      me->prevsize = size;
+      PUBLIC(me)->image.setValue(size, 3, NULL);
     }
-    SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "rendering");
+    if ( size != me->prevsize ) {
+      me->renderer->setViewportRegion(SbViewportRegion(size));
+      me->prevsize = size;
+      PUBLIC(me)->image.setValue(size, 3, NULL);
+    }
     me->renderer->render(scene);
-    SbBool save = PUBLIC(me)->image.enableNotify(FALSE);
-    PUBLIC(me)->image.setValue(size, 3, NULL);
-    SbVec2s dummy;
-    int dummync;
-    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
-
     unsigned char * renderbuffer = me->renderer->getBuffer();
+    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
     memcpy(imagebytes, renderbuffer, size[0] * size[1] * 3);
-
     PUBLIC(me)->image.finishEditing();
-    PUBLIC(me)->image.enableNotify(save);
-    if ( save ) PUBLIC(me)->image.touch();
-
   } else {
-    SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "clear not implemented");
+    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
+    memset(imagebytes, 0, size[0] * size[1] * 3);
+    PUBLIC(me)->image.finishEditing();
   }
+  PUBLIC(me)->image.enableNotify(save);
+  if ( save ) PUBLIC(me)->image.touch();
 }
 
 #undef PUBLIC
