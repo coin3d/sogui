@@ -199,6 +199,7 @@ SoGuiSlider1::SoGuiSlider1(void)
   SO_KIT_ADD_CATALOG_ENTRY(knobFaceSet, SoIndexedFaceSet, FALSE, knobGeometry, knobShadeMaterial, FALSE);
   SO_KIT_ADD_CATALOG_ENTRY(knobMaterial, SoMaterial, FALSE, knobGeometry, knobFaceSet, TRUE);
   SO_KIT_ADD_CATALOG_ENTRY(knobCoords, SoCoordinate3, FALSE, knobGeometry, knobMaterial, FALSE);
+
   SO_KIT_ADD_CATALOG_ENTRY(knobGeometry, SoSeparator, FALSE, topSeparator, "", FALSE);
   SO_KIT_ADD_CATALOG_ENTRY(surfaceFaceSet, SoIndexedFaceSet, FALSE, surfaceGeometry, "", FALSE);
   SO_KIT_ADD_CATALOG_ENTRY(surfaceCoords, SoCoordinate3, FALSE, surfaceGeometry, surfaceFaceSet, FALSE);
@@ -278,14 +279,6 @@ SoGuiSlider1::~SoGuiSlider1(void)
   Slider1 * obj = PRIVATE(this);
   delete obj;
   this->internals = NULL;
-}
-
-void
-SoGuiSlider1::setDefaultOnNonWritingFields(void)
-{
-  // this->topSeparator.setDefault(TRUE);
-  // ...
-  inherited::setDefaultOnNonWritingFields();
 }
 
 void
@@ -434,20 +427,16 @@ SoGuiSlider1::maxUpdate(void)
 void
 SoGuiSlider1::handleEvent(SoHandleEventAction * action)
 {
+  if ( action->isHandled() ) return;
   const SoEvent * event = action->getEvent();
-  if ( action->isHandled() ) {
-    return;
-  }
 
-  if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
-    if ( PRIVATE(this)->grabbing ) { // click-and-drag
+  if ( PRIVATE(this)->grabbing ) { // click-and-drag
+    if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
       assert(PRIVATE(this)->pane != NULL);
-
       // although the return value is discarded, we need to make this call to make
       // sure the raypick action is run over the scene graph so the pane can return
       // a useful value...
       action->getPickedPoint();
-
       SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
       if ( raypos[0] != -1.0f ) {
         float imagpos = raypos[0] + PRIVATE(this)->graboffset;
@@ -458,21 +447,22 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
         else imagval = So@Gui@Clamp(imagpos / this->size.getValue()[0], max, min);
         this->value.setValue(imagval);
       }
+      action->setHandled();
+    }
+    else if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
+      SoMouseButtonEvent * mbevent = (SoMouseButtonEvent *) event;
+      if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
+           (mbevent->getState() == SoButtonEvent::UP) ) {
+        PRIVATE(this)->grabbing = FALSE;
+        PRIVATE(this)->pane = NULL;
+        action->setHandled();
+      }
     }
   }
   else if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
     SoMouseButtonEvent * mbevent = (SoMouseButtonEvent *) event;
-    if ( (PRIVATE(this)->grabbing != FALSE) &&
-         (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
-         (mbevent->getState() == SoButtonEvent::UP) ) {
-      if ( action->getGrabber() == (SoNode *) this ) {
-        action->releaseGrabber();
-        PRIVATE(this)->grabbing = FALSE;
-        PRIVATE(this)->pane = NULL;
-      }
-    }
-    else if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
-              (mbevent->getState() == SoButtonEvent::DOWN) ) {
+    if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
+         (mbevent->getState() == SoButtonEvent::DOWN) ) {
       action->setPickRadius(0);
       const SoPickedPointList & pplist = action->getPickedPointList();
       if ( pplist.getLength() > 0 ) {
@@ -492,9 +482,8 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
             if ( point[0] >= knobmin[0] && point[0] <= knobmax[0] &&
                  point[1] >= knobmin[1] && point[1] <= knobmax[1] ) {
               PRIVATE(this)->grabbing = TRUE;
-              action->setGrabber(this);
               action->setHandled();
-
+  
               const SoFullPath * path = (const SoFullPath *) action->getCurPath();
               int i = path->getLength() - 1;
               SoNode * node = NULL;
@@ -507,7 +496,7 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
               PRIVATE(this)->pane = (SoGuiPane *) node;
               PRIVATE(this)->grabval = this->value.getValue();
               PRIVATE(this)->pickpos = point[0];
-
+  
               SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
               PRIVATE(this)->grabpos = raypos[0];
               float realval = ((this->value.getValue() - this->min.getValue()) /
@@ -528,8 +517,6 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
             action->setHandled();
             if ( this->alwaysHook.getValue() ) {
               PRIVATE(this)->grabbing = TRUE;
-              action->setGrabber(this);
-
               const SoFullPath * path = (const SoFullPath *) action->getCurPath();
               int i = path->getLength() - 1;
               SoNode * node = NULL;
@@ -542,9 +529,8 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
               PRIVATE(this)->pane = (SoGuiPane *) node;
               PRIVATE(this)->grabval = this->value.getValue();
               PRIVATE(this)->pickpos = point[0];
-
               SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
-              PRIVATE(this)->grabpos = raypos[0];
+                PRIVATE(this)->grabpos = raypos[0];
               float realval = ((this->value.getValue() - this->min.getValue()) /
                 (this->max.getValue() - this->min.getValue())) * this->size.getValue()[0];
               PRIVATE(this)->graboffset = realval - raypos[0];

@@ -76,8 +76,6 @@ public:
 
   virtual void handleEvent(SoHandleEventAction * action);
 
-  virtual void setDefaultOnNonWritingFields(void);
-
   virtual void setSurfaceColor(const SbColor & value);
   virtual void setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue);
   virtual SbColor getValueAsColor(void) const;
