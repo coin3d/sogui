@@ -1337,11 +1337,13 @@ static void
 Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 {
   // Store GL state.
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
 
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_TEXTURE_2D);
+  glDisable(GL_BLEND);
+
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
@@ -1371,6 +1373,8 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // restore default value
 
   glPopAttrib();
 }
