@@ -381,6 +381,9 @@ SbBool
 SoAnyPlaneViewer::processSoEvent(
   const SoEvent * const ev )
 {
+  if ( ! viewer->isViewing() )
+    return FALSE;
+
   const SoType type( ev->getTypeId() );
 
   const SbVec2s size( viewer->getGLSize() );
@@ -423,6 +426,9 @@ SoAnyPlaneViewer::processSoEvent(
         break;
 
       case SoMouseButtonEvent::BUTTON2:
+        return FALSE;
+
+      case SoMouseButtonEvent::BUTTON3:
         if ( this->mode == IDLE_MODE ) {
           viewer->interactiveCountInc();
           this->mode = TRANSLATE_MODE;
@@ -447,7 +453,7 @@ SoAnyPlaneViewer::processSoEvent(
     } else {
       switch ( event->getButton() ) {
       case SoMouseButtonEvent::BUTTON1:
-      case SoMouseButtonEvent::BUTTON2:
+      case SoMouseButtonEvent::BUTTON3:
         if ( this->mode != IDLE_MODE && this->mode != ROTZ_MODE ) {
           viewer->interactiveCountDec();
           this->mode = IDLE_MODE;
@@ -460,7 +466,6 @@ SoAnyPlaneViewer::processSoEvent(
     }
 
     return TRUE;
-    
   }
 
   if ( type.isDerivedFrom( LOCATION2_EVENT_TYPE ) ) {
@@ -478,7 +483,7 @@ SoAnyPlaneViewer::processSoEvent(
         break;
       }
 
-      if ( ! this->controldown && this->button2down ) {
+      if ( ! this->controldown && this->button3down ) {
         if ( (posn[0] != prevn[0]) || (posn[1] != prevn[1]) ) {
           float dx = (posn[0] - prevn[0]) * 2.5f;
           float dy = (posn[1] - prevn[1]) * 2.5f;
