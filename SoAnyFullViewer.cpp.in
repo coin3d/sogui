@@ -780,7 +780,7 @@ SoAnyFullViewer::processSoEvent(
       return TRUE;
     }
     if ( (button == SoMouseButtonEvent::BUTTON2) ) {
-      if ( event->getState() == SoButtonEvent::DOWN )
+      if ( event->getState() == SoButtonEvent::DOWN && viewer->prefmenu )
         viewer->openPopupMenu( event->getPosition() );
       return TRUE;
     }
