@@ -198,7 +198,7 @@ SoAny::unregisterGLContext(void * context)
       return;
     }
   }
-  assert(0 && "should not get here!");
+  assert(FALSE && "couldn't find context in internal list");
 }
 
 /*!
@@ -218,5 +218,3 @@ SoAny::getSharedCacheContextId(void * context)
 #endif // COIN_DEBUG
   return 0;
 }
-
-
