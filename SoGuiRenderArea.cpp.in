@@ -406,6 +406,8 @@ void
 So@Gui@RenderArea::setViewportRegion(
   const SbViewportRegion & region )
 {
+  if ( region.getWindowSize()[0] == -1 ) return;
+
   assert( this->normalManager != NULL );
   this->normalManager->getGLRenderAction()->setViewportRegion( region );
 /*
@@ -895,6 +897,8 @@ void
 So@Gui@RenderArea::sizeChanged( // virtual, protected
   const SbVec2s size )
 {
+  if ( size[0] == -1 )
+    return;
   inherited::sizeChanged( size );
 
   assert( this->normalManager != NULL );
@@ -951,7 +955,8 @@ So@Gui@RenderArea::buildWidget( // protected
     }
   }
   const SbVec2s glsize = this->getGLSize();
-  this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  if ( glsize[0] != -1 )
+    this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
   return widget;
 } // buildWidget()
 
@@ -1036,6 +1041,27 @@ So@Gui@RenderArea::glReshape( // virtual, derived
 
   this->glLock();
   this->setViewportRegion( SbViewportRegion( width, height ) );
+
+  const SbVec2s glsize = this->getGLSize();
+
+  this->normalManager->setWindowSize( glsize );
+  this->normalManager->setSize( glsize );
+//  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
+//  this->normalManager->scheduleRedraw();
+
+  this->overlayManager->setWindowSize( glsize );
+  this->overlayManager->setSize( glsize );
+//  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
+//  this->overlayManager->scheduleRedraw();
+
+  if ( this->devices.mouse != NULL )
+    this->devices.mouse->setWindowSize( glsize );
+  if ( this->devices.keyboard != NULL )
+    this->devices.keyboard->setWindowSize( glsize );
+  if ( this->devices.extra != NULL ) {
+    for ( int i = 0; i < this->devices.extra->getLength(); i++ )
+      ((So@Gui@Device *)((*(this->devices.extra))[i]))->setWindowSize( glsize );
+  }
   this->glUnlock();
   // call widgetChanged() or something?
   this->actualRedraw();
