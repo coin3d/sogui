@@ -81,6 +81,13 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 
+/*!
+  \var SbPList * So@Gui@RenderArea::deviceList
+  FIXME: write doc
+*/
+
+// *************************************************************************
+
 class So@Gui@RenderAreaP {
   friend class So@Gui@RenderArea;
 
@@ -1240,6 +1247,7 @@ So@Gui@RenderArea::glInit( // virtual, derived
 // *************************************************************************
 
 /*!
+  FIXME: write doc
 */
 
 SbBool
@@ -1256,6 +1264,7 @@ So@Gui@RenderArea::processSoEvent( // virtual
 // *************************************************************************
 
 /*!
+  FIXME: write doc
 */
 
 void
@@ -1316,6 +1325,7 @@ So@Gui@RenderArea::setDevicesWindowSize(
 // *************************************************************************
 
 /*!
+  FIXME: write doc
 */
 
 void
@@ -1385,7 +1395,7 @@ So@Gui@RenderAreaP::So@Gui@RenderAreaP(
 } // So@Gui@RenderAreaP()
 
 /*!
-  Private class desrtuctor.
+  Private class destructor.
 */
 
 So@Gui@RenderAreaP::~So@Gui@RenderAreaP(

@@ -40,7 +40,21 @@ static const char rcsid[] =
 
 // *************************************************************************
 
+/*!
+  \var SoType So@Gui@Object::classTypeId
+  FIXME: write doc
+*/
+
+/*!
+  \fn SoType So@Gui@Object::getTypeId
+  FIXME: write doc
+*/
+
 SoType So@Gui@Object::classTypeId; // static
+
+/*!
+  FIXME: write doc
+*/
 
 void
 So@Gui@Object::init( // static
@@ -51,6 +65,10 @@ So@Gui@Object::init( // static
   So@Gui@Component::initClasses();
 } // init()
 
+/*!
+  FIXME: write doc
+*/
+
 void
 So@Gui@Object::initClass( // static
   void )
@@ -60,12 +78,20 @@ So@Gui@Object::initClass( // static
     SoType::createType( SoType::badType(), "So@Gui@Object");
 } // initClass()
 
+/*!
+  FIXME: write doc
+*/
+
 SbBool
 So@Gui@Object::isOfType(
   SoType type ) const
 {
   return this->getTypeId().isDerivedFrom(type);
 } // isOfType()
+
+/*!
+  FIXME: write doc
+*/
 
 SoType
 So@Gui@Object::getClassTypeId( // static
