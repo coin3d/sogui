@@ -33,6 +33,9 @@
 #ifdef __COIN_SOXT__
 #include <GL/glx.h>
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+#include <gtk/gtk.h>
+#endif // __COIN_SOGTK__
 
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
@@ -139,6 +142,11 @@ protected:
   int getDisplayListShareGroup(GLXContext context);
   Widget getGlxMgrWidget(void);
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+  virtual void afterRealizeHook(void);
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
+#endif // __COIN_SOGTK__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
@@ -160,7 +168,9 @@ private slots:
 
 private:
   class So@Gui@GLWidgetP * pimpl;
-  void buildGLWidget(void);
+  friend class So@Gui@GLWidgetP; // FIXME: only used by SoGtkGLWidgetP -- get rid of it? 20011012 mortene.
+
+  void buildGLWidget(void); // FIXME: could we get rid of this? 20011012 mortene.
 
 }; // class So@Gui@GLWidget
 
