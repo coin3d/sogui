@@ -30,6 +30,7 @@
 // *************************************************************************
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@FullViewerP.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 #include <so@gui@defs.h>
 
@@ -42,6 +43,11 @@
 #else // SoXt, SoWin, SoQt
 #include <Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h>
 #endif
+
+// ************************************************************************
+
+#define PRIVATE(o) (o->pimpl)
+#define PUBLIC(o) (o->pub)
 
 // ************************************************************************
 
@@ -371,14 +377,23 @@ So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
 void
 So@Gui@FullViewer::setPopupMenuString(const char * name)
 {
-  this->popupmenutitle = name;
-  if (this->prefmenu) { this->prefmenu->setMenuTitle(ROOT_MENU, name); }
+  PRIVATE(this)->popupmenutitle = name;
+  if (this->prefmenu) { this->prefmenu->setMenuTitle(SoGuiFullViewerP::ROOT_MENU, name); }
 }
 
 // ************************************************************************
 
+SoGuiFullViewerP::SoGuiFullViewerP(So@Gui@FullViewer * owner)
+{
+  this->pub = owner;
+}
+
+SoGuiFullViewerP::~SoGuiFullViewerP()
+{
+}
+
 So@Gui@PopupMenu *
-So@Gui@FullViewer::setupStandardPopupMenu(void)
+SoGuiFullViewerP::setupStandardPopupMenu(void)
 {
   So@Gui@PopupMenu * menu = So@Gui@PopupMenu::createInstance();
 
@@ -613,32 +628,32 @@ So@Gui@FullViewer::setupStandardPopupMenu(void)
   toggle = menu->newRadioGroup();
   menu->addRadioGroupItem(toggle, FULLSCREEN_ITEM);
 
-  menu->addMenuSelectionCallback(So@Gui@FullViewer::menuSelectionCallback,
-    (void *) this);
+  menu->addMenuSelectionCallback(SoGuiFullViewerP::menuSelectionCallback,
+                                 (void *) this);
 
-  this->prefmenu = menu;
+  PUBLIC(this)->prefmenu = menu;
   return menu;
 }
 
 // ************************************************************************
 
 void
-So@Gui@FullViewer::prepareMenu(So@Gui@PopupMenu * menu)
+SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
 {
   //// Misc. //////////////////////////////////////////////////////////
-  menu->setMenuItemMarked(DECORATION_ITEM, this->isDecoration());
-  menu->setMenuItemMarked(EXAMINING_ITEM, this->isViewing());
-  menu->setMenuItemMarked(HEADLIGHT_ITEM, this->isHeadlight());
-  menu->setMenuItemMarked(FULLSCREEN_ITEM, this->isFullScreen());
+  menu->setMenuItemMarked(DECORATION_ITEM, PUBLIC(this)->isDecoration());
+  menu->setMenuItemMarked(EXAMINING_ITEM, PUBLIC(this)->isViewing());
+  menu->setMenuItemMarked(HEADLIGHT_ITEM, PUBLIC(this)->isHeadlight());
+  menu->setMenuItemMarked(FULLSCREEN_ITEM, PUBLIC(this)->isFullScreen());
 
   //// Basic drawstyles. //////////////////////////////////////////////
   this->setDrawStyleMenuActivation(So@Gui@FullViewer::STILL,
-                                   this->getDrawStyle(So@Gui@FullViewer::STILL));
+                                   PUBLIC(this)->getDrawStyle(So@Gui@FullViewer::STILL));
   this->setDrawStyleMenuActivation(So@Gui@FullViewer::INTERACTIVE,
-                                   this->getDrawStyle(So@Gui@FullViewer::INTERACTIVE));
+                                   PUBLIC(this)->getDrawStyle(So@Gui@FullViewer::INTERACTIVE));
 
   //// Transparency setting. //////////////////////////////////////////
-  switch (this->getTransparencyType()) {
+  switch (PUBLIC(this)->getTransparencyType()) {
   case SoGLRenderAction::SCREEN_DOOR:
     menu->setMenuItemMarked(SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE);
     break;
@@ -672,8 +687,8 @@ So@Gui@FullViewer::prepareMenu(So@Gui@PopupMenu * menu)
   }
 
   //// Stereo viewing. ////////////////////////////////////////////////
-  SbBool stereo = this->isStereoViewing();
-  SbBool quadbuffer = this->isQuadBufferStereo();
+  SbBool stereo = PUBLIC(this)->isStereoViewing();
+  SbBool quadbuffer = PUBLIC(this)->isQuadBufferStereo();
  if (!stereo)
   menu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
  if (stereo && !quadbuffer)
@@ -682,7 +697,7 @@ So@Gui@FullViewer::prepareMenu(So@Gui@PopupMenu * menu)
   menu->setMenuItemMarked(STEREO_QUADBUFFER_ITEM, TRUE);
 
   //// GL canvas settings. ////////////////////////////////////////////
-  switch (this->getBufferingType()) {
+  switch (PUBLIC(this)->getBufferingType()) {
   case So@Gui@Viewer::BUFFER_SINGLE:
     menu->setMenuItemMarked(SINGLE_BUFFER_ITEM, TRUE);
     break;
@@ -701,54 +716,54 @@ So@Gui@FullViewer::prepareMenu(So@Gui@PopupMenu * menu)
 // ************************************************************************
 
 void
-So@Gui@FullViewer::menuSelection(int menuitemid)
+SoGuiFullViewerP::menuSelection(int menuitemid)
 {
   switch (menuitemid) {
   case -1:
     // means no item was selected
 #if SO@GUI@_DEBUG
-    SoDebugError::postInfo("So@Gui@FullViewer::menuSelection",
-      "-1 not appropriate on callback usage");
+    SoDebugError::postInfo("SoGuiFullViewerP::menuSelection",
+                           "-1 not appropriate on callback usage");
 #endif // SO@GUI@_DEBUG
     break;
 
   case EXAMINING_ITEM:
-    this->setViewing(this->isViewing() ? FALSE : TRUE);
+    PUBLIC(this)->setViewing(PUBLIC(this)->isViewing() ? FALSE : TRUE);
     break;
   case DECORATION_ITEM:
-    this->setDecoration(this->isDecoration() ? FALSE : TRUE);
+    PUBLIC(this)->setDecoration(PUBLIC(this)->isDecoration() ? FALSE : TRUE);
     break;
   case HEADLIGHT_ITEM:
-    this->setHeadlight(this->isHeadlight() ? FALSE : TRUE);
+    PUBLIC(this)->setHeadlight(PUBLIC(this)->isHeadlight() ? FALSE : TRUE);
     break;
   case FULLSCREEN_ITEM:
-    (void)this->setFullScreen(this->isFullScreen() ? FALSE : TRUE);
+    (void)PUBLIC(this)->setFullScreen(PUBLIC(this)->isFullScreen() ? FALSE : TRUE);
     break;
   case PREFERENCES_ITEM:
-    this->selectedPrefs();
+    PUBLIC(this)->selectedPrefs();
     break;
 
   case HELP_ITEM:
-    this->openViewerHelpCard();
+    PUBLIC(this)->openViewerHelpCard();
     break;
   case HOME_ITEM:
-    this->resetToHomePosition();
+    PUBLIC(this)->resetToHomePosition();
     break;
   case SET_HOME_ITEM:
-    this->saveHomePosition();
+    PUBLIC(this)->saveHomePosition();
     break;
   case VIEW_ALL_ITEM:
-    this->viewAll();
+    PUBLIC(this)->viewAll();
     break;
   case SEEK_ITEM:
-    this->seekbuttonClicked();
+    PUBLIC(this)->seekbuttonClicked();
     break;
   case COPY_VIEW_ITEM:
-    this->copyView(SbTime::getTimeOfDay());
+    PUBLIC(this)->copyView(SbTime::getTimeOfDay());
 
     break;
   case PASTE_VIEW_ITEM:
-    this->pasteView(SbTime::getTimeOfDay());
+    PUBLIC(this)->pasteView(SbTime::getTimeOfDay());
     break;
 
   case AS_IS_ITEM:
@@ -783,7 +798,7 @@ So@Gui@FullViewer::menuSelection(int menuitemid)
   case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
     this->drawstyleActivated(menuitemid);
-    this->scheduleRedraw();
+    PUBLIC(this)->scheduleRedraw();
     break;
 
   case SINGLE_BUFFER_ITEM:
@@ -793,24 +808,24 @@ So@Gui@FullViewer::menuSelection(int menuitemid)
     break;
 
   case STEREO_OFF_ITEM:
-    this->setStereoViewing(FALSE);
-    this->setQuadBufferStereo(FALSE);
+    PUBLIC(this)->setStereoViewing(FALSE);
+    PUBLIC(this)->setQuadBufferStereo(FALSE);
     break;
   case STEREO_ANAGLYPH_ITEM:
-    this->setStereoViewing(TRUE);
-    this->setQuadBufferStereo(FALSE);
+    PUBLIC(this)->setStereoViewing(TRUE);
+    PUBLIC(this)->setQuadBufferStereo(FALSE);
     break;
   case STEREO_QUADBUFFER_ITEM:
-    this->setStereoViewing(TRUE);
-    this->setQuadBufferStereo(TRUE);
-    if (!this->isQuadBufferStereo()) {
-      this->setStereoViewing(FALSE);
-      this->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
+    PUBLIC(this)->setStereoViewing(TRUE);
+    PUBLIC(this)->setQuadBufferStereo(TRUE);
+    if (!PUBLIC(this)->isQuadBufferStereo()) {
+      PUBLIC(this)->setStereoViewing(FALSE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
     }
     break;
 
   default:
-    SoDebugError::postInfo("So@Gui@FullViewer::menuSelection",
+    SoDebugError::postInfo("SoGuiFullViewerP::menuSelection",
                            "popup menu handling for item %d is not implemented", 
                            menuitemid);
     break;
@@ -821,10 +836,10 @@ So@Gui@FullViewer::menuSelection(int menuitemid)
 // ************************************************************************
 
 void
-So@Gui@FullViewer::menuSelectionCallback(int menuitemid,
-                                         void * userdata)
+SoGuiFullViewerP::menuSelectionCallback(int menuitemid,
+                                        void * userdata)
 {
-  So@Gui@FullViewer * viewer = (So@Gui@FullViewer *) userdata;
+  SoGuiFullViewerP * viewer = (SoGuiFullViewerP *) userdata;
   viewer->menuSelection(menuitemid);
 }
 
@@ -835,28 +850,28 @@ So@Gui@FullViewer::menuSelectionCallback(int menuitemid,
 */
 
 void
-So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
-                                              So@Gui@Viewer::DrawStyle value)
+SoGuiFullViewerP::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
+                                             So@Gui@Viewer::DrawStyle value)
 {
-  assert(this->prefmenu != NULL);
+  assert(PUBLIC(this)->prefmenu != NULL);
 
   switch (type) {
   case So@Gui@Viewer::STILL:
     switch (value) {
     case So@Gui@Viewer::VIEW_AS_IS:
-      this->prefmenu->setMenuItemMarked(AS_IS_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(AS_IS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_HIDDEN_LINE:
-      this->prefmenu->setMenuItemMarked(HIDDEN_LINE_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(HIDDEN_LINE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY:
-      this->prefmenu->setMenuItemMarked(WIREFRAME_OVERLAY_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(WIREFRAME_OVERLAY_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      this->prefmenu->setMenuItemMarked(NO_TEXTURE_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(NO_TEXTURE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      this->prefmenu->setMenuItemMarked(LOW_RESOLUTION_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(LOW_RESOLUTION_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
 #if SO@GUI@_DEBUG
@@ -864,7 +879,7 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
                                 "Use VIEW_LINE, not VIEW_LOW_RES_LINE for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_LINE:
-      this->prefmenu->setMenuItemMarked(WIREFRAME_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
 #if SO@GUI@_DEBUG
@@ -872,10 +887,10 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
                                 "Use VIEW_POINT, not VIEW_LOW_RES_POINT for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_POINT:
-      this->prefmenu->setMenuItemMarked(POINTS_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      this->prefmenu->setMenuItemMarked(BOUNDING_BOX_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
       assert(0 && "unsupported default switch-case");
@@ -886,28 +901,28 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
   case So@Gui@Viewer::INTERACTIVE:
     switch (value) {
     case So@Gui@Viewer::VIEW_SAME_AS_STILL:
-      this->prefmenu->setMenuItemMarked(MOVE_SAME_AS_STILL_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_SAME_AS_STILL_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      this->prefmenu->setMenuItemMarked(MOVE_NO_TEXTURE_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_NO_TEXTURE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      this->prefmenu->setMenuItemMarked(MOVE_LOW_RES_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_LOW_RES_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LINE:
-      this->prefmenu->setMenuItemMarked(MOVE_WIREFRAME_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-      this->prefmenu->setMenuItemMarked(MOVE_LOW_RES_WIREFRAME_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_LOW_RES_WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_POINT:
-      this->prefmenu->setMenuItemMarked(MOVE_POINTS_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-      this->prefmenu->setMenuItemMarked(MOVE_LOW_RES_POINTS_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_LOW_RES_POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      this->prefmenu->setMenuItemMarked(MOVE_BOUNDING_BOX_ITEM, TRUE);
+      PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
       assert(0 && "unsupported default switch-case");
@@ -928,17 +943,17 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
 */
 
 void
-So@Gui@FullViewer::drawstyleActivated(int menuitemid)
+SoGuiFullViewerP::drawstyleActivated(int menuitemid)
 {
   switch (menuitemid) {
   case SINGLE_BUFFER_ITEM:
-    this->setBufferingType(So@Gui@Viewer::BUFFER_SINGLE);
+    PUBLIC(this)->setBufferingType(So@Gui@Viewer::BUFFER_SINGLE);
     return;
   case DOUBLE_BUFFER_ITEM:
-    this->setBufferingType(So@Gui@Viewer::BUFFER_DOUBLE);
+    PUBLIC(this)->setBufferingType(So@Gui@Viewer::BUFFER_DOUBLE);
     return;
   case INTERACTIVE_BUFFER_ITEM:
-    this->setBufferingType(So@Gui@Viewer::BUFFER_INTERACTIVE);
+    PUBLIC(this)->setBufferingType(So@Gui@Viewer::BUFFER_INTERACTIVE);
     return;
   default:
     break;
@@ -946,32 +961,32 @@ So@Gui@FullViewer::drawstyleActivated(int menuitemid)
 
   switch (menuitemid) {
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::SCREEN_DOOR);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SCREEN_DOOR);
     return;
   case ADD_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::ADD);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::ADD);
     return;
   case DELAYED_ADD_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::DELAYED_ADD);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::DELAYED_ADD);
     return;
   case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_ADD);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_ADD);
     return;
   case BLEND_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::BLEND);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::BLEND);
     return;
   case DELAYED_BLEND_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
     return;
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
     return;
 #ifdef __COIN__ // Coin extensions
   case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD);
     return;
   case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
-    this->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
     return;
 #endif // __COIN__
   default:
@@ -1065,7 +1080,7 @@ So@Gui@FullViewer::drawstyleActivated(int menuitemid)
     break;
   }
 
-  this->setDrawStyle(type, val);
+  PUBLIC(this)->setDrawStyle(type, val);
 }
 
 // ************************************************************************
