@@ -36,7 +36,7 @@ So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * name,
   : inherited(parent, name, embed)
 {
   PRIVATE(this) = new MaterialEditorComponent;
-  this->setSize(SbVec2s(320,256));
+  this->setSize(SbVec2s(550,300));
   this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
 }
 
@@ -44,7 +44,7 @@ So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * const
 : inherited(parent, name, embed)
 {
   PRIVATE(this) = new MaterialEditorComponent;
-  this->setSize(SbVec2s(320,256));
+  this->setSize(SbVec2s(550,300));
   this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
 }
 
@@ -202,6 +202,7 @@ MaterialEditorComponent::getSceneGraph(void)
 {
   SoSeparator * root = MaterialEditorComponent::getSuperScene();
   assert(root != NULL);
+  // FIXME: route ViewportFix field value into editor
   root->addChild(new SoGuiMaterialEditor);
   return root;
 }
