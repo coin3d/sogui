@@ -316,7 +316,7 @@ SoAnyThumbWheel::getBitmapForValue(
     return 0; // only one disabled bitmap in this implementation
 
   double squarerange = (2.0 * M_PI) / this->numsquares;
-  double normalizedmodval = fmod(value, squarerange) / squarerange;
+  double normalizedmodval = fmod((double) value, squarerange) / squarerange;
   if (normalizedmodval < 0.0) normalizedmodval += 1.0;
   int bitmap = 1 + (int) (normalizedmodval * (this->width - 4 + 2));
   return bitmap;
@@ -638,7 +638,7 @@ SoAnyThumbWheel::drawEnabledWheel(
             for (int i = 3; i < (this->width-2); i++)
               buffer[j+(this->diameter*i)] = color;
         }
-        radian = (float)fmod(radian, modulo);
+        radian = (float) fmod(radian, modulo);
         newsquare = 1;
       }
     }
