@@ -77,3 +77,28 @@ NOTE: see also So@Gui@/BUGS.txt.
     20030107 mortene.
 
 =====================================================================
+
+003 View volume settings becomes incorrect for "point scene".
+
+    If the scene graph just contains a single point in 3D space, the
+    view volume setup will cause heaps of error messages when running
+    on top of debug-mode Coin.
+
+    Can be reproduced by loading this into an examinerviewer and
+    interacting with the camera:
+
+    ----8<--- [snip] ---------8<--- [snip] ---------8<--- [snip] ---
+    #Inventor V2.1 ascii
+    
+    Coordinate3 { point 42 4242 424242 }
+    PointSet { }
+    ----8<--- [snip] ---------8<--- [snip] ---------8<--- [snip] ---
+
+    A suggestion for a solution: should most likely handle this
+    problem by detecting when the scene bounding sphere is below a
+    certain radius, and then "artificially" expand it to a minimum
+    value.
+
+    20030916 mortene.
+
+=====================================================================
