@@ -119,6 +119,36 @@
   method.
 */
 
+/*!
+  \typedef SbVec2f So@Gui@AutoClippingCB(void * data, const SbVec2f & nearfar)
+
+  An application function callback for adjusting calculated near and
+  far clipping plane distances, as can be set up with the
+  So@Gui@Viewer::setAutoClippingStrategy() method.
+
+  The first argument is the userdata passed in to
+  So@Gui@Viewer::setAutoClippingStrategy() along with the callback
+  function pointer itself (ie the callback functions closure). The
+  second argument is the near and far clipping plane distances from
+  the camera position, as calculated internally by the viewer.
+
+  The function callback can then modify the near and far clipping
+  plane distances to what will \e actually be used by the viewer.
+
+  This is a good way of dynamically modifying the near and far
+  distances such that they at all times exactly matches the specific
+  layout of the application scene, for instance with regard to the
+  trade-off between z-buffer resolution and how early geometry is
+  clipped at the near plane (or at the far plane).
+
+  Note that the internal near/far calculations should be good enough
+  for the vast majority of scenes. Application programmers should only
+  need to set up their own adjustments upon "unusual" scenes, like for
+  instance scenes with a large world space, but where one would still
+  like to be able to get up extremely close on details in some parts
+  of the scene.
+*/
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
@@ -2214,10 +2244,24 @@ So@Gui@Viewer::isCursorEnabled(void) const
 // *************************************************************************
 
 /*!
-  Turn on or off continuous automatic adjustments of the near
-  and far clipping planes.
+  Turn on or off continuous automatic adjustments of the near and far
+  clipping planes.
+
+  If on, the distance from the camera position to the near and far
+  planes will be calculated to be a "best fit" around the geometry in
+  the scene, to maximize the "stretch" of values for the visible
+  geometry in the z-buffer. This is important, as z-buffer resolution
+  is usually limited enough that one will quickly see flickering in
+  the rasterization of close polygons upon lousy utilization of the
+  z-buffer.
 
   Automatic clipping is on as default.
+
+  For better control over what happens in boundary conditions (for
+  instance when the distance between near and far planes get very far,
+  or if geometry gets very close to the camera position), it is
+  possible to use the So@Gui@Viewer::setAutoClippingStrategy() method
+  to fine-tune the near/far clipping plane settings.
 
   \sa getAutoClipping()
 */
