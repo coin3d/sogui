@@ -111,6 +111,14 @@ INCLUDES = -I.
 LIBS = 
 
 libSoCommon_la_SOURCES = \
+	SoAnyViewer.cpp \
+	SoAnyViewer.h \
+	SoAnyFullViewer.cpp \
+	SoAnyFullViewer.h \
+	SoAnyExaminerViewer.cpp \
+	SoAnyExaminerViewer.h \
+	SoAnyPlaneViewer.cpp \
+	SoAnyPlaneViewer.h \
 	ThumbWheel.cpp \
 	ThumbWheel.h
 
@@ -130,7 +138,8 @@ X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 libSoCommon_la_LDFLAGS = 
 libSoCommon_la_LIBADD = 
-am_libSoCommon_la_OBJECTS =  ThumbWheel.lo
+am_libSoCommon_la_OBJECTS =  SoAnyViewer.lo SoAnyFullViewer.lo \
+SoAnyExaminerViewer.lo SoAnyPlaneViewer.lo ThumbWheel.lo
 libSoCommon_la_OBJECTS =  $(am_libSoCommon_la_OBJECTS)
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -150,7 +159,9 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
 GZIP_ENV = --best
 depcomp = $(SHELL) $(top_srcdir)/depcomp
-DEP_FILES =  @AMDEP@ $(DEPDIR)/ThumbWheel.Plo
+DEP_FILES =  @AMDEP@ $(DEPDIR)/SoAnyExaminerViewer.Plo \
+$(DEPDIR)/SoAnyFullViewer.Plo $(DEPDIR)/SoAnyPlaneViewer.Plo \
+$(DEPDIR)/SoAnyViewer.Plo $(DEPDIR)/ThumbWheel.Plo
 SOURCES = $(libSoCommon_la_SOURCES)
 OBJECTS = $(am_libSoCommon_la_OBJECTS)
 
@@ -244,6 +255,10 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 
+@AMDEP@include $(DEPDIR)/SoAnyExaminerViewer.Plo
+@AMDEP@include $(DEPDIR)/SoAnyFullViewer.Plo
+@AMDEP@include $(DEPDIR)/SoAnyPlaneViewer.Plo
+@AMDEP@include $(DEPDIR)/SoAnyViewer.Plo
 @AMDEP@include $(DEPDIR)/ThumbWheel.Plo
 
 mostlyclean-depend:
