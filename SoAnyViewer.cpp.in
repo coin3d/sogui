@@ -48,9 +48,9 @@ static const char rcsid[] =
   \sa So@GUI@FullViewer
 */
 
-// FIXME: find this value by using configure (SoPolygonOffset is not
-// present in all Inventor versions). 20000308 mortene.
-#define HAVE_SOPOLYGONOFFSET 1
+#if HAVE_CONFIG_H
+#include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
+#endif // HAVE_CONFIG_H
 
 #include <assert.h>
 
