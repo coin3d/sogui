@@ -50,8 +50,8 @@ public:
   int getFeedbackSize(void) const;
 
 protected:
-  static float rotXWheelMotion( float value, float old, SoCamera * camera );
-  static float rotYWheelMotion( float value, float old, SoCamera * camera );
+  float rotXWheelMotion( float value, float old );
+  float rotYWheelMotion( float value, float old );
 
   void reorientCamera( const SbRotation & rotation );
   void spin( const SbVec2f & mousepos );

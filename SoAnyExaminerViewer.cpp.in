@@ -58,6 +58,8 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   So@GUI@ExaminerViewer * container )
 : viewer( container )
 {
+  assert( container != NULL );
+
   this->spinanimatingallowed = TRUE;
   this->spinanimating = FALSE;
   this->spinsamplecounter = 0;
@@ -102,9 +104,9 @@ SoAnyExaminerViewer::~SoAnyExaminerViewer(
 float
 SoAnyExaminerViewer::rotXWheelMotion(
   float value,
-  float oldvalue,
-  SoCamera * camera )
+  float oldvalue )
 {
+  SoCamera * camera = this->viewer->getCamera();
   assert( camera != NULL );
 
   SbVec3f dir;
@@ -131,9 +133,9 @@ SoAnyExaminerViewer::rotXWheelMotion(
 float
 SoAnyExaminerViewer::rotYWheelMotion(
   float value,
-  float oldvalue,
-  SoCamera * camera )
+  float oldvalue )
 {
+  SoCamera * camera = this->viewer->getCamera();
   assert( camera != NULL );
 
   SbVec3f dir;
