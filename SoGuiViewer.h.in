@@ -239,7 +239,7 @@ protected:
   SoNode * sceneGraph; // userroot
 
 private:
-  class SoGuiViewerP * pimpl;
+  class So@Gui@ViewerP * pimpl;
 
   void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
   
