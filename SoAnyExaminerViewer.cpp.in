@@ -1133,7 +1133,7 @@ SoAnyExaminerViewer::addToLog(
 
 void
 SoAnyExaminerViewer::setMotion3OnCamera(
-  const SbBool enable)
+  SbBool enable)
 {
   this->motion3OnCamera = enable;
 } // setMotion3OnCamera()

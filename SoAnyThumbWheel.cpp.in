@@ -236,7 +236,7 @@ void
 SoAnyThumbWheel::drawBitmap(
   const int number,
   void * bitmap,
-  const Alignment alignment) const
+  Alignment alignment) const
 {
   if (number == 0) {
     drawDisabledWheel(number, bitmap, alignment);
@@ -484,7 +484,7 @@ void
 SoAnyThumbWheel::drawDisabledWheel(// private
   const int number,
   void * bitmap,
-  const Alignment alignment) const
+  Alignment alignment) const
 {
   assert(number == 0);
 
@@ -538,7 +538,7 @@ void
 SoAnyThumbWheel::drawEnabledWheel(
   const int number,
   void * bitmap,
-  const Alignment alignment) const
+  Alignment alignment) const
 {
   this->validate();
 
