@@ -316,6 +316,7 @@ So@Gui@Viewer::So@Gui@Viewer(
 
   // initialization of internal data
   this->cursoron = TRUE;
+  this->localsetbuffertype = FALSE;
 
   this->cameratype = SoPerspectiveCamera::getClassTypeId();
   this->deletecamera = FALSE;
@@ -858,7 +859,10 @@ So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
   }
 
   this->buffertype = type;
-  inherited::setDoubleBuffer(type == BUFFER_DOUBLE ? TRUE : FALSE);
+
+  this->localsetbuffertype = TRUE;
+  inherited::setDoubleBuffer(type == BUFFER_DOUBLE);
+  this->localsetbuffertype = FALSE;
 } // setBufferingType()
 
 // *************************************************************************
@@ -1495,7 +1499,9 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 void
 So@Gui@Viewer::setDoubleBuffer(SbBool on)
 {
-  this->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
+  if (!this->localsetbuffertype)
+    this->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
+
   inherited::setDoubleBuffer(on);
 } // setDoubleBuffer()
 
@@ -1520,10 +1526,10 @@ void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
   if ( root == this->sceneGraph ) {
-#if SOXT_DEBUG
+#if SO@GUI@_DEBUG
     SoDebugError::postWarning( "So@Gui@Viewer::setSceneGraph",
       "called with the same root as already set" );
-#endif // SOXT_DEBUG
+#endif // SO@GUI@_DEBUG
     return;
   }
 
@@ -1619,12 +1625,12 @@ void
 So@Gui@Viewer::setSeekMode(
   SbBool enable )
 {
-#if SO@Gui@_DEBUG
+#if SO@GUI@_DEBUG
   // user might have switched mode during seek, so if enable == FALSE,
   // isViewing() is irrelevant.
   if ( enable )
     assert( this->isViewing() );
-#endif // SO@Gui@_DEBUG
+#endif // SO@GUI@_DEBUG
 
   if ( ! enable && this->seeksensor->isScheduled() ) {
     this->seeksensor->unschedule();
@@ -2348,8 +2354,11 @@ void
 So@Gui@Viewer::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during interaction.
-  if (thisp->buffertype == BUFFER_INTERACTIVE)
+  if (thisp->buffertype == BUFFER_INTERACTIVE) {
+    thisp->localsetbuffertype = TRUE;
     thisp->inherited::setDoubleBuffer(TRUE);
+    thisp->localsetbuffertype = FALSE;
+  }
 
   // Use the dynamic drawstyle.
   if (!thisp->drawInteractiveAsStill())
@@ -2370,8 +2379,11 @@ So@Gui@Viewer::interactiveendCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during
   // interaction, singelbuffering while the camera is static.
-  if (thisp->buffertype == BUFFER_INTERACTIVE)
+  if (thisp->buffertype == BUFFER_INTERACTIVE) {
+    thisp->localsetbuffertype = TRUE;
     thisp->inherited::setDoubleBuffer(FALSE);
+    thisp->localsetbuffertype = FALSE;
+  }
 
   // Back to static drawstyle.
   if (!thisp->drawInteractiveAsStill())

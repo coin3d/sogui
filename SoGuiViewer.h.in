@@ -279,7 +279,7 @@ private:
 
   // Misc
   SoType cameratype;
-  SbBool cursoron;
+  SbBool cursoron, localsetbuffertype;
 
   SoCallbackList * interactionstartCallbacks, * interactionendCallbacks;
 
