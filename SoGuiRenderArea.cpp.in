@@ -603,12 +603,20 @@ So@Gui@RenderAreaP::setDevicesWindowSize(const SbVec2s size)
 void
 So@Gui@RenderAreaP::renderCB(void * closure, SoSceneManager * manager)
 {
+  assert(closure && manager);
   So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
-  if (manager == PRIVATE(thisptr)->normalManager)
+  if (manager == PRIVATE(thisptr)->normalManager) {
     thisptr->render();
-  else if (manager == PRIVATE(thisptr)->overlayManager)
+  } else if (manager == PRIVATE(thisptr)->overlayManager) {
     thisptr->renderOverlay();
-  else assert(0);
+  } else {
+#if SO@GUI@_DEBUG
+    SoDebugError::post("So@Gui@RenderAreaP::renderCB",
+                       "invoked for unknown SoSceneManager (%p)", manager);
+#endif // SO@GUI@_DEBUG
+    manager->setRenderCallback(NULL, NULL);
+    return;
+  }
 
   if (!thisptr->isAutoRedraw())
     manager->setRenderCallback(NULL, NULL);
@@ -1385,6 +1393,7 @@ void
 So@Gui@RenderArea::setSceneManager(SoSceneManager * manager)
 {
   assert(PRIVATE(this)->normalManager != NULL);
+  PRIVATE(this)->normalManager->setRenderCallback(NULL, NULL);
   delete PRIVATE(this)->normalManager;
   PRIVATE(this)->normalManager = manager;
 }
