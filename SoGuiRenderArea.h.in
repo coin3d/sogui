@@ -141,13 +141,13 @@ protected:
   void * appEventHandlerData;
 
 private:
+  friend class So@Gui@RenderAreaP;
   class So@Gui@RenderAreaP * priv;
 
   void constructor(SbBool mouseInput, SbBool keyboardInput, SbBool build);
   static void renderCB(void * user, SoSceneManager * manager);
   static void selection_redraw_cb(void * data, SoSelection * sel);
   void setDevicesWindowSize(const SbVec2s size);
-
 }; // class So@Gui@RenderArea
 
 // *************************************************************************

@@ -267,7 +267,7 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
   // ourselves) tend to spread those files around misc diskdrive
   // directories -- especially on MSWindows platforms.  Mismatches for
   // run-time binding and link-time binding then causes bugs which are
-  // hard to understand.
+  // impossible to make sense of.
   //
   // I don't know if any platforms have enough introspection
   // functionality to enable us to do this, though. Should
@@ -278,9 +278,27 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
 
   // FIXME: dump rcsid strings for all components. 20010927 mortene.
 
-  // FIXME: information about the native OpenGL widget format, along
-  // with the generic format flags (SO_GL_DOUBLE etc), could be
-  // useful.  20010927 mortene.
+  // OpenGL canvas settings.
+  {
+    SbString s;
+    s.sprintf("\nCurrent OpenGL canvas:\n"
+              "         %sbuffer\n"
+              "         drawing to %sbuffer\n"
+              "         %s rendering%s\n"
+              "         %s mode\n"
+              "         with%s overlay planes\n",
+              PUBLIC(this)->isDoubleBuffer() ? "double" : "single",
+              PUBLIC(this)->isDrawToFrontBufferEnable() ? "front" : "back",
+              PUBLIC(this)->isStereoBuffer() ? "stereo" : "mono",
+              PUBLIC(this)->isQuadBufferStereo() ? " (OpenGL quadbuffer)" : "",
+              PUBLIC(this)->isRGBMode() ? "RGB" : "colorindex",
+              PUBLIC(this)->isOverlayRender() ? "" : "out");
+
+    // FIXME: information about the native OpenGL widget format?
+    // 20010927 mortene.
+
+    info += s;
+  }
 
   // Underlying Inventor implementation.
   {
@@ -509,8 +527,8 @@ So@Gui@RenderArea::setOverlaySceneGraph(SoNode * scene)
   SoNode * oldroot = this->getOverlaySceneGraph();
   PRIVATE(this)->overlayManager->setSceneGraph(scene);
 
-  if (!oldroot && scene) { this->setOverlayPlanes(TRUE); }
-  else if (oldroot && !scene) { this->setOverlayPlanes(FALSE); }
+  if (!oldroot && scene) { this->setOverlayRender(TRUE); }
+  else if (oldroot && !scene) { this->setOverlayRender(FALSE); }
 }
 
 /*!
@@ -1514,8 +1532,7 @@ So@Gui@RenderArea::selection_redraw_cb(void * closure, SoSelection * sel)
 /*!
   Private class constructor.
 */
-So@Gui@RenderAreaP::So@Gui@RenderAreaP(
-  So@Gui@RenderArea * pub)
+So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * pub)
 {
   PUBLIC(this) = pub;
 
@@ -1543,8 +1560,7 @@ So@Gui@RenderAreaP::So@Gui@RenderAreaP(
 /*!
   Private class destructor.
 */
-So@Gui@RenderAreaP::~So@Gui@RenderAreaP(
-  void)
+So@Gui@RenderAreaP::~So@Gui@RenderAreaP()
 {
   delete this->normalManager;
   delete this->overlayManager;
