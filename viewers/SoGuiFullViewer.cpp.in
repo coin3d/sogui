@@ -37,6 +37,7 @@
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/nodes/SoCamera.h>
 
 // ************************************************************************
 
@@ -1145,6 +1146,48 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
   }
 
   PUBLIC(this)->setDrawStyle(type, val);
+}
+
+// ************************************************************************
+
+// Move camera parallel with the plane orthogonal to the camera
+// direction vector.
+//
+// Used from both SoGuiPlaneViewer and
+// SoGuiExaminerViewer. Implemented in the SoGuiFullViewer private
+// class to collect common code.
+void
+SoGuiFullViewerP::pan(SoCamera * cam,
+                      float aspectratio, const SbPlane & panningplane,
+                      const SbVec2f & currpos, const SbVec2f & prevpos)
+{
+  if (cam == NULL) return; // can happen for empty scenegraph
+  if (currpos == prevpos) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("SoGuiFullViewerP::pan", "useless invokation");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo("SoGuiFullViewerP::pan",
+                         "was(%.3g, %.3g) -> now(%.3g, %.3g)",
+                         prevpos[0], prevpos[1], currpos[0], currpos[1]);
+#endif // SO@GUI@_DEBUG
+
+  // Find projection points for the last and current mouse coordinates.
+  SbViewVolume vv = cam->getViewVolume(aspectratio);
+  SbLine line;
+  vv.projectPointToLine(currpos, line);
+  SbVec3f current_planept;
+  panningplane.intersect(line, current_planept);
+  vv.projectPointToLine(prevpos, line);
+  SbVec3f old_planept;
+  panningplane.intersect(line, old_planept);
+
+  // Reposition camera according to the vector difference between the
+  // projected points.
+  cam->position = cam->position.getValue() - (current_planept - old_planept);
 }
 
 // ************************************************************************

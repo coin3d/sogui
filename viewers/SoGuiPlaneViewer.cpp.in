@@ -106,6 +106,7 @@
 
 #include <so@gui@defs.h>
 
+#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan()
 #include <Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h>
 
 // *************************************************************************
@@ -319,7 +320,10 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       }
 
       if (currentmode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
-        if (posn != prevn) { PRIVATE(this)->pan(posn, prevn); }
+        if (posn != prevn) {
+          SoGuiFullViewerP::pan(this->getCamera(), this->getGLAspectRatio(),
+                                PRIVATE(this)->panningplane, posn, prevn);
+        }
         break;
       }
 
@@ -507,7 +511,10 @@ So@Gui@PlaneViewer::bottomWheelMotion(float value)
   // in the horizontal direction.
 
   if (value != this->getBottomWheelValue()) {
-    PRIVATE(this)->pan(SbVec2f(value, 0), SbVec2f(this->getBottomWheelValue(), 0));
+    SoGuiFullViewerP::pan(this->getCamera(), this->getGLAspectRatio(),
+                          PRIVATE(this)->panningplane,
+                          SbVec2f(value, 0),
+                          SbVec2f(this->getBottomWheelValue(), 0));
   }
   inherited::bottomWheelMotion(value);
 }
@@ -535,7 +542,10 @@ So@Gui@PlaneViewer::leftWheelMotion(float value)
   // in the vertical direction.
 
   if (value != this->getLeftWheelValue()) {
-    PRIVATE(this)->pan(SbVec2f(0, this->getLeftWheelValue()), SbVec2f(0, value));
+    SoGuiFullViewerP::pan(this->getCamera(), this->getGLAspectRatio(),
+                          PRIVATE(this)->panningplane,
+                          SbVec2f(0, this->getLeftWheelValue()),
+                          SbVec2f(0, value));
   }
 
   inherited::leftWheelMotion(value);
@@ -989,41 +999,6 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
 
   this->setCursorRepresentation(newmode);
   this->mode = newmode;
-}
-
-// FIXME: this method is cut'n'pasted from SoGuiExaminerViewer --
-// should collect them in a common place. 20020512 mortene.
-void
-SoGuiPlaneViewerP::pan(const SbVec2f & thispos, const SbVec2f & prevpos)
-{
-  SoCamera * cam = PUBLIC(this)->getCamera();
-  if (cam == NULL) return; // can happen for empty scenegraph
-  if (thispos == prevpos) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo("So@Gui@PlaneViewerP::pan", "useless invokation");
-#endif // SO@GUI@_DEBUG
-    return;
-  }
-
-#if SO@GUI@_DEBUG && 0
-  SoDebugError::postInfo("So@Gui@PlaneViewerP::pan",
-                         "was(%.3g, %.3g) -> now(%.3g, %.3g)",
-                         prevpos[0], prevpos[1], thispos[0], thispos[1]);
-#endif // SO@GUI@_DEBUG
-
-  // Find projection points for the last and current mouse coordinates.
-  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
-  SbLine line;
-  vv.projectPointToLine(thispos, line);
-  SbVec3f current_planept;
-  this->panningplane.intersect(line, current_planept);
-  vv.projectPointToLine(prevpos, line);
-  SbVec3f old_planept;
-  this->panningplane.intersect(line, old_planept);
-
-  // Reposition camera according to the vector difference between the
-  // projected points.
-  cam->position = cam->position.getValue() - (current_planept - old_planept);
 }
 
 // *************************************************************************

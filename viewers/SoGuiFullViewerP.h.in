@@ -124,6 +124,10 @@ public:
                                   So@Gui@Viewer::DrawStyle value);
   void drawstyleActivated(int menuitemid);
 
+  static void pan(SoCamera * cam,
+                  float aspectratio, const SbPlane & panplane,
+                  const SbVec2f & currpos, const SbVec2f & prevpos);
+
 protected:
   SoGuiFullViewerP(So@Gui@FullViewer * publ);
   So@Gui@FullViewer * pub;

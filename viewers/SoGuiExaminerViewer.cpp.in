@@ -76,6 +76,7 @@
 
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
+#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan()
 
 
 static const int MOUSEPOSLOGSIZE = 16;
@@ -620,43 +621,6 @@ SoGuiExaminerViewerP::spin(const SbVec2f & pointerpos)
 
 // ************************************************************************
 
-// Move scene parallel with the plane orthogonal to the camera
-// direction vector.
-void
-SoGuiExaminerViewerP::pan(const SbVec2f & thispos, const SbVec2f & prevpos)
-{
-  SoCamera * cam = PUBLIC(this)->getCamera();
-  if (cam == NULL) return; // can happen for empty scenegraph
-  if (thispos == prevpos) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo("SoGuiExaminerViewerP::pan", "useless invokation");
-#endif // SO@GUI@_DEBUG
-    return;
-  }
-
-#if SO@GUI@_DEBUG && 0
-  SoDebugError::postInfo("SoGuiExaminerViewerP::pan",
-                         "was(%.3g, %.3g) -> now(%.3g, %.3g)",
-                         prevpos[0], prevpos[1], thispos[0], thispos[1]);
-#endif // SO@GUI@_DEBUG
-
-  // Find projection points for the last and current mouse coordinates.
-  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
-  SbLine line;
-  vv.projectPointToLine(thispos, line);
-  SbVec3f current_planept;
-  this->panningplane.intersect(line, current_planept);
-  vv.projectPointToLine(prevpos, line);
-  SbVec3f old_planept;
-  this->panningplane.intersect(line, old_planept);
-
-  // Reposition camera according to the vector difference between the
-  // projected points.
-  cam->position = cam->position.getValue() - (current_planept - old_planept);
-}
-
-// ************************************************************************
-
 // Dependent on the camera type this will either shrink or expand the
 // height of the viewport (orthogonal camera) or move the camera
 // closer or further away from the focal point in the scene.
@@ -912,7 +876,8 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
       PRIVATE(this)->zoomByCursor(posn, prevnormalized);
     }
     else if ((PRIVATE(this)->button1down && PRIVATE(this)->controldown) || PRIVATE(this)->button3down) {
-      PRIVATE(this)->pan(posn, prevnormalized);
+      SoGuiFullViewerP::pan(this->getCamera(), this->getGLAspectRatio(),
+                            PRIVATE(this)->panningplane, posn, prevnormalized);
     }
     else if (PRIVATE(this)->button1down) {
       PRIVATE(this)->addToLog(event->getPosition(), event->getTime());
