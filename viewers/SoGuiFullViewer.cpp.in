@@ -415,6 +415,18 @@
   \fn void So@Gui@FullViewer::buildPopupMenu(void)
 
   Make a popup menu with preferences settings.
+
+  One important note as for when you want to override this function in
+  a subclass: be aware that it will usually be invoked (indirectly)
+  from this class's constructor. That is \e before the table of
+  virtual function pointers has been set up for the subclass, and
+  because of this, the function will not be called in the subclass
+  even though it is virtual.
+
+  To make the overriding actually be in effect, you need to delay
+  building the widgets of this class. For information on how to do
+  that, see the documentation of
+  So@Gui@FullViewer::createViewerButtons().
 */
 
 /*!
