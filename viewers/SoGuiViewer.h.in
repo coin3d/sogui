@@ -156,6 +156,14 @@ public:
   virtual void setStereoOffset(const float dist);
   float getStereoOffset(void) const;
 
+  enum StereoType {
+    STEREO_NONE, STEREO_ANAGLYPH, STEREO_QUADBUFFER,
+    STEREO_INTERLEAVED_ROWS, STEREO_INTERLEAVED_COLUMNS
+  };
+
+  SbBool setStereoType(So@Gui@Viewer::StereoType s);
+  So@Gui@Viewer::StereoType getStereoType(void) const;
+
   void setDetailSeek(const SbBool enable);
   SbBool isDetailSeek(void) const;
 

@@ -265,6 +265,11 @@ public:
   // Stereo-related
   SbBool stereoviewing;
   float stereooffset;
+  So@Gui@Viewer::StereoType stereotype;
+  SbVec2s stereostencilmasksize;
+  GLubyte * stereostencilmask;
+  enum StencilType { ROWS, COLUMNS, NONE };
+  So@Gui@Viewer::StereoType stereostenciltype;
   enum Eye { LEFT, RIGHT, RESTORE };
   struct StereoData {
     SbVec3f camerapos, cameradir, offsetvec, focalpoint;
@@ -275,6 +280,7 @@ public:
   void setStereoEye(SoCamera * camera,
                     const So@Gui@ViewerP::Eye eye,
                     So@Gui@ViewerP::StereoData & storage) const;
+  void initStencilBufferForInterleavedStereo(void);
 
   // Misc
   SoType cameratype;
@@ -341,6 +347,11 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->autoclipstrategy = So@Gui@Viewer::VARIABLE_NEAR_PLANE;
   this->autoclipvalue = 0.6f;
   this->autoclipcb = NULL;
+
+  this->stereotype = So@Gui@Viewer::STEREO_NONE;
+  this->stereostencilmasksize = SbVec2s(0, 0);
+  this->stereostencilmask = NULL;
+  this->stereostenciltype = So@Gui@Viewer::STEREO_NONE;
 }
 
 So@Gui@ViewerP::~So@Gui@ViewerP()
@@ -351,6 +362,8 @@ So@Gui@ViewerP::~So@Gui@ViewerP()
 #if (SO@GUI@_MAJOR_VERSION == 2)
 #error This is a reminder: when jumping to version 2 of an So* toolkit, the viewer destructors (at least, possibly also further up in the inheritance hierarchy) should be made virtual.
 #endif // version = 2
+
+  delete[] this->stereostencilmask;
 
   if ( this->superimpositions != NULL ) delete this->superimpositions;
   delete this->searchaction;
@@ -2409,18 +2422,15 @@ So@Gui@Viewer::isAutoClipping(
 
     http://astronomy.swin.edu.au/~pbourke/opengl/stereogl/
 
-  \sa isStereoViewing()
+  \sa isStereoViewing(), setStereoType()
 */
 
 void
-So@Gui@Viewer::setStereoViewing(// virtual
-  SbBool enable)
+So@Gui@Viewer::setStereoViewing(SbBool enable)
 {
   PRIVATE(this)->stereoviewing = enable;
   this->scheduleRedraw();
 }
-
-// *************************************************************************
 
 /*!
   Returns a boolean indicating whether or not we're in stereo viewing
@@ -2429,14 +2439,94 @@ So@Gui@Viewer::setStereoViewing(// virtual
   NOTE: in the original InventorXt API, this method was virtual.  It is not
   virtual here.
 
-  \sa setStereoViewing()
+  \sa setStereoViewing(), getStereoType()
 */
 
 SbBool
-So@Gui@Viewer::isStereoViewing(
-  void) const
+So@Gui@Viewer::isStereoViewing(void) const
 {
   return PRIVATE(this)->stereoviewing;
+}
+
+// *************************************************************************
+
+// FIXME: _really_ need to document the So@Gui@Viewer::StereoType
+// values properly. 20040618 mortene.
+
+/*!
+  Set up stereo rendering.
+
+  It is prefered that one uses this function for control of which type
+  of stereo rendering to use, instead of the older
+  So@Gui@Viewer::setStereoViewing() and
+  So@Gui@GLWidget::setQuadBufferStereo() functions.
+
+  \sa So@Gui@Viewer::StereoType
+*/
+SbBool
+So@Gui@Viewer::setStereoType(So@Gui@Viewer::StereoType s)
+{
+  if (s == this->getStereoType()) { return TRUE; }
+
+  switch (s) {
+  case So@Gui@Viewer::STEREO_NONE:
+    this->setQuadBufferStereo(FALSE);
+    this->setStereoViewing(FALSE);
+    break;
+
+  case So@Gui@Viewer::STEREO_ANAGLYPH:
+    this->setStereoViewing(TRUE);
+    this->setQuadBufferStereo(FALSE);
+    break;
+
+  case So@Gui@Viewer::STEREO_QUADBUFFER:
+    this->setStereoViewing(TRUE);
+    this->setQuadBufferStereo(TRUE);
+
+    // Check, in case GL quad buffers not supported with the driver
+    // config:
+    if (!this->isQuadBufferStereo()) {
+      this->setStereoViewing(FALSE);
+      return FALSE;
+    }
+    break;
+
+  case So@Gui@Viewer::STEREO_INTERLEAVED_ROWS:
+  case So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS:
+    this->setStereoViewing(TRUE);
+    this->setQuadBufferStereo(FALSE);
+    this->setStencilBuffer(TRUE);
+
+    // Check, in case GL stencil buffers not supported with the driver
+    // config:
+    if (!this->getStencilBuffer()) {
+      this->setStereoViewing(FALSE);
+      return FALSE;
+    }
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+  PRIVATE(this)->stereotype = s;
+  return TRUE;
+}
+
+/*!
+  Returns the current type of stereo rendering used (or
+  So@Gui@Viewer::STEREO_NONE if monoscopic).
+*/
+So@Gui@Viewer::StereoType
+So@Gui@Viewer::getStereoType(void) const
+{
+  // This can be set up outside of setStereoType(), so we need to
+  // check for it separately.
+  if (this->isQuadBufferStereo()) {
+    PRIVATE(this)->stereotype = So@Gui@Viewer::STEREO_QUADBUFFER;
+  }
+
+  return PRIVATE(this)->stereotype;
 }
 
 // *************************************************************************
@@ -2979,6 +3069,83 @@ So@Gui@ViewerP::setStereoEye(SoCamera * camera,
 #endif // ! HAVE_SOCAMERA_SETSTEREOMODE
 }
 
+void
+So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
+{
+  So@Gui@Viewer::StereoType s = PUBLIC(this)->getStereoType();
+  assert((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) ||
+         (s == So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS));
+
+  // Find out whether or not we need to regenerate the mask data.
+  SbBool allocnewmask = (this->stereostencilmask == NULL);
+  const SbVec2s glsize = PUBLIC(this)->getGLSize();
+  allocnewmask = allocnewmask ||
+    ((this->stereostencilmasksize[0] + 7) / 8 * this->stereostencilmasksize[1]) <
+    ((glsize[0] + 7) / 8 * glsize[1]);
+
+  SbBool fillmask = allocnewmask ||
+    (this->stereostenciltype != s) ||
+    ((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) && 
+     (this->stereostencilmasksize[0] != glsize[0]));
+
+
+  const short bytewidth = (glsize[0] + 7) / 8;
+
+  if (allocnewmask) {
+    delete[] this->stereostencilmask;
+    this->stereostencilmask = new GLubyte[bytewidth * glsize[1]];
+    this->stereostencilmasksize = glsize;
+  }
+
+  if (fillmask) {
+    GLubyte * mask = this->stereostencilmask;
+
+    if (s == So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS) {
+      // alternating columns of 0's and 1's
+      (void)memset(mask, 0x55, bytewidth * glsize[1]);
+    }
+    else {
+      // alternating rows of 0's and 1's
+      for (short h=0; h < glsize[1]; h++) {
+        const GLubyte fill = (h % 2) ? 0xff : 0x00;
+        (void)memset(mask + (h * bytewidth), fill, bytewidth);
+      }
+    }
+
+    this->stereostenciltype = s;
+  }
+
+  // FIXME: should we fill in the stencil buffer more often?
+  // 20040618 mortene.
+
+  if (!fillmask) { return; }
+
+  glClearStencil(0x0);
+
+  glClear(GL_STENCIL_BUFFER_BIT);
+  glStencilFunc(GL_ALWAYS, GL_REPLACE, GL_REPLACE);
+
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0, glsize[0], 0, glsize[1], -1.0f, 1.0f);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glRasterPos2f(0, 0);
+  glDrawPixels(glsize[0], glsize[1], GL_STENCIL_INDEX, GL_BITMAP,
+               this->stereostencilmask);
+
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+}
+
+
 // Documented in superclass. Overridden from parent class to be able
 // to do the necessary two-pass rendering e.g. if the drawing style is
 // hidden line.
@@ -2986,47 +3153,82 @@ void
 So@Gui@Viewer::actualRedraw(void)
 {
   SbTime redrawtime = SbTime::getTimeOfDay();
+  const SbBool clearcol = this->isClearBeforeRender();
+  const So@Gui@Viewer::StereoType stereotype = this->getStereoType();
 
-  SbBool clearcol = this->isClearBeforeRender();
+  if (stereotype != So@Gui@Viewer::STEREO_NONE) {
+    const SbColor bgcol = this->getSceneManager()->getBackgroundColor();
 
-  if (this->isStereoViewing()) {
-    SbColor bgcol = this->getSceneManager()->getBackgroundColor();
-    SbBool quadstereo = this->isQuadBufferStereo();
     SoCamera * camera = this->getCamera();
     So@Gui@ViewerP::StereoData tmpstorage;
 
+    // Render left eye:
+
     PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::LEFT, tmpstorage);
 
-    if (quadstereo) {
-      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT);
-      PRIVATE(this)->reallyRedraw(clearcol);
-    }
-    else { // red/cyan
+    switch (stereotype) {
+    case So@Gui@Viewer::STEREO_ANAGLYPH:
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
       glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
       PRIVATE(this)->reallyRedraw(FALSE, FALSE);
+      break;
+    case So@Gui@Viewer::STEREO_QUADBUFFER:
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT);
+      PRIVATE(this)->reallyRedraw(clearcol);
+      break;
+    case So@Gui@Viewer::STEREO_INTERLEAVED_ROWS:
+    case So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS:
+      PRIVATE(this)->initStencilBufferForInterleavedStereo();
+      glEnable(GL_STENCIL_TEST);
+      // immutable data in the stencil buffer
+      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+      glStencilFunc(GL_EQUAL, 0x1, 0x1);
+      PRIVATE(this)->reallyRedraw(clearcol);
+      break;
+
+    default: assert(FALSE); break;
     }
+
+    // Render right eye:
 
     PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::RIGHT, tmpstorage);
 
-    if (quadstereo) {
-      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_RIGHT : GL_FRONT_RIGHT);
-      PRIVATE(this)->reallyRedraw(clearcol);
-    }
-    else {
+    switch (stereotype) {
+    case So@Gui@Viewer::STEREO_ANAGLYPH:
       glColorMask(0,1,1,1); // draw green and blue
       PRIVATE(this)->reallyRedraw(FALSE, TRUE);
+      break;
+    case So@Gui@Viewer::STEREO_QUADBUFFER:
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_RIGHT : GL_FRONT_RIGHT);
+      PRIVATE(this)->reallyRedraw(clearcol);
+      break;
+    case So@Gui@Viewer::STEREO_INTERLEAVED_ROWS:
+    case So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS:
+      glStencilFunc(GL_NOTEQUAL, 0x1, 0x1);
+      PRIVATE(this)->reallyRedraw(FALSE, FALSE);
+      break;
+    default: assert(FALSE); break;
     }
+
+    // Post clean-up, after rendering:
 
     PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::RESTORE, tmpstorage);
 
-    if (quadstereo) {
-      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
-    }
-    else {
+    switch (stereotype) {
+    case So@Gui@Viewer::STEREO_ANAGLYPH:
       glColorMask(1,1,1,1); // restore GL color mask
+      break;
+    case So@Gui@Viewer::STEREO_QUADBUFFER:
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
+      break;
+    case So@Gui@Viewer::STEREO_INTERLEAVED_ROWS:
+    case So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS:
+      // FIXME: restore old val. 20040618 mortene.
+      glDisable(GL_STENCIL_TEST);
+      break;
+    default: assert(FALSE); break;
     }
   }
   else {

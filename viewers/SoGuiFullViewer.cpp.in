@@ -958,17 +958,26 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->newMenuItem("stereoredcyan", STEREO_ANAGLYPH_ITEM);
   menu->newMenuItem("stereoquadbuffer", STEREO_QUADBUFFER_ITEM);
   menu->setMenuItemTitle(STEREO_OFF_ITEM, _("Off"));
-  menu->setMenuItemTitle(STEREO_ANAGLYPH_ITEM, _("Red/Cyan"));
+  menu->setMenuItemTitle(STEREO_ANAGLYPH_ITEM, _("Red/Cyan Anaglyph"));
   menu->setMenuItemTitle(STEREO_QUADBUFFER_ITEM, _("Quad buffer"));
+
+  menu->newMenuItem("stereointerleavedrows", STEREO_INTERLEAVED_ROWS_ITEM);
+  menu->setMenuItemTitle(STEREO_INTERLEAVED_ROWS_ITEM, _("Interleaved Rows"));
+  menu->newMenuItem("stereointerleavedcolumns", STEREO_INTERLEAVED_COLUMNS_ITEM);
+  menu->setMenuItemTitle(STEREO_INTERLEAVED_COLUMNS_ITEM, _("Interleaved Columns"));
 
   menu->newRadioGroup(STEREO_GROUP);
   menu->addRadioGroupItem(STEREO_GROUP, STEREO_OFF_ITEM);
   menu->addRadioGroupItem(STEREO_GROUP, STEREO_ANAGLYPH_ITEM);
   menu->addRadioGroupItem(STEREO_GROUP, STEREO_QUADBUFFER_ITEM);
+  menu->addRadioGroupItem(STEREO_GROUP, STEREO_INTERLEAVED_ROWS_ITEM);
+  menu->addRadioGroupItem(STEREO_GROUP, STEREO_INTERLEAVED_COLUMNS_ITEM);
 
   menu->addMenuItem(STEREO_MENU, STEREO_OFF_ITEM);
   menu->addMenuItem(STEREO_MENU, STEREO_ANAGLYPH_ITEM);
   menu->addMenuItem(STEREO_MENU, STEREO_QUADBUFFER_ITEM);
+  menu->addMenuItem(STEREO_MENU, STEREO_INTERLEAVED_ROWS_ITEM);
+  menu->addMenuItem(STEREO_MENU, STEREO_INTERLEAVED_COLUMNS_ITEM);
 
   menu->newMenu("renderbuffertype", RENDER_BUFFER_TYPE_MENU);
   menu->setMenuTitle(RENDER_BUFFER_TYPE_MENU, _("Render Buffer Type"));
@@ -1073,14 +1082,27 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
   }
 
   //// Stereo viewing. ////////////////////////////////////////////////
-  SbBool stereo = PUBLIC(this)->isStereoViewing();
-  SbBool quadbuffer = PUBLIC(this)->isQuadBufferStereo();
-  if (!stereo)
+
+  const So@Gui@Viewer::StereoType type = PUBLIC(this)->getStereoType();
+  switch (type) {
+  case So@Gui@Viewer::STEREO_NONE:
     menu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
-  if (stereo && !quadbuffer)
+    break;
+  case So@Gui@Viewer::STEREO_ANAGLYPH:
     menu->setMenuItemMarked(STEREO_ANAGLYPH_ITEM, TRUE);
-  if (stereo && quadbuffer)
+    break;
+  case So@Gui@Viewer::STEREO_QUADBUFFER:
     menu->setMenuItemMarked(STEREO_QUADBUFFER_ITEM, TRUE);
+    break;
+  case So@Gui@Viewer::STEREO_INTERLEAVED_ROWS:
+    menu->setMenuItemMarked(STEREO_INTERLEAVED_ROWS_ITEM, TRUE);
+    break;
+  case So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS:
+    menu->setMenuItemMarked(STEREO_INTERLEAVED_COLUMNS_ITEM, TRUE);
+    break;
+  default:
+    assert(FALSE); break;
+  }
 
   //// GL canvas settings. ////////////////////////////////////////////
   switch (PUBLIC(this)->getBufferingType()) {
@@ -1107,6 +1129,8 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
 void
 SoGuiFullViewerP::menuSelection(int menuitemid)
 {
+  SbBool ok;
+
   switch (menuitemid) {
   case -1:
     // means no item was selected
@@ -1185,20 +1209,24 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     break;
 
   case STEREO_OFF_ITEM:
-    PUBLIC(this)->setStereoViewing(FALSE);
-    PUBLIC(this)->setQuadBufferStereo(FALSE);
+    ok = PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_NONE);
+    assert(ok);
     break;
   case STEREO_ANAGLYPH_ITEM:
-    PUBLIC(this)->setStereoViewing(TRUE);
-    PUBLIC(this)->setQuadBufferStereo(FALSE);
+    ok = PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_ANAGLYPH);
+    assert(ok && "anaglyph stereo should always be possible");
     break;
   case STEREO_QUADBUFFER_ITEM:
-    PUBLIC(this)->setStereoViewing(TRUE);
-    PUBLIC(this)->setQuadBufferStereo(TRUE);
-    if (!PUBLIC(this)->isQuadBufferStereo()) {
-      PUBLIC(this)->setStereoViewing(FALSE);
-      // PUBLIC(this)->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
-    }
+    ok = PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_QUADBUFFER);
+    if (!ok) { PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_NONE); }
+    break;
+  case STEREO_INTERLEAVED_ROWS_ITEM:
+    ok = PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_INTERLEAVED_ROWS);
+    if (!ok) { PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_NONE); }
+    break;
+  case STEREO_INTERLEAVED_COLUMNS_ITEM:
+    ok = PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS);
+    if (!ok) { PUBLIC(this)->setStereoType(So@Gui@Viewer::STEREO_NONE); }
     break;
 
   default:
