@@ -29,6 +29,8 @@ static const char rcsid[] =
 #include <assert.h>
 
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/SbLinear.h>
+#include <Inventor/nodes/SoCamera.h>
 
 #include <Inventor/@GUI@/viewers/SoAnyWalkViewer.h>
 #include <Inventor/@GUI@/viewers/So@GUI@WalkViewer.h>
@@ -53,3 +55,45 @@ SoAnyWalkViewer::~SoAnyWalkViewer(
 } // ~SoAnyWalkViewer()
 
 // *************************************************************************
+
+/*!
+  This method dollies the camera back and forth in the scene.
+*/
+
+void
+SoAnyWalkViewer::dollyCamera(
+  const float delta ) const
+{
+  SoCamera * const camera = viewer->getCamera();
+  assert( camera != NULL );
+  SbPlane walkplane( viewer->getUpDirection(), camera->position.getValue() );
+  SbVec3f campos = camera->position.getValue();
+  SbVec3f camvec;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
+  SbLine cross( campos + camvec,
+                campos + camvec + viewer->getUpDirection() );
+  SbVec3f intersect;
+  walkplane.intersect( cross, intersect );
+  SbVec3f dir = intersect - campos;
+  dir.normalize();
+
+  camera->position = campos - dir * delta;
+} // dollyCamera()
+
+/*!
+  This method elevates the camera up and down.
+*/
+
+void
+SoAnyWalkViewer::elevateCamera(
+  const float delta ) const
+{
+  SoCamera * const camera = viewer->getCamera();
+  assert( camera != NULL );
+  SbVec3f up = viewer->getUpDirection();
+  up.normalize();
+  camera->position = camera->position.getValue() - up * delta;
+} // elevateCamera()
+
+// *************************************************************************
+
