@@ -1,6 +1,6 @@
 /**************************************************************************\
  *
- *  Copyright (C) 1999 by Systems in Motion.  All rights reserved.
+ *  Copyright (C) 1999-2000 by Systems in Motion.  All rights reserved.
  *
  *  This file is part of the Coin library.
  *
