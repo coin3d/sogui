@@ -171,19 +171,12 @@
 
 // *************************************************************************
 
-#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
-#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h>
-
-#include <assert.h>
-#include <math.h>
-
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <so@gui@defs.h>
-
-#include <Inventor/@Gui@/common/gl.h>
+#include <assert.h>
+#include <math.h>
 
 #include <Inventor/SbTime.h>
 #include <Inventor/errors/SoDebugError.h>
@@ -195,6 +188,12 @@
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoLocation2Event.h>
 #include <Inventor/events/SoMotion3Event.h>
+
+#include <so@gui@defs.h>
+
+#include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h>
 
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
