@@ -131,19 +131,6 @@ private:
 private:
   void constructor(SbBool buildNow);
 
-  enum PlaneViewerMode {
-    IDLE_MODE,
-
-    DOLLY_MODE,
-    TRANSLATE_MODE,
-
-    ROTZ_WAIT_MODE,
-    ROTZ_MODE,
-
-    SEEK_WAIT_MODE,
-    SEEK_MODE
-  } mode;
-
   void setModeFromState(unsigned int state);
   void setMode(PlaneViewerMode mode);
 
@@ -161,8 +148,6 @@ private:
   } pixmaps;
 
   static void visibilityCB(void * data, SbBool visible);
-
-  SoAnyPlaneViewer * const common;
 
 private slots:
   void xClicked(void);
