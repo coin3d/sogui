@@ -252,3 +252,6 @@ SoAnyStateStack::invokeTransitionCallbacks(
 } // invokeTransitionCallbacks()
 
 // *************************************************************************
+
+static const char * getSoAnyStateStackRCSId(void) { return rcsid; }
+

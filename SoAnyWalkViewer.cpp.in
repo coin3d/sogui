@@ -100,3 +100,5 @@ SoAnyWalkViewer::elevateCamera(
 
 // *************************************************************************
 
+static const char * getSoAnyWalkViewerRCSId(void) { return rcsid; }
+

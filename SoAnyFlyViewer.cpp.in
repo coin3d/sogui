@@ -81,3 +81,6 @@ SoAnyFlyViewer::dolly(
 } // dolly()
 
 // *************************************************************************
+
+static const char * getSoAnyFlyViewerRCSId(void) { return rcsid; }
+

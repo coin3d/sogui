@@ -714,3 +714,6 @@ SoAnyExaminerViewer::zoomByCursor(
 } // zoomByCursor()
 
 // *************************************************************************
+
+static const char * getSoAnyExaminerViewerRCSId(void) { return rcsid; }
+

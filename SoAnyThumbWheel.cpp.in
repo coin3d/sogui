@@ -650,3 +650,6 @@ SoAnyThumbWheel::DrawEnabledWheel(
 } // DrawEnabledWheel()
 
 // ************************************************************************
+
+static const char * getSoAnyThumbWheelRCSId(void) { return rcsid; }
+

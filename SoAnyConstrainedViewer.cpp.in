@@ -90,3 +90,6 @@ SoAnyConstrainedViewer::rotateCamera(
 } // rotateCamera()
 
 // *************************************************************************
+
+static const char * getSoAnyConstrainedViewerRCSId(void) { return rcsid; }
+

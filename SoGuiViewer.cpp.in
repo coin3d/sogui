@@ -2249,9 +2249,5 @@ So@GUI@Viewer::seeksensorCB(void * data, SoSensor * s)
 
 // *************************************************************************
 
-// silence some compilers
-const char *
-getSo@GUI@ViewerRCSId(void)
-{
-  return rcsid;
-}
+static const char * getSo@GUI@ViewerRCSId(void) { return rcsid; }
+

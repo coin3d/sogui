@@ -914,10 +914,5 @@ So@GUI@RenderArea::glInit( // virtual, derived
 
 // *************************************************************************
 
-// silence some compilers.
-const char *
-getSo@GUI@RenderAreaRCSId(void)
-{
-  return rcsid;
-}
+static const char * getSo@GUI@RenderAreaRCSId(void) { return rcsid; }
 

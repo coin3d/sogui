@@ -402,3 +402,6 @@ SoAnyPlaneViewer::drawRotateGraphics(
 } // drawRotateGraphics()
 
 // ************************************************************************
+
+static const char * getSoAnyPlaneViewerRCSId(void) { return rcsid; }
+
