@@ -2154,17 +2154,11 @@ So@Gui@Viewer::actualRedraw(void)
     SbRotation rot(cameradir, dir);
     camera->orientation = camerarot * rot;
     if (quadstereo) {
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK_LEFT);
-      else
-        glDrawBuffer(GL_FRONT_LEFT);
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT)
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else { // red/cyan
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK);
-      else
-        glDrawBuffer(GL_FRONT);
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
       glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
@@ -2178,10 +2172,7 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation = camerarot * rot;
 
     if (quadstereo) {
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK_RIGHT);
-      else
-        glDrawBuffer(GL_FRONT_RIGHT);
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_RIGHT : GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else {
@@ -2196,10 +2187,7 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation.enableNotify(orientationstore);
     camera->enableNotify(notifystore);
     if (quadstereo) {
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK);
-      else
-        glDrawBuffer(GL_FRONT);
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
     }
     else {
       glColorMask(1,1,1,1); // restore GL color mask
@@ -2208,10 +2196,10 @@ So@Gui@Viewer::actualRedraw(void)
 
     if (!quadstereo) {
       SoCamera * camera = this->getCamera();
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK);
-   else
-    glDrawBuffer(GL_FRONT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK);
+      else
+        glDrawBuffer(GL_FRONT);
       glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
@@ -2227,24 +2215,24 @@ So@Gui@Viewer::actualRedraw(void)
     }
     else {
       SoCamera * camera = this->getCamera();
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK_LEFT);
-   else
-    glDrawBuffer(GL_FRONT_LEFT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK_LEFT);
+      else
+        glDrawBuffer(GL_FRONT_LEFT);
       camera->setStereoAdjustment(this->getStereoOffset());
       camera->setStereoMode(SoCamera::LEFT_VIEW);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::RIGHT_VIEW);
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK_RIGHT);
-   else
-    glDrawBuffer(GL_FRONT_RIGHT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK_RIGHT);
+      else
+        glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::MONOSCOPIC);
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK);
-   else
-    glDrawBuffer(GL_FRONT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK);
+      else
+        glDrawBuffer(GL_FRONT);
     }
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
@@ -2815,6 +2803,11 @@ So@Gui@ViewerP::setClippingPlanes(void)
       // resolution, adjusting to find something that would work well
       // with both a very "stretched" / deep scene and a more compact
       // single-model one.)
+
+      // FIXME: we're seeing bugs here on some OpenGL drivers if there
+      // are SoPolygonOffset nodes in the scenegraph, pushing z-buffer
+      // values so they overflow. Don't know how to fix yet, or even
+      // if it's "fixable" here at all. 20020318 mortene.
     }
   }
 
