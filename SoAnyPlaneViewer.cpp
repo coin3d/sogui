@@ -26,6 +26,7 @@ static const char rcsid[] =
   all the PlaneViewer components for Coin.
 */
 
+#include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 
 #include "SoAnyPlaneViewer.h"
@@ -67,6 +68,22 @@ SoAnyPlaneViewer::transXWheelMotion( // static
     camera->focalDistance.getValue() / 2.5f;
   return value;
 } // transXWheelMotion()
+
+// ************************************************************************
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::rotZ( // static
+  SbVec2f position,
+  SbVec2f oldposition,
+  float aspectratio,
+  SoCamera * const camera )
+{
+  assert( camera != NULL );
+  SoDebugError::postInfo( "SoAnyPlaneViewer::rotZ", "hello Z" );
+} // rotZ()
 
 // ************************************************************************
 
