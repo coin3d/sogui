@@ -225,6 +225,17 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   const SbVec2f posn((float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
                      (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
 
+#if 0 // FIXME: this is used in the examinerviewer, should do the same here. 20020618 mortene.
+  // Mismatches in state of the modifier keys happens if the user
+  // presses or releases them outside the viewer window.
+  if (PRIVATE(this)->ctrldown != ev->wasCtrlDown()) {
+    PRIVATE(this)->ctrldown = ev->wasCtrlDown();
+  }
+  if (PRIVATE(this)->shiftdown != ev->wasShiftDown()) {
+    PRIVATE(this)->shiftdown = ev->wasShiftDown();
+  }
+#endif // FIXME
+
   if (type.isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
     processed = TRUE;
     const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
