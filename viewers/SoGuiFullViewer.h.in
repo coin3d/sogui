@@ -158,11 +158,6 @@ protected:
   SbBool popupEnabled;
   SbPList * viewerButtonWidgets;
 #endif // __COIN_SOXT__
-
-#ifdef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
-public:
-  virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-#endif // __COIN_SOWIN__
 };
 
 // *************************************************************************

@@ -82,14 +82,6 @@ private:
 
   friend class SoGuiPlaneViewerP;
   friend class So@Gui@PlaneViewerP;
-
-//// FIXME!: get rid of toolkit-specific stuff. 20020109 mortene.
-
-#ifdef __COIN_SOWIN__
-protected:
-  virtual LRESULT onCommand(HWND window,UINT message,
-                            WPARAM wparam, LPARAM lparam);
-#endif // !__COIN_SOWIN__
 };
 
 #endif // !SO@GUI@PLANEVIEWER_H

@@ -92,14 +92,6 @@ private:
 
   friend class SoGuiExaminerViewerP;
   friend class So@Gui@ExaminerViewerP;
-
-
-//// FIXME!: get rid of toolkit-specific stuff. 20020109 mortene.
-
-#ifdef __COIN_SOWIN__
-protected:
-  virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-#endif // ! __COIN_SOWIN__
 };
 
 #endif // ! SO@GUI@_EXAMINERVIEWER_H
