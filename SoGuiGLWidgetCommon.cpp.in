@@ -65,6 +65,15 @@
   \endcode
 
   \endif
+
+  \if SOWIN_DOC
+
+  For debugging purposes, SoWinGLWidget provides the
+  OIV_FORCE_PIXEL_FORMAT environment variable to make it possible to
+  override the pixel format chosen by the internal attribute match
+  algorithm.
+
+  \endif
 */
 
 // *************************************************************************
