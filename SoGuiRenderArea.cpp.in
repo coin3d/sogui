@@ -426,12 +426,8 @@ So@Gui@RenderArea::setViewportRegion(
 {
   if ( region.getWindowSize()[0] == -1 ) return;
 
-  assert( this->normalManager != NULL );
-  this->normalManager->getGLRenderAction()->setViewportRegion( region );
-/*
-  assert( this->overlayManager != NULL );
-  this->overlayManager->getGLRenderAction()->setViewportRegion( region );
-*/
+  this->normalManager->setViewportRegion( region );
+  this->overlayManager->setViewportRegion( region );
 } // setViewportRegion()
 
 /*!
@@ -981,6 +977,10 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
     return;
   inherited::sizeChanged( size );
 
+  // FIXME: the rest of this method is almost identical to
+  // So@Gui@RenderArea::glReshape() -- looks like terrible design to
+  // me. Investigate. 20001125 mortene.
+
   assert( this->normalManager != NULL );
   assert( this->overlayManager != NULL );
 
@@ -989,17 +989,16 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
   if ( glsize[0] <= 0 || glsize[1] <= 0 ) 
     return;
 
+  this->setViewportRegion( SbViewportRegion( glsize ) );
+  this->setDevicesWindowSize( glsize );
+
   this->normalManager->setWindowSize( glsize );
   this->normalManager->setSize( glsize );
-  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
-  this->normalManager->scheduleRedraw();
 
   this->overlayManager->setWindowSize( glsize );
   this->overlayManager->setSize( glsize );
-  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
-  this->overlayManager->scheduleRedraw();
 
-  this->setDevicesWindowSize( glsize );
+  this->scheduleRedraw();
 } // sizeChanged()
 
 // Documented in superclass.
@@ -1136,6 +1135,11 @@ So@Gui@RenderArea::glReshape( // virtual, derived
   int width,
   int height )
 {
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo( "So@Gui@RenderArea::glReshape",
+                          "invoked, <%d, %d>", width, height );
+#endif // SO@GUI@_DEBUG
+
   inherited::glReshape( width, height );
 
   this->glLock();
@@ -1145,13 +1149,9 @@ So@Gui@RenderArea::glReshape( // virtual, derived
 
   this->normalManager->setWindowSize( glsize );
   this->normalManager->setSize( glsize );
-//  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
-//  this->normalManager->scheduleRedraw();
 
   this->overlayManager->setWindowSize( glsize );
   this->overlayManager->setSize( glsize );
-//  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
-//  this->overlayManager->scheduleRedraw();
 
   this->setDevicesWindowSize( glsize );
   this->glUnlock();
