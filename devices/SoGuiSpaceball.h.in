@@ -1,0 +1,70 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// $Id$
+
+#ifndef SO@GUI@_SPACEBALL_H
+#define SO@GUI@_SPACEBALL_H
+
+#include <Inventor/@Gui@/devices/So@Gui@Device.h>
+#include <Inventor/SbLinear.h>
+
+// *************************************************************************
+
+class SO@GUI@_DLL_API So@Gui@Spaceball : public So@Gui@Device {
+  SO@GUI@_OBJECT_HEADER(So@Gui@Spaceball, So@Gui@Device);
+  @COMPONENTHEADER@
+
+public:
+  enum Events {
+    MOTION      = 0x01,
+    PRESS       = 0x02,
+    RELEASE     = 0x04,
+    ALL_EVENTS  = 0x07
+  };
+
+  So@Gui@Spaceball(int events = ALL_EVENTS);
+  virtual ~So@Gui@Spaceball(void);
+
+  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler,
+                      void * closure);
+  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler,
+                       void * closure);
+
+  virtual const SoEvent * translateEvent(@EVENT@ event);
+
+  void setRotationScaleFactor(float f);
+  float getRotationScaleFactor(void) const;
+  void setTranslationScaleFactor(float f);
+  float getTranslationScaleFactor(void) const;
+
+  static SbBool exists(void);
+
+  void setFocusToWindow(SbBool flag);
+  SbBool isFocusToWindow(void) const;
+
+private:
+  class So@Gui@SpaceballP * pimpl;
+
+}; // class So@Gui@Spaceball
+
+// *************************************************************************
+
+#endif // ! SO@GUI@_SPACEBALL_H
