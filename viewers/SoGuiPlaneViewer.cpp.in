@@ -86,6 +86,29 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
 
 // ************************************************************************
 
+/*!
+  \fn So@Gui@PlaneViewer::So@Gui@PlaneViewer(@WIDGET@ parent, const char * const name, SbBool embed, So@Gui@FullViewer::BuildFlag flag, So@Gui@Viewer::Type type)
+
+  The public constructor, to be used by application programmers who
+  want to instantiate the plain, standard So@Gui@PlaneViewer.
+*/
+
+/*!
+  \fn So@Gui@PlaneViewer::So@Gui@PlaneViewer(@WIDGET@ parent, const char * const name, SbBool embed, So@Gui@FullViewer::BuildFlag flag, So@Gui@Viewer::Type type, SbBool build)
+
+  A protected constructor, to be used by application programmers who
+  want to extend the So@Gui@PlaneViewer.
+*/
+
+/*!
+  \fn So@Gui@PlaneViewer::~So@Gui@PlaneViewer()
+
+  The destructor. Cleans up all internal resources used by the
+  So@Gui@PlaneViewer instance.
+*/
+
+// ************************************************************************
+
 #define MOUSE_BUTTON_EVENT_TYPE (SoMouseButtonEvent::getClassTypeId())
 #define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
 #define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
