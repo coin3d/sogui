@@ -65,7 +65,7 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // public
   SbBool embed, 
   So@Gui@FullViewer::BuildFlag flag,
   So@Gui@Viewer::Type type )
-: inherited( parent, name, embed, flag, type, TRUE )
+: inherited( parent, name, embed, flag, type, FALSE )
 {
   this->constructor( TRUE );
 } // So@Gui@FlyViewer()
