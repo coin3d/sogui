@@ -218,7 +218,7 @@ So@Gui@RenderAreaP::showInventorInformation(void)
 
   // Display calculated maximum resolution of SbTime::getTimeOfDay().
   {
-    const double DURATION = 0.1;  // run check for 1 sec
+    const double DURATION = 0.2;  // in seconds
     SbTime current = SbTime::getTimeOfDay();
     SbTime end(current + DURATION);
     SbTime last = current;
