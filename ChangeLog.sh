@@ -1,9 +1,9 @@
 #!/bin/sh
 ############################################################################
 
-module=SoGUI
+moduledir=${0%/[^/]*}
+module=${moduledir##*/}
 cvs2cl=$HOME/store/cvs/cvs2cl/cvs2cl.pl
-moduledir=$HOME/code/coin/src/$module
 headerfile=/tmp/$module.header
 
 cd $moduledir
