@@ -35,6 +35,9 @@ class QWidget;
 #ifdef __COIN_SOGTK__
 #include <gtk/gtk.h>
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+#include <wtypes.h>
+#endif // __COIN_SOWIN__
 
 
 class So@Gui@Component;
@@ -65,6 +68,11 @@ public:
   @WIDGET@ getShellWidget(void) const;
   @WIDGET@ getParentWidget(void) const;
 
+#ifdef __COIN_SOWIN__
+  HWND getBaseWidget(void) const;
+  HWND setFocusProxy(HWND widget);
+  HWND getFocusProxy(void);
+#endif // __COIN_SOWIN__
 #ifdef __COIN_SOXT__
   Widget getBaseWidget(void) const;
   Display * getDisplay(void);
@@ -102,6 +110,13 @@ protected:
   void setClassName(const char * const name);
   void setBaseWidget(@WIDGET@ widget);
 
+#ifdef __COIN_SOWIN__
+  HWND buildFormWidget(HWND parent);
+  virtual void windowCloseAction(void);
+  void setResize(SbBool set);
+  SbBool getResize(void);
+  SbBool realized;
+#endif // __COIN_SOWIN__
 #ifdef __COIN_SOXT__
   // FIXME: I guess this should perhaps be part of the common API?
   // 20011012 mortene.
@@ -149,7 +164,8 @@ private slots:
 
 private:
   class So@Gui@ComponentP * pimpl;
-  // FIXME: get rid of this? Possibly used by SoGtkComponent. 20011012 mortene.
+  // FIXME: get rid of this? Possibly used by SoGtkComponent and
+  // SoWinComponent. 20011012 mortene.
   friend class So@Gui@ComponentP;
 
 #ifdef __COIN_SOXT__
