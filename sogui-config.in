@@ -61,19 +61,27 @@ alternate=default
 for arg
 do
   case $arg in
-  --alternate=*) alternate=`echo $arg | cut -d= -f2-` ;;
-  --debug) alternate=debug ;;
+  --usage | --help)
+    echo "$usage"
+    exit 0
+    ;;
+  --alternate=*)
+    alternate=`echo $arg | cut -d= -f2-`
+    ;;
+  --debug)
+    alternate=debug
+    ;;
   esac
 done
 
-if test -f $prefix/share/Coin/conf/so@gui@-$alternate.cfg; then
+if test -f "$prefix/share/Coin/conf/so@gui@-$alternate.cfg"; then
   configfile="$prefix/share/Coin/conf/so@gui@-$alternate.cfg"
-  . $configfile
-elif test -f $prefix/share/Coin/conf/so@gui@-default.cfg; then
+  . "$configfile"
+elif test -f "$prefix/share/Coin/conf/so@gui@-default.cfg"; then
   configfile="$prefix/share/Coin/conf/so@gui@-default.cfg"
-  . $configfile
+  . "$configfile"
 else
-  echo >&2 "$me: no default So@Gui@ config available in $prefix/share/Coin/conf/"
+  echo >&2 "$me: no default So@Gui@ config available in \"$prefix/share/Coin/conf/\""
   exit 1
 fi
 
@@ -111,7 +119,6 @@ fi
 while test $# -gt 0
 do
   case $1 in
-  --usage | --help)  echo "$usage"         ;;
   --version)         echo "$version"       ;;
   --cppflags)        echo "$cppflags"      ;;
   --cflags)          echo "$cflags"        ;;
