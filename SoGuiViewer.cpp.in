@@ -2401,9 +2401,6 @@ SbBool
 So@Gui@Viewer::processSoEvent( // virtual
   const SoEvent * const event )
 {
-  if ( ! this->isViewing() )
-    return inherited::processSoEvent(event);
-
   const SoType type( event->getTypeId() );
 
   if ( type.isDerivedFrom( SoKeyboardEvent::getClassTypeId() ) ) {
@@ -2456,6 +2453,9 @@ So@Gui@Viewer::processSoEvent( // virtual
       } // switch ( keyevent->getKey() )
     } while ( FALSE );
   }
+
+  if ( ! this->isViewing() )
+    return inherited::processSoEvent(event);
 
   return FALSE;
 } // processSoEvent()
