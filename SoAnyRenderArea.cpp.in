@@ -43,6 +43,8 @@ static const char rcsid[] =
 
 #include <Inventor/@GUI@/So@GUI@RenderArea.h>
 
+#include <GL/gl.h> // glDrawBuffer()
+
 // *************************************************************************
 
 // Metadon doc:
@@ -119,7 +121,7 @@ So@GUI@RenderArea::constructor( // private
 
   this->appEventHandler = NULL;
 } // constructor()
-  
+
 /*!
 */
 
@@ -314,7 +316,7 @@ So@GUI@RenderArea::setOverlayColorMap(
   this->overlayColormapStart = start;
   this->overlayColormapSize = num;
   this->overlayColormap = new SbColor [ num ];
-  for ( int i = 0; i < num; i++ ) 
+  for ( int i = 0; i < num; i++ )
     this->overlayColormap[i] = colors[i];
 } // setOverlayColorMap()
 
