@@ -137,13 +137,16 @@ private:
 
 #ifdef __COIN_SOWIN__
 protected:
-
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
+  virtual void createPrefSheet(void);
   
 private:
+  void setCursorRepresentation(int mode);
+
   SoAnyExaminerViewer * common;
-  SoWinExaminerViewerP * pimpl;
+  class SoWinExaminerViewerP * pimpl;
+  friend class SoWinExaminerViewerP;
 #endif // ! __COIN_SOWIN__
 
 
