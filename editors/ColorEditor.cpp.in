@@ -21,6 +21,8 @@
  *
 \**************************************************************************/
 
+// FIXME: overload the getClassName() type functions
+
 #include <Inventor/SbPList.h>
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/fields/SoSFColor.h>
@@ -114,12 +116,20 @@ public:
   int mfindex;
   SoFieldSensor * sensor;
 
+  SbBool updating;
+
   void attachedToColor(const SbColor & color);
   void colorChange(void);
   static void update_cb(void * closure, SoSensor * sensor);
   static void delete_cb(void * closure, SoSensor * sensor);
 
-  SbBool updating;
+  SoGuiSlider1 * slider_r; // red
+  SoGuiSlider1 * slider_g; // green
+  SoGuiSlider1 * slider_b; // blue
+  SoGuiSlider1 * slider_h; // hue
+  SoGuiSlider1 * slider_s; // saturation
+  SoGuiSlider1 * slider_v; // value
+
   SoFieldSensor * sensor_r;
   SoFieldSensor * sensor_g;
   SoFieldSensor * sensor_b;
@@ -133,13 +143,6 @@ public:
   static void update_h_cb(void * closure, SoSensor * sensor);
   static void update_s_cb(void * closure, SoSensor * sensor);
   static void update_v_cb(void * closure, SoSensor * sensor);
-
-  SoGuiSlider1 * slider_r; // red
-  SoGuiSlider1 * slider_g; // green
-  SoGuiSlider1 * slider_b; // blue
-  SoGuiSlider1 * slider_h; // hue
-  SoGuiSlider1 * slider_s; // saturation
-  SoGuiSlider1 * slider_v; // value
 
   static const char * scenegraph[];
 };
@@ -156,6 +159,7 @@ ColorEditor::scenegraph[] = {
   "  DEF pane SoGuiPane {",
   "    worldSize 1 1 0",
   "    objectSize 0 0 0 = USE viewportfix.viewportSize",
+  //   the initial bottom-left positioning is done right here (position = [...] . oB)
   "    SoGuiPosition {",
   "      position 0 0 0",
   "      = DEF slidergeometry Calculator {",
@@ -169,26 +173,55 @@ ColorEditor::scenegraph[] = {
   "        ]",
   "      } . oB",
   "    }",
-  // FIXME: this only takes care of RGBI, not the rest of the options
-  // frames before sliders, since knobs need to paint over frames (we're not in 3D anymore)
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliderh SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliders SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliderv SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliderb SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliderg SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
-  "    DEF sliderr SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    DEF layouts Switch {",
+  "      whichChild 6",
+  "      DEF instances Group {", // never to be rendered...
+  "        DEF slider_r SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_g SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_b SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_h SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_s SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_v SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "        DEF slider_translation SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+  "        DEF slider_frame SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "      }",
+  "      DEF sliders_NONE Group {",
+  "      }",
+  "      DEF sliders_INTENSITY Group {",
+  "        USE slider_frame", // frames before sliders - knobs need to paint over frames
+  "        USE slider_v",
+  "      }",
+  "      DEF sliders_RGB Group {",
+  "        USE slider_frame",
+  "        USE slider_b",
+  "        USE slider_translation",
+  "        USE slider_frame",
+  "        USE slider_g",
+  "        USE slider_translation",
+  "        USE slider_frame",
+  "        USE slider_r",
+  "      }",
+  "      DEF sliders_HSV Group {",
+  "        USE slider_frame",
+  "        USE slider_v",
+  "        USE slider_translation",
+  "        USE slider_frame",
+  "        USE slider_s",
+  "        USE slider_translation",
+  "        USE slider_frame",
+  "        USE slider_h",
+  "      }",
+  "      DEF sliders_RGB_V Group {",
+  "        USE sliders_INTENSITY",
+  "        USE slider_translation",
+  "        USE sliders_RGB",
+  "      }",
+  "      DEF sliders_RGB_HSV Group {",
+  "        USE sliders_HSV",
+  "        USE slider_translation",
+  "        USE sliders_RGB",
+  "      }",
+  "    }",
   "  }",
   "}",
   NULL
@@ -230,12 +263,12 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool 
   SoNode * root = SoAny::loadSceneGraph(ColorEditor::scenegraph);
   if ( root ) {
     root->ref();
-    PRIVATE(this)->slider_r = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderr");
-    PRIVATE(this)->slider_g = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderg");
-    PRIVATE(this)->slider_b = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderb");
-    PRIVATE(this)->slider_h = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderh");
-    PRIVATE(this)->slider_s = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliders");
-    PRIVATE(this)->slider_v = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderv");
+    PRIVATE(this)->slider_r = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_r", TRUE);
+    PRIVATE(this)->slider_g = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_g", TRUE);
+    PRIVATE(this)->slider_b = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_b", TRUE);
+    PRIVATE(this)->slider_h = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_h", TRUE);
+    PRIVATE(this)->slider_s = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_s", TRUE);
+    PRIVATE(this)->slider_v = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_v", TRUE);
     if ( PRIVATE(this)->slider_r ) {
       PRIVATE(this)->slider_r->ref();
       PRIVATE(this)->slider_r->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 0, 0));
@@ -600,6 +633,7 @@ void
 ColorEditor::attachedToColor(const SbColor & color)
 {
   float r, g, b, h, s, v;
+  this->color = color;
   color.getValue(r, g, b);
   color.getHSVValue(h, s, v);
   this->updating = TRUE;
