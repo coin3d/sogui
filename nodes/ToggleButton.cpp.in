@@ -123,8 +123,8 @@ SoGuiToggleButton::handleEvent(SoHandleEventAction * action)
         } else {
           this->on.setValue(TRUE);
         }
+        action->setHandled();
       }
-      action->setHandled();
     }
   }
   if ( !action->isHandled() ) {

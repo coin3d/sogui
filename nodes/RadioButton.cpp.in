@@ -119,8 +119,8 @@ SoGuiRadioButton::handleEvent(SoHandleEventAction * action)
       const SoMouseButtonEvent * event = (SoMouseButtonEvent *) ev;
       if ( event->getState() == SoButtonEvent::DOWN ) {
         this->on.setValue(TRUE);
+        action->setHandled();
       }
-      action->setHandled();
     }
   }
   if ( !action->isHandled() ) {
