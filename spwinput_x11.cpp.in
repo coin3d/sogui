@@ -17,6 +17,10 @@
  * int SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent);
  */
 
+/* FIXME: isn't this really "pure" C code? If so, don't use a C++
+   suffix on the file -- so we don't get tempted to pollute
+   it. 20010821 mortene. */
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
