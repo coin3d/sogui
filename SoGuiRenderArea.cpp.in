@@ -75,6 +75,8 @@ static const char rcsid[] =
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
 #include <Inventor/@Gui@/SoAny.h>
 
+#include <string.h> // strchr()
+
 #define RENDERAREA_DEBUG_REDRAWS 0
 
 // *************************************************************************
