@@ -101,11 +101,6 @@ static const char rcsid[] =
 static int UNINITIALIZED_ENVVAR = -1; // value of envvars before tested
 static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
-#ifdef SO@GUI@_DEBUG
-// For smoking out the interaction count nesting bugs.
-static int COIN_ASSERT_ON_INTERACTION_COUNT_FAILURE = UNINITIALIZED_ENVVAR;
-#endif // SO@GUI@_DEBUG
-
 // *************************************************************************
 
 // The private data for the So@Gui@Viewer.
@@ -2080,13 +2075,6 @@ So@Gui@Viewer::interactiveCountDec(void)
     SoDebugError::postWarning( "So@Gui@Viewer::interactiveCountDec",
                                "interaction count nesting went below zero. "
                                "This is due to an internal So@Gui@ bug." );
-
-    if ( COIN_ASSERT_ON_INTERACTION_COUNT_FAILURE == UNINITIALIZED_ENVVAR ) {
-      char * env = getenv( "COIN_ASSERT_ON_INTERACTION_COUNT_FAILURE" );
-      COIN_ASSERT_ON_INTERACTION_COUNT_FAILURE = env ? atoi( env ) : 0;
-    }
-
-    assert ( !COIN_ASSERT_ON_INTERACTION_COUNT_FAILURE );
   }
 #endif // SO@GUI@_DEBUG
 
