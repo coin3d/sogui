@@ -641,8 +641,6 @@ So@Gui@FlyViewer::processSoEvent(// virtual
       PRIVATE(this)->maxspeed = 0.0f;
       PRIVATE(this)->updateSpeedIndicator();
       PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_ALL);
-      SoCamera * camera = this->getCamera();
-      assert(camera != NULL);
       this->scheduleRedraw();
       // NOTE; this could be optimized to only draw the superimposition in
       // question if speed is zero.
@@ -749,7 +747,7 @@ So@Gui@FlyViewer::processSoEvent(// virtual
       float dy = newpos[1] - PRIVATE(this)->tiltpos[1];
       if (dx != 0.0f || dy != 0.0f) {
         SoCamera * camera = this->getCamera();
-        assert(camera != NULL);
+        if (camera == NULL) { return TRUE; } // probably sceneless
         SbVec3f up(PRIVATE(this)->tiltup);
         SbVec3f dir;
         SbRotation orientation(PRIVATE(this)->tiltrotation);
@@ -853,30 +851,31 @@ So@Gui@FlyViewer::actualRedraw(// virtual
           t = float(thisrender.getMsecValue() - PRIVATE(this)->lastrender->getMsecValue()) / 500.0f;
           if (t > 0.0f) {
             SoCamera * camera = this->getCamera();
-            assert(camera != NULL);
-            SbVec3f up(this->getUpDirection());
-            SbVec3f dir;
-            SbRotation orientation(camera->orientation.getValue());
-            orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
-            camera->position.setValue(camera->position.getValue() +
-                                      dir * (PRIVATE(this)->currentspeed * t * PRIVATE(this)->speedfactor));
-            float xfactor = xfrac * xfrac / 2.0f;
-            SbVec3f horizon(dir.cross(up));
-            horizon.normalize();
+            if (camera) { // could be a sceneless viewer
+              SbVec3f up(this->getUpDirection());
+              SbVec3f dir;
+              SbRotation orientation(camera->orientation.getValue());
+              orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
+              camera->position.setValue(camera->position.getValue() +
+                                        dir * (PRIVATE(this)->currentspeed * t * PRIVATE(this)->speedfactor));
+              float xfactor = xfrac * xfrac / 2.0f;
+              SbVec3f horizon(dir.cross(up));
+              horizon.normalize();
 
-            // FIXME: roll instead of turn if either shift button is down
-            // if it seems like a good idea
-            if (xfrac < 0.0f) xfactor = -xfactor;
-            orientation *= SbRotation(this->getUpDirection(), xfactor * t);
+              // FIXME: roll instead of turn if either shift button is
+              // down if it seems like a good idea
+              if (xfrac < 0.0f) xfactor = -xfactor;
+              orientation *= SbRotation(this->getUpDirection(), xfactor * t);
 
-            // set tilt
-            SbRotation tilt = SbRotation(horizon, yfrac * yfrac * 0.002f);
-            if (yfrac >= 0.0f) tilt.invert();
-            orientation *= tilt;
-            SbVec3f newUp;
-            tilt.multVec(up, newUp);
-            this->setUpDirection(newUp);
-            camera->orientation.setValue(orientation);
+              // set tilt
+              SbRotation tilt = SbRotation(horizon, yfrac * yfrac * 0.002f);
+              if (yfrac >= 0.0f) tilt.invert();
+              orientation *= tilt;
+              SbVec3f newUp;
+              tilt.multVec(up, newUp);
+              this->setUpDirection(newUp);
+              camera->orientation.setValue(orientation);
+            }
           }
         }
       }
