@@ -175,7 +175,7 @@ ColorEditor::editorscene[] = {
   "",
   "DEF pane SoGuiPane {",
   "  worldSize 1 1 0",
-  "  objectSize 1 1 0",
+  "  objectSize 400 300 0",
   "  SoGuiPosition {",
   "    position 0 0 0",
   "    = DEF windowgeometry Calculator {",
@@ -194,12 +194,10 @@ ColorEditor::editorscene[] = {
   "    last 6",  // the RGB_HSV sliders
   "    value 5", // start with the RGB_V group
   "  }",
-#if 0
   "  SoGuiPosition { position 0 0 0 = USE windowgeometry.oB }",
   "  DEF slider_wheel SoGuiSlider2 {",
   "    size 80 80 0",
   "  }",
-#endif
   // the bottom-left positioning of sliders is done right here (position = [...] . oB)
   "  SoGuiPosition {",
   "    position 0 0 0",
@@ -216,7 +214,7 @@ ColorEditor::editorscene[] = {
   "  }",
   "  Switch {",
   "    whichChild -1 = USE switcher.value",
-  "    DEF instances Group {", // never to be rendered...
+  "    Group {", // never to be rendered...
   "      DEF slider_r SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "      DEF slider_g SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "      DEF slider_b SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
@@ -364,7 +362,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
 
   SoGuiViewportFix * viewportfix = (SoGuiViewportFix *) SoAny::scanSceneForName(inherited::getSceneGraph(), "viewportfix", FALSE);
   assert(viewportfix != NULL);
-  PRIVATE(this)->editor->objectSize.connectFrom(&(viewportfix->viewportSize));
+  // PRIVATE(this)->editor->objectSize.connectFrom(&(viewportfix->viewportSize));
 }
 
 So@Gui@ColorEditor::~So@Gui@ColorEditor(void)
