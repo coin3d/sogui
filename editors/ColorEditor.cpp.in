@@ -1009,7 +1009,7 @@ ColorEditor::update_wheel_cb(void * closure, SoSensor * sensor)
   if ( value[0] < 0.0f ) h += M_PI; 
   if ( h < 0.0f ) h += (2.0 * M_PI);
   h /= 2.0f * M_PI; 
-  float s = SbMax(value.length(), 1.0f); // float precision bugfix
+  float s = SbMin(value.length(), 1.0f); // float precision bugfix
   float v = 1.0f;
   SbColor color;
   color.setHSVValue(h, s, v);
