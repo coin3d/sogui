@@ -21,41 +21,25 @@
  *
 \**************************************************************************/
 
-#ifndef SO@GUI@_INPUTFOCUS_H
-#define SO@GUI@_INPUTFOCUS_H
-
-#include <Inventor/@Gui@/devices/So@Gui@Device.h>
+#ifndef SOGUI_INPUTFOCUSP_H
+#define SOGUI_INPUTFOCUSP_H
 
 // *************************************************************************
 
-class SO@GUI@_DLL_API So@Gui@InputFocus : public So@Gui@Device {
-  SO@GUI@_OBJECT_HEADER(So@Gui@InputFocus, So@Gui@Device);
-
+class SoGuiInputFocusP {
 public:
-  enum Events {
-    ENTER_WINDOW = 1 << 0,
-    LEAVE_WINDOW = 1 << 1,
-    ALL_EVENTS   = ENTER_WINDOW | LEAVE_WINDOW
-  };
+  SoGuiInputFocusP(class So@Gui@InputFocus * p);
+  ~SoGuiInputFocusP();
 
-  So@Gui@InputFocus(int mask = ALL_EVENTS);
-  virtual ~So@Gui@InputFocus();
+  int eventmask;
 
-  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
-  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
-
-  virtual const SoEvent * translateEvent(@EVENT@ event);
-
-private:
-  class So@Gui@InputFocusP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
-  friend class SoGuiInputFocusP;
-  friend class So@Gui@InputFocusP;
-#endif // DOXYGEN_SKIP_THIS
+protected:
+  class So@Gui@InputFocus * pub;
 };
 
-#define SO_@GUI@_ALL_FOCUS_EVENTS So@Gui@InputFocus::ALL_EVENTS;
+#define PRIVATE(p) (p->pimpl)
+#define PUBLIC(p) (p->pub)
 
 // *************************************************************************
 
-#endif // ! SO@GUI@_INPUTFOCUS_H
+#endif // ! SOGUI_INPUTFOCUSP_H
