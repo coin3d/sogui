@@ -72,6 +72,26 @@
 
 #include <so@gui@defs.h>
 
+#include <Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h>
+
+// *************************************************************************
+
+// SoGuiPlaneViewerP "private implementation" class.
+
+#define PUBLIC(ptr) (ptr->pub)
+#define PRIVATE(ptr) (ptr->pimpl)
+
+#define THIS (PRIVATE(this))
+
+SoGuiPlaneViewerP::SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ)
+{
+  this->pub = publ;
+}
+
+SoGuiPlaneViewerP::~SoGuiPlaneViewerP()
+{
+}
+
 // *************************************************************************
 
 SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
