@@ -32,9 +32,9 @@ class QWidget;
 #ifdef __COIN_SOXT__
 #include <X11/Intrinsic.h>
 #endif // __COIN_SOXT__
-#ifdef __COIN_SOXT__
+#ifdef __COIN_SOGTK__
 #include <gtk/gtk.h>
-#endif // __COIN_SOXT__
+#endif // __COIN_SOGTK__
 
 
 class So@Gui@Component;
@@ -100,7 +100,7 @@ protected:
   virtual void afterRealizeHook(void);
 
   void setClassName(const char * const name);
-  void setBaseWidget(const @WIDGET@ widget);
+  void setBaseWidget(@WIDGET@ widget);
 
 #ifdef __COIN_SOXT__
   // FIXME: I guess this should perhaps be part of the common API?
