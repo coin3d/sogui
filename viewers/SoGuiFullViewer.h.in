@@ -81,6 +81,11 @@ protected:
   virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
 #endif // __COIN_SOQT__
 
+#ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+  virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
+#endif // __COIN_SOGTK__
+
 #ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
   Widget buildAppButtonsForm(Widget parent);
 
@@ -400,9 +405,33 @@ private:
   SbBool seekdistaspercentage;
 #endif // __COIN_SOXT__
 
+#ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+private:
+  // hooks for SoAnyFullViewer
+
+  // menu selections
+  void selectedPrefs(void);
+  void selectedViewing(void);
+  void selectedDecoration(void);
+  void selectedHeadlight(void);
+  void copyviewSelected(void);
+  void pasteviewSelected(void);
+
+  // button selections
+  void interactbuttonClicked(void);
+  void viewbuttonClicked(void);
+  void helpbuttonClicked(void);
+  void homebuttonClicked(void);
+  void sethomebuttonClicked(void);
+  void viewallbuttonClicked(void);
+  void seekbuttonClicked(void);
+#endif // __COIN_SOGTK__
+
+
 private:
   SoAnyFullViewer * common;
   class So@Gui@FullViewerP * pimpl;
+  friend class So@Gui@FullViewerP;
 };
 
 // *************************************************************************
