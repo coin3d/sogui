@@ -2159,7 +2159,7 @@ So@Gui@Viewer::actualRedraw(void)
     SbRotation rot(cameradir, dir);
     camera->orientation = camerarot * rot;
     if (quadstereo) {
-      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT)
+      glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else { // red/cyan
