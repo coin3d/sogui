@@ -1163,6 +1163,8 @@ So@Gui@Viewer::getBufferingType(void) const
 
 // *************************************************************************
 
+// Note: this documentation for setViewing() will also be used for all
+// the miscellaneous viewer subclasses, so keep it general.
 /*!
   Set view mode.
 
@@ -1177,8 +1179,7 @@ So@Gui@Viewer::getBufferingType(void) const
 */
 
 void
-So@Gui@Viewer::setViewing(
-  SbBool enable)
+So@Gui@Viewer::setViewing(SbBool enable)
 {
   if (this->viewingFlag == enable) {
     if (SO@GUI@_DEBUG) {
