@@ -2113,6 +2113,8 @@ So@Gui@Viewer::interactiveCountInc(void)
 void
 So@Gui@Viewer::interactiveCountDec(void)
 {
+	// FIXME: The UI toolkits may cause the interactionnesting to go below zero
+	// by triggering press and release events in different widgets. mariusbu 20010709.
 #if SO@GUI@_DEBUG
   if (PRIVATE(this)->interactionnesting <= 0) {
     SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
