@@ -115,10 +115,8 @@ protected:
 
 private:
   class So@Gui@ComponentP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiComponentP;
   friend class So@Gui@ComponentP;
-#endif // DOXYGEN_SKIP_THIS
 
   // FIXME: get rid of remaining toolkit specifics below. 20020611 mortene.
 
@@ -126,12 +124,6 @@ private:
 public:
   HWND setFocusProxy(HWND widget);
   HWND getFocusProxy(void);
-
-protected:
-  HWND buildFormWidget(HWND parent);
-  virtual void windowCloseAction(void);
-  void setResize(SbBool set);
-  SbBool getResize(void);
 #endif // __COIN_SOWIN__
 
 #ifdef __COIN_SOXT__
@@ -146,11 +138,11 @@ public:
 protected:
   // FIXME: I guess this should perhaps be part of the common API?
   // 20011012 mortene.
-  virtual void windowCloseAction(void);
   void invokeVisibilityChangeCallbacks(const SbBool enable) const;
   void invokeWindowCloseCallbacks(void) const;
 
-  // FIXME: get rid of these two? 20011012 mortene.
+  // FIXME: get rid of these? 20011012 mortene.
+  virtual void windowCloseAction(void);
   static char * getlabel(unsigned int what);
   SbBool firstRealize;
 
