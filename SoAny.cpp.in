@@ -488,44 +488,40 @@ SoAny::listWin32ProcessModules(void)
   funModule32Next = (Module32Next_t)
     GetProcAddress(kernel32dll, "Module32Next");
 
-  if (!funCreateToolhelp32Snapshot || !funModule32First || !funModule32Next) {
-    SoDebugError::postWarning("SoAny::listWin32ProcessModules",
-                              "Tool Help Library not available (NT4?)");
-    goto end_freelib;
-  }
 
-  HANDLE tool32snap = funCreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
-  assert((tool32snap != (void *)-1) && "CreateToolhelp32Snapshot() failed");
-
-  MODULEENTRY32 moduleentry;
-  moduleentry.dwSize = sizeof(MODULEENTRY32);
-  ok = funModule32First(tool32snap, &moduleentry);
-  assert(GetLastError()==ERROR_NO_MORE_FILES && "Module32First() failed"); 
-
-  SoDebugError::postInfo("SoAny::listWin32ProcessModules",
-                         "MODULEENTRY32.szModule=='%s', .szExePath=='%s'",
-                         moduleentry.szModule, moduleentry.szExePath);
-
-  while (funModule32Next(tool32snap, &moduleentry)) {
+  do {
+    if (!funCreateToolhelp32Snapshot || !funModule32First || !funModule32Next) {
+      SoDebugError::postWarning("SoAny::listWin32ProcessModules",
+                                "Tool Help Library not available (NT4?)");
+      break; // goto end of do-while loop
+    }
+    
+    HANDLE tool32snap = funCreateToolhelp32Snapshot(TH32CS_SNAPALL, 0);
+    assert((tool32snap != (void *)-1) && "CreateToolhelp32Snapshot() failed");
+    
+    MODULEENTRY32 moduleentry;
+    moduleentry.dwSize = sizeof(MODULEENTRY32);
+    ok = funModule32First(tool32snap, &moduleentry);
+    assert(GetLastError()==ERROR_NO_MORE_FILES && "Module32First() failed"); 
+    
     SoDebugError::postInfo("SoAny::listWin32ProcessModules",
                            "MODULEENTRY32.szModule=='%s', .szExePath=='%s'",
                            moduleentry.szModule, moduleentry.szExePath);
-  }
+    
+    while (funModule32Next(tool32snap, &moduleentry)) {
+      SoDebugError::postInfo("SoAny::listWin32ProcessModules",
+                             "MODULEENTRY32.szModule=='%s', .szExePath=='%s'",
+                             moduleentry.szModule, moduleentry.szExePath);
+    }
+    
+    assert(GetLastError()==ERROR_NO_MORE_FILES && "Module32Next() failed"); 
 
-  assert(GetLastError()==ERROR_NO_MORE_FILES && "Module32Next() failed"); 
+    ok = CloseHandle(tool32snap);
+    assert(ok && "CloseHandle() failed");
+  } while (0);
 
-  ok = CloseHandle(tool32snap);
-  assert(ok && "CloseHandle() failed");
- end_freelib:
   ok = FreeLibrary(kernel32dll);
   assert(ok && "FreeLibrary() failed");
-}
-
-int
-main(void)
-{
-  win32_list_process_modules();
-  return 0;
 }
 
 
