@@ -57,8 +57,6 @@ static SoAny * single_instance = NULL;
 
 SoSearchAction * SoAny::finder = NULL;
 
-#ifndef DOXYGEN_SKIP_THIS
-
 // Following block explains OpenGL cache context handling in some
 // depth. Copied from an email write-up by pederb:
 //
@@ -73,7 +71,7 @@ SoSearchAction * SoAny::finder = NULL;
 // SoAny::getSharedCacheContextId() is called to find a valid cache
 // context id for SoGLRenderAction.
 //
-// What one needs to to is to detect when the GL-context is
+// What one needs to do is to detect when the GL-context is
 // destructed, and then call SoAny::unregisterGLContext(). Then
 // SoAny::registerGLContext() to register the new context, and then
 // set the new cache context id in the SoGLRenderAction. This can
@@ -145,9 +143,7 @@ int soany_cache_context::oiv_counter = 4242;
 int soany_cache_context::oiv_counter = 0;
 #endif
 
-#endif // DOXYGEN_SKIP_THIS
-
-
+// *************************************************************************
 
 // private constructor
 SoAny::SoAny(void) 
