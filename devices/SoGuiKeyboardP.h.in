@@ -21,43 +21,25 @@
  *
 \**************************************************************************/
 
-#ifndef SO@GUI@_KEYBOARD_H
-#define SO@GUI@_KEYBOARD_H
-
-#include <Inventor/@Gui@/devices/So@Gui@Device.h>
+#ifndef SOGUI_KEYBOARDP_H
+#define SOGUI_KEYBOARDP_H
 
 class SoKeyboardEvent;
 
 // *************************************************************************
 
-#define SO_@GUI@_ALL_KEYBOARD_EVENTS So@Gui@Keyboard::ALL
-
-class SO@GUI@_DLL_API So@Gui@Keyboard : public So@Gui@Device {
-  SO@GUI@_OBJECT_HEADER(So@Gui@Keyboard, So@Gui@Device);
-
+class SoGuiKeyboardP {
 public:
-  enum Events {
-    KEY_PRESS = 0x01,
-    KEY_RELEASE = 0x02,
-    ALL_EVENTS = KEY_PRESS | KEY_RELEASE
-  };
+  SoGuiKeyboardP(void);
+  ~SoGuiKeyboardP();
 
-  So@Gui@Keyboard(int eventmask = ALL_EVENTS);
-  virtual ~So@Gui@Keyboard(void);
-
-  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
-  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
-
-  virtual const SoEvent * translateEvent(@EVENT@ event);
-
-private:
-  class So@Gui@KeyboardP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
-  friend class So@Gui@KeyboardP;
-  friend class SoGuiKeyboardP;
-#endif // DOXYGEN_SKIP_THIS
+  int eventmask;
+  SoKeyboardEvent * kbdevent;
 };
+
+#define PRIVATE(p) (p->pimpl)
+#define PUBLIC(p) (p->pub)
 
 // *************************************************************************
 
-#endif // ! SO@GUI@_KEYBOARD_H
+#endif // ! SOGUI_KEYBOARDP_H

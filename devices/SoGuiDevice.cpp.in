@@ -32,6 +32,10 @@
   The So@Gui@ device classes provide glue functionality for
   translating native GUI events from the underlying toolkit to
   Inventor scenegraph SoEvent events.
+
+  The device classes are mainly of interest to application programmers
+  when writing extensions for new types of devices, and seldom in
+  other contexts -- so they can most often be ignored.
 */
 
 #if HAVE_CONFIG_H

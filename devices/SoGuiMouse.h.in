@@ -25,10 +25,6 @@
 #define SO@GUI@_MOUSE_H
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
-// FIXME: this include only needed because of SoWin-specific private
-// functions -- get rid of it after fixing up the header file to be a
-// 100% "pure" template. 20011210 mortene.
-#include <Inventor/events/SoButtonEvent.h>
 
 class SoMouseButtonEvent;
 class SoLocation2Event;
@@ -40,14 +36,10 @@ class SO@GUI@_DLL_API So@Gui@Mouse : public So@Gui@Device {
 
 public:
   enum Events {
-    // FIXME: check if the define matches with X11 is really
-    // necessary. If not, remove the comments below, if so, document
-    // properly this dependency. 20011229 mortene.
-
-    BUTTON_PRESS    = 0x01, // matches X11's ButtonPressMask define
-    BUTTON_RELEASE  = 0x02, // matches X11's ButtonReleaseMask define
-    POINTER_MOTION  = 0x04, // matches X11's PointerMotionMask define
-    BUTTON_MOTION   = 0x08, // matches X11's ButtonMotionMask define
+    BUTTON_PRESS    = 0x01,
+    BUTTON_RELEASE  = 0x02,
+    POINTER_MOTION  = 0x04,
+    BUTTON_MOTION   = 0x08,
 
     ALL_EVENTS = BUTTON_PRESS | BUTTON_RELEASE | POINTER_MOTION | BUTTON_MOTION
   };
@@ -55,27 +47,18 @@ public:
   So@Gui@Mouse(int eventmask = ALL_EVENTS);
   virtual ~So@Gui@Mouse(void);
 
-  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                      void * closure);
-  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                       void * closure);
+  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
+  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
 
   virtual const SoEvent * translateEvent(@EVENT@ event);
 
 private:
-  SoMouseButtonEvent * buttonevent;
-  SoLocation2Event * locationevent;
-  int eventmask;
-
-#ifdef __COIN_SOWIN__ // FIXME: make a "pure" template. 20011210 mortene.
-  SoLocation2Event * makeLocationEvent(MSG * msg);
-  SoMouseButtonEvent * makeButtonEvent(MSG * msg, SoButtonEvent::State state);
-#endif // __COIN_SOWIN__
-#ifdef __COIN_SOXT__ // FIXME: make a "pure" template. 20011210 mortene.
-  SoLocation2Event * makeLocationEvent(XMotionEvent * event);
-  SoMouseButtonEvent * makeButtonEvent(XButtonEvent * event, SoButtonEvent::State state);
-#endif // __COIN_SOXT__
-}; // class So@Gui@Mouse
+  class So@Gui@MouseP * pimpl;
+#ifndef DOXYGEN_SKIP_THIS
+  friend class So@Gui@MouseP;
+  friend class SoGuiMouseP;
+#endif // DOXYGEN_SKIP_THIS
+};
 
 // *************************************************************************
 
