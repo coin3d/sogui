@@ -413,7 +413,7 @@ So@GUI@Viewer::getCamera(void) const
 void
 So@GUI@Viewer::setCameraType(SoType t)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   SbBool valid = TRUE;
   if (t == SoType::badType()) valid = FALSE;
   if (valid) {
@@ -429,7 +429,7 @@ So@GUI@Viewer::setCameraType(SoType t)
                        "badType" : t.getName().getString());
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
 
   this->cameratype = t;
 } // setCameraType()
@@ -534,7 +534,7 @@ So@GUI@Viewer::resetToHomePosition(void)
 void
 So@GUI@Viewer::setHeadlight(SbBool on)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (this->lightroot &&
       ((on && this->isHeadlight()) || (!on && !this->isHeadlight()))) {
     SoDebugError::postWarning("So@GUI@Viewer::setHeadlight",
@@ -542,7 +542,7 @@ So@GUI@Viewer::setHeadlight(SbBool on)
                               on ? "on" : "off");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
 
   SoSearchAction search;
 
@@ -637,7 +637,7 @@ void
 So@GUI@Viewer::setDrawStyle(So@GUI@Viewer::DrawType type,
                          So@GUI@Viewer::DrawStyle style)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if ((type != STILL) && (type != INTERACTIVE)) {
     SoDebugError::postWarning("So@GUI@Viewer::setDrawStyle",
                               "unknown drawstyle type setting 0x%x", type);
@@ -651,14 +651,14 @@ So@GUI@Viewer::setDrawStyle(So@GUI@Viewer::DrawType type,
                               "unknown drawstyle setting 0x04%x", style);
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
 
   if (style == this->getDrawStyle(type)) {
-#if 0 // SOGUI_DEBUG
+#if 0 // SO@uGUI@_DEBUG
     SoDebugError::postWarning("So@GUI@Viewer::setDrawStyle",
                               "drawstyle for type 0x%02x already 0x%02x",
                               type, style);
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
     return;
   }
 
@@ -678,13 +678,13 @@ So@GUI@Viewer::setDrawStyle(So@GUI@Viewer::DrawType type,
 So@GUI@Viewer::DrawStyle
 So@GUI@Viewer::getDrawStyle(const So@GUI@Viewer::DrawType type) const
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if ((type != STILL) && (type != INTERACTIVE)) {
     SoDebugError::postWarning("So@GUI@Viewer::setDrawStyle",
                               "unknown drawstyle type setting 0x%x", type);
     return this->drawstyles[STILL];
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   return this->drawstyles[type];
 } // getDrawStyle()
 
@@ -701,7 +701,7 @@ So@GUI@Viewer::getDrawStyle(const So@GUI@Viewer::DrawType type) const
 void
 So@GUI@Viewer::setBufferingType(So@GUI@Viewer::BufferType type)
 {
-#if 0 // SOGUI_DEBUG
+#if 0 // SO@uGUI@_DEBUG
   if (type == this->buffertype) {
     SoDebugError::postWarning("So@GUI@Viewer::setBufferingType",
                               "buffer type 0x%x already set", type);
@@ -715,7 +715,7 @@ So@GUI@Viewer::setBufferingType(So@GUI@Viewer::BufferType type)
                               "unknown buffer type 0x%x", type);
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
 
   this->buffertype = type;
   inherited::setDoubleBuffer(type == BUFFER_DOUBLE ? TRUE : FALSE);
@@ -753,12 +753,12 @@ So@GUI@Viewer::getBufferingType(void) const
 void
 So@GUI@Viewer::setViewing(SbBool on)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (this->viewmode == on) {
     SoDebugError::postWarning("So@GUI@Viewer::setViewing", "unnecessary called");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
 
   // Turn off the selection indicators when we go back from picking
   // mode into viewing mode.
@@ -829,13 +829,13 @@ So@GUI@Viewer::isCursorEnabled(void) const
 void
 So@GUI@Viewer::setAutoClipping(SbBool on)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (this->adjustclipplanes == on) {
     SoDebugError::postWarning("So@GUI@Viewer::setAutoClipping",
                               "unnecessary called");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   this->adjustclipplanes = on;
   if (on) this->scheduleRedraw();
 } // setAutoClipping()
@@ -934,13 +934,13 @@ So@GUI@Viewer::getStereoOffset(void) const
 void
 So@GUI@Viewer::setDetailSeek(const SbBool on)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (this->seektopoint == on) {
     SoDebugError::postWarning("So@GUI@Viewer::setDetailSeek",
                               "unnecessary called");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   this->seektopoint = on;
 } // setDetailSeek()
 
@@ -974,14 +974,14 @@ So@GUI@Viewer::isDetailSeek(void) const
 void
 So@GUI@Viewer::setSeekTime(const float seconds)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (seconds < 0.0f) {
     SoDebugError::postWarning("So@GUI@Viewer::setSeekTime",
                               "an attempt was made to set a negative seek "
                               "time duration");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   this->seekperiod = seconds;
 } // setSeekTime()
 
@@ -1640,7 +1640,7 @@ So@GUI@Viewer::interactiveCountInc(void)
 void
 So@GUI@Viewer::interactiveCountDec(void)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   // Catch problems with missing interactiveCountInc() calls.
   assert(this->interactionnesting > 0);
 
@@ -1697,14 +1697,14 @@ So@GUI@Viewer::getInteractiveCount(void) const
 void
 So@GUI@Viewer::setSeekDistance(const float distance)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if (distance <= 0.0f) {
     SoDebugError::postWarning("So@GUI@Viewer::setSeekDistance",
                               "invalid seek distance value: %f",
                               distance);
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   this->seekdistance = distance;
 } // setSeekDistance()
 
@@ -1737,7 +1737,7 @@ So@GUI@Viewer::getSeekDistance(void) const
 void
 So@GUI@Viewer::setSeekValueAsPercentage(const SbBool on)
 {
-#if SOGUI_DEBUG
+#if SO@uGUI@_DEBUG
   if ((on && this->isSeekValuePercentage()) ||
       (!on && !this->isSeekValuePercentage())) {
     SoDebugError::postWarning("So@GUI@Viewer::setSeekDistanceAsPercentage",
@@ -1745,7 +1745,7 @@ So@GUI@Viewer::setSeekValueAsPercentage(const SbBool on)
                               on ? "on" : "off");
     return;
   }
-#endif // SOGUI_DEBUG
+#endif // SO@uGUI@_DEBUG
   this->seekdistanceabs = on ? FALSE : TRUE;
 } // setSeekValkueAsPercentage()
 
@@ -2040,7 +2040,7 @@ So@GUI@Viewer::moveCameraScreen(const SbVec2f & screenpos)
   SoCamera * cam = this->getCamera();
   assert(cam);
 
-#if SOGUI_DEBUG && 0 // debug
+#if SO@uGUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@GUI@Viewer::moveCameraScreen",
                          "screenpos: <%f, %f>, campos: <%f, %f, %f>",
                          screenpos[0], screenpos[1],
@@ -2064,7 +2064,7 @@ So@GUI@Viewer::moveCameraScreen(const SbVec2f & screenpos)
   // projected points.
   cam->position = cam->position.getValue() - (current_planept - old_planept);
 
-#if SOGUI_DEBUG && 0 // debug
+#if SO@uGUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@GUI@Viewer::moveCameraScreen",
                          "newcampos: <%f, %f, %f>",
                          cam->position.getValue()[0],
