@@ -2789,7 +2789,7 @@ So@Gui@Viewer::recordFPS(void)
       char buffer[64];
       int nr = sprintf(buffer, "%.1f fps", 1.0/THIS->currentframetime);
       assert(nr < 64);
-      Draw2DString(buffer, this->getGlxSize(), SbVec2f(10, 10));
+      Draw2DString(buffer, this->getGLSize(), SbVec2f(10, 10));
     }
   }
 }
