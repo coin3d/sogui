@@ -36,7 +36,7 @@ static const char rcsid[] =
 \**************************************************************************/
 
 /*!
-  \class So@Gui@RenderArea Invnetor/@Gui@/So@Gui@RenderArea.h
+  \class So@Gui@RenderArea Inventor/@Gui@/So@Gui@RenderArea.h
   \brief The So@Gui@RenderArea class is a component that adds scene graph
   management and input device handling to the So@Gui@GLWidget component.
   \ingroup components
