@@ -3271,7 +3271,7 @@ So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
   const SbBool fillmask = allocnewmask || (this->stereostenciltype != s) ||
     ((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) && (oldsize[0] != newsize[0]));
 
-  const SbBool layoutchange = (this->stereostencilmaskvp != currentvp);
+  const SbBool layoutchange = !(this->stereostencilmaskvp == currentvp);
 
   const short bytewidth = (newsize[0] + 7) / 8;
 
