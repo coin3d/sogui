@@ -1766,23 +1766,9 @@ So@Gui@RenderArea::widgetChanged(@WIDGET@ widget)
   PRIVATE(this)->overlayManager->setRGBMode(this->isRGBMode());
 #endif
 
-  // FIXME: this code needs to be enabled (and rewritten to work) to
-  // handle display list caching. 20001121 mortene.
-  // UPDATE: check with pederb if any of this is really needed, or if
-  // it should just be removed. 20010802 mortene.
-#if 0
-  SoGLRenderAction * ra = PRIVATE(this)->normalManager->getGLRenderAction();
-  ra->setCacheContext(XXX);
-  ra->setRenderingIsRemote(XXX);
-  ra = PRIVATE(this)->overlayManager->getGLRenderAction();
-  ra->setCacheContext(XXX);
-  ra->setRenderingIsRemote(XXX);
-#endif
-
   // FIXME: should also walk through all registered devices and do a
   // disable() on the old widget and enable() on the new one.
   // 20001121 mortene.
-
 }
 
 // Documented in superclass.
@@ -1790,6 +1776,7 @@ So@Gui@RenderArea::widgetChanged(@WIDGET@ widget)
 So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
 {
   @WIDGET@ widget = inherited::buildWidget(parent);
+
   if (PRIVATE(this)->devicelist != NULL) {
     const int num = PRIVATE(this)->devicelist->getLength();
     for (int i = 0; i < num; i++) {
@@ -1798,17 +1785,7 @@ So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
                      &So@Gui@GLWidgetP::eventHandler, (void *) this);
     }
   }
-  const SbVec2s glsize = this->getGLSize();
-  if (glsize[0] <= 0 || glsize[1] <= 0)
-    return widget;
 
-/*
-  PRIVATE(this)->setDevicesWindowSize(glsize);
-
-  this->setViewportRegion(SbViewportRegion(glsize[0], glsize[1]));
-  PRIVATE(this)->normalManager->setViewportRegion(SbViewportRegion(glsize[0], glsize[1]));
-  PRIVATE(this)->overlayManager->setViewportRegion(SbViewportRegion(glsize[0], glsize[1]));
-*/
   return widget;
 }
 
