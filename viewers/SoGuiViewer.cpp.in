@@ -104,17 +104,19 @@
 */
 
 /*!
-  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::CONSTANT_NEAR_PLANE,
-  Constant near plane auto clipping strategy.
-  
-  \sa setAutoClippingStrategy()
+  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::CONSTANT_NEAR_PLANE
+
+  Constant near plane auto clipping strategy. Explained in detail in
+  the documentation for the So@Gui@Viewer::setAutoClippingStrategy()
+  method.
 */
 
 /*!
-  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::VARIABLE_NEAR_PLANE,
-  Variable near plane auto clipping strategy.
+  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::VARIABLE_NEAR_PLANE
 
-  \sa setAutoClippingStrategy()
+  Variable near plane auto clipping strategy. Explained in detail in
+  the documentation for the So@Gui@Viewer::setAutoClippingStrategy()
+  method.
 */
 
 #if HAVE_CONFIG_H
@@ -2255,6 +2257,16 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
   \a value. If \a value at some point approaches the far clipping
   plane distance, the near plane distance will be set to far plane 
   distance divided by 5000.0.
+
+  The default strategy is VARIABLE_NEAR_PLANE.
+
+  It is also possible to register a callback method \a cb, which will
+  then be invoked after the near and far clipping planes has been
+  calculated by the So@Gui@Viewer code. The callback can then adjust
+  the values for the distance to the near and far planes to exactly
+  match the needs of the application (for instance at specific parts
+  in the scene), to limit the distance to either plane, or whatever
+  else needs to be controlled.
 
   \sa setAutoClipping() 
 */
