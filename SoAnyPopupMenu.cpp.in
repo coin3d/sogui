@@ -66,7 +66,6 @@ SoAnyPopupMenu::~SoAnyPopupMenu(
 
 // *************************************************************************
 
-/*
 void
 SoAnyPopupMenu::SetMenuItemMarked(
   int itemid,
@@ -74,7 +73,7 @@ SoAnyPopupMenu::SetMenuItemMarked(
 {
   int groupid = GetRadioGroup( itemid );
   if ( groupid == -1 ) {
-    this->menu->SetMenuItemMarked( itemid, marked );
+    this->_setMenuItemMarked( itemid, marked );
     return;
   }
   const int numGroupedItems = this->menuitems->getLength();
@@ -85,7 +84,7 @@ SoAnyPopupMenu::SetMenuItemMarked(
          ((*this->menuitems)[i] != -1) )
       groupsize++;
   }
-  if ( this->menu->GetMenuItemMarked( itemid ) == marked ) {
+  if ( this->GetMenuItemMarked( itemid ) == marked ) {
 #if SO@GUI@_DEBUG && 0
     SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
       "Marked state already '%s'.", marked ? "on" : "off" );
@@ -93,13 +92,13 @@ SoAnyPopupMenu::SetMenuItemMarked(
   } else if ( groupsize == 0 ) {
     assert( 0 && "how weird..." );
   } else if ( groupsize == 1 ) {
-    this->menu->SetMenuItemMarked( itemid, marked );
+    this->_setMenuItemMarked( itemid, marked );
   } else if ( (groupsize == 2) ||
               ((groupsize > 2) && marked) ) {
     for ( i = 0; i < numGroupedItems; i++ ) {
       if ( ((*this->radiogroups)[i] == groupid) &&
            ((*this->menuitems)[i] != -1) ) {
-        this->menu->SetMenuItemMarked( (*this->menuitems)[i],
+        this->_setMenuItemMarked( (*this->menuitems)[i],
           ((*this->menuitems)[i] == itemid) ? marked :
           ((groupsize == 2) ? (! marked) : FALSE) );
       }
@@ -111,8 +110,7 @@ SoAnyPopupMenu::SetMenuItemMarked(
       "Consider that radio grouping is handled automatically." );
 #endif // SO@GUI@_DEBUG
   }
-} // SetMenuItemEnabled()
-*/
+} // SetMenuItemMarked()
 
 // *************************************************************************
 
