@@ -243,48 +243,38 @@ SoAnyFullViewer::setupStandardPopupMenu(
 
   menu->newMenu( "transparencytype", TRANSPARENCY_TYPE_MENU );
   menu->setMenuTitle( TRANSPARENCY_TYPE_MENU, _( "Transparency Type" ) );
-
-  menu->newMenuItem( "screen_door", SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( SCREEN_DOOR_TRANSPARENCY_ITEM, _( "screen door" ) );
-  menu->newMenuItem( "add", ADD_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( ADD_TRANSPARENCY_ITEM, _( "add" ) );
-  menu->newMenuItem( "delayed_add", DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( DELAYED_ADD_TRANSPARENCY_ITEM, _( "delayed add" ) );
-  menu->newMenuItem( "sorted_object_add", SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM,
-                          _( "sorted object add" ) );
-  menu->newMenuItem( "blend", BLEND_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( BLEND_TRANSPARENCY_ITEM, _( "blend" ) );
-  menu->newMenuItem( "delayed_blend", DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( DELAYED_BLEND_TRANSPARENCY_ITEM, _( "delayed blend" ) );
-  menu->newMenuItem( "sorted_object_blend",
-                     SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
-  menu->setMenuItemTitle( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM,
-                          _( 
-"sorted object blend" ) );
-
   menu->newRadioGroup( TRANSPARENCY_GROUP );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP, SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP, ADD_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP, DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
-                           SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP, BLEND_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
-                           DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
-                           SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
 
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, ADD_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU,
-                     SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, BLEND_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->addMenuItem( TRANSPARENCY_TYPE_MENU,
-                     SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
+  { // Fill in menu items in radiomenu with transparency selections.
 
+    struct menutransparencyitem {
+      const char * name, * title;
+      int id;
+    };
+
+    struct menutransparencyitem items[] = {
+      { "screen_door", _( "screen_door" ), SCREEN_DOOR_TRANSPARENCY_ITEM },
+      { "add", _( "add"), ADD_TRANSPARENCY_ITEM },
+      { "delayed_add", _( "delayed_add" ), DELAYED_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_add", _( "sorted_object_add" ), SORTED_OBJECT_ADD_TRANSPARENCY_ITEM },
+      { "blend", _( "blend" ), BLEND_TRANSPARENCY_ITEM },
+      { "delayed_blend", _( "delayed_blend" ), DELAYED_BLEND_TRANSPARENCY_ITEM },
+      { "sorted_object_blend", _( "sorted_object_blend" ), SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM }
+#ifdef __COIN__ // Coin extensions
+      ,
+      { "sorted_object_sorted_triangle_add", _( "sorted_object_sorted_triangle_add" ), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_sorted_triangle_blend", _( "sorted_object_sorted_triangle_blend" ), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
+#endif // __COIN__
+    };
+
+    int nritems = sizeof(items) / sizeof(struct menutransparencyitem);
+    for (int i = 0; i < nritems; i++) {
+      menu->newMenuItem( items[i].name, items[i].id );
+      menu->setMenuItemTitle( items[i].id, items[i].title );
+      menu->addRadioGroupItem( TRANSPARENCY_GROUP, items[i].id );
+      menu->addMenuItem( TRANSPARENCY_TYPE_MENU, items[i].id );
+    }
+  }
 
   menu->newMenuItem( "stereooff", STEREO_OFF_ITEM );
   menu->newMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
@@ -387,6 +377,14 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
   case SoGLRenderAction::SORTED_OBJECT_BLEND:
     menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
+#ifdef __COIN__  // Coin extensions
+  case SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD:
+    menu->setMenuItemMarked( SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND:
+    menu->setMenuItemMarked( SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM, TRUE );
+    break;
+#endif // __COIN__
   default: assert( FALSE && "unknown transparency type" );
   }
 
@@ -502,6 +500,8 @@ SoAnyFullViewer::menuSelection( // virtual
   case BLEND_TRANSPARENCY_ITEM:
   case DELAYED_BLEND_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
+  case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
+  case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
     this->drawstyleActivated( menuitemid );
     this->viewer->scheduleRedraw();
     break;
@@ -512,7 +512,7 @@ SoAnyFullViewer::menuSelection( // virtual
     this->drawstyleActivated( menuitemid );
     break;
 
-  case STEREO_OFF_ITEM:    
+  case STEREO_OFF_ITEM:
     this->viewer->setStereoViewing(FALSE);
     this->viewer->setQuadBufferStereo(FALSE);
     break;
@@ -528,7 +528,7 @@ SoAnyFullViewer::menuSelection( // virtual
       this->prefmenu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
     }
     break;
-    
+
   default:
     SoDebugError::postInfo( "So@Gui@FullViewer::menuSelection",
       "popup menu handling for item %d is not implemented", menuitemid );
@@ -688,6 +688,14 @@ SoAnyFullViewer::drawstyleActivated(
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
     return;
+#ifdef __COIN__ // Coin extensions
+  case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD );
+    return;
+  case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND );
+    return;
+#endif // __COIN__
   default:
     break;
   } // switch ( menuitemid )
@@ -834,4 +842,3 @@ SoAnyFullViewer::processSoEvent(
 #if SO@GUI@_DEBUG
 static const char * getSoAnyFullViewerRCSId(void) { return rcsid; }
 #endif // SO@GUI@_DEBUG
-
