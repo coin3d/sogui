@@ -80,7 +80,7 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
     @WIDGET@ viewer = this->buildWidget( this->getParentWidget() );
     this->setBaseWidget( viewer );
   }
-} // So@Gui@ConstainedViewer()
+}
 
 // ************************************************************************
 
@@ -90,7 +90,7 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
 So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
 {
   delete PRIVATE( this );
-} // ~So@Gui@ConstarinedViewer()
+}
 
 // ************************************************************************
 
@@ -103,7 +103,7 @@ So@Gui@ConstrainedViewer::setUpDirection(
 {
   this->upVector = dir;
   // FIXME: re-set camera orientation if necessary here? 20010907 mortene.
-} // setUpDirection()
+}
 
 // ************************************************************************
 
@@ -114,7 +114,7 @@ const SbVec3f &
 So@Gui@ConstrainedViewer::getUpDirection( void ) const
 {
   return this->upVector;
-} // getUpDirection()
+}
 
 // ************************************************************************
 
@@ -125,7 +125,7 @@ So@Gui@ConstrainedViewer::setCamera( // virtual
 {
   inherited::setCamera( newcam );
   // FIXME: enforce upvector. 20010905 mortene.
-} // setCamera()
+}
 
 // ************************************************************************
 
@@ -136,7 +136,7 @@ So@Gui@ConstrainedViewer::saveHomePosition( // virtual
 {
   inherited::saveHomePosition();
   PRIVATE( this )->upvechome = this->upVector;
-} // saveHomePosition()
+}
 
 // ************************************************************************
 
@@ -147,7 +147,10 @@ So@Gui@ConstrainedViewer::resetToHomePosition( // virtual
 {
   inherited::resetToHomePosition();
   this->upVector = PRIVATE( this )->upvechome;
-} // resetToHomePosition()
+  // should be unnecessary to reset camera position here (camera
+  // should have been in a valid state on the last saveHomePosition()
+  // call)
+}
 
 // ************************************************************************
 
@@ -160,7 +163,7 @@ So@Gui@ConstrainedViewer::recomputeSceneSize( // virtual
 {
   SO@GUI@_STUB();  // FIXME: re-calculate sceneHeight value. 20010907 mortene.
   inherited::recomputeSceneSize();
-} // recomputeSceneGraph()
+}
 
 // ************************************************************************
 
@@ -179,7 +182,7 @@ So@Gui@ConstrainedViewer::tiltCamera( // virtual, protected
   camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camdir );
   camera->orientation = camera->orientation.getValue() *
     SbRotation( this->getUpDirection().cross( camdir ), delta );
-} // tiltCamera()
+}
 
 // ************************************************************************
 
@@ -192,7 +195,7 @@ So@Gui@ConstrainedViewer::bottomWheelMotion( // virtual, protected
 {
   this->rotateCamera( value - this->getBottomWheelValue() );
   inherited::bottomWheelMotion( value );
-} // bottomWheelMotion()
+}
 
 // ************************************************************************
 
@@ -205,7 +208,7 @@ So@Gui@ConstrainedViewer::leftWheelMotion( // virtual, protected
 {
   this->tiltCamera( value - this->getLeftWheelValue() );
   inherited::leftWheelMotion( value );
-} // leftWheelMotion()
+}
 
 // ************************************************************************
 
@@ -217,7 +220,7 @@ So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
   SoCamera * camera )
 {
   SO@GUI@_STUB();
-} // changeCameraValues()
+}
 
 // ************************************************************************
 
@@ -230,7 +233,7 @@ So@Gui@ConstrainedViewer::findUpDirection(
 {
   SO@GUI@_STUB();
   // FIXME: pick on point, set upVector to normal of picked polygon
-} // findUpDirection()
+}
 
 // ************************************************************************
 
@@ -242,7 +245,7 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain(
   void )
 {
   SO@GUI@_STUB();
-} // checkForCameraUpConstrain()
+}
 
 // ************************************************************************
 
@@ -254,7 +257,7 @@ So@Gui@ConstrainedViewer::computeSeekFinalOrientation( // virtual, protected
   void )
 {
   SO@GUI@_STUB();
-} // computeSeekFinalOrientation()
+}
 
 // ************************************************************************
 
@@ -267,6 +270,6 @@ So@Gui@ConstrainedViewer::rotateCamera( const float delta ) const
 
   camera->orientation = camera->orientation.getValue() *
     SbRotation( this->getUpDirection(), -delta );
-} // rotateCamera()
+}
 
 // ************************************************************************
