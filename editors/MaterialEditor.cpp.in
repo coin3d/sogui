@@ -1,0 +1,211 @@
+
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/VRMLnodes/SoVRMLMaterial.h>
+#include <Inventor/sensors/SoNodeSensor.h>
+
+#include <Inventor/@Gui@/SoAny.h>
+#include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
+#include <Inventor/@Gui@/editors/So@Gui@MaterialEditor.h>
+
+// *************************************************************************
+
+class MaterialEditorComponent {
+public:
+  MaterialEditorComponent(void);
+  ~MaterialEditorComponent(void);
+
+  SoMaterial * material;
+  SoNodeSensor * attachment;
+  SoGuiMaterialEditor * editor;
+
+  SbPList * callbacks;
+
+  static SoSeparator * getSuperScene(void);
+  static SoNode * getSceneGraph(void);
+  static const char * superscene[];
+};
+
+// *************************************************************************
+
+#define PRIVATE(obj) ((MaterialEditorComponent *) obj->internals)
+
+SO@GUI@_OBJECT_SOURCE(So@Gui@MaterialEditor);
+
+So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * name, SbBool embed)
+  : inherited(parent, name, embed)
+{
+  PRIVATE(this) = new MaterialEditorComponent;
+  this->setSize(SbVec2s(320,256));
+  this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
+}
+
+So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * const name, SbBool embed, SbBool build)
+: inherited(parent, name, embed)
+{
+  PRIVATE(this) = new MaterialEditorComponent;
+  this->setSize(SbVec2s(320,256));
+  this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
+}
+
+So@Gui@MaterialEditor::~So@Gui@MaterialEditor(void)
+{
+  PRIVATE(this)->material->unref();
+  MaterialEditorComponent * obj = PRIVATE(this);
+  delete obj;
+}
+
+void
+So@Gui@MaterialEditor::attach(SoMaterial * material, int index)
+{
+}
+
+void
+So@Gui@MaterialEditor::attach(SoVRMLMaterial * material)
+{
+}
+
+void
+So@Gui@MaterialEditor::detach(void)
+{
+  delete PRIVATE(this)->attachment;
+  PRIVATE(this)->attachment = NULL;
+}
+
+SbBool
+So@Gui@MaterialEditor::isAttached(void)
+{
+  return (PRIVATE(this)->attachment != NULL) ? TRUE : FALSE;
+}
+
+void
+So@Gui@MaterialEditor::addMaterialChangedCallback(So@Gui@MaterialEditorCB * callback, void * closure)
+{
+}
+
+void
+So@Gui@MaterialEditor::removeMaterialChangedCallback(So@Gui@MaterialEditorCB * callback, void * closure)
+{
+}
+
+void
+So@Gui@MaterialEditor::setUpdateFrequency(So@Gui@MaterialEditor::UpdateFrequency frequency)
+{
+}
+
+So@Gui@MaterialEditor::UpdateFrequency
+So@Gui@MaterialEditor::getUpdateFrequency(void) const
+{
+  return CONTINUOUS;
+}
+
+void
+So@Gui@MaterialEditor::setMaterial(const SoMaterial & material)
+{
+  // PRIVATE(this)->material->copyFrom(material);
+}
+
+void
+So@Gui@MaterialEditor::setMaterial(const SoVRMLMaterial & material)
+{
+  // PRIVATE(this)->material->copyFrom(material);
+}
+
+const SoMaterial &
+So@Gui@MaterialEditor::getMaterial(void) const
+{
+  return *(PRIVATE(this)->material);
+}
+
+SbBool
+So@Gui@MaterialEditor::isAttachedVRML(void)
+{
+  // FIXME
+  return FALSE;
+}
+
+const char *
+So@Gui@MaterialEditor::getDefaultWidgetName(void) const
+{
+  static const char widgetName[] = "So@Gui@MaterialEditor";
+  return widgetName;
+}
+
+const char *
+So@Gui@MaterialEditor::getDefaultTitle(void) const
+{
+  static const char title[] = "MaterialEditor";
+  return title;
+}
+
+const char *
+So@Gui@MaterialEditor::getDefaultIconTitle(void) const
+{
+  static const char iconTitle[] = "MatEd";
+  return iconTitle;
+}
+
+#undef PRIVATE
+
+// *************************************************************************
+// MaterialEditorComponent
+// *************************************************************************
+
+#define PUBLIC(obj)  (obj->api)
+
+const char *
+MaterialEditorComponent::superscene[] =
+{
+  "#Inventor V2.1 ascii",
+  "",
+  "Separator {",
+  "  DirectionalLight { direction 0 0 -1 color 1 1 1 intensity 0.8 }",
+  "  OrthographicCamera { }",
+  "  DEF viewportfix SoGuiViewportFix { }",
+  "  Material { ambientColor 0.8 0.8 0.8 }",
+  "}",
+  NULL
+};
+
+// *************************************************************************
+
+MaterialEditorComponent::MaterialEditorComponent(void)
+{
+  this->material = new SoMaterial;
+  this->material->ref();
+  this->attachment = NULL;
+  this->editor = NULL;
+  this->callbacks = NULL;
+}
+
+MaterialEditorComponent::~MaterialEditorComponent(void)
+{
+  this->material->unref();
+  if ( this->attachment != NULL ) {
+    delete this->attachment;
+  }
+  if ( this->callbacks != NULL )
+    delete this->callbacks;
+}
+
+SoSeparator *
+MaterialEditorComponent::getSuperScene(void)
+{
+  SoNode * root = SoAny::loadSceneGraph(MaterialEditorComponent::superscene);
+  assert(root != NULL);
+  assert(root->isOfType(SoSeparator::getClassTypeId()));
+  return (SoSeparator *) root;
+}
+
+SoNode *
+MaterialEditorComponent::getSceneGraph(void)
+{
+  SoSeparator * root = MaterialEditorComponent::getSuperScene();
+  assert(root != NULL);
+  root->addChild(new SoGuiMaterialEditor);
+  return root;
+}
+
+#undef PUBLIC
+
+// *************************************************************************

@@ -1,0 +1,58 @@
+#ifndef COIN_SO@GUI@MATERIALEDITOR_H
+#define COIN_SO@GUI@MATERIALEDITOR_H
+
+#include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
+#include <Inventor/@Gui@/So@Gui@RenderArea.h>
+
+class SoMaterial;
+class SoVRMLMaterial;
+
+// *************************************************************************
+
+typedef void So@Gui@MaterialEditorCB(void * userdata, const SoMaterial * material);
+
+class SO@GUI@_DLL_API So@Gui@MaterialEditor : public So@Gui@RenderArea {
+  SO@GUI@_OBJECT_HEADER(So@Gui@MaterialEditor, So@Gui@RenderArea);
+
+public:
+  So@Gui@MaterialEditor(@WIDGET@ parent = NULL, const char * name = NULL, SbBool embed = TRUE);
+  ~So@Gui@MaterialEditor(void);
+
+  enum UpdateFrequency {
+    CONTINUOUS = SoGuiMaterialEditor::CONTINUOUS,
+    AFTER_ACCEPT = SoGuiMaterialEditor::AFTER_ACCEPT
+  };
+
+  void attach(SoMaterial * material, int index = 0);
+  void attach(SoVRMLMaterial * material);
+  void detach(void);
+  SbBool isAttached(void);
+
+  void addMaterialChangedCallback(
+    So@Gui@MaterialEditorCB * callback, void * closure = NULL);
+  void removeMaterialChangedCallback(
+    So@Gui@MaterialEditorCB * callback, void * closure = NULL);
+
+  void setUpdateFrequency(So@Gui@MaterialEditor::UpdateFrequency frequency);
+  So@Gui@MaterialEditor::UpdateFrequency getUpdateFrequency(void) const;
+
+  void setMaterial(const SoMaterial & material);
+  void setMaterial(const SoVRMLMaterial & material);
+  const SoMaterial & getMaterial(void) const;
+  SbBool isAttachedVRML(void);
+
+protected:
+  So@Gui@MaterialEditor(@WIDGET@ parent, const char * const name, SbBool embed, SbBool build);
+
+  virtual const char * getDefaultWidgetName(void) const;
+  virtual const char * getDefaultTitle(void) const;
+  virtual const char * getDefaultIconTitle(void) const;
+
+private:
+  void * internals;
+
+}; // class So@Gui@MaterialEditor
+
+// *************************************************************************
+
+#endif // !COIN_SO@GUI@MATERIALEDITOR_H
