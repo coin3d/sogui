@@ -92,7 +92,7 @@ enum SoViewerPopupMenuRadioGroup {
 
 class SoAnyFullViewer {
 public:
-  SoAnyFullViewer( So@GUI@FullViewer * container );
+  SoAnyFullViewer( So@GUI@FullViewer * const viewer );
   ~SoAnyFullViewer(void);
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);

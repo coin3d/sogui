@@ -44,10 +44,10 @@ static const char rcsid[] =
 */
 
 SoAnyFullViewer::SoAnyFullViewer(
-  So@GUI@FullViewer * container )
-: viewer( container )
+  So@GUI@FullViewer * const _viewer )
+: viewer( _viewer )
 {
-  assert( container != NULL );
+  assert( _viewer != NULL );
 } // SoAnyFullViewer()
 
 /*!

@@ -44,6 +44,7 @@ SoAnyConstrainedViewer::SoAnyConstrainedViewer(
   So@GUI@ConstrainedViewer * const _viewer )
 : viewer( _viewer )
 {
+  assert( _viewer != NULL );
 } // SoAnyConstrainedViewer()
 
 /*!

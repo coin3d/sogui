@@ -44,6 +44,7 @@ SoAnyWalkViewer::SoAnyWalkViewer(
   So@GUI@WalkViewer * const _viewer )
 : viewer( _viewer )
 {
+  assert( _viewer != NULL );
 } // SoAnyWalkViewer()
 
 /*!
