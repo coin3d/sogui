@@ -33,15 +33,50 @@
   \brief The So@Gui@ExaminerViewer class is a 3D-model examination viewer.
   \ingroup components viewers
 
+  This class is the viewer considered to be the most "general purpose"
+  viewer, and it is often used in rapid prototyping to examine models
+  and full scene.
+
+  <center>
+  <img src="http://doc.coin3d.org/images/SoLibs/viewers/examinerviewer.png">
+  </center>
+
+  It has a convenient interface for repositioning and reorientation of
+  the camera, for panning, rotating and zooming it's position. The
+  following controls can be used:
+
+  <ul>
+
+  <li>hold down left mousebutton and move mouse pointer to rotate the
+  camera around it's current focal point (the focal point can be
+  changed by doing a seek operation)</li>
+
+  <li>hold middle mousebutton to pan (or a CTRL-key plus left
+  mousebutton, or a SHIFT-key plus left mousebutton)</li>
+
+  <li>hold down CTRL + middle mousebutton to zoom / dolly (or CTRL +
+  SHIFT + the left mousebutton)</li>
+
+  <li>click 's', then pick with the left mousebutton to seek</li>
+
+  <li>right mousebutton open the popup menu</li>
+
+  <li>click 'ESC' key to switch to and from 'view' mode and
+  'scenegraph interaction' mode (see setViewing() documentation)</li>
+
+  <li>hold down the 'ALT' key to temporary toggle from
+  camera-interaction mode to scenegraph-interaction mode</li>
+
+  </ul>
+
+  The EV provides a user decoration's button for toggling between
+  orthographic or perspective camera view volumes and projection
+  methods. This is the bottom-most click button on the right
+  decoration border.
+
   FIXME: more doc
-  ...functionality for rotation, pan, zoom, etc...
-  ...overview of what this class provides over parent class...
-  ...keyboard combinations...mousebutton combinations...explain pan,
-  rotate, zoom, dolly, seek...explain the fact that we're moving the
-  camera, not the scene...
   ...viewer modes (examine vs interact) w/ explanation of what they are
   useful for...
-  ...screenshot...
   ...example code...
 
   \sa So@Gui@WalkViewer, So@Gui@FlyViewer, So@Gui@PlaneViewer
@@ -128,16 +163,16 @@ So@Gui@ExaminerViewer::isAnimationEnabled(void) const
 void
 So@Gui@ExaminerViewer::stopAnimating(void)
 {
-  if (PRIVATE(this)->spinanimating) {
-    PRIVATE(this)->spinanimating = FALSE;
-    this->interactiveCountDec();
-  }
+  if (PRIVATE(this)->currentmode != SoGuiExaminerViewerP::SPINNING) {
 #if SO@GUI@_DEBUG
-  else {
     SoDebugError::postWarning("So@Gui@ExaminerViewer::stopAnimating",
                               "not animating");
-  }
 #endif // SO@GUI@_DEBUG
+    return;
+  }
+  PRIVATE(this)->setMode(this->isViewing() ?
+                         SoGuiExaminerViewerP::IDLE :
+                         SoGuiExaminerViewerP::INTERACT);
 }
 
 // *************************************************************************
@@ -150,7 +185,7 @@ So@Gui@ExaminerViewer::stopAnimating(void)
 SbBool
 So@Gui@ExaminerViewer::isAnimating(void) const
 {
-  return PRIVATE(this)->spinanimating;
+  return PRIVATE(this)->currentmode == SoGuiExaminerViewerP::SPINNING;
 }
 
 // ************************************************************************
@@ -202,7 +237,7 @@ So@Gui@ExaminerViewer::setFeedbackSize(const int size)
 {
 #if SO@GUI@_DEBUG
   if (size < 1) {
-    SoDebugError::postWarning("SoGuiExaminerViewer::setFeedbackSize",
+    SoDebugError::postWarning("So@Gui@ExaminerViewer::setFeedbackSize",
                               "the size setting should be larger than 0");
     return;
   }
@@ -229,11 +264,6 @@ So@Gui@ExaminerViewer::getFeedbackSize(void) const
 
 // *************************************************************************
 
-#define MOUSEBUTTON_EVENT_TYPE  (SoMouseButtonEvent::getClassTypeId())
-#define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
-#define MOTION3_EVENT_TYPE      (SoMotion3Event::getClassTypeId())
-#define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
-
 // Documented in superclass.
 SbBool
 So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
@@ -243,6 +273,26 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
                           "[invoked], event '%s'",
                           ev->getTypeId().getName().getString());
 #endif // debug
+
+  // Let the end-user toggle between camera-interaction mode
+  // ("viewing") and scenegraph-interaction mode with ALT key(s).
+  if (ev->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
+    SoKeyboardEvent * ke = (SoKeyboardEvent *)ev;
+    switch (ke->getKey()) {
+    case SoKeyboardEvent::LEFT_ALT:
+    case SoKeyboardEvent::RIGHT_ALT:
+      if (this->isViewing() && (ke->getState() == SoButtonEvent::DOWN)) {
+        this->setViewing(FALSE);
+        return TRUE;
+      }
+      else if (!this->isViewing() && (ke->getState() == SoButtonEvent::UP)) {
+        this->setViewing(TRUE);
+        return TRUE;
+      }
+    default:
+      break;
+    }
+  }
 
   // We're in "interact" mode (ie *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
@@ -255,12 +305,13 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   // up the inheritance hierarchy.
   if (this->isSeekMode()) { return inherited::processSoEvent(ev); }
 
-  PRIVATE(this)->canvas = this->getGLSize();
   const SoType type(ev->getTypeId());
+
+  const SbVec2s size(this->getGLSize());
   const SbVec2f prevnormalized = PRIVATE(this)->lastmouseposition;
   const SbVec2s pos(ev->getPosition());
-  const SbVec2f posn((float) pos[0] / (float) So@Gui@Max((int)(PRIVATE(this)->canvas[0] - 1), 1),
-                     (float) pos[1] / (float) So@Gui@Max((int)(PRIVATE(this)->canvas[1] - 1), 1));
+  const SbVec2f posn((float) pos[0] / (float) So@Gui@Max((int)(size[0] - 1), 1),
+                     (float) pos[1] / (float) So@Gui@Max((int)(size[1] - 1), 1));
 
   PRIVATE(this)->lastmouseposition = posn;
 
@@ -270,17 +321,23 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   // at all.
   SbBool processed = FALSE;
 
+  const SoGuiExaminerViewerP::ViewerMode currentmode = PRIVATE(this)->currentmode;
+  SoGuiExaminerViewerP::ViewerMode newmode = currentmode;
 
-  // Mismatches in state of the Ctrl key happens if the user presses
-  // or releases it outside the viewer window.
-  if (PRIVATE(this)->controldown != ev->wasCtrlDown()) {
-    PRIVATE(this)->controldown = ev->wasCtrlDown();
-    processed = TRUE;
+  // Mismatches in state of the modifier keys happens if the user
+  // presses or releases them outside the viewer window.
+  if (PRIVATE(this)->ctrldown != ev->wasCtrlDown()) {
+    PRIVATE(this)->ctrldown = ev->wasCtrlDown();
+  }
+  if (PRIVATE(this)->shiftdown != ev->wasShiftDown()) {
+    PRIVATE(this)->shiftdown = ev->wasShiftDown();
   }
 
   // Mouse Button / Spaceball Button handling
 
-  if (type.isDerivedFrom(MOUSEBUTTON_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
+    processed = TRUE;
+
     const SoMouseButtonEvent * const event = (const SoMouseButtonEvent *) ev;
     const int button = event->getButton();
     const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
@@ -289,172 +346,74 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
     switch (button) {
     case SoMouseButtonEvent::BUTTON1:
       PRIVATE(this)->button1down = press;
+      if (press && (currentmode == SoGuiExaminerViewerP::SEEK_WAIT_MODE)) {
+        newmode = SoGuiExaminerViewerP::SEEK_MODE;
+        this->seekToPoint(pos); // implicitly calls interactiveCountInc()
+      }
       break;
     case SoMouseButtonEvent::BUTTON2:
-      PRIVATE(this)->button2down = press;
+      processed = FALSE; // pass on to superclass, so popup menu is shown
       break;
     case SoMouseButtonEvent::BUTTON3:
       PRIVATE(this)->button3down = press;
       break;
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
+    case SoMouseButtonEvent::BUTTON4:
+      if (press) PRIVATE(this)->zoom(0.1f);
+      break;
+    case SoMouseButtonEvent::BUTTON5:
+      if (press) PRIVATE(this)->zoom(-0.1f);
+      break;
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
     default:
       break;
     }
+  }
 
-    if (press) {
-      switch (button) {
-      case SoMouseButtonEvent::BUTTON1:
-        if (! this->isSeekMode()) {
-          if (this->isAnimating()) this->stopAnimating();
-          this->interactiveCountInc();
-          PRIVATE(this)->clearLog();
-          processed = TRUE;
-        }
-        break;
-
-      case SoMouseButtonEvent::BUTTON3:
-        {
-          if (this->isAnimating()) this->stopAnimating();
-          this->interactiveCountInc();
-          SoCamera * const camera = this->getCamera();
-          if (camera == NULL) { // can happen for empty scenegraph
-            PRIVATE(this)->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
-          }
-          else {
-            SbViewVolume volume = camera->getViewVolume(this->getGLAspectRatio());
-            PRIVATE(this)->panningplane = volume.getPlane(camera->focalDistance.getValue());
-          }
-          processed = TRUE;
-        }
-        break;
-
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-      case SoMouseButtonEvent::BUTTON4:
-        PRIVATE(this)->zoom(-0.1f);
-        processed = TRUE;
-        break;
-
-      case SoMouseButtonEvent::BUTTON5:
-        PRIVATE(this)->zoom(0.1f);
-        processed = TRUE;
-        break;
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-
-      default:
-        break;
-      }
-
-    } else { // ! press
-      switch (button) {
-      case SoMouseButtonEvent::BUTTON1:
-        {
-          PRIVATE(this)->spinanimating = FALSE;
-          if (! this->isSeekMode()) {
-            if (! this->isAnimationEnabled() || PRIVATE(this)->log.historysize < 3) {
-              // FIXME: attention: here lies dragons! This will f*ck
-              // up the interactioncounter if a mouse release "just
-              // happens", as can be the case (dependent on the native
-              // UI toolkit). At least Win32 can give us a release
-              // event with no press event in advance. 20010709 mortene.
-              this->interactiveCountDec();
-            }
-            else {
-              const SbVec2s glsize(this->getGLSize());
-              SbVec3f from = PRIVATE(this)->spinprojector->project(SbVec2f(float(PRIVATE(this)->log.position[2][0]) / float(So@Gui@Max(glsize[0]-1, 1)),
-                                                                   float(PRIVATE(this)->log.position[2][1]) / float(So@Gui@Max(glsize[1]-1, 1))));
-              SbVec3f to = PRIVATE(this)->spinprojector->project(posn);
-              SbRotation rot = PRIVATE(this)->spinprojector->getRotation(from, to);
-
-              SbTime stoptime = (event->getTime() - PRIVATE(this)->log.time[0]);
-              if (stoptime.getValue() > 0.100) {
-                this->interactiveCountDec();
-              }
-              else {
-                SbTime delta = (PRIVATE(this)->log.time[0] - PRIVATE(this)->log.time[2]);
-                double deltatime = delta.getValue();
-                rot.invert();
-                rot.scaleAngle(0.200 / deltatime);
-
-                SbVec3f axis;
-                float radians;
-                rot.getValue(axis, radians);
-                if (radians < 0.01f || deltatime > 0.300) {
-                  this->interactiveCountDec();
-                }
-                else {
-                  PRIVATE(this)->spinRotation = rot;
-                  PRIVATE(this)->spinanimating = TRUE;
-                  this->scheduleRedraw();
-                }
-              }
-            }
-          }
-        }
-        processed = TRUE;
-        break;
-
-      case SoMouseButtonEvent::BUTTON3:
-        this->interactiveCountDec();
-        processed = TRUE;
-        break;
-
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-      case SoMouseButtonEvent::BUTTON4:
-        processed = TRUE; // don't pass on
-        break;
-
-      case SoMouseButtonEvent::BUTTON5:
-        processed = TRUE; // don't pass on
-        break;
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-
-      default:
-        break;
-      }
+  // Keyboard handling
+  if (type.isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
+    const SoKeyboardEvent * const event = (const SoKeyboardEvent *) ev;
+    const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
+    switch (event->getKey()) {
+    case SoKeyboardEvent::LEFT_CONTROL:
+    case SoKeyboardEvent::RIGHT_CONTROL:
+      processed = TRUE;
+      PRIVATE(this)->ctrldown = press;
+      break;
+    case SoKeyboardEvent::LEFT_SHIFT:
+    case SoKeyboardEvent::RIGHT_SHIFT:
+      processed = TRUE;
+      PRIVATE(this)->shiftdown = press;
+      break;
+    default:
+      break;
     }
   }
 
   // Mouse Movement handling
-  if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoLocation2Event::getClassTypeId())) {
     const SoLocation2Event * const event = (const SoLocation2Event *) ev;
 
-    if (PRIVATE(this)->button1down || PRIVATE(this)->button3down) processed = TRUE;
+    processed = TRUE;
 
-    if ((PRIVATE(this)->button1down && PRIVATE(this)->button3down) ||
-         (PRIVATE(this)->button3down && PRIVATE(this)->controldown)) {
+    if (PRIVATE(this)->currentmode == SoGuiExaminerViewerP::ZOOMING) {
       PRIVATE(this)->zoomByCursor(posn, prevnormalized);
     }
-    else if ((PRIVATE(this)->button1down && PRIVATE(this)->controldown) || PRIVATE(this)->button3down) {
+    else if (PRIVATE(this)->currentmode == SoGuiExaminerViewerP::PANNING) {
       SoGuiFullViewerP::pan(this->getCamera(), this->getGLAspectRatio(),
                             PRIVATE(this)->panningplane, posn, prevnormalized);
     }
-    else if (PRIVATE(this)->button1down) {
+    else if (PRIVATE(this)->currentmode == SoGuiExaminerViewerP::DRAGGING) {
       PRIVATE(this)->addToLog(event->getPosition(), event->getTime());
       PRIVATE(this)->spin(posn);
     }
-
-  }
-
-  // Keyboard handling
-  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
-    const SoKeyboardEvent * const event = (const SoKeyboardEvent *) ev;
-    const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
-    if (press) {
-      if (event->getKey() == SoKeyboardEvent::LEFT_CONTROL
-        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL) {
-        PRIVATE(this)->controldown = TRUE;
-        processed = TRUE;
-      }
-    } else {
-      if (event->getKey() == SoKeyboardEvent::LEFT_CONTROL
-        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL) {
-        PRIVATE(this)->controldown = FALSE;
-        processed = TRUE;
-      }
+    else {
+      processed = FALSE;
     }
   }
 
   // Spaceball & Joystick handling
-  if (type.isDerivedFrom(MOTION3_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoMotion3Event::getClassTypeId())) {
     SoMotion3Event * const event = (SoMotion3Event *) ev;
     SoCamera * const camera = this->getCamera();
     if (camera) {
@@ -464,7 +423,8 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
         camera->orientation =
           camera->orientation.getValue() * event->getRotation();
         processed = TRUE;
-      } else {
+      }
+      else {
         // FIXME: move/rotate model
 #if SO@GUI@_DEBUG
         SoDebugError::postInfo("So@Gui@ExaminerViewer::processSoEvent",
@@ -475,45 +435,70 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
     }
   }
 
-  if (processed) {
-    enum { STATE_LMB = 0x01, STATE_MMB = 0x02, STATE_CTRL = 0x04 };
-    unsigned short stateflags =
-      (PRIVATE(this)->button1down ? STATE_LMB : 0) +
-      (PRIVATE(this)->button3down ? STATE_MMB : 0) +
-      (PRIVATE(this)->controldown ? STATE_CTRL : 0);
+  enum {
+    BUTTON1DOWN = 1 << 0,
+    BUTTON3DOWN = 1 << 1,
+    CTRLDOWN =    1 << 2,
+    SHIFTDOWN =   1 << 3
+  };
+  unsigned int combo =
+    (PRIVATE(this)->button1down ? BUTTON1DOWN : 0) |
+    (PRIVATE(this)->button3down ? BUTTON3DOWN : 0) |
+    (PRIVATE(this)->ctrldown ? CTRLDOWN : 0) |
+    (PRIVATE(this)->shiftdown ? SHIFTDOWN : 0);
 
-    SoGuiExaminerViewerP::ViewerMode mode;
+  switch (combo) {
+  case 0:
+    if (currentmode == SoGuiExaminerViewerP::SPINNING) { break; }
+    newmode = SoGuiExaminerViewerP::IDLE;
+    if ((currentmode == SoGuiExaminerViewerP::DRAGGING) &&
+        this->isAnimationEnabled() && (PRIVATE(this)->log.historysize >= 3)) {
+      SbTime stoptime = (ev->getTime() - PRIVATE(this)->log.time[0]);
+      if (stoptime.getValue() < 0.100) {
+        const SbVec2s glsize(this->getGLSize());
+        SbVec3f from = PRIVATE(this)->spinprojector->project(SbVec2f(float(PRIVATE(this)->log.position[2][0]) / float(So@Gui@Max(glsize[0]-1, 1)),
+                                                                     float(PRIVATE(this)->log.position[2][1]) / float(So@Gui@Max(glsize[1]-1, 1))));
+        SbVec3f to = PRIVATE(this)->spinprojector->project(posn);
+        SbRotation rot = PRIVATE(this)->spinprojector->getRotation(from, to);
 
-    switch (stateflags) {
-    case 0:
-      mode = SoGuiExaminerViewerP::EXAMINE;
-      break;
+        SbTime delta = (PRIVATE(this)->log.time[0] - PRIVATE(this)->log.time[2]);
+        double deltatime = delta.getValue();
+        rot.invert();
+        rot.scaleAngle(0.200 / deltatime);
 
-    case STATE_LMB:
-      mode = SoGuiExaminerViewerP::DRAGGING;
-      break;
-
-    case STATE_MMB:
-    case (STATE_LMB | STATE_CTRL):
-      mode = SoGuiExaminerViewerP::PANNING;
-      break;
-
-    case STATE_CTRL:
-      mode = SoGuiExaminerViewerP::WAITING_FOR_PAN;
-      break;
-
-    case (STATE_MMB | STATE_CTRL):
-    case (STATE_LMB | STATE_MMB):
-    case (STATE_LMB | STATE_MMB | STATE_CTRL):
-      mode = SoGuiExaminerViewerP::ZOOMING;
-      break;
-
-    default:
-      assert(FALSE && "unhandled input state");
-      break;
+        SbVec3f axis;
+        float radians;
+        rot.getValue(axis, radians);
+        if ((radians > 0.01f) && (deltatime < 0.300)) {
+          newmode = SoGuiExaminerViewerP::SPINNING;
+          PRIVATE(this)->spinRotation = rot;
+        }
+      }
     }
+    break;
+  case BUTTON1DOWN:
+    newmode = SoGuiExaminerViewerP::DRAGGING;
+    break;
+  case BUTTON3DOWN:
+  case CTRLDOWN|BUTTON1DOWN:
+  case SHIFTDOWN|BUTTON1DOWN:
+    newmode = SoGuiExaminerViewerP::PANNING;
+    break;
+  case BUTTON1DOWN|BUTTON3DOWN:
+  case CTRLDOWN|BUTTON3DOWN:
+  case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
+    newmode = SoGuiExaminerViewerP::ZOOMING;
+    break;
+  default:
+    if ((currentmode != SoGuiExaminerViewerP::SEEK_WAIT_MODE) &&
+        (currentmode != SoGuiExaminerViewerP::SEEK_MODE)) {
+      newmode = SoGuiExaminerViewerP::IDLE;
+    }
+    break;
+  }
 
-    PRIVATE(this)->setMode(mode);
+  if (newmode != currentmode) {
+    PRIVATE(this)->setMode(newmode);
   }
 
   // If not handled in this class, pass on upwards in the inheritance
@@ -544,8 +529,9 @@ So@Gui@ExaminerViewer::setSeekMode(SbBool on)
   if (this->isAnimating()) { this->stopAnimating(); }
   inherited::setSeekMode(on);
   PRIVATE(this)->setMode(on ?
-                         SoGuiExaminerViewerP::WAITING_FOR_SEEK :
-                         SoGuiExaminerViewerP::EXAMINE);
+                         SoGuiExaminerViewerP::SEEK_WAIT_MODE :
+                         (this->isViewing() ?
+                          SoGuiExaminerViewerP::IDLE : SoGuiExaminerViewerP::INTERACT));
 }
 
 // *************************************************************************
@@ -674,7 +660,7 @@ So@Gui@ExaminerViewer::setViewing(SbBool enable)
   }
 
   PRIVATE(this)->setMode(enable ?
-                         SoGuiExaminerViewerP::EXAMINE :
+                         SoGuiExaminerViewerP::IDLE :
                          SoGuiExaminerViewerP::INTERACT);
   inherited::setViewing(enable);
 }
@@ -698,11 +684,10 @@ SoGuiExaminerViewerP::~SoGuiExaminerViewerP()
 void
 SoGuiExaminerViewerP::genericConstructor(void)
 {
-  this->currentmode = SoGuiExaminerViewerP::EXAMINE;
+  this->currentmode = SoGuiExaminerViewerP::IDLE;
 
   this->prevRedrawTime = SbTime::getTimeOfDay();
   this->spinanimatingallowed = TRUE;
-  this->spinanimating = FALSE;
   this->spinsamplecounter = 0;
   this->spinincrement = SbRotation::identity();
 
@@ -724,9 +709,9 @@ SoGuiExaminerViewerP::genericConstructor(void)
   this->log.time = new SbTime [ MOUSEPOSLOGSIZE ];
   this->log.historysize = 0;
   this->button1down = FALSE;
-  this->button2down = FALSE;
   this->button3down = FALSE;
-  this->controldown = FALSE;
+  this->ctrldown = FALSE;
+  this->shiftdown = FALSE;
   this->pointer.now = SbVec2s(0, 0);
   this->pointer.then = SbVec2s(0, 0);
   this->motion3OnCamera = TRUE;
@@ -795,23 +780,23 @@ SoGuiExaminerViewerP::rotYWheelMotion(float value, float oldvalue)
 // The viewer is a state machine, and all changes to the current state
 // are made through this call.
 void
-SoGuiExaminerViewerP::setMode(const ViewerMode mode)
+SoGuiExaminerViewerP::setMode(const ViewerMode newmode)
 {
-  this->setCursorRepresentation(mode);
+  const ViewerMode oldmode = this->currentmode;
+  if (newmode == oldmode) { return; }
 
-  switch (mode) {
-  case INTERACT:
-    if (PUBLIC(this)->isAnimating()) PUBLIC(this)->stopAnimating();
-    // FIXME: this looks like someone fixed the symptom instead of
-    // fixing the cause? 20010709 mortene.
-    while (PUBLIC(this)->getInteractiveCount())
-      PUBLIC(this)->interactiveCountDec();
-    break;
-
+  switch (newmode) {
   case DRAGGING:
     // Set up initial projection point for the projector object when
     // first starting a drag operation.
     this->spinprojector->project(this->lastmouseposition);
+    PUBLIC(this)->interactiveCountInc();
+    this->clearLog();
+    break;
+
+  case SPINNING:
+    PUBLIC(this)->interactiveCountInc();
+    PUBLIC(this)->scheduleRedraw();
     break;
 
   case PANNING:
@@ -828,13 +813,31 @@ SoGuiExaminerViewerP::setMode(const ViewerMode mode)
         this->panningplane = vv.getPlane(cam->focalDistance.getValue());
       }
     }
+    PUBLIC(this)->interactiveCountInc();
+    break;
+
+  case ZOOMING:
+    PUBLIC(this)->interactiveCountInc();
     break;
 
   default: // include default to avoid compiler warnings.
     break;
   }
 
-  this->currentmode = mode;
+  switch (oldmode) {
+  case SPINNING:
+  case DRAGGING:
+  case PANNING:
+  case ZOOMING:
+    PUBLIC(this)->interactiveCountDec();
+    break;
+
+  default:
+    break;
+  }
+
+  this->setCursorRepresentation(newmode);
+  this->currentmode = newmode;
 }
 
 // ************************************************************************
@@ -1208,8 +1211,9 @@ SoGuiExaminerViewerP::setCursorRepresentation(int mode)
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
     break;
 
-  case SoGuiExaminerViewerP::EXAMINE:
+  case SoGuiExaminerViewerP::IDLE:
   case SoGuiExaminerViewerP::DRAGGING:
+  case SoGuiExaminerViewerP::SPINNING:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getRotateCursor());
     break;
 
@@ -1217,11 +1221,11 @@ SoGuiExaminerViewerP::setCursorRepresentation(int mode)
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getZoomCursor());
     break;
 
-  case SoGuiExaminerViewerP::WAITING_FOR_SEEK:
+  case SoGuiExaminerViewerP::SEEK_MODE:
+  case SoGuiExaminerViewerP::SEEK_WAIT_MODE:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
     break;
 
-  case SoGuiExaminerViewerP::WAITING_FOR_PAN:
   case SoGuiExaminerViewerP::PANNING:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getPanCursor());
     break;

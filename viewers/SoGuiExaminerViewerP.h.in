@@ -57,7 +57,6 @@ public:
   SbVec2f lastmouseposition;
   SbPlane panningplane;
 
-  SbBool spinanimating;
   SbBool spinanimatingallowed;
   SbVec2f lastspinposition;
   int spinsamplecounter;
@@ -88,9 +87,8 @@ public:
   } pointer;
 
   SbBool button1down;
-  SbBool button2down;
   SbBool button3down;
-  SbBool controldown;
+  SbBool ctrldown, shiftdown;
 
   void clearLog(void);
   void addToLog(const SbVec2s pos, const SbTime time);
@@ -99,17 +97,15 @@ public:
 
   SbBool motion3OnCamera;
 
-  SbVec2s canvas;
-
   enum ViewerMode {
     IDLE,
     INTERACT,
-    EXAMINE,
-    DRAGGING,
-    WAITING_FOR_SEEK,
     ZOOMING,
-    WAITING_FOR_PAN,
-    PANNING
+    PANNING,
+    DRAGGING,
+    SPINNING,
+    SEEK_WAIT_MODE,
+    SEEK_MODE
   } mode;
 
   ViewerMode currentmode;
