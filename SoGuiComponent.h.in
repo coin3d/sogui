@@ -29,6 +29,9 @@
 #ifdef __COIN_SOQT__
 class QWidget;
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+#include <X11/Intrinsic.h>
+#endif // __COIN_SOXT__
 
 class So@Gui@Component;
 
@@ -51,22 +54,37 @@ public:
   SbBool setFullScreen(const SbBool onoff);
 
   SbBool isVisible(void);
+  SbBool isTopLevelShell(void) const;
+
   @WIDGET@ getWidget(void) const;
   @WIDGET@ baseWidget(void) const;
-  SbBool isTopLevelShell(void) const;
   @WIDGET@ getShellWidget(void) const;
   @WIDGET@ getParentWidget(void) const;
+
+#ifdef __COIN_SOXT__
+  Widget getBaseWidget(void) const;
+  Display * getDisplay(void);
+  void fitSize(const SbVec2s size);
+  // FIXME: I guess these should really be part of the common
+  // API. 20011012 mortene.
+  void addWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
+  void removeWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
+#endif // __COIN_SOXT__
+
   void setSize(const SbVec2s size);
   SbVec2s getSize(void) const;
+
   void setTitle(const char * const title);
   const char * getTitle(void) const;
   void setIconTitle(const char * const title);
   const char * getIconTitle(void) const;
+
+  const char * getWidgetName(void) const;
+  const char * getClassName(void) const;
+
   void setWindowCloseCallback(So@Gui@ComponentCB * const func,
                               void * const user = NULL);
   static So@Gui@Component * getComponent(@WIDGET@ const widget);
-  const char * getWidgetName(void) const;
-  const char * getClassName(void) const;
 
   static void initClasses(void);
 
@@ -78,7 +96,21 @@ protected:
   virtual void afterRealizeHook(void);
 
   void setClassName(const char * const name);
-  void setBaseWidget(@WIDGET@ const widget);
+  void setBaseWidget(const @WIDGET@ widget);
+
+#ifdef __COIN_SOXT__
+  // FIXME: I guess this should perhaps be part of the common API?
+  // 20011012 mortene.
+  virtual void windowCloseAction(void);
+  void invokeVisibilityChangeCallbacks(const SbBool enable) const;
+  void invokeWindowCloseCallbacks(void) const;
+
+  // FIXME: get rid of these two? 20011012 mortene.
+  static char * getlabel(unsigned int what);
+  SbBool firstRealize;
+
+  virtual Boolean eventHandler(Widget widget, XEvent * event);
+#endif // __COIN_SOXT__
 
   void registerWidget(@WIDGET@ widget);
   void unregisterWidget(@WIDGET@ widget);
@@ -90,9 +122,9 @@ protected:
   virtual void sizeChanged(const SbVec2s size);
 
   void addVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
-                                    void * const user = NULL);
+                                   void * const user = NULL);
   void removeVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
-                                       void * const user = NULL);
+                                      void * const user = NULL);
 
   void openHelpCard(const char * const name);
 
@@ -108,6 +140,10 @@ private slots:
 private:
   class So@Gui@ComponentP * pimpl;
 
+#ifdef __COIN_SOXT__
+  // FIXME: get rid of this? 20011012 mortene.
+  static void event_handler(Widget, XtPointer, XEvent *, Boolean *);
+#endif // __COIN_SOXT__
 }; // class So@Gui@Component
 
 // *************************************************************************
