@@ -60,7 +60,7 @@ public:
   SoEngineOutput out7;
 
 protected:
-  ~SoGuiRadioGroup(void);
+  virtual ~SoGuiRadioGroup(void);
 
 private:
   virtual void inputChanged(SoField * which);
