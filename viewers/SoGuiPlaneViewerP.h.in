@@ -1,3 +1,6 @@
+#ifndef SOGUIPLANEVIEWERP_H
+#define SOGUIPLANEVIEWERP_H
+
 /**************************************************************************\
  *
  *  This file is part of the Coin family of 3D visualization libraries.
@@ -21,8 +24,9 @@
  *
 \**************************************************************************/
 
-#ifndef SOGUIPLANEVIEWERP_H
-#define SOGUIPLANEVIEWERP_H
+#ifndef SO@GUI@_INTERNAL
+#error this is a private header file
+#endif /* !SO@GUI@_INTERNAL */
 
 #include <Inventor/SbLinear.h>
 

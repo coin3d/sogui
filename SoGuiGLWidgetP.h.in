@@ -1,3 +1,6 @@
+#ifndef SOGUIGLWIDGETP_H
+#define SOGUIGLWIDGETP_H
+
 /**************************************************************************\
  *
  *  This file is part of the Coin family of 3D visualization libraries.
@@ -21,11 +24,11 @@
  *
 \**************************************************************************/
 
-#ifndef SOGUIGLWIDGETP_H
-#define SOGUIGLWIDGETP_H
+#ifndef SO@GUI@_INTERNAL
+#error this is a private header file
+#endif /* !SO@GUI@_INTERNAL */
 
 #include <Inventor/SbBasic.h>
-
 
 class So@Gui@GLWidget;
 

@@ -1,3 +1,6 @@
+#ifndef SOGUI_DEVICEP_H
+#define SOGUI_DEVICEP_H
+
 /**************************************************************************\
  *
  *  This file is part of the Coin family of 3D visualization libraries.
@@ -21,10 +24,9 @@
  *
 \**************************************************************************/
 
-#ifndef SOGUI_DEVICEP_H
-#define SOGUI_DEVICEP_H
-
-// *************************************************************************
+#ifndef SO@GUI@_INTERNAL
+#error this is a private header file
+#endif /* !SO@GUI@_INTERNAL */
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 
