@@ -392,7 +392,8 @@ SoAnyPlaneViewer::processSoEvent(
 
   const SbVec2s size( viewer->getGLSize() );
   const SbVec2s pos( ev->getPosition() );
-  const SbVec2f posn( (float)pos[0]/(float)size[0], (float)pos[1]/(float)size[1] );
+  const SbVec2f posn( (float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
+                      (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1) );
 
   if ( type.isDerivedFrom( MOUSE_BUTTON_EVENT_TYPE ) ) {
     const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
@@ -477,8 +478,8 @@ SoAnyPlaneViewer::processSoEvent(
 
     this->setPointerLocation( pos );
 
-    const SbVec2f prevn( (float) this->pointer.then[0] / (float) size[0],
-                         (float) this->pointer.then[1] / (float) size[1] );
+    const SbVec2f prevn( (float) this->pointer.then[0] / (float) So@Gui@Max(size[0], (short int)1),
+                         (float) this->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1) );
 
     do {
 

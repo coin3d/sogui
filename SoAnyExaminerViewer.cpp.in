@@ -62,6 +62,8 @@ static const char rcsid[] =
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
+static const int MOUSEPOSLOGSIZE = 16;
+
 // Bitmap representations of an "X", a "Y" and a "Z" for the axis cross.
 static GLubyte xbmp[] = { 0x11,0x11,0x0a,0x04,0x0a,0x11,0x11 };
 static GLubyte ybmp[] = { 0x04,0x04,0x04,0x04,0x0a,0x11,0x11 };
@@ -103,9 +105,9 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
 
   this->spinRotation.setValue( SbVec3f( 0, 0, -1 ), 0 );
 
-  this->log.size = 16;
-  this->log.position = new SbVec2s [ 16 ];
-  this->log.time = new SbTime [ 16 ];
+  this->log.size = MOUSEPOSLOGSIZE;
+  this->log.position = new SbVec2s [ MOUSEPOSLOGSIZE ];
+  this->log.time = new SbTime [ MOUSEPOSLOGSIZE ];
   this->log.historysize = 0;
   this->button1down = FALSE;
   this->button2down = FALSE;
@@ -632,22 +634,13 @@ SoAnyExaminerViewer::spin(
 
   SbVec2s glsize( viewer->getGLSize() );
   SbVec2f lastpos;
-  lastpos[0] = float(this->log.position[1][0]) / float(glsize[0]-1);
-  lastpos[1] = float(this->log.position[1][1]) / float(glsize[1]-1);
+  lastpos[0] = float(this->log.position[1][0]) / float(So@Gui@Max(glsize[0]-1, 1));
+  lastpos[1] = float(this->log.position[1][1]) / float(So@Gui@Max(glsize[1]-1, 1));
 
   this->spinprojector->project( lastpos );
   SbRotation r;
   this->spinprojector->projectAndGetRotation( pointerpos, r );
-#if 0 // debug
-  // FIXME: Trying to track down an annoying (non-critical) bug.
-  // 19990501 mortene.
-  if (r == SbRotation::identity()) {
-    SoDebugError::postWarning("So@Gui@ExaminerViewer::spin",
-                              "rotation equals identity");
-  }
-#endif // debug
   r.invert();
-//  SoDebugError::postWarning("So@Gui@ExaminerViewer::spin", "reorientCamera" );
   this->reorientCamera( r );
 
   // Calculate an average angle magnitude value to make the transition
@@ -824,8 +817,8 @@ SoAnyExaminerViewer::processSoEvent(
   const SbVec2f prevnormalized = this->lastmouseposition;
 
   const SbVec2s pos( ev->getPosition() );
-  const SbVec2f posn( (float) pos[0] / (float) canvas[0],
-                      (float) pos[1] / (float) canvas[1] );
+  const SbVec2f posn( (float) pos[0] / (float) So@Gui@Max(canvas[0], (short int)1),
+                      (float) pos[1] / (float) So@Gui@Max(canvas[1], (short int)1) );
 
   this->lastmouseposition = posn;
 
@@ -914,9 +907,8 @@ SoAnyExaminerViewer::processSoEvent(
             }
             else {
               const SbVec2s glsize( viewer->getGLSize() );
-              SbVec3f from = this->spinprojector->project(
-                                                          SbVec2f( float(this->log.position[2][0]) / float(glsize[0]-1),
-                                                                   float(this->log.position[2][1]) / float(glsize[1]-1) ) );
+              SbVec3f from = this->spinprojector->project(SbVec2f( float(this->log.position[2][0]) / float( So@Gui@Max(glsize[0]-1, 1) ),
+                                                                   float(this->log.position[2][1]) / float( So@Gui@Max(glsize[1]-1, 1) )));
               SbVec3f to = this->spinprojector->project( posn );
               SbRotation rot = this->spinprojector->getRotation( from, to );
 
@@ -1106,21 +1098,18 @@ SoAnyExaminerViewer::addToLog(
   const SbVec2s pos,
   const SbTime time )
 {
-  if ( this->log.size <= 0 ) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo( "SoAnyExaminerViewer::addToLog", "no mouse log!" );
-#endif // SO@GUI@_DEBUG
-    return;
-  }
+  // In case someone changes the const size setting at the top of this
+  // file too small.
+  assert ( this->log.size > 2 && "mouse log too small!" );
+
   if ( this->log.historysize > 0 && pos == this->log.position[0] ) {
-#if SO@GUI@_DEBUG
+#if SO@GUI@_DEBUG && 0 // debug
+    // This can at least happen under SoQt.
     SoDebugError::postInfo( "SoAnyExaminerViewer::addToLog", "got position already!" );
-#endif // SO@GUI@_DEBUG
+#endif // debug
     return;
   }
 
-//  memmove( &(this->log.position[1]), &(this->log.position[0]), sizeof(SbVec2s)*(this->log.size-1) );
-//  memmove( &(this->log.time[1]), &(this->log.time[0]), sizeof(SbTime)*(this->log.size-1) );
   for ( int i = this->log.size - 1; i > 0; i-- ) {
     this->log.position[i] = this->log.position[i-1];
     this->log.time[i] = this->log.time[i-1];
