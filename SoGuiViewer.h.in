@@ -212,6 +212,7 @@ protected:
 #endif // SO@uGUI@_HAVE_WINWIDGET
   ~So@GUI@Viewer( void );
 
+  virtual void sizeChanged( const SbVec2s size );
   virtual void setSeekMode( SbBool enable );
   SbBool isSeekMode(void) const;
   SbBool seekToPoint( const SbVec2s screenpos );

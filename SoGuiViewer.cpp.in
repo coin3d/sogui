@@ -2319,5 +2319,18 @@ So@GUI@Viewer::seeksensorCB(void * data, SoSensor * s)
 
 // *************************************************************************
 
+/*!
+  FIXME: write doc
+*/
+
+void
+So@Gui@Viewer::sizeChanged(
+  const SbVec2s size )
+{
+  inherited::sizeChanged( size );
+} // sizeChanged()
+
+// *************************************************************************
+
 static const char * getSo@GUI@ViewerRCSId(void) { return rcsid; }
 

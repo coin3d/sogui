@@ -905,10 +905,12 @@ So@GUI@RenderArea::sizeChanged( // virtual, protected
   this->normalManager->setWindowSize( glsize );
   this->normalManager->setSize( glsize );
 //  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
+//  this->normalManager->scheduleRedraw();
 
   this->overlayManager->setWindowSize( glsize );
   this->overlayManager->setSize( glsize );
 //  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
+//  this->overlayManager->scheduleRedraw();
 
   if ( this->devices.mouse != NULL )
     this->devices.mouse->setWindowSize( glsize );
@@ -948,6 +950,8 @@ So@GUI@RenderArea::buildWidget( // protected
         (So@GUI@EventHandlerPtr) inherited::eventHandler, (void *) this );
     }
   }
+  const SbVec2s glsize = this->getGLSize();
+  this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
   return widget;
 } // buildWidget()
 
@@ -1034,6 +1038,7 @@ So@GUI@RenderArea::glReshape( // virtual, derived
   this->setViewportRegion( SbViewportRegion( width, height ) );
   this->glUnlock();
   // call widgetChanged() or something?
+  this->actualRedraw();
 } // glReshape()
 
 /*!
