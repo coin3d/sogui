@@ -1299,13 +1299,10 @@ So@Gui@Viewer::removeFinishCallback(So@Gui@ViewerCB * func, void * data)
 */
 
 void
-So@Gui@Viewer::copyView(const SbTime /*eventTime*/)
+So@Gui@Viewer::copyView(const SbTime eventTime)
 {
-  // FIXME: not implemented. Needs So@Gui@Clipboard implementation
-  // first. 19990507 mortene.
-
-  SoDebugError::postInfo("So@Gui@Viewer::copyView",
-                         "clipboard support not implemented yet");
+  // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
+  SO@GUI@_STUB();
 } // copyView()
 
 // *************************************************************************
@@ -1319,13 +1316,10 @@ So@Gui@Viewer::copyView(const SbTime /*eventTime*/)
 */
 
 void
-So@Gui@Viewer::pasteView(const SbTime /*eventTime*/)
+So@Gui@Viewer::pasteView(const SbTime eventTime)
 {
-  // FIXME: not implemented. Needs So@Gui@Clipboard implementation
-  // first. 19990507 mortene.
-
-  SoDebugError::postInfo("So@Gui@Viewer::pasteView",
-                         "clipboard support not implemented yet");
+  // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
+  SO@GUI@_STUB();
 } // pasteView()
 
 // *************************************************************************
@@ -2052,8 +2046,18 @@ So@Gui@Viewer::interactiveCountInc(void)
 void
 So@Gui@Viewer::interactiveCountDec(void)
 {
- // FIXME: The UI toolkits may cause the interactionnesting to go below zero
- // by triggering press and release events in different widgets. mariusbu 20010709.
+  // FIXME: The UI toolkits may cause the interactionnesting to go
+  // below zero by triggering press and release events in different
+  // widgets. mariusbu 20010709.
+
+  // FIXME: just to clarify; this is due to programming mistakes on
+  // our behalf and should be cleaned up. We're using a simple
+  // work-around / ignore strategy for now, though, as getting this
+  // 100% correct is hard (there are so many possible ways of user
+  // interaction with a viewer canvas) and the end-user will usually
+  // not notice any problems at all. So that's why we are using a
+  // warning instead of an assert(). 20010815 mortene.
+
 #if SO@GUI@_DEBUG
   if (PRIVATE(this)->interactionnesting <= 0) {
     SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
@@ -2610,10 +2614,7 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
 
 // *************************************************************************
 
-/*!
-  FIXME: write doc
-*/
-
+// doc in super
 void
 So@Gui@Viewer::sizeChanged(
   const SbVec2s size )
@@ -2870,10 +2871,7 @@ So@Gui@ViewerP::recordFPS(void)
 
 // *************************************************************************
 
-/*!
-  FIXME: write doc
-*/
-
+// doc in super
 SbBool
 So@Gui@Viewer::processSoEvent( // virtual
   const SoEvent * const event )
