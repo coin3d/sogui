@@ -959,7 +959,22 @@ So@Gui@Viewer::setCameraType(SoType t)
                               cameraparent->findChild(this->camera));
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
 
+    // Store the current home position, as it will be implicitly reset
+    // by setCamera().
+    SoOrthographicCamera * homeo = new SoOrthographicCamera;
+    SoPerspectiveCamera * homep = new SoPerspectiveCamera;
+    homeo->ref();
+    homep->ref();
+    homeo->copyContents(PRIVATE(this)->storedortho, FALSE);
+    homep->copyContents(PRIVATE(this)->storedperspective, FALSE);
+
     this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
+
+    // Restore home position.
+    PRIVATE(this)->storedortho->copyContents(homeo, FALSE);
+    PRIVATE(this)->storedperspective->copyContents(homep, FALSE);
+    homeo->unref();
+    homep->unref();
 
     PRIVATE(this)->deletecamera = TRUE;
     if (oldcamera) { cameraparent->removeChild(oldcamera); }
@@ -1016,12 +1031,12 @@ So@Gui@Viewer::saveHomePosition(void)
 
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
-    *(PRIVATE(this)->storedortho) = *((SoOrthographicCamera *)this->camera);
+    PRIVATE(this)->storedortho->copyContents(this->camera, FALSE);
     So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
                                              PRIVATE(this)->storedperspective);
   }
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-    *(PRIVATE(this)->storedperspective) = *((SoPerspectiveCamera *)this->camera);
+    PRIVATE(this)->storedperspective->copyContents(this->camera, FALSE);
     So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
                                              PRIVATE(this)->storedortho);
   }
@@ -1042,9 +1057,9 @@ So@Gui@Viewer::resetToHomePosition(void)
 
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()))
-    *((SoOrthographicCamera *)this->camera) = *(PRIVATE(this)->storedortho);
+    this->camera->copyContents(PRIVATE(this)->storedortho, FALSE);
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
-    *((SoPerspectiveCamera *)this->camera) = *(PRIVATE(this)->storedperspective);
+    this->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
 }
 
 // *************************************************************************
