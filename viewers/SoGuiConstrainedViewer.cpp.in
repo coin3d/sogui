@@ -215,7 +215,7 @@ So@Gui@ConstrainedViewer::bottomWheelMotion(float value)
 void
 So@Gui@ConstrainedViewer::leftWheelMotion(float value)
 {
-  this->tiltCamera(value - this->getLeftWheelValue());
+  this->tiltCamera( this->getLeftWheelValue() - value);
   inherited::leftWheelMotion(value);
 }
 
