@@ -2257,8 +2257,6 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
   plane distance, the near plane distance will be set to far plane 
   distance divided by 5000.0.
 
-  \since 2002-06-06
-
   \sa setAutoClipping() 
 */
 void 
