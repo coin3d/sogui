@@ -311,35 +311,41 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp \
-                         @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@Component.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Component.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidgetCommon.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/viewers/FullViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/viewers/PlaneViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/viewers/ExaminerViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h
+INPUT                  = \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
+@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.h \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp \
+@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@Component.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Component.h \
+@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidgetCommon.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.h \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.h \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.h \
+@sogui_src_dir@/src/Inventor/@Gui@/viewers/FullViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.h \
+@sogui_src_dir@/src/Inventor/@Gui@/viewers/PlaneViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
+@sogui_src_dir@/src/Inventor/@Gui@/viewers/ExaminerViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h \
+ \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.h \
+@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp
+
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
