@@ -234,6 +234,10 @@ protected:
 
   virtual void toggleCameraType(void);
 
+protected:
+  // FIXME: more data than this should be protected
+  SoCamera * camera;
+
 private:
   // Seek functionality
   SoTimerSensor * seeksensor;
@@ -246,7 +250,6 @@ private:
   SbBool seekdistanceabs;
 
   // Camera handling
-  SoCamera * camera;
   SbBool deletecamera;
   SbVec3f storedposition;
   SbRotation storedorientation;
