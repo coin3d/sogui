@@ -1,0 +1,127 @@
+/**************************************************************************\
+ *
+ *  This file is part of the Coin family of 3D visualization libraries.
+ *  Copyright (C) 1998-2002 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and / or
+ *  modify it under the terms of the GNU General Public License
+ *  version 2 as published by the Free Software Foundation.  See the
+ *  file LICENSE.GPL at the root directory of this source distribution
+ *  for more details.
+ *
+ *  If you desire to use this library in software that is incompatible
+ *  with the GNU GPL, and / or you would like to take advantage of the
+ *  additional benefits with regard to our support services, please
+ *  contact Systems in Motion about acquiring a Coin Professional
+ *  Edition License.  See <URL:http://www.coin3d.org> for more
+ *  information.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, 7030 Trondheim, NORWAY
+ *  <URL:http://www.sim.no>, <mailto:support@sim.no>
+ *
+\**************************************************************************/
+
+#include <Inventor/@Gui@/SoAny.h>
+#include <Inventor/@Gui@/nodes/SoGuiPane.h>
+#include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
+
+// *************************************************************************
+
+class MaterialEditor {
+public:
+  MaterialEditor(void);
+
+  SoGuiMaterialEditor * api;
+
+  static const char * editorscene[];
+};
+
+// *************************************************************************
+
+#define PRIVATE(obj) ((MaterialEditor *) ((SoGuiMaterialEditor *) obj)->internals)
+
+void
+SoGuiMaterialEditor::initClass(void)
+{
+  SO_KIT_INIT_CLASS(SoGuiMaterialEditor, SoBaseKit, SoBaseKit);
+}
+
+SO_KIT_SOURCE(SoGuiMaterialEditor);
+
+SoGuiMaterialEditor::SoGuiMaterialEditor(void)
+{
+  PRIVATE(this) = new MaterialEditor;
+  PRIVATE(this)->api = this;
+
+  SO_KIT_CONSTRUCTOR(SoGuiMaterialEditor); 
+
+  SO_KIT_ADD_FIELD(material, (NULL));
+  SO_KIT_ADD_FIELD(update, (CONTINUOUS));
+      
+  SO_KIT_DEFINE_ENUM_VALUE(Update, CONTINUOUS);
+  SO_KIT_DEFINE_ENUM_VALUE(Update, AFTER_ACCEPT);
+
+  SO_KIT_SET_SF_ENUM_TYPE(update, Update);
+
+  SO_KIT_ADD_CATALOG_ENTRY(root, SoGuiPane, TRUE, this, "", FALSE);
+
+  SO_KIT_INIT_INSTANCE(); 
+
+  SoNode * scene = SoAny::loadSceneGraph(MaterialEditor::editorscene);
+  assert(scene != NULL);
+  assert(scene->isOfType(SoGuiPane::getClassTypeId()));
+  scene->ref();
+
+  // initialize sliders
+
+  scene->unrefNoDelete();
+  this->setAnyPart("root", scene);
+
+  // sensors
+}
+
+SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
+{
+  MaterialEditor * obj = PRIVATE(this);
+  delete obj;
+}
+
+#undef PRIVATE
+
+// *************************************************************************
+// MaterialEditor
+// *************************************************************************
+
+#define PUBLIC(obj) (((MaterialEditor *) obj)->api)
+
+const char *
+MaterialEditor::editorscene[] =
+{
+  "#Inventor V2.1 ascii",
+  "",
+  "DEF pane SoGuiPane {",
+  "  worldSize 1 1 0",
+  "  objectSize 400 300 0",
+  "  SoGuiPosition {",
+  "    position 10 10 0",
+  "  }",
+  "  DEF button SoGuiToggleButton {",
+  "    size 10 10 0",
+  "  }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE button.size",
+  "    design EMBOSS",
+  "    complement FALSE = USE button.on",
+  "  }",
+  "}",
+  NULL
+};
+
+MaterialEditor::MaterialEditor(void)
+{
+  this->api = NULL;
+}
+
+#undef PUBLIC
+
+// *************************************************************************
