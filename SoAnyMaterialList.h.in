@@ -1,0 +1,85 @@
+/**************************************************************************
+ *
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This file is part of the Coin library.
+ *
+ *  This file may be distributed under the terms of the Q Public License
+ *  as defined by Troll Tech AS of Norway and appearing in the file
+ *  LICENSE.QPL included in the packaging of this file.
+ *
+ *  If you want to use Coin in applications not covered by licenses
+ *  compatible with the QPL, you can contact SIM to aquire a
+ *  Professional Edition license for Coin.
+ *
+ *  Systems in Motion AS, Prof. Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ sales@sim.no Voice: +47 22114160 Fax: +47 67172912
+ *
+ **************************************************************************/
+
+#ifndef SOANY_MATERIALLIST_H
+#define SOANY_MATERIALLIST_H
+
+#include <Inventor/@GUI@/So@GUI@MaterialList.h>
+
+class SbPList;
+class SoMaterial;
+
+// *************************************************************************
+
+#define SO@uGUI@_BUILTIN_MATERIALS 0x0001
+
+struct So@GUI@Material {
+  const char * name;
+  const char * data;
+};
+
+struct So@GUI@MaterialGroup {
+  const char * name;
+  short numMaterials;
+  So@GUI@Material ** materials;
+  @WIDGET@ menuitem;
+};
+
+struct So@GUI@MaterialDirectory {
+  short flags;
+  short numGroups;
+  So@GUI@MaterialGroup ** groups;
+  short current;
+};
+
+// *************************************************************************
+
+class SoAnyMaterialList {
+public:
+  SoAnyMaterialList( const char * const dir );
+  ~SoAnyMaterialList(void);
+
+  void addCallback(
+    So@GUI@MaterialListCB * const callback, void * const closure );
+  void removeCallback(
+    So@GUI@MaterialListCB * const callback, void * const closure );
+  void invokeCallbacks( SoMaterial * material );
+
+  const char * getMaterialDirectoryPath(void) const;
+  So@GUI@MaterialDirectory * getMaterialDirectory(void);
+
+private:
+  void setupBuiltinMaterials( So@GUI@MaterialDirectory * const index ) const;
+  void freeMaterialDirectory(void);
+
+  static char ** getNonemptySubdirs( const char * const path );
+  static char ** getRegularFiles( const char * const path );
+
+  static int qsort_comparator( const void * itemA, const void * itemB );
+
+private:
+  SbPList * callbacks;
+  const char * dirpath;
+  So@GUI@MaterialDirectory * directory;
+
+}; // class SoAnyMaterialList
+
+// *************************************************************************
+
+#endif // ! SOANY_MATERIALLIST_H

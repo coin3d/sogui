@@ -1,0 +1,433 @@
+/**************************************************************************
+ *
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This file is part of the Coin library.
+ *
+ *  This file may be distributed under the terms of the Q Public License
+ *  as defined by Troll Tech AS of Norway and appearing in the file
+ *  LICENSE.QPL included in the packaging of this file.
+ *
+ *  If you want to use Coin in applications not covered by licenses
+ *  compatible with the QPL, you can contact SIM to aquire a
+ *  Professional Edition license for Coin.
+ *
+ *  Systems in Motion AS, Prof. Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ sales@sim.no Voice: +47 22114160 Fax: +47 67172912
+ *
+ **************************************************************************/
+//  @configure_input@
+
+#if SO@uGUI@_DEBUG
+static const char rcsid[] =
+  "$Id$";
+#endif // SO@uGUI@_DEBUG
+
+#include <assert.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#include <Inventor/SbPList.h>
+#include <Inventor/errors/SoDebugError.h>
+
+#include <so@lGUI@defs.h>
+#include <Inventor/@GUI@/SoAnyMaterialList.h>
+
+struct So@GUI@MaterialListCallbackInfo {
+  So@GUI@MaterialListCB * callback;
+  void * closure;
+};
+
+/*!
+  \class SoAnyMaterialList Inventor/@GUI@/SoAnyMaterialList.h
+  \brief The SoAnyMaterialList class is the common code for the MaterialList
+  component classes.
+*/
+
+// *************************************************************************
+
+/*!
+*/
+
+SoAnyMaterialList::SoAnyMaterialList(
+  const char * const dir )
+{
+  this->callbacks = NULL;
+  this->dirpath = NULL;
+  this->directory = NULL;
+  if ( dir != NULL )
+    this->dirpath = strcpy( new char [strlen(dir)+1], dir );
+}
+
+/*!
+*/
+
+SoAnyMaterialList::~SoAnyMaterialList(
+  void )
+{
+  if ( this->callbacks != NULL ) {
+    const int num = this->callbacks->getLength();
+    for ( int i = 0; i < num; i++ )
+      delete (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+    delete this->callbacks;
+  }
+  if ( this->dirpath )
+    delete [] this->dirpath;
+  if ( this->directory != NULL )
+    this->freeMaterialDirectory();
+}
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+SoAnyMaterialList::addCallback(
+  So@GUI@MaterialListCB * const callback,
+  void * const closure )
+{
+  if ( this->callbacks == NULL )
+    this->callbacks = new SbPList;
+  So@GUI@MaterialListCallbackInfo * info =
+    new So@GUI@MaterialListCallbackInfo;
+  info->callback = callback;
+  info->closure = closure;
+  this->callbacks->append( info );
+} // addCallback()
+
+/*!
+*/
+
+void
+SoAnyMaterialList::removeCallback(
+  So@GUI@MaterialListCB * const callback,
+  void * const closure )
+{
+  if ( ! this->callbacks ) {
+#if SO@uGUI@_DEBUG
+    SoDebugError::postInfo( "SoAnyMaterialList::removeCallback",
+      "component has zero callbacks set." );
+#endif // SO@uGUI@_DEBUG
+    return;
+  }
+
+  const int numcallbacks = this->callbacks->getLength();
+  for ( int i = 0; i < numcallbacks; i++ ) {
+    So@GUI@MaterialListCallbackInfo * info =
+      (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+    if ( info->callback == callback && info->closure == closure ) {
+      this->callbacks->remove(i);
+      delete info;
+      return;
+    }
+  }
+
+#if SO@uGUI@_DEBUG
+  SoDebugError::postInfo( "SoAnyMaterialList::removeCallback",
+    "callback was not set for component." );
+#endif // SO@uGUI@_DEBUG
+} // removeCallback()
+
+/*!
+*/
+
+void
+SoAnyMaterialList::invokeCallbacks(
+  SoMaterial * material )
+{
+  if ( this->callbacks ) {
+    const int numCallbacks = this->callbacks->getLength();
+    for ( int i = 0; i < numCallbacks; i++ ) {
+      So@GUI@MaterialListCallbackInfo * info =
+        (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+      info->callback( info->closure, (SoMaterial *) material );
+    }
+  }
+} // invokeCallbacks()
+
+// *************************************************************************
+
+/*!
+  \internal
+
+  This method frees up the memory used by the material-index data strucure.
+*/
+
+void
+SoAnyMaterialList::freeMaterialDirectory(
+  void )
+{
+  if ( this->directory == NULL )
+    return;
+  int i, j;
+  if ( (this->directory->flags & SO@uGUI@_BUILTIN_MATERIALS) == 0 ) {
+    // all data is allocated
+    for ( i = 0; i < this->directory->numGroups; i++ ) {
+      for ( j = 0; j < this->directory->groups[i]->numMaterials; j++ ) {
+        delete [] this->directory->groups[i]->materials[j]->data;
+        delete [] this->directory->groups[i]->materials[j]->name;
+        delete this->directory->groups[i]->materials[j];
+      }
+      delete [] this->directory->groups[i]->name;
+      delete [] this->directory->groups[i]->materials;
+      delete this->directory->groups[i];
+    }
+    delete [] this->directory->groups;
+  } else {
+    // lots of data is static and should therefore not be freed
+    for ( i = 0; i < this->directory->numGroups; i++ ) {
+      for ( j = 0; j < this->directory->groups[i]->numMaterials; j++ )
+        delete this->directory->groups[i]->materials[j];
+      delete [] this->directory->groups[i]->materials;
+      delete this->directory->groups[i];
+    }
+    delete [] this->directory->groups;
+  }
+  delete this->directory;
+  this->directory = NULL;
+} // freeMaterialDirectory()
+
+// *************************************************************************
+
+const char *
+SoAnyMaterialList::getMaterialDirectoryPath(
+  void ) const
+{
+  return this->dirpath;
+} // getMaterialDirectoryPath()
+
+// *************************************************************************
+
+/*!
+  \internal
+*/
+
+static
+int
+containsFiles(
+  const char * const path )
+{
+  DIR * directory = opendir( path );
+  struct dirent * entry;
+  struct stat entrystats;
+  if ( directory != NULL ) {
+    const int pathnamelen = strlen(path);
+    int foundfile = 0;
+    while ( ! foundfile && (entry = readdir(directory)) != NULL ) {
+      if ( entry->d_name[0] == '.' ) continue;
+      char * entrypath = new char [pathnamelen + strlen(entry->d_name) + 2];
+      sprintf( entrypath, "%s/%s", path, entry->d_name );
+      if ( stat( entrypath, &entrystats ) == 0 &&
+           S_ISREG(entrystats.st_mode) ) {
+        delete [] entrypath;
+        closedir( directory );
+        return 1;
+      }
+      delete [] entrypath;
+    }
+    closedir( directory );
+  }
+  return 0;
+} // containsFiles()
+
+/*!
+  \internal
+*/
+
+char **
+SoAnyMaterialList::getNonemptySubdirs( // static, private
+  const char * const path )
+{
+  DIR * dir = opendir( path );
+  if ( ! dir ) return NULL;
+
+  SbPList subdirs;
+  DIR * subdir;
+  const int pathlen = strlen( path ) + 2;
+  struct dirent * entry, * subentry;
+  struct stat statbuf, substatbuf;
+  while ( (entry = readdir( dir)) != NULL ) {
+    if ( entry->d_name[0] == '.' ) continue;
+    int pathnamelen = pathlen + strlen(entry->d_name);
+    char * pathname = new char [ pathnamelen ];
+    sprintf( pathname, "%s/%s", path, entry->d_name );
+    if ( (stat( pathname, &statbuf ) == 0) && S_ISDIR(statbuf.st_mode) ) {
+      if ( (subdir = opendir( pathname )) != NULL ) {
+        int foundfile = 0;
+        while ( ! foundfile && (subentry = readdir(subdir)) != NULL ) {
+          if ( subentry->d_name[0] == '.' ) continue;
+          char * entrypathname =
+            new char [pathnamelen + strlen(subentry->d_name) + 1];
+          sprintf( entrypathname, "%s/%s", pathname, subentry->d_name );
+          if ( stat( entrypathname, &substatbuf ) == 0 &&
+               S_ISREG(substatbuf.st_mode) ) {
+            foundfile = 1;
+          }
+          delete [] entrypathname;
+        }
+        if ( foundfile )
+          subdirs.append( strcpy( new char [strlen(entry->d_name)+1],
+                                  entry->d_name ) );
+        closedir( subdir );
+      }
+    }
+    delete [] pathname;
+  }
+  closedir( dir );
+
+  const int num = subdirs.getLength();
+  char ** subdirarray = new char * [ num + 1 ];
+  for ( int i = 0; i < num; i++ )
+    subdirarray[i] = (char *) subdirs[i];
+  subdirarray[num] = NULL;
+  return subdirarray;
+} // numNonemptySubdirs()
+
+
+/*!
+  \internal
+*/
+
+char **
+SoAnyMaterialList::getRegularFiles( // static, private
+  const char * const path )
+{
+  DIR * dir = opendir( path );
+  if ( ! dir ) return NULL;
+
+  const int pathlen = strlen(path);
+  SbPList files;
+  struct dirent * entry;
+  while ( (entry = readdir(dir)) != NULL ) {
+    if ( entry->d_name[0] == '.' ) continue;
+    char * pathname = new char [pathlen + 2 + strlen(entry->d_name)];
+    sprintf( pathname, "%s/%s", path, entry->d_name );
+    struct stat statbuf;
+    if ( (stat(pathname, &statbuf) == 0) && S_ISREG(statbuf.st_mode) )
+      files.append( strcpy( new char [strlen(entry->d_name)+1],
+                            entry->d_name ) );
+    delete [] pathname;
+  }
+  closedir( dir );
+
+  const int num = files.getLength();
+  char ** filearray = new char * [ num + 1 ];
+  for ( int i = 0; i < num; i++ )
+    filearray[i] = (char *) files[i];
+  filearray[num] = NULL;
+  return filearray;
+} // getRegularFiles()
+
+/*!
+  \internal
+
+  Used for qsort().
+*/
+
+int
+SoAnyMaterialList::qsort_comparator( // static, private
+  const void * itemA,
+  const void * itemB )
+{
+  SO@uGUI@_STUB();
+  return 0;
+} // qsort_comparator()
+
+/*!
+*/
+
+So@GUI@MaterialDirectory *
+SoAnyMaterialList::getMaterialDirectory(
+  void )
+{
+  if ( this->directory != NULL ) // already created
+    return this->directory;
+
+  // get the path to search for materials in
+  SbBool path_allocated = FALSE;
+  const char * path = this->dirpath;
+  if ( ! path ) path = getenv( "SO_MATERIAL_DIR" );
+  if ( path == NULL ) {
+    path = getenv( "WALLET" );
+    if ( ! path ) path = getenv( "COIN_HOME" );
+    if ( path != NULL ) {
+      char * buf = new char [ strlen(path) + 12 ];
+      sprintf( buf, "%s/materials", path ); // use DIRSEP string?
+      path = buf;
+      path_allocated = TRUE;
+    }
+  }
+  if ( ! path ) {
+    path = getenv( "OIVHOME" );
+    if ( path != NULL ) {
+      char * buf = new char [ strlen(path) + 15 ];
+      sprintf( buf, "%s/data/materials", path ); // use DIRSEP string?
+      path = buf;
+      path_allocated = TRUE;
+    }
+  }
+
+  this->directory = new So@GUI@MaterialDirectory;
+  this->directory->flags = 0;
+  this->directory->current = 0;
+
+  if ( path != NULL ) {
+#if SO@uGUI@_DEBUG
+    SoDebugError::postInfo( "SoAnyMaterialList::getMaterialDirectory",
+      "scanning '%s'", path );
+#endif // SO@uGUI@_DEBUG
+    char ** subdirs = getNonemptySubdirs( path );
+    if ( subdirs ) {
+      int numsubdirs;
+      for ( numsubdirs = 0; subdirs[numsubdirs] != NULL; numsubdirs++ ) { }
+      this->directory->numGroups = numsubdirs;
+      this->directory->groups = new So@GUI@MaterialGroup * [ numsubdirs ];
+      for ( int subdir = 0; subdir < numsubdirs; subdir++ ) {
+        this->directory->groups[subdir] = new So@GUI@MaterialGroup;
+        this->directory->groups[subdir]->name = subdirs[subdir];
+        char * subdirname =
+          new char [strlen(path) + strlen(subdirs[subdir]) + 2];
+        sprintf( subdirname, "%s/%s", path, subdirs[subdir] );
+        char ** files = getRegularFiles( subdirname );
+        assert( files != NULL );
+        int numfiles;
+        for ( numfiles = 0; files[numfiles] != NULL; numfiles++ ) { }
+        this->directory->groups[subdir]->numMaterials = numfiles;
+        this->directory->groups[subdir]->materials =
+          new So@GUI@Material * [ numfiles ];
+        for ( int file = 0; file < numfiles; file++ ) {
+          this->directory->groups[subdir]->materials[file] =
+            new So@GUI@Material;
+          this->directory->groups[subdir]->materials[file]->name =
+            files[file];
+          char * buf = new char [strlen(subdirname) + strlen(files[file]) + 2];
+          sprintf( buf, "%s/%s", subdirname, files[file] );
+          this->directory->groups[subdir]->materials[file]->data = buf;
+        }
+        delete [] files; // actual strings are transfered, don't delete them!
+        delete [] subdirname;
+      }
+      delete [] subdirs; // actual strings are transfered, don't delete them!
+    } else {
+      if ( path_allocated )
+        delete [] path;
+      path = NULL;
+    }
+  }
+
+  if ( path == NULL ) // fallback on builtins...
+    this->setupBuiltinMaterials( this->directory );
+
+  return this->directory;
+} // getMaterialDirectory()
+
+// *************************************************************************
+
+#if SO@uGUI@_DEBUG
+static const char * getSoAnyMaterialListRCSId(void) { return rcsid; }
+#endif // SO@uGUI@_DEBUG
