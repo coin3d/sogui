@@ -172,7 +172,7 @@
 #endif // HAVE_JOYSTICK_LINUX
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
-#include <Inventor/@Gui@/So@Gui@GLWidgetP.h> // for eventHandler()
+#include <Inventor/@Gui@/So@Gui@GLWidgetP.h>
 #include <Inventor/@Gui@/SoAny.h>
 
 #include <string.h> // strchr()
@@ -353,6 +353,12 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
     //
     // 20020802 mortene.
   }
+
+  SbString s;
+  s.sprintf("\n"
+            "Rendering is %sdirect.\n",
+            SoGuiGLWidgetP::isDirectRendering(PUBLIC(this)) ? "" : "in");
+  info += s;
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
                                     info.getString());
@@ -1175,7 +1181,8 @@ So@Gui@RenderArea::getDefaultRedrawPriority(void)
 }
 
 /*!
-  This method renders the scene.
+  This method causes the immediate rendering of the scene, by calling
+  So@Gui@RenderArea::redraw().
 */
 void
 So@Gui@RenderArea::render(void)
@@ -1441,8 +1448,8 @@ So@Gui@RenderArea::redraw(void)
 // Note: the following function documentation block will also be used
 // for all the miscellaneous viewer subclasses, so keep it general.
 /*!
-  This method redraws the normal scenegraph by calling
-  SoSceneManager::render().
+  This method instantly redraws the normal (non-overlay) scenegraph by
+  calling SoSceneManager::render().
 
   Subclasses may override this method to add their own rendering
   before or after Coin renders it's scenegraph.
@@ -1669,10 +1676,13 @@ So@Gui@RenderArea::initGraphic(void)
   if (mgr) {
     mgr->reinitialize();
     mgr->setRGBMode(this->isRGBMode());
-    mgr->getGLRenderAction()->setCacheContext(SoAny::si()->getSharedCacheContextId((void*) this));  
+
+    SoGLRenderAction * renderaction = mgr->getGLRenderAction();
+    renderaction->setCacheContext(SoAny::si()->getSharedCacheContextId(this));
+    SbBool isdirect = SoGuiGLWidgetP::isDirectRendering(this);
+    renderaction->setRenderingIsRemote(!isdirect);
   }
-  // FIXME: should init cache context stuff,
-  // FIXME: if not RGB mode, load colormap
+  // FIXME: if not RGB mode, load colormap. pederb.
 
   inherited::initGraphic();
 }
@@ -1686,9 +1696,17 @@ So@Gui@RenderArea::initOverlayGraphic(void)
   SoSceneManager * mgr = this->getOverlaySceneManager();
   if (mgr) {
     mgr->reinitialize();
+    // FIXME: does overlays really _have_ to be in colorindex mode?
+    // 20020916 mortene.
     mgr->setRGBMode(FALSE);
+
+    SoGLRenderAction * renderaction = mgr->getGLRenderAction();
+    SbBool isdirect = SoGuiGLWidgetP::isDirectRendering(this);
+    renderaction->setRenderingIsRemote(!isdirect);
+    // FIXME: shouldn't we also setCacheContext() on the renderaction?
+    // 20020916 mortene.
   }
-  // FIXME: load colormap
+  // FIXME: if not RGB mode, load colormap. pederb.
 
   // FIXME: shouldn't we do inherited::initOverlayGraphic() ? 20010831 mortene.
 }
