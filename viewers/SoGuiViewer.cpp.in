@@ -127,7 +127,7 @@
 
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/SoAny.h>
-#include <Inventor/@Gui@/SoGuiIntList.h>
+#include <Inventor/@Gui@/common/SbGuiList.h>
 
 #include <Inventor/SoDB.h>
 
@@ -288,7 +288,7 @@ public:
   SoSearchAction * searchaction;
   SoGetMatrixAction * matrixaction;
   SbPList * superimpositions;
-  SoGuiIntList * superimpositionsenabled;
+  SbGuiList<SbBool> superimpositionsenabled;
   So@Gui@Viewer * pub;
 
   // auto clipping parameters
@@ -308,7 +308,6 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->searchaction = new SoSearchAction;
   this->matrixaction = new SoGetMatrixAction(SbViewportRegion(100,100));
   this->superimpositions = NULL;
-  this->superimpositionsenabled = NULL;
 
   this->storedortho = new SoOrthographicCamera;
   this->storedortho->ref();
@@ -325,7 +324,6 @@ So@Gui@ViewerP::~So@Gui@ViewerP()
 {
   if (this->superimpositions) {
     delete this->superimpositions;
-    delete this->superimpositionsenabled;
     this->superimpositions = NULL;
   }
   delete this->searchaction;
@@ -2926,7 +2924,7 @@ So@Gui@Viewer::actualRedraw(void)
     SbBool first = TRUE;
     SbBool zWasEnabled = FALSE;
     for (int i = 0; i < PRIVATE(this)->superimpositions->getLength(); i++) {
-      if ((*PRIVATE(this)->superimpositionsenabled)[i] != FALSE) {
+      if (PRIVATE(this)->superimpositionsenabled[i] != FALSE) {
 	if (first) {
 	  // save Z buffer state and disable
           zWasEnabled = glIsEnabled(GL_DEPTH_TEST) ? TRUE : FALSE;
@@ -3298,7 +3296,6 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
 {
   if (PRIVATE(this)->superimpositions == NULL) {
     PRIVATE(this)->superimpositions = new SbPList;
-    PRIVATE(this)->superimpositionsenabled = new SoGuiIntList;
   }
   PRIVATE(this)->searchaction->reset();
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
@@ -3316,7 +3313,7 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
   }
   scene->ref();
   PRIVATE(this)->superimpositions->append(scene);
-  PRIVATE(this)->superimpositionsenabled->append(TRUE);
+  PRIVATE(this)->superimpositionsenabled.append(TRUE);
 }
 
 // *************************************************************************
@@ -3333,9 +3330,9 @@ So@Gui@Viewer::removeSuperimposition(SoNode * scene)
   if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
   if (idx == -1) goto error;
-  assert(PRIVATE(this)->superimpositionsenabled != NULL);
+  assert(PRIVATE(this)->superimpositions != NULL);
   PRIVATE(this)->superimpositions->remove(idx);
-  PRIVATE(this)->superimpositionsenabled->remove(idx);
+  PRIVATE(this)->superimpositionsenabled.remove(idx);
   scene->unref();
   return;
 
@@ -3364,7 +3361,7 @@ So@Gui@Viewer::setSuperimpositionEnabled(SoNode * scene,
   if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
   if (idx == -1) goto error;
-  PRIVATE(this)->superimpositionsenabled->set(idx, enable);
+  PRIVATE(this)->superimpositionsenabled[idx] = enable;
   return;
 
  error:
@@ -3390,7 +3387,7 @@ So@Gui@Viewer::getSuperimpositionEnabled(SoNode * scene) const
   if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
   if (idx == -1) goto error;
-  return PRIVATE(this)->superimpositionsenabled->get(idx);
+  return PRIVATE(this)->superimpositionsenabled[idx];
 
  error:
   if (SO@GUI@_DEBUG) {
