@@ -1508,6 +1508,17 @@ So@Gui@Viewer::setDoubleBuffer(SbBool on)
 void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
+  if ( root == this->sceneGraph ) {
+#if SOXT_DEBUG
+    SoDebugError::postWarning( "So@Gui@Viewer::setSceneGraph",
+      "called with the same root as already set" );
+#endif // SOXT_DEBUG
+    return;
+  }
+
+  // If the SoRenderArea hasn't yet set up its pointer to the SoViewer
+  // "viewer root" (i.e. the viewer-generated root above the
+  // user-supplied root), do that first.
   if (!inherited::getSceneGraph()) inherited::setSceneGraph(this->sceneRoot);
 
   if ( this->sceneGraph ) {
