@@ -53,6 +53,7 @@ public:
   virtual void rayPick(SoRayPickAction * action);
   virtual void getMatrix(SoGetMatrixAction * action);
   virtual void getBoundingBox(SoGetBoundingBoxAction * action);
+  virtual void handleEvent(SoHandleEventAction * action);
 
   SbVec2f getRayPickIntersectionPoint(void) const;
 
