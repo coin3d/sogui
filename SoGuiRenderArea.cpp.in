@@ -224,7 +224,7 @@ So@Gui@RenderArea::~So@Gui@RenderArea(
   A hook invoked after window has been realized.
 */
 
-void 
+void
 So@Gui@RenderArea::afterRealizeHook(void)
 {
   inherited::afterRealizeHook();
@@ -709,13 +709,14 @@ So@Gui@RenderArea::renderOverlay(
     return;
 
   this->setOverlayRender( TRUE );
+  if ( ! this->isOverlayRender() ) return; // overlay planes not available
   this->glLock(); // this makes the GL context "current"
   this->redrawOverlay();
   this->glUnlock();
 } // renderOverlay()
 
 /*!
-  This method schedules a redraw to happen at a later time (then the
+  This method schedules a redraw to happen at a later time (when the
   application has processed it's other events first).
 */
 
@@ -1015,7 +1016,7 @@ So@Gui@RenderArea::initOverlayGraphic( // virtual, protected
 } // initOverlayGraphic()
 
 /*!
-  This method is 
+  This method is
 */
 
 void
@@ -1040,7 +1041,7 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
 
   const SbVec2s glsize = this->getGLSize();
 
-  if ( glsize[0] <= 0 || glsize[1] <= 0 ) 
+  if ( glsize[0] <= 0 || glsize[1] <= 0 )
     return;
 
   this->setViewportRegion( SbViewportRegion( glsize ) );
@@ -1068,7 +1069,7 @@ So@Gui@RenderArea::widgetChanged( // virtual, protected
   THIS->normalManager->setRGBMode(this->isRGBMode());
   THIS->overlayManager->setRGBMode(this->isRGBMode());
 #endif
-    
+
   // FIXME: this code needs to be enabled (and rewritten to work) to
   // handle display list caching. 20001121 mortene.
 #if 0
@@ -1204,6 +1205,7 @@ So@Gui@RenderArea::glReshape( // virtual, derived
   this->actualRedraw();
   this->glUnlock();
   this->setOverlayRender( TRUE );
+  if ( ! this->isOverlayRender() ) return; // overlay planes not available
   this->glLock();
   this->actualOverlayRedraw();
   this->glUnlock();
@@ -1400,4 +1402,3 @@ So@Gui@RenderAreaP::~So@Gui@RenderAreaP(
 #if SO@GUI@_DEBUG
 static const char * getSo@Gui@RenderAreaRCSId(void) { return rcsid; }
 #endif // SO@GUI@_DEBUG
-
