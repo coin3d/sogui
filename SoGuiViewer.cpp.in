@@ -248,6 +248,7 @@ So@GUI@Viewer::So@GUI@Viewer(
   this->viewingFlag = TRUE;
   this->camera = NULL;
   this->altSwitchBack = FALSE;
+  this->sceneGraph = NULL;
 
   // initialization of internal data
   this->cursoron = TRUE;
@@ -267,12 +268,11 @@ So@GUI@Viewer::So@GUI@Viewer(
   this->inseekmode = FALSE;
   this->seeksensor = new SoTimerSensor(So@GUI@Viewer::seeksensorCB, this);
 
-  this->userroot = NULL;
 
-  this->viewerroot = new SoSeparator;
-  this->viewerroot->ref();
-  this->viewerroot->renderCaching.setValue(SoSeparator::OFF);
-  this->viewerroot->renderCulling.setValue(SoSeparator::OFF);
+  this->sceneRoot = new SoSeparator;
+  this->sceneRoot->ref();
+  this->sceneRoot->renderCaching.setValue(SoSeparator::OFF);
+  this->sceneRoot->renderCulling.setValue(SoSeparator::OFF);
 
   // Drawstyle subgraph.
   {
@@ -296,7 +296,7 @@ So@GUI@Viewer::So@GUI@Viewer(
     this->drawstyleroot->addChild(this->solightmodel);
     this->drawstyleroot->addChild(this->sodrawstyle);
     this->drawstyleroot->addChild(this->socomplexity);
-    this->viewerroot->addChild(this->drawstyleroot);
+    this->sceneRoot->addChild(this->drawstyleroot);
     this->drawstyleroot->whichChild = SO_SWITCH_NONE;
   }
 
@@ -362,9 +362,9 @@ So@GUI@Viewer::~So@GUI@Viewer(
 
   delete this->seeksensor;
 
-  if (this->userroot) this->setSceneGraph(NULL);
-  if (this->lightroot) this->lightroot->unref();
-  this->viewerroot->unref();
+  if ( this->sceneGraph ) this->setSceneGraph(NULL);
+  if ( this->lightroot ) this->lightroot->unref();
+  this->sceneRoot->unref();
 } // ~So@GUI@Viewer()
 
 // *************************************************************************
@@ -390,7 +390,7 @@ So@GUI@Viewer::setCamera(SoCamera * cam)
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (this->deletecamera) {
-      SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
+      SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
       cameraparent->removeChild(this->camera);
       this->deletecamera = FALSE;
     }
@@ -503,7 +503,7 @@ So@GUI@Viewer::setCameraType(SoType t)
         2 * focaldist * tan(oldpcam->heightAngle.getValue() / 2.0f);
     }
 
-    SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
+    SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
     cameraparent->insertChild( newcamera,
                                cameraparent->findChild( this->camera ) );
     SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
@@ -544,7 +544,7 @@ void
 So@GUI@Viewer::viewAll(void)
 {
   assert(this->camera);
-  this->camera->viewAll(this->userroot, this->getViewportRegion());
+  this->camera->viewAll( this->sceneGraph, this->getViewportRegion() );
 } // viewAll()
 
 // *************************************************************************
@@ -633,7 +633,7 @@ So@GUI@Viewer::setHeadlight(SbBool on)
       return;
     }
 
-    SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
+    SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
     int lidx = cameraparent->findChild(this->lightroot);
     if (lidx == -1) {
       int idx = cameraparent->findChild(this->camera);
@@ -645,7 +645,7 @@ So@GUI@Viewer::setHeadlight(SbBool on)
   }
   else {
     if (this->lightroot) {
-      SoGroup * lightparent = GETPARENTOFNODE(this->viewerroot,
+      SoGroup * lightparent = GETPARENTOFNODE(this->sceneRoot,
                                               this->lightroot);
       lightparent->removeChild(this->lightroot);
 
@@ -1453,23 +1453,24 @@ So@GUI@Viewer::setDoubleBuffer(SbBool on)
 void
 So@GUI@Viewer::setSceneGraph(SoNode * root)
 {
-  if (!inherited::getSceneGraph()) inherited::setSceneGraph(this->viewerroot);
+  if (!inherited::getSceneGraph()) inherited::setSceneGraph(this->sceneRoot);
 
-  if (this->userroot) {
-    if (this->getCamera()) this->setCamera(NULL);
+  if ( this->sceneGraph ) {
+    if (this->getCamera())
+      this->setCamera(NULL);
     // Release the old user-supplied graph.
-    this->viewerroot->removeChild(this->userroot);
+    this->sceneRoot->removeChild(this->sceneGraph);
   }
 
-  this->userroot = root;
+  this->sceneGraph = root;
   if (!root) return;
 
-  this->viewerroot->addChild(this->userroot);
+  this->sceneRoot->addChild(this->sceneGraph);
 
   // Search for a camera already present.
   SoSearchAction search;
   search.setType(SoCamera::getClassTypeId());
-  search.apply(this->userroot);
+  search.apply(this->sceneGraph);
   SoCamera * scenecamera = NULL;
   SoFullPath * fullpath = (SoFullPath *)search.getPath();
   if (fullpath) scenecamera = (SoCamera *)fullpath->getTail();
@@ -1486,23 +1487,23 @@ So@GUI@Viewer::setSceneGraph(SoNode * root)
     this->deletecamera = TRUE;
 
     if ( this->type == So@GUI@Viewer::BROWSER ) {
-      this->viewerroot->insertChild(scenecamera, 1);
+      this->sceneRoot->insertChild(scenecamera, 1);
     }
     else {
-      if (this->userroot->isOfType(SoGroup::getClassTypeId())) {
-        ((SoGroup *)this->userroot)->insertChild(scenecamera, 0);
+      if (this->sceneGraph->isOfType(SoGroup::getClassTypeId())) {
+        ((SoGroup *)this->sceneGraph)->insertChild(scenecamera, 0);
       }
       else {
         SoGroup * g = new SoGroup;
         g->addChild(scenecamera);
-        g->addChild(this->userroot);
-        this->viewerroot->removeChild(this->userroot);
-        this->viewerroot->addChild(g);
-        this->userroot = g;
+        g->addChild(this->sceneGraph);
+        this->sceneRoot->removeChild(this->sceneGraph);
+        this->sceneRoot->addChild(g);
+        this->sceneGraph = g;
       }
     }
 
-    scenecamera->viewAll(this->userroot, this->getViewportRegion());
+    scenecamera->viewAll(this->sceneGraph, this->getViewportRegion());
   }
 
   // This will set up the headlight
@@ -1522,7 +1523,7 @@ So@GUI@Viewer::setSceneGraph(SoNode * root)
 SoNode *
 So@GUI@Viewer::getSceneGraph(void)
 {
-  return this->userroot;
+  return this->sceneGraph;
 } // getSceneGraph()
 
 // *************************************************************************
@@ -1589,7 +1590,7 @@ So@GUI@Viewer::seekToPoint( const SbVec2s screenpos )
   SoRayPickAction rpaction(this->getViewportRegion());
   rpaction.setPoint(screenpos);
   rpaction.setRadius(2);
-  rpaction.apply(this->viewerroot);
+  rpaction.apply(this->sceneRoot);
 
   SoPickedPoint * picked = rpaction.getPickedPoint();
   if (!picked) {
@@ -2104,7 +2105,7 @@ So@GUI@Viewer::setClippingPlanes(
   else
     this->autoClipBboxAction->setViewportRegion( this->getViewportRegion() );
 
-  this->autoClipBboxAction->apply( this->viewerroot );
+  this->autoClipBboxAction->apply( this->sceneRoot );
 
   SbXfBox3f xbox = this->autoClipBboxAction->getXfBoundingBox();
   SbMatrix mat;

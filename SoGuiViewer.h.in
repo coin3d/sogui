@@ -240,7 +240,12 @@ protected:
   So@GUI@Viewer::Type type;
   SbBool viewingFlag;
   SbBool altSwitchBack;
+
   SoGetBoundingBoxAction * autoClipBboxAction;
+  float minimumNearPlane; // % of far plane
+
+  SoNode * sceneGraph; // userroot
+  SoSeparator * sceneRoot; // viewerroot
 
 private:
   // Seek functionality
@@ -294,9 +299,6 @@ private:
   BufferType buffertype;
 
   void moveCameraScreen( const SbVec2f & screenpos );
-
-  SoSeparator * viewerroot;
-  SoNode * userroot;
 
 }; // class So@GUI@Viewer
 
