@@ -1890,15 +1890,15 @@ So@Gui@Viewer::getSceneGraph(void)
 // *************************************************************************
 
 /*!
-  Put the viewer in or out of seek mode.
+  Put the viewer in or out of "waiting-to-seek" mode.
 
-  If the user performs a mouse button click when the viewer is in seek
-  mode, the camera will be repositioned so the camera focal point lies
-  on the point of the geometry under the mouse cursor.
+  If the user performs a mouse button click when the viewer is in
+  "waiting-to-seek" mode, the camera will be repositioned so the
+  camera focal point lies on the point of the geometry under the mouse
+  cursor.
 
   \sa isSeekMode(), setDetailSeek()
 */
-
 void
 So@Gui@Viewer::setSeekMode(SbBool enable)
 {
@@ -1908,39 +1908,42 @@ So@Gui@Viewer::setSeekMode(SbBool enable)
     if (enable) { assert(this->isViewing()); }
   }
 
-  if (! enable && PRIVATE(this)->seeksensor->isScheduled()) {
+  if (!enable && PRIVATE(this)->seeksensor->isScheduled()) {
     PRIVATE(this)->seeksensor->unschedule();
     this->interactiveCountDec();
   }
 
   PRIVATE(this)->inseekmode = enable;
-} // setSeekMode()
+}
 
 // *************************************************************************
 
 /*!
-  Return a flag which indicates whether or not the viewer is in seek mode.
+  Return a flag which indicates whether or not the viewer is in
+  "waiting-to-seek" mode.
+
+  (The actual animated translation will not occur until the end user
+  really \e starts the seek operation, typically by clicking with the
+  left mousebutton.)
 
   \sa setSeekMode()
 */
-
 SbBool
 So@Gui@Viewer::isSeekMode(void) const
 {
   return PRIVATE(this)->inseekmode;
-} // isSeekMode()
+}
 
 // *************************************************************************
 
 /*!
-  Call this method to initiate a seek action towards the 3D intersection
-  of the scene and the ray from the screen coordinate's point and in the same
-  direction as the camera is pointing.
+  Call this method to initiate a seek action towards the 3D
+  intersection of the scene and the ray from the screen coordinate's
+  point and in the same direction as the camera is pointing.
 
-  Returns \a TRUE if the ray from the \a screenpos position intersect with
-  any parts of the onscreen geometry, otherwise FALSE.
+  Returns \c TRUE if the ray from the \a screenpos position intersect
+  with any parts of the onscreen geometry, otherwise \c FALSE.
 */
-
 SbBool
 So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 {
@@ -1954,7 +1957,12 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 
   SoPickedPoint * picked = rpaction.getPickedPoint();
   if (!picked) {
+    // FIXME: this inc seems bogus, but is needed now due to buggy
+    // code in for instance the examinerviewer
+    // processSoEvent(). 20020510 mortene.
+#if 1
     this->interactiveCountInc(); // decremented in setSeekMode(FALSE)
+#endif // FIXME
     this->setSeekMode(FALSE);
     return FALSE;
   }
@@ -3325,6 +3333,8 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 
 // *************************************************************************
 
+// FIXME: it seems bogus that this should be obsoleted, as it still
+// does something seemingly useful. Investigate. 20020510 mortene.
 /*!
   This method is obsoleted.
 */
