@@ -12,10 +12,14 @@ CURRENT
 
   SoGuiFrame - a 2d-rect emboss / frame renderer
 
-  SoGuiSlider1 - an interactive slider for a one-dimensional value space
+  SoGuiClickCounter - a button-like widget that reacts to mouse presses
 
-PLANNED
+  SoGuiSlider1 - an interactive slider for a one-dimensional value space
 
   SoGuiSlider2 - an interative slider for a two-dimensional value space
 
+
+FUTURE
+
+  ColorEditor as NodeKit
 
