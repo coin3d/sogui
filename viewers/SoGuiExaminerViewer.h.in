@@ -111,10 +111,10 @@ private:
   void setCursorRepresentation(int mode);
   QCursor * defaultcursor;
 
-  QPushButton * cameratogglebutton;
-  QLabel * feedbacklabel1, * feedbacklabel2;
+  class QPushButton * cameratogglebutton;
+  class QLabel * feedbacklabel1, * feedbacklabel2;
   SoQtThumbWheel * feedbackwheel;
-  QLineEdit * feedbackedit;
+  class QLineEdit * feedbackedit;
   void setEnableFeedbackControls(const SbBool flag);
 
 private slots:
