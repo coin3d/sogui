@@ -213,6 +213,10 @@ public:
   So@Gui@Viewer * pub;
 };
 
+#define PRIVATE(ptr) (ptr->pimpl)
+#define PUBLIC(ptr) (ptr->pub)
+
+
 So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
 {
   this->pub = publ;
@@ -427,8 +431,6 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * camera,
   this->searchaction->reset();
 }
 
-
-#define PRIVATE(ptr) (ptr->pimpl)
 
 // *************************************************************************
 
@@ -999,7 +1001,6 @@ So@Gui@Viewer::resetToHomePosition(void)
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
     ((SoPerspectiveCamera *)this->camera)->heightAngle = PRIVATE(this)->storedheightval;
 
-  PRIVATE(this)->setClippingPlanes();
   this->camera->focalDistance =
     (this->camera->farDistance.getValue() +
      this->camera->nearDistance.getValue())/2;
@@ -2012,6 +2013,11 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 void
 So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 {
+  // Recalculate near/far planes. Must be done in reallyRedraw() --
+  // not actualRedraw() -- so the clipping planes are correct even
+  // when rendering multiple times with different camera settings.
+  if (PUBLIC(this)->isAutoClipping()) { this->setClippingPlanes(); }
+
   if (this->drawAsHiddenLine()) {
 
     // First pass: render as filled, but with the background color.
@@ -2119,10 +2125,6 @@ void
 So@Gui@Viewer::actualRedraw(void)
 {
   SbTime redrawtime = SbTime::getTimeOfDay();
-
-  // Recalculate near/far planes.
-  if (this->isAutoClipping())
-    PRIVATE(this)->setClippingPlanes();
 
   SbBool clearcol = this->isClearBeforeRender();
 
