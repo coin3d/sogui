@@ -23,6 +23,8 @@
 
 // @configure_input@
 
+#define PRIVATE(obj) ((SoGuiGLWidgetP *)(obj->pimpl))
+
 // *************************************************************************
 
 /*!
@@ -507,6 +509,19 @@
   \since 2004-12-08
 */
 
+// Documented in common/SoGuiGLWidgetCommon.cpp.in.
+void
+So@Gui@GLWidget::setStealFocus(SbBool enable)
+{
+  PRIVATE(this)->stealFocus = enable;
+}
+
+// Documented in common/SoGuiGLWidgetCommon.cpp.in.
+SbBool
+So@Gui@GLWidget::isStealFocus(void) const
+{
+  return PRIVATE(this)->stealFocus;
+}
 
 // *************************************************************************
 
@@ -627,6 +642,7 @@ So@Gui@GLWidget::isStereoBuffer(void) const
 SoGuiGLWidgetP::SoGuiGLWidgetP(So@Gui@GLWidget * publ)
 {
   this->pub = publ;
+  this->stealFocus = TRUE;
 }
 
 SoGuiGLWidgetP::~SoGuiGLWidgetP()
@@ -642,6 +658,7 @@ SoGuiGLWidgetP::isDirectRendering(So@Gui@GLWidget * w)
   return ((SoGuiGLWidgetP *)(w->pimpl))->isDirectRendering();
 }
 
+#undef PRIVATE
 #endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************

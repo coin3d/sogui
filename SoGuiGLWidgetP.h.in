@@ -43,6 +43,7 @@ public:
   virtual ~SoGuiGLWidgetP();
 
   static SbBool isDirectRendering(class So@Gui@GLWidget * w);
+  SbBool stealFocus;
 
 protected:
   SoGuiGLWidgetP(So@Gui@GLWidget * publ);
