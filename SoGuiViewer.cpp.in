@@ -2001,10 +2001,15 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->socomplexity->textureQuality.setIgnored(FALSE);
 
     pub->getSceneManager()->render(FALSE, FALSE);
-
+    
+    // disable override nodes
+    this->sobasecolor->rgb.setIgnored(TRUE);
+    this->somaterialbinding->value.setIgnored(TRUE);
+    this->solightmodel->model.setIgnored(TRUE);
+    this->socomplexity->textureQuality.setIgnored(TRUE);
+    this->sodrawstyle->style.setIgnored(TRUE);
     return;
   }
-
 
   SbBool clearzbuffer = TRUE;
   So@Gui@Viewer::DrawStyle style = this->currentDrawStyle();
