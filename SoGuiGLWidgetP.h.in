@@ -24,6 +24,9 @@
 #ifndef SOGUIGLWIDGETP_H
 #define SOGUIGLWIDGETP_H
 
+#include <Inventor/SbBasic.h>
+
+
 class So@Gui@GLWidget;
 
 // ************************************************************************
@@ -34,11 +37,15 @@ class So@Gui@GLWidget;
 class SoGuiGLWidgetP
 {
 public:
-  ~SoGuiGLWidgetP();
+  virtual ~SoGuiGLWidgetP();
+
+  static SbBool isDirectRendering(class So@Gui@GLWidget * w);
 
 protected:
   SoGuiGLWidgetP(So@Gui@GLWidget * publ);
   So@Gui@GLWidget * pub;
+
+  virtual SbBool isDirectRendering(void) = 0;
 };
 
 // ************************************************************************

@@ -544,6 +544,15 @@ SoGuiGLWidgetP::~SoGuiGLWidgetP()
 {
 }
 
+// Just forward from a static function, so we can find out from
+// anywhere within the library -- without exposing the API for the app
+// programmer.
+SbBool
+SoGuiGLWidgetP::isDirectRendering(So@Gui@GLWidget * w)
+{
+  return ((SoGuiGLWidgetP *)(w->pimpl))->isDirectRendering();
+}
+
 #endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
