@@ -58,7 +58,7 @@ class So@GUI@Mouse;
 
 typedef SbBool So@GUI@RenderAreaEventCB( void * user, @EVENT@ event );
 
-class So@GUI@RenderArea : public So@GUI@GLWidget {
+class SO@uGUI@_DLL_EXPORT So@GUI@RenderArea : public So@GUI@GLWidget {
   typedef So@GUI@GLWidget inherited;
   @COMPONENTHEADER@
 

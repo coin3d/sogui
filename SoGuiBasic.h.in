@@ -40,83 +40,26 @@ inline void So@GUI@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
 
 // *************************************************************************
 
-#ifdef __FILE__
-#define SO@uGUI@_STUB_FILE __FILE__
+#define __COIN_SO@uGUI@__
+
+#if ! defined(SO@uGUI@_MAJOR_VERSION)
+#undef SO@uGUI@_MAJOR_VERSION
+#endif /* ! SO@uGUI@_MAJOR_VERSION */
+#if ! defined(SO@uGUI@_MINOR_VERSION)
+#undef SO@uGUI@_MINOR_VERSION
+#endif /* ! SO@uGUI@_MINOR_VERSION */
+#if ! defined(SO@uGUI@_MICRO_VERSION)
+#undef SO@uGUI@_MICRO_VERSION
+#endif /* ! SO@uGUI@_MICRO_VERSION */
+#if ! defined(SO@uGUI@_VERSION)
+#undef SO@uGUI@_VERSION
+#endif /* ! SO@uGUI@_VERSION */
+
+#ifdef SO@uGUI@_MAKE_DLL
+#define SO@uGUI@_DLL_EXPORT __declspec(dllexport)
 #else
-#define SO@uGUI@_STUB_FILE ((char *)0L)
+#define SO@uGUI@_DLL_EXPORT
 #endif
-
-#ifdef __LINE__
-#define SO@uGUI@_STUB_LINE __LINE__
-#else
-#define SO@uGUI@_STUB_LINE 0
-#endif
-
-#if HAVE_VAR___PRETTY_FUNCTION__
-#define SO@uGUI@_STUB_FUNC __PRETTY_FUNCTION__
-#else
-#if HAVE_VAR___FUNCTION__
-#define SO@uGUI@_STUB_FUNC __FUNCTION__
-#else
-#define SO@uGUI@_STUB_FUNC ((char *)0L)
-#endif
-#endif
-
-// SO@uGUI@_STUB(): this is the method which prints out stub
-// information. Used where there is functionality missing.
-
-#include <stdio.h> // fprintf()
-
-// This stupid thing is here to silence some compilers that complain on
-// constant if-expressions.
-inline int _not_null( const void * arg ) { return (arg != NULL) ? 1 : 0; }
-
-#define SO@uGUI@_STUB() \
-  do { \
-    (void)fprintf(stderr, "STUB: functionality not yet completed"); \
-    if ( _not_null(SO@uGUI@_STUB_FILE) ) { \
-      (void)fprintf(stderr, " at %s", SO@uGUI@_STUB_FILE); \
-      if ( _not_null((void *)SO@uGUI@_STUB_LINE) ) \
-        (void)fprintf(stderr, ":line %u", SO@uGUI@_STUB_LINE); \
-      if ( _not_null(SO@uGUI@_STUB_FUNC) ) \
-        (void)fprintf(stderr, ":[%s]", SO@uGUI@_STUB_FUNC); \
-    } \
-    (void)fprintf(stderr, "\n"); \
-  } while (0)
-
-#define SO@uGUI@_STUB_ONCE() \
-  do { \
-    static int first = 1; \
-    if ( first ) { \
-      first = 0; \
-      (void)fprintf(stderr, "STUB: functionality not yet completed (first and last warning)"); \
-      if ( _not_null(SO@uGUI@_STUB_FILE) ) { \
-        (void)fprintf(stderr, " at %s", SO@uGUI@_STUB_FILE); \
-        if ( _not_null((void *)SO@uGUI@_STUB_LINE) ) \
-          (void)fprintf(stderr, ":line %u", SO@uGUI@_STUB_LINE); \
-        if ( _not_null(SO@uGUI@_STUB_FUNC) ) \
-          (void)fprintf(stderr, ":[%s]", SO@uGUI@_STUB_FUNC); \
-      } \
-      (void)fprintf(stderr, "\n"); \
-    } \
-  } while (0)
-
-// *************************************************************************
-
-#define __SOXT__
-
-#if ! defined(SOXT_MAJOR_VERSION)
-#undef SOXT_MAJOR_VERSION
-#endif /* ! SOXT_MAJOR_VERSION */
-#if ! defined(SOXT_MINOR_VERSION)
-#undef SOXT_MINOR_VERSION
-#endif /* ! SOXT_MINOR_VERSION */
-#if ! defined(SOXT_MICRO_VERSION)
-#undef SOXT_MICRO_VERSION
-#endif /* ! SOXT_MICRO_VERSION */
-#if ! defined(SOXT_VERSION)
-#undef SOXT_VERSION
-#endif /* ! SOXT_VERSION */
 
 // *************************************************************************
 

@@ -39,6 +39,7 @@ static const char rcsid[] =
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/SoSceneManager.h>
 
+#include <so@lGUI@defs.h>
 #include <Inventor/@GUI@/So@GUI@Basic.h>
 #include <Inventor/@GUI@/devices/So@GUI@Mouse.h>
 #include <Inventor/@GUI@/devices/So@GUI@Keyboard.h>
