@@ -155,12 +155,13 @@ do
             test $retval -ne 0 && exit $retval
             ;;
           *)
-            echo $compiler $CPPFLAGS $cppflags $CXXFLAGS $cxxflags -c $1 \
+            basename=`echo "$1" | sed -e 's/\.[^\.]*$//'`  # strip off extension
+            echo $compiler $CPPFLAGS $cppflags $CXXFLAGS $cxxflags -c $1 -o $basename.@OBJEXT@ \
               | $preformat | sed "$sedformat"
             $compiler \
               $CPPFLAGS $cppflags \
               $CXXFLAGS $cxxflags \
-              -c $1
+              -c $1 -o $basename.@OBJEXT@
             retval=$?
             test $retval -ne 0 && exit $retval
             ;;
@@ -219,21 +220,19 @@ do
             ;;
           *.c.in | *.cpp.in | *.cxx.in | *.cc.in)
             outfile=`echo "$arg" | sed -e 's/\.in$//'`
-            basename=`echo "$outfile" | sed -e 's/\.[^\.]*$//'`
+            basename=`echo "$outfile" | sed -e 's/\.[^\.]*$//'`  # strip off extension
             $program --alternate="$alternate" --ac-subst $arg
             $program --alternate="$alternate" --compile $outfile
             retval=$?
             test $retval -ne 0 && exit $retval
-            objfile=`ls $basename.o $basename.obj 2>/dev/null`
-            objs="$objs $objfile"
+            objs="$objs $basename.@OBJEXT@"
             ;;
           *.c | *.cpp | *.cxx | *.cc)
-            basename=`echo "$arg" | sed -e 's/\.[^\.]*$//'`
+            basename=`echo "$arg" | sed -e 's/\.[^\.]*$//'`  # strip off extension
             $program --alternate="$alternate" --compile $arg
             retval=$?
             test $retval -ne 0 && exit $retval
-            objfile=`ls $basename.o $basename.obj 2>/dev/null`
-            objs="$objs $objfile"
+            objs="$objs $basename.@OBJEXT@"
             ;;
           -L*)
             extraldflags="$extraldflags $arg"
@@ -294,4 +293,3 @@ do
 done
 
 exit 0
-
