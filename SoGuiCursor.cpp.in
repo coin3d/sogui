@@ -280,6 +280,10 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
   }
 }
 
+So@Gui@Cursor::So@Gui@Cursor(const So@Gui@Cursor & cursor)
+{
+  this->commonConstructor(cursor.shape, cursor.cc);
+}
 
 /*!
   Destructor

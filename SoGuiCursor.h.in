@@ -49,6 +49,7 @@ public:
   So@Gui@Cursor(void);
   So@Gui@Cursor(const Shape shape);
   So@Gui@Cursor(const CustomCursor * cc);
+  So@Gui@Cursor(const So@Gui@Cursor & cursor);
   ~So@Gui@Cursor();
 
   Shape getShape(void) const;
