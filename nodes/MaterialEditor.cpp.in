@@ -106,7 +106,7 @@ SO_KIT_SOURCE(SoGuiMaterialEditor);
 
 SoGuiMaterialEditor::SoGuiMaterialEditor(void)
 {
-  PRIVATE(this) = new MaterialEditor;
+  this->internals = new MaterialEditor;
   PRIVATE(this)->api = this;
 
   SO_KIT_CONSTRUCTOR(SoGuiMaterialEditor); 

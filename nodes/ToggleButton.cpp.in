@@ -61,7 +61,7 @@ SO_KIT_SOURCE(SoGuiToggleButton);
 
 SoGuiToggleButton::SoGuiToggleButton(void)
 {
-  PRIVATE(this) = new ToggleButton;
+  this->internals = new ToggleButton;
   PRIVATE(this)->api = this;
 
   SO_KIT_CONSTRUCTOR(SoGuiToggleButton);

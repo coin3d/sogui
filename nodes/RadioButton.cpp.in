@@ -61,7 +61,7 @@ SO_KIT_SOURCE(SoGuiRadioButton);
 
 SoGuiRadioButton::SoGuiRadioButton(void)
 {
-  PRIVATE(this) = new RadioButton;
+  this->internals = new RadioButton;
   PRIVATE(this)->api = this;
 
   SO_KIT_CONSTRUCTOR(SoGuiRadioButton);
