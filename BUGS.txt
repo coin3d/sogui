@@ -102,3 +102,32 @@ NOTE: see also So@Gui@/BUGS.txt.
     20030916 mortene.
 
 =====================================================================
+
+004 Switching back and forth between camera types causes bugs in
+    height / heightAngle fields.
+
+    To reproduce, load a simple scene into the SoGuiExaminerViewer,
+    then switch camera modes, zoom back and forth, switch, zoom,
+    etc. Eventually, the field-of-view for the SoPerspectiveCamera
+    will go bonkers.
+
+    20040726 mortene.
+
+=====================================================================
+
+005 Switching back and forth between camera types causes weird
+    behavior with "view all".
+
+    To reproduce buggy behavior: load an iv-file just containing an
+    SoSphere node into an SoGuiExaminerViewer. Go to ortho camera,
+    click "view all", switch to perspective camera, click "view
+    all". The camera will now be a great deal further away from the
+    sphere than when in ortho camera mode.
+
+    This bug may be related to the generally buggy re-calculation of
+    height / heightAngle when switching back and forth between ortho
+    and perspective camera, as described in bug #004.
+
+    20040726 mortene.
+
+=====================================================================
