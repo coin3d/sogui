@@ -40,7 +40,6 @@ public:
   virtual void setCamera(SoCamera * newcam);
   virtual void saveHomePosition(void);
   virtual void resetToHomePosition(void);
-  virtual void recomputeSceneSize(void);
 
 protected:
   So@Gui@ConstrainedViewer(@WIDGET@ parent,

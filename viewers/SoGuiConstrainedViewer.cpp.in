@@ -188,18 +188,6 @@ So@Gui@ConstrainedViewer::resetToHomePosition(void)
 // ************************************************************************
 
 /*!
-  FIXME: doc
-*/
-void
-So@Gui@ConstrainedViewer::recomputeSceneSize(void)
-{
-  SO@GUI@_STUB();  // FIXME: re-calculate sceneHeight value. 20010907 mortene.
-  inherited::recomputeSceneSize();
-}
-
-// ************************************************************************
-
-/*!
   This method tilts the camera \a delta degrees closer to the up
   direction.
 */

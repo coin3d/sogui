@@ -155,8 +155,6 @@ public:
   void removeStartCallback(So@Gui@ViewerCB * func, void * data = NULL);
   void removeFinishCallback(So@Gui@ViewerCB * func, void * data = NULL);
 
-  virtual void recomputeSceneSize(void);
-
   void setWireframeOverlayColor(const SbColor & color);
   const SbColor & getWireframeOverlayColor(void) const;
 

@@ -2276,21 +2276,6 @@ So@Gui@Viewer::removeFinishCallback(So@Gui@ViewerCB * func, void * data)
 // *************************************************************************
 
 /*!
-  Not used, only included for compatibility reasons.
-*/
-
-void
-So@Gui@Viewer::recomputeSceneSize(
-  void)
-{
-  // FIXME: implement and use SO@GUI@_OBSOLETED(). 20010815 mortene.
-  SoDebugError::postInfo("So@Gui@Viewer::recomputeSceneSize",
-                         "this method is obsoleted, don't use it");
-}
-
-// *************************************************************************
-
-/*!
   Set the color of the overlay wireframe to \a color.
 
   \sa getWireframeOverlayColor()
