@@ -533,11 +533,10 @@ void
 ColorEditorComponent::invokeColorChangeCallbacks(void)
 {
   int i;
-  const SbColor color(this->editor->color.getValue());
   for ( i = 0; i < this->callbacks.getLength(); i += 2 ) {
     So@Gui@ColorEditorCB * callback = (So@Gui@ColorEditorCB *) this->callbacks[i];
     void * closure = this->callbacks[i+1];
-    callback(closure, &color);
+    callback(closure, &this->editor->color.getValue());
   }
 }
 
