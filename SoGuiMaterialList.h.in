@@ -1,0 +1,86 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin So@Gui@ GUI binding library.
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License version
+ *  2.1 as published by the Free Software Foundation.  See the file
+ *  LICENSE.LGPL at the root directory of the distribution for all the
+ *  details.
+ *
+ *  If you want to use Coin So@Gui@ for applications not compatible with the
+ *  LGPL, please contact SIM to acquire a Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// $Id$
+
+#ifndef SO@GUI@_MATERIALLIST_H
+#define SO@GUI@_MATERIALLIST_H
+
+#include <Inventor/@Gui@/So@Gui@Component.h>
+
+class SoMaterial;
+class SoAnyMaterialList;
+
+typedef void So@Gui@MaterialListCB(void * closure, const SoMaterial * material);
+
+// *************************************************************************
+
+class SOQT_DLL_API So@Gui@MaterialList : public So@Gui@Component {
+  SOQT_OBJECT_HEADER(So@Gui@MaterialList, So@Gui@Component);
+
+public:
+  So@Gui@MaterialList(
+    @WIDGET@ parent = NULL,
+    const char * const name = NULL,
+    SbBool embed = TRUE,
+    const char * const dir = NULL);
+  ~So@Gui@MaterialList(void);
+
+  void addCallback(
+    So@Gui@MaterialListCB * const callback,
+    void * const closure = NULL);
+  void removeCallback(
+    So@Gui@MaterialListCB * const callback,
+    void * const closure = NULL);
+
+protected:
+  So@Gui@MaterialList(
+    @WIDGET@ parent,
+    const char * const name,
+    SbBool embed,
+    const char * const dir,
+    SbBool build);
+
+  virtual const char * getDefaultWidgetName(void) const;
+  virtual const char * getDefaultTitle(void) const;
+  virtual const char * getDefaultIconTitle(void) const;
+
+  @WIDGET@ buildWidget(@WIDGET@ parent);
+  @WIDGET@ buildPulldownMenu(@WIDGET@ parent);
+
+private:
+  void constructor(const char * const dir, const SbBool build);
+
+  // FIXME: remove all this and set it up for use with a SoGuiMaterialListP class.
+
+  void selectionCallback(int i);
+  static void selection_cb(@WIDGET@, void *, void *);
+
+  void paletteMenuCallback(@WIDGET@);
+  static void palette_menu_cb(@WIDGET@, void *, void *);
+
+  @WIDGET@ listwidget;
+
+  SoAnyMaterialList * common;
+
+}; // public So@Gui@MaterialList
+
+// *************************************************************************
+
+#endif // ! SO@GUI@_MATERIALLIST_H
