@@ -40,6 +40,9 @@
 #include <windows.h>
 class SoWinGLArea;
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOMAC__
+// WORK-IN-PROGRESS
+#endif // __COIN_SOMAC__
 
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
@@ -110,6 +113,9 @@ public:
   void setCursor(HCURSOR newCursor);
   HCURSOR getCursor(void);
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOMAC__
+  // WORK-IN-PROGRESS
+#endif // __COIN_SOMAC__
 
   SbBool hasOverlayGLArea(void) const;
   SbBool hasNormalGLArea(void) const;
@@ -185,6 +191,9 @@ protected:
   void setOverlayRender(const SbBool enable);
   SbBool isOverlayRender(void) const;
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOMAC__
+  // WORK-IN-PROGRESS
+#endif // __COIN_SOMAC__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
