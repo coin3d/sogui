@@ -322,6 +322,15 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
               colbits[0], colbits[1], colbits[2], colbits[3]);
     info += s;
 
+    GLint accumbits[4];
+    glGetIntegerv(GL_RED_BITS, &accumbits[0]);
+    glGetIntegerv(GL_GREEN_BITS, &accumbits[1]);
+    glGetIntegerv(GL_BLUE_BITS, &accumbits[2]);
+    glGetIntegerv(GL_ALPHA_BITS, &accumbits[3]);
+    s.sprintf("GL_ACCUM_[RED|GREEN|BLUE|ALPHA]_BITS==[%d, %d, %d, %d]\n",
+              accumbits[0], accumbits[1], accumbits[2], accumbits[3]);
+    info += s;
+
     GLint maxdims[2];
     glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxdims);
     s.sprintf("GL_MAX_VIEWPORT_DIMS==<%d, %d>\n", maxdims[0], maxdims[1]);
