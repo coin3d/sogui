@@ -1802,10 +1802,16 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
 
   \sa setCamera()
 */
-
 SoCamera *
 So@Gui@Viewer::getCamera(void) const
 {
+  // This impossible to miss reminder was inserted so we don't
+  // accidentally let an So* v2 slip out the door without fixing this
+  // API design flaw. 20030903 mortene.
+#if (SO@GUI@_MAJOR_VERSION == 2)
+#error This is a reminder: when jumping to version 2 of an So* toolkit, the So@Gui@Viewer::getCamera() method should be made virtual.
+#endif // version = 2
+
   return PRIVATE(this)->camera;
 }
 
