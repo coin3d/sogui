@@ -216,7 +216,7 @@ SoAnyPopupMenu::AddMenuItem(
 void
 SoAnyPopupMenu::AddSeparator(
   int menuid,
-  int pos = -1 )
+  int pos )
 {
   this->menu->AddSeparator( menuid, pos );
 } // AddSeparator()
@@ -360,3 +360,11 @@ SoAnyPopupMenu::PopUp(
 } // PopUp()
 
 // *************************************************************************
+
+// silence some compilers
+const char *
+getSoAnyPopupMenuRCSId(void)
+{
+  return rcsid;
+}
+
