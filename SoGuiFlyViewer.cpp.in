@@ -47,6 +47,11 @@ static const char rcsid[] =
   FIXME: document (all mouse controls, all keyboard controls, ...)
 */
 
+/*
+  TODO
+  - animate camera when changing up-vector.
+*/
+
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
 // #include <Inventor/SbViewportRegion.h>
@@ -59,9 +64,9 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoScale.h>
 #include <Inventor/nodes/SoTranslation.h>
-#if SO@GUI@_DEBUG
+// #if SO@GUI@_DEBUG
 #include <Inventor/errors/SoDebugError.h>
-#endif // SO@GUI@_DEBUG
+// #endif // SO@GUI@_DEBUG
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
 
@@ -80,12 +85,14 @@ public:
     this->sscale = NULL;
     this->button1down = FALSE;
     this->button3down = FALSE;
+    this->lctrldown = 0;
+    this->rctrldown = 0;
     this->lastrender = NULL;
   }
   ~So@Gui@FlyViewerP(void);
 
   enum ViewerMode {
-    FLYING, WAITING_FOR_SEEK, WAITING_FOR_UP_PICK
+    FLYING, TILTING, WAITING_FOR_SEEK, WAITING_FOR_UP_PICK
   };
 
   void dolly( const float delta ) const;
@@ -103,17 +110,21 @@ public:
   void updateSpeedIndicator(void);
 
   SbBool button1down, button3down;
+  int lctrldown, rctrldown;
 
   SoSearchAction * searcher;
 
   SoNode * superimposition;
-  SoScale * sscale;
   SoCoordinate3 * sgeometry;
-  SoTranslation * stranslation;
-  SoSwitch * smaxspeedswitch, * scurrentspeedswitch;
+  SoScale * sscale, * crossscale;
+  SoTranslation * stranslation, * crossposition;
+  SoSwitch * smaxspeedswitch, * scurrentspeedswitch, * crossswitch;
   void superimpositionevent(SoAction * action);
   static void superimposition_cb(void * closure, SoAction * action);
-  SbVec2s mouseloc;
+
+  SbVec2s mouseloc, tiltpos;
+  SbRotation tiltrotation;
+  SbVec3f tiltup;
 
   SoNode * getSuperimpositionNode(const char * name);
 private:
@@ -194,6 +205,7 @@ So@Gui@FlyViewer::constructor( // private
     "    farDistance 1",
     "  }",
     "  DEF so@gui@->callback Callback { }",
+    "  Separator {",
     "  DEF so@gui@->translation Translation {",
     "    translation 0 0 0",
     "  }",
@@ -234,8 +246,8 @@ So@Gui@FlyViewer::constructor( // private
     "    }",
     "  }",
     // the coordinate system
-    "  Material {",
-    "    emissiveColor 1 1 1",
+    "  BaseColor {",
+    "    rgb 1 1 1",
     "  }",
     "  IndexedLineSet {",
     "    coordIndex [",
@@ -257,11 +269,25 @@ So@Gui@FlyViewer::constructor( // private
     "      ]",
     "    }",
     "  }",
+    "  }",
     // cross
     "  DEF so@gui@->crossswitch Switch {",
     "    whichChild -1",
+    "    DEF so@gui@->crossposition Translation {",
+    "      translation 0 0 0",
+    "    }",
+    "    DEF so@gui@->crossscale Scale {",
+    "      scaleFactor 1 1 1",
+    "    }",
+    "    BaseColor {",
+    "      rgb 1 0 0",
+    "    }",
     "    Coordinate3 {",
     "      point [",
+    "        0 -1  0,",
+    "        0  1  0,",
+    "       -1  0  0,",
+    "        1  0  0",
     "      ]",
     "    }",
     "    IndexedLineSet {",
@@ -303,6 +329,12 @@ So@Gui@FlyViewer::constructor( // private
     PRIVATE(this)->getSuperimpositionNode("so@gui@->maxspeedswitch");
   PRIVATE(this)->scurrentspeedswitch = (SoSwitch *)
     PRIVATE(this)->getSuperimpositionNode("so@gui@->currentspeedswitch");
+  PRIVATE(this)->crossswitch = (SoSwitch *)
+    PRIVATE(this)->getSuperimpositionNode("so@gui@->crossswitch");
+  PRIVATE(this)->crossposition = (SoTranslation *)
+    PRIVATE(this)->getSuperimpositionNode("so@gui@->crossposition");
+  PRIVATE(this)->crossscale = (SoScale *)
+    PRIVATE(this)->getSuperimpositionNode("so@gui@->crossscale");
 
   SoCallback * cb = (SoCallback *)
     PRIVATE(this)->getSuperimpositionNode("so@gui@->callback");
@@ -459,18 +491,96 @@ So@Gui@FlyViewer::processSoEvent( // virtual
   if ( event->isOfType(SoKeyboardEvent::getClassTypeId()) ) {
     // FIXME: only in fly mode
     const SoKeyboardEvent * const ke = (const SoKeyboardEvent *) event;
-    const SbBool release = ke->getState() == SoButtonEvent::UP ? TRUE : FALSE;
-    if ( release ) {
-      if ( ke->getKey() == SoKeyboardEvent::U ) {
-        // either to switch to up-vector pick mode, or back to fly
-        // mode if pick-mode already activated (ie cancel the
-        // up-vector pick operation)
-        SbBool uppickmode =
-          PRIVATE( this )->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
-        PRIVATE( this )->setMode( uppickmode ? So@Gui@FlyViewerP::FLYING :
-                                  So@Gui@FlyViewerP::WAITING_FOR_UP_PICK );
-        return TRUE;
+    switch ( ke->getState() ) {
+    case SoButtonEvent::UP:
+      switch ( ke->getKey() ) {
+      case SoKeyboardEvent::U:
+        do {
+          // either to switch to up-vector pick mode, or back to fly
+          // mode if pick-mode already activated (ie cancel the
+          // up-vector pick operation)
+          SbBool uppickmode =
+            PRIVATE( this )->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
+          PRIVATE( this )->setMode( uppickmode ? So@Gui@FlyViewerP::FLYING :
+                                    So@Gui@FlyViewerP::WAITING_FOR_UP_PICK );
+          return TRUE;
+        } while ( FALSE );
+        break; 
+      case SoKeyboardEvent::LEFT_CONTROL:
+        PRIVATE(this)->lctrldown -= 1;
+        if ( PRIVATE(this)->lctrldown < 0 ) {
+#if SO@GUI@_DEBUG
+          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+                             "left control button count < 0");
+#endif
+          PRIVATE(this)->lctrldown = 0;
+        }
+        break;
+      case SoKeyboardEvent::RIGHT_CONTROL:
+        PRIVATE(this)->rctrldown -= 1;
+        if ( PRIVATE(this)->rctrldown < 0 ) {
+#if SO@GUI@_DEBUG
+          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+                             "right control button count < 0");
+#endif
+          PRIVATE(this)->rctrldown = 0;
+        }
+        break;
+      default:
+        break;
       }
+      break;
+    case SoButtonEvent::DOWN:
+      switch ( ke->getKey() ) {
+      case SoKeyboardEvent::LEFT_CONTROL:
+        PRIVATE(this)->lctrldown += 1;
+        if ( PRIVATE(this)->lctrldown > 2 ) {
+#if SO@GUI@_DEBUG
+          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+                             "left control button count > 2");
+#endif
+          PRIVATE(this)->lctrldown = 2;
+        }
+        break;
+      case SoKeyboardEvent::RIGHT_CONTROL:
+        PRIVATE(this)->rctrldown += 1;
+        if ( PRIVATE(this)->rctrldown > 2 ) {
+#if SO@GUI@_DEBUG
+          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+                             "right control button count > 2");
+#endif
+          PRIVATE(this)->rctrldown = 2;
+        }
+        break;
+      default:
+        break; 
+      }
+      break;
+    default:
+      break;
+    }
+
+    if ( (PRIVATE(this)->getMode() == So@Gui@FlyViewerP::FLYING) &&
+         (PRIVATE(this)->lctrldown || PRIVATE(this)->rctrldown) ) {
+      PRIVATE(this)->setMode(So@Gui@FlyViewerP::TILTING);
+      PRIVATE(this)->tiltrotation = camera->orientation.getValue();
+      PRIVATE(this)->tiltup = this->getUpDirection();
+      PRIVATE(this)->tiltpos = PRIVATE(this)->mouseloc;
+      PRIVATE(this)->currentspeed = 0.0f;
+      PRIVATE(this)->maxspeed = 0.0f;
+      PRIVATE(this)->updateSpeedIndicator();
+      PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_ALL);
+      SoCamera * camera = this->getCamera();
+      assert(camera != NULL);
+      this->scheduleRedraw();
+      // NOTE; this could be optimized to only draw the superimposition in
+      // question if speed is zero.
+    } else if ( (PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING) &&
+                !PRIVATE(this)->lctrldown && !PRIVATE(this)->rctrldown ) {
+      PRIVATE(this)->setMode(So@Gui@FlyViewerP::FLYING);
+      assert( PRIVATE(this)->crossswitch != NULL );
+      PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_NONE);
+      this->scheduleRedraw();
     }
   }
 
@@ -564,8 +674,34 @@ So@Gui@FlyViewer::processSoEvent( // virtual
   }
 
   else if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
-    // FIXME: only for fly mode
+    if ( PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING ) {
+      SbVec2s newpos = ((SoLocation2Event *) event)->getPosition();
+      float dx = newpos[0] - PRIVATE(this)->tiltpos[0];
+      float dy = newpos[1] - PRIVATE(this)->tiltpos[1];
+      // SoDebugError::postInfo("processSoEvent", "delta(%g, %g)", dx, dy);
+      if ( dx != 0.0f || dy != 0.0f ) {
+        SoCamera * camera = this->getCamera();
+        assert(camera != NULL);
+        // SbVec3f up(this->getUpDirection());
+        SbVec3f up(PRIVATE(this)->tiltup);
+        SbVec3f dir;
+        // SbRotation orientation(camera->orientation.getValue());
+        SbRotation orientation(PRIVATE(this)->tiltrotation);
+        orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
+        SbVec3f horizon(dir.cross(up));
+        horizon.normalize();
+        SbRotation tilt = SbRotation(horizon, dy / 100.0f);
+        SbVec3f newup;
+        tilt.multVec(up, newup);
+        SbRotation newOrientation = PRIVATE(this)->tiltrotation;
+        newOrientation *= tilt;
+        newOrientation *= SbRotation(newup, -dx / 100.0f);
+        camera->orientation.setValue(newOrientation);
+        this->setUpDirection(newup);
+      }
+    }
     PRIVATE(this)->mouseloc = ((SoLocation2Event *) event)->getPosition();
+    return TRUE;
   }
 
   return inherited::processSoEvent( event );
@@ -792,6 +928,7 @@ So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
   searcher->reset();
   searcher->setName(SbName(name));
   searcher->setInterest(SoSearchAction::FIRST);
+  searcher->setSearchingAll(TRUE);
   searcher->apply(this->superimposition);
   assert(searcher->getPath());
   return searcher->getPath()->getTail();
@@ -822,6 +959,33 @@ So@Gui@FlyViewerP::superimpositionevent(
   else
     factorx *= float(viewport[0]) / 400.0f;
   this->sscale->scaleFactor.setValue( SbVec3f(factorx, factory, 1.0f) );
+
+  if ( this->getMode() == TILTING ) {
+    assert( this->crossposition != NULL );
+    assert( this->crossscale != NULL );
+    float tx = float(this->tiltpos[0]-float(viewport[0])/2.0f)/(float(viewport[0]));
+    float ty = float(this->tiltpos[1]-float(viewport[1])/2.0f)/(float(viewport[1]));
+    if ( aspect > 1.0f ) tx *= aspect;
+    else ty /= aspect;
+    this->crossposition->translation.setValue(SbVec3f(tx, ty, 0));
+
+    float sx = (1.0f/float(viewport[0])) * 15.0f;
+    float sy = (1.0f/float(viewport[1])) * 15.0f;
+    if ( aspect > 1.0f ) sx *= aspect;
+    else sy /= aspect;
+    this->crossscale->scaleFactor.setValue(SbVec3f(sx, sy, 0));
+
+
+    //if ( aspect < 1.0f ) {
+    //  factorx /= aspect;
+    //  factory /= aspect;
+    //}
+    //if ( viewport[0] > 500 )
+    //  factorx *= 500.0f / 400.0f;
+    //else
+    //  factorx *= float(viewport[0]) / 400.0f;
+    
+  }
 } // superimpositionevent()
 
 void
