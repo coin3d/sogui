@@ -51,6 +51,8 @@ class So@GUI@Device;
 class So@GUI@Keyboard;
 class So@GUI@Mouse;
 
+#define SO_GL_DEFAULT_MODE (SO_GL_RGB | SO_GL_ZBUFFER | SO_GL_DOUBLE)
+
 // *************************************************************************
 
 typedef SbBool So@GUI@RenderAreaEventCB( void * user, @EVENT@ event );
@@ -137,9 +139,9 @@ protected:
 
   SbBool invokeAppCB( @EVENT@ event );
 
+  virtual void glInit(void);
   virtual void glReshape( int width, int height );
   virtual void glRender(void);
-  virtual void glInit(void);
 
 private:
   void constructor( SbBool mouseInput, SbBool keyboardInput );

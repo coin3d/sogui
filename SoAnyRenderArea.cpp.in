@@ -17,7 +17,8 @@
  *
  **************************************************************************/
 
-//  $Id$
+static const char rcsid[] =
+  "$Id$";
 
 /**************************************************************************\
  *
@@ -31,18 +32,16 @@
 \**************************************************************************/
 
 #include <assert.h>
-#include <common/soguidefs.h>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/SoSceneManager.h>
 
+#include <Inventor/@GUI@/common/soguidefs.h>
 #include <Inventor/@GUI@/devices/So@GUI@Mouse.h>
 #include <Inventor/@GUI@/devices/So@GUI@Keyboard.h>
 
 #include <Inventor/@GUI@/So@GUI@RenderArea.h>
-
-#define DEFAULT_GL_MODE (SO_GL_RGB | SO_GL_ZBUFFER | SO_GL_DOUBLE)
 
 // *************************************************************************
 
@@ -55,7 +54,7 @@ So@GUI@RenderArea::So@GUI@RenderArea(
   SbBool inParent,
   SbBool mouseInput,
   SbBool keyboardInput )
-: inherited( parent, name, inParent, DEFAULT_GL_MODE, FALSE )
+: inherited( parent, name, inParent, SO_GL_DEFAULT_MODE, FALSE )
 {
   this->constructor( mouseInput, keyboardInput );
   this->buildWidget( inParent != FALSE ? parent : NULL );
@@ -71,7 +70,7 @@ So@GUI@RenderArea::So@GUI@RenderArea( // protected
   SbBool mouseInput,
   SbBool keyboardInput,
   SbBool build )
-: inherited( parent, name, inParent, DEFAULT_GL_MODE, FALSE )
+: inherited( parent, name, inParent, SO_GL_DEFAULT_MODE, FALSE )
 {
   this->constructor( mouseInput, keyboardInput );
   if ( build )
