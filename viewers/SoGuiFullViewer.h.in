@@ -357,8 +357,6 @@ protected:
   SbBool popupEnabled;
   SbPList * viewerButtonWidgets;
 
-  Pixmap createPixmapFromXpmData(Widget button, char ** xpm);
-  Pixmap createInsensitivePixmapFromXpmData(Widget button, char ** xpm);
   Widget prefshell;
   Widget prefsheet;
 
