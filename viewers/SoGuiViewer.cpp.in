@@ -2745,7 +2745,6 @@ So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   Near and far clipping planes are specified in the camera fields
   nearDistance and farDistance.
 */
-
 void
 So@Gui@ViewerP::setClippingPlanes(void)
 {
@@ -2781,26 +2780,65 @@ So@Gui@ViewerP::setClippingPlanes(void)
   float nearval = -box.getMax()[2];
   float farval = -box.getMin()[2];
 
-  // This factor should really be made dependent on the underlying
-  // hardware or software Z buffer resolution.
-  const float SLACK = 1.0f/1000.0f;
+  // FIXME: what if we have a weird scale transform in the scenegraph?
+  // Could we end up with nearval > farval then? Investigate, then
+  // either use an assert() (if it can't happen) or an So@Gui@Swap()
+  // (to handle it). 20020116 mortene.
 
-  // Scene is completely behind us.
-  if (farval < SLACK) return;
-
-
-  float farslack = SLACK * farval;
+  // Check if scene is completely behind us.
+  if (farval <= 0.0f) { return; }
 
   if (pub->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
-    // Disallow negative near clipping plane distance, and make sure the
-    // z-buffer depth utilization is kept below a certain threshold.
-    nearval = farslack > nearval ? farslack : nearval;
+    // Disallow negative near clipping plane distance.
+    if (nearval <= 0.0f) {
+      // Set to a short distance, but make sure we're still well below
+      // the far clipping plane distance (in case that is also very
+      // short).
+      nearval = So@Gui@Min(0.1f, farval / 5000.0f);
+      // (The "5000" magic constant was found by fiddling around a bit
+      // on an OpenGL implementation with a 16-bit depth-buffer
+      // resolution, adjusting to find something that would work well
+      // with both a very "stretched" / deep scene and a more compact
+      // single-model one.)
+    }
   }
 
-  // Give a bit of slack to avoid artifacts when scene fits exactly
-  // inside bounding box.
+  // Some slack around the bounding box, in case the scene fits
+  // exactly inside it. This is done to minimize the chance of
+  // artifacts caused by the limitation of the z-buffer
+  // resolution. One common artifact if this is not done is that the
+  // near clipping plane cuts into the corners of the model as it's
+  // rotated.
+  const float SLACK = 0.001f;
+
   pub->camera->nearDistance = nearval * (1.0f - SLACK);
   pub->camera->farDistance = farval * (1.0f + SLACK);
+
+
+  // FIXME: there's a possible optimization to take advantage of here,
+  // since we are able to sometimes know for sure that all geometry is
+  // completely inside the view volume. I quote from the "OpenGL FAQ
+  // and Troubleshooting Guide":
+  //
+  //  "10.050 I know my geometry is inside the view volume. How can I
+  //  turn off OpenGL's view-volume clipping to maximize performance?
+  //
+  //   Standard OpenGL doesn't provide a mechanism to disable the
+  //   view-volume clipping test; thus, it will occur for every
+  //   primitive you send.
+  //
+  //   Some implementations of OpenGL support the
+  //   GL_EXT_clip_volume_hint extension. If the extension is
+  //   available, a call to
+  //   glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT,GL_FASTEST) will inform
+  //   OpenGL that the geometry is entirely within the view volume and
+  //   that view-volume clipping is unnecessary. Normal clipping can
+  //   be resumed by setting this hint to GL_DONT_CARE. When clipping
+  //   is disabled with this hint, results are undefined if geometry
+  //   actually falls outside the view volume."
+  //
+  // 20020117 mortene.
+
 
   if (SO@GUI@_DEBUG && 0) { // debug
     SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
