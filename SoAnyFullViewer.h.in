@@ -103,6 +103,7 @@ public:
   ~SoAnyFullViewer(void);
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);
+  void prepareMenu( SoAnyPopupMenu * menu );
 
   void setDrawStyleMenuActivation(
     So@Gui@Viewer::DrawType type,

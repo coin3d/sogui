@@ -236,7 +236,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
                            DELAYED_BLEND_TRANSPARENCY_ITEM );
   menu->addRadioGroupItem( TRANSPARENCY_GROUP,
                            SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
-  switch ( this->viewer->getGLRenderAction()->getTransparencyType() ) {
+  switch ( this->viewer->getTransparencyType() ) {
   case SoGLRenderAction::SCREEN_DOOR:
     menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
     break;
@@ -258,7 +258,8 @@ SoAnyFullViewer::setupStandardPopupMenu(
   case SoGLRenderAction::SORTED_OBJECT_BLEND:
     menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
-  } // switch ( this->viewer->getGLRenderAction()->getTransparencyType() )
+  default: assert( FALSE && "unknown transparency type" );
+  } // switch ( this->viewer->getTransparencyType() )
 
   menu->addMenuItem( TRANSPARENCY_TYPE_MENU, SCREEN_DOOR_TRANSPARENCY_ITEM );
   menu->addMenuItem( TRANSPARENCY_TYPE_MENU, ADD_TRANSPARENCY_ITEM );
@@ -327,6 +328,37 @@ SoAnyFullViewer::setupStandardPopupMenu(
   this->prefmenu = menu;
   return menu;
 } // buildPopupMenu()
+
+// ************************************************************************
+
+void
+SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
+{
+  switch ( this->viewer->getTransparencyType() ) {
+  case SoGLRenderAction::SCREEN_DOOR:
+    menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::ADD:
+    menu->setMenuItemMarked( ADD_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::DELAYED_ADD:
+    menu->setMenuItemMarked( DELAYED_ADD_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::SORTED_OBJECT_ADD:
+    menu->setMenuItemMarked( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::BLEND:
+    menu->setMenuItemMarked( BLEND_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::DELAYED_BLEND:
+    menu->setMenuItemMarked( DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE );
+    break;
+  case SoGLRenderAction::SORTED_OBJECT_BLEND:
+    menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
+    break;
+  default: assert( FALSE && "unknown transparency type" );
+  }
+}
 
 // ************************************************************************
 
@@ -550,42 +582,38 @@ SoAnyFullViewer::drawstyleActivated(
     break;
   } // switch ( menuitemid )
 
-  do {
-    SoGLRenderAction * const ra = this->viewer->getGLRenderAction();
-    assert( ra != NULL );
-    switch ( menuitemid ) {
-    case SCREEN_DOOR_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::SCREEN_DOOR );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case ADD_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::ADD );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case DELAYED_ADD_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::DELAYED_ADD );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_ADD );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case BLEND_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::BLEND );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case DELAYED_BLEND_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::DELAYED_BLEND );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
-      ra->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
-      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
-      return;
-    default:
-      break;
-    } // switch ( menuitemid )
-  } while ( FALSE );
+  switch ( menuitemid ) {
+  case SCREEN_DOOR_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::SCREEN_DOOR );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case ADD_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::ADD );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case DELAYED_ADD_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_ADD );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_ADD );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case BLEND_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::BLEND );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case DELAYED_BLEND_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_BLEND );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
+    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
+    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
+    return;
+  default:
+    break;
+  } // switch ( menuitemid )
 
   So@Gui@Viewer::DrawStyle val = So@Gui@Viewer::VIEW_AS_IS;
   switch ( menuitemid ) {
