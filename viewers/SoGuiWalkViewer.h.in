@@ -55,6 +55,7 @@ protected:
   virtual const char * getDefaultIconTitle(void) const;
 
   virtual void processEvent(@EVENT@ event);
+
   virtual void setSeekMode(SbBool enable);
   virtual void actualRedraw(void);
 
@@ -82,7 +83,6 @@ protected:
 private:
   void constructor(SbBool build);
 
-  class SoAnyWalkViewer * const common;
   Widget * prefparts;
   int numprefparts;
 
@@ -99,14 +99,11 @@ private:
 
 #ifdef __COIN_SOGTK__
 protected:
-  virtual SbBool processSoEvent(const SoEvent * const event);
   virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
 
 private:
   void constructor(const SbBool build);
   // friends and family
-  class SoAnyWalkViewer * common;
-  friend class SoAnyWalkViewer;
   class SoGtkWalkViewerP * pimpl;
   friend class SoGtkWalkViewerP;
 #endif // ! __COIN_SOGTK__
