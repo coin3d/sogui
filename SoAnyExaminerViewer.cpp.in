@@ -887,7 +887,7 @@ SoAnyExaminerViewer::processSoEvent(
         }
         break;
 
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
         this->zoom( -0.1f );
         processed = TRUE;
@@ -898,7 +898,7 @@ SoAnyExaminerViewer::processSoEvent(
         processed = TRUE;
         break;
 
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       default:
         break;
       } // switch ( button )
@@ -959,7 +959,7 @@ SoAnyExaminerViewer::processSoEvent(
         processed = TRUE;
         break;
 
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
         processed = TRUE; // don't pass on
         break;
@@ -968,7 +968,7 @@ SoAnyExaminerViewer::processSoEvent(
         processed = TRUE; // don't pass on
         break;
 
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       default:
         break;
       } // switch ( button )

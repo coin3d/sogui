@@ -235,8 +235,8 @@ protected:
   SoGetBoundingBoxAction * autoClipBboxAction;
   float minimumNearPlane; // % of far plane
 
-  SoNode * sceneGraph; // userroot
   SoSeparator * sceneRoot; // viewerroot
+  SoNode * sceneGraph; // userroot
 
 private:
   class SoGuiViewerP * pimpl;

@@ -443,7 +443,7 @@ SoAnyPlaneViewer::processSoEvent(
         }
         break;
 
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
         this->zoom( 0.1f );
         break;
@@ -451,7 +451,7 @@ SoAnyPlaneViewer::processSoEvent(
       case SoMouseButtonEvent::BUTTON5:
         this->zoom( -0.1f );
         break;
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
 
       default:
         break;
