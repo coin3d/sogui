@@ -179,6 +179,9 @@ private:
 
 #ifdef __COIN_SOXT__
 public:
+  GLXContext getNormalContext(void);
+  GLXContext getOverlayContext(void);
+
   Window getNormalWindow(void);
   Window getOverlayWindow(void);
 
