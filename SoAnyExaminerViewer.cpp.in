@@ -986,12 +986,12 @@ SoAnyExaminerViewer::processSoEvent(
          (this->button3down && this->controldown) ) {
       this->zoomByCursor( posn, prevnormalized );
     }
+    else if ( (this->button1down && this->controldown) || this->button3down ) {
+      this->pan( posn, prevnormalized );
+    }
     else if ( this->button1down ) {
       this->addToLog( event->getPosition(), event->getTime() );
       this->spin( posn );
-    }
-    else if ( this->button3down ) {
-      this->pan( posn, prevnormalized );
     }
 
   }
