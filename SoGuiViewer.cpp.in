@@ -603,8 +603,8 @@ So@Gui@Viewer::getCameraType(void) const
 void
 So@Gui@Viewer::viewAll(void)
 {
-  assert(this->camera);
-  this->camera->viewAll( this->sceneGraph, this->getViewportRegion() );
+  if ( this->camera && this->sceneGraph )
+    this->camera->viewAll( this->sceneGraph, this->getViewportRegion() );
 } // viewAll()
 
 // *************************************************************************
