@@ -93,9 +93,9 @@ public:
   static const char * getVersionString(void);
 
   enum FatalErrors {
-    NO_OPENGL_CANVAS = 0,
-    INTERNAL_ASSERT,
-    UNSPECIFIED_ERROR
+    UNSPECIFIED_ERROR = 0,
+    NO_OPENGL_CANVAS,
+    INTERNAL_ASSERT
   };
   typedef void FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode,
                             void * userdata);
