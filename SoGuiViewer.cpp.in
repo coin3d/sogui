@@ -104,16 +104,8 @@ static const char rcsid[] =
 #define M_PI 3.1415926535f
 #endif // ! M_PI
 
-// FIXME: this is just a temporary hack to enable the FPS counter. We
-// should really write a proper interface against it, so applications
-// can set up feedback loops to control scene complexity and get a
-// nice and steady maximum framerate, for instance.
-//
-// For anyone who want to execute that task, check what TGS has done
-// first. If their API is fine, use the same approach.
-//
-// 20001124 mortene.
-#define I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER 0
+// environment variable
+static int COIN_SHOW_FPS_COUNTER = -1;
 
 // *************************************************************************
 
@@ -2751,6 +2743,16 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 }
 
 
+// FIXME: the following is just a temporary hack to enable the FPS
+// counter. We should really write a proper interface against it, so
+// applications can set up feedback loops to control scene complexity
+// and get a nice and steady maximum framerate, for instance.
+//
+// For anyone who want to execute that task, check what TGS has done
+// first. If their API is fine, use the same approach.
+//
+// 20001124 mortene.
+
 /*!
   Draw a text string showing the current frame-per-seconds value in
   the lower left corner of the OpenGL canvas (after recording
@@ -2764,26 +2766,32 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 void
 So@Gui@Viewer::recordFPS(void)
 {
-#if I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER
-  double frametime, timeofday = SbTime::getTimeOfDay().getValue();
-  if((THIS->lasttimeofday == 0.0) ||
-     ((timeofday - THIS->lasttimeofday) > 1.0)) {
-    this->resetFrameCounter();
-    
-    frametime = 0.0;
-    THIS->lasttimeofday = timeofday;
+  if (COIN_SHOW_FPS_COUNTER == -1) {
+    char * env = getenv("COIN_SHOW_FPS_COUNTER");
+    if (env) COIN_SHOW_FPS_COUNTER = atoi(env);
+    else COIN_SHOW_FPS_COUNTER = 0;
   }
-  else {
-    frametime = timeofday - THIS->lasttimeofday;
-    THIS->lasttimeofday = timeofday;
-    this->addFrametime(frametime);
 
-    char buffer[64];
-    int nr = sprintf(buffer, "%.1f fps", 1.0/THIS->currentframetime);
-    assert(nr < 64);
-    Draw2DString(buffer, this->getGlxSize(), SbVec2f(10, 10));
+  if (COIN_SHOW_FPS_COUNTER) {
+    double frametime, timeofday = SbTime::getTimeOfDay().getValue();
+    if((THIS->lasttimeofday == 0.0) ||
+       ((timeofday - THIS->lasttimeofday) > 1.0)) {
+      this->resetFrameCounter();
+    
+      frametime = 0.0;
+      THIS->lasttimeofday = timeofday;
+    }
+    else {
+      frametime = timeofday - THIS->lasttimeofday;
+      THIS->lasttimeofday = timeofday;
+      this->addFrametime(frametime);
+
+      char buffer[64];
+      int nr = sprintf(buffer, "%.1f fps", 1.0/THIS->currentframetime);
+      assert(nr < 64);
+      Draw2DString(buffer, this->getGlxSize(), SbVec2f(10, 10));
+    }
   }
-#endif // I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER
 }
 
 // *************************************************************************
