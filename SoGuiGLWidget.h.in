@@ -37,9 +37,6 @@ class QEvent;
 #ifdef __COIN_SOGTK__
 #include <gtk/gtk.h>
 #endif // __COIN_SOGTK__
-#ifdef __COIN_SOWIN__
-#include <windows.h>
-#endif // __COIN_SOWIN__
 
 // *************************************************************************
 
@@ -167,25 +164,6 @@ protected:
   int getDisplayListShareGroup(GLXContext context);
   Widget getGlxMgrWidget(void);
 #endif // __COIN_SOXT__
-#ifdef __COIN_SOWIN__
-public:
-  HWND getNormalWindow(void) const;
-  HWND getOverlayWindow(void) const;
-  HDC getNormalDC(void) const;
-  HDC getOverlayDC(void) const;
-
-  void setStealFocus(SbBool doStealFocus);
-
-  // FIXME: get rid of these. If someone cries up, we should rather
-  // make a new API method for registering a callback for
-  // user-supplied evaluation of available formats. 20020729 mortene.
-  virtual void setNormalVisual(PIXELFORMATDESCRIPTOR * vis);
-  PIXELFORMATDESCRIPTOR * getNormalVisual(void);
-  virtual void setOverlayVisual(PIXELFORMATDESCRIPTOR * vis);
-  PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
-  virtual void setPixelFormat(int format);
-  int getPixelFormat(void);
-#endif // __COIN_SOWIN__
 
 #ifdef __COIN_SOGTK__
 protected:
