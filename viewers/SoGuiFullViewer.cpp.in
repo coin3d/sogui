@@ -38,12 +38,6 @@
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/errors/SoDebugError.h>
 
-#ifdef __COIN_SOGTK__
-#include <Inventor/Gtk/widgets/gtkthumbwheel.h>
-#else // SoXt, SoWin, SoQt
-#include <Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h>
-#endif
-
 // ************************************************************************
 
 #define PRIVATE(o) (o->pimpl)
@@ -181,14 +175,6 @@ So@Gui@FullViewer::leftWheelFinish(void)
   this->interactiveCountDec();
 }
 
-#ifdef __COIN_SOXT__
-#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) SoXtThumbWheelSetValue(wheel, val)
-#elif defined(__COIN_SOGTK__)
-#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) gtk_thumbwheel_set_value(GTK_THUMBWHEEL(wheel), val)
-#else // SoQt, SoWin
-#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) ((So@Gui@ThumbWheel *)wheel)->setValue(val)
-#endif
-
 /*!
   Set a new value for the left thumbwheel.
 */
@@ -196,7 +182,11 @@ void
 So@Gui@FullViewer::setLeftWheelValue(const float value)
 {
   this->leftWheelVal = value;
-  SO@GUI@_SETTHUMBWHEEL_VAL(this->leftWheel, value);
+  // Wheel may not be constructed yet, but we need to be robust, as
+  // set*WheelValue() is used from subclasses.
+  if (this->leftWheel) {
+    So@Gui@FullViewerP::setThumbWheelValue(this->leftWheel, value);
+  }
 }
 
 /*!
@@ -259,7 +249,11 @@ void
 So@Gui@FullViewer::setBottomWheelValue(const float value)
 {
   this->bottomWheelVal = value;
-  SO@GUI@_SETTHUMBWHEEL_VAL(this->bottomWheel, value);
+  // Wheel may not be constructed yet, but we need to be robust, as
+  // set*WheelValue() is used from subclasses.
+  if (this->bottomWheel) {
+    So@Gui@FullViewerP::setThumbWheelValue(this->bottomWheel, value);
+  }
 }
 
 /*!
@@ -322,7 +316,11 @@ void
 So@Gui@FullViewer::setRightWheelValue(const float value)
 {
   this->rightWheelVal = value;
-  SO@GUI@_SETTHUMBWHEEL_VAL(this->rightWheel, value);
+  // Wheel may not be constructed yet, but we need to be robust, as
+  // set*WheelValue() is used from subclasses.
+  if (this->rightWheel) {
+    So@Gui@FullViewerP::setThumbWheelValue(this->rightWheel, value);
+  }
 }
 
 /*!
