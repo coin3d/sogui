@@ -47,7 +47,8 @@ static const char rcsid[] =
 
 SoAnyFullViewer::SoAnyFullViewer(
   So@Gui@FullViewer * const _viewer )
-: viewer( _viewer )
+  : viewer( _viewer ),
+    prefmenu( NULL )
 {
   assert( _viewer != NULL );
 } // SoAnyFullViewer()
@@ -75,6 +76,8 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->SetMenuTitle( FUNCTIONS_MENU, "Functions" );
   menu->NewMenu( "drawstylesmenu", DRAWSTYLES_MENU );
   menu->SetMenuTitle( DRAWSTYLES_MENU, "Draw Styles" );
+  menu->NewMenu( "stereomenu", STEREO_MENU );
+  menu->SetMenuTitle( STEREO_MENU, "Stereo Viewing" );
   menu->NewMenuItem( "examining", EXAMINING_ITEM );
   menu->SetMenuItemTitle( EXAMINING_ITEM, "Viewing" );
   menu->NewMenuItem( "decoration", DECORATION_ITEM );
@@ -86,6 +89,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
 
   menu->AddMenu( ROOT_MENU, FUNCTIONS_MENU );
   menu->AddMenu( ROOT_MENU, DRAWSTYLES_MENU );
+  menu->AddMenu( ROOT_MENU, STEREO_MENU );
   menu->AddMenuItem( ROOT_MENU, EXAMINING_ITEM );
   menu->AddMenuItem( ROOT_MENU, DECORATION_ITEM );
   menu->AddMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
@@ -260,6 +264,26 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->AddMenuItem( TRANSPARENCY_TYPE_MENU,
                      SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
 
+
+  menu->NewMenuItem( "stereooff", STEREO_OFF_ITEM );
+  menu->NewMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
+  menu->SetMenuItemTitle( STEREO_OFF_ITEM, "Off" );
+  menu->SetMenuItemTitle( STEREO_ANAGLYPH_ITEM, "Red/Cyan" );
+
+  menu->NewRadioGroup( STEREO_GROUP );
+  menu->AddRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
+  menu->AddRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
+
+  if (this->viewer->isStereoViewing()) {
+    menu->SetMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
+  }
+  else {
+    menu->SetMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+  }
+  
+  menu->AddMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
+  menu->AddMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
+
   menu->NewMenu( "renderbuffertype", RENDER_BUFFER_TYPE_MENU );
   menu->SetMenuTitle( RENDER_BUFFER_TYPE_MENU, "Render Buffer Type" );
 
@@ -296,6 +320,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->AddMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
     (void *) this );
 
+  this->prefmenu = menu;
   return menu;
 } // buildPopupMenu()
 
@@ -388,6 +413,16 @@ SoAnyFullViewer::menuSelection( // virtual
     this->drawstyleActivated( menuitemid );
     break;
 
+  case STEREO_OFF_ITEM:    
+    this->prefmenu->SetMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+    this->viewer->setStereoViewing(FALSE);
+    break;
+  case STEREO_ANAGLYPH_ITEM:
+    this->prefmenu->SetMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
+    this->viewer->setStereoViewing(TRUE);
+    this->viewer->scheduleRedraw();
+    break;
+    
   default:
     SoDebugError::postInfo( "So@Gui@FullViewer::menuSelection",
       "popup menu handling for item %d is not implemented", menuitemid );

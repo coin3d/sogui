@@ -394,6 +394,9 @@ So@Gui@Viewer::So@Gui@Viewer(
   this->adjustclipplanes = TRUE;
   this->autoClipBboxAction = NULL;
 
+  this->stereoviewing = FALSE;
+  this->stereooffset = 0.1f;
+
   if ( build ) {
     this->setClassName( "So@Gui@Viewer" );
     @WIDGET@ widget = this->buildWidget( this->getParentWidget() );
@@ -957,17 +960,18 @@ So@Gui@Viewer::isCursorEnabled(void) const
 */
 
 void
-So@Gui@Viewer::setAutoClipping(SbBool on)
+So@Gui@Viewer::setAutoClipping(
+  SbBool enable )
 {
 #if SO@GUI@_DEBUG
-  if (this->adjustclipplanes == on) {
+  if ( this->adjustclipplanes == enable ) {
     SoDebugError::postWarning("So@Gui@Viewer::setAutoClipping",
                               "unnecessary called");
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->adjustclipplanes = on;
-  if (on) this->scheduleRedraw();
+  this->adjustclipplanes = enable;
+  if ( enable ) this->scheduleRedraw();
 } // setAutoClipping()
 
 // *************************************************************************
@@ -979,7 +983,8 @@ So@Gui@Viewer::setAutoClipping(SbBool on)
 */
 
 SbBool
-So@Gui@Viewer::isAutoClipping(void) const
+So@Gui@Viewer::isAutoClipping(
+  void ) const
 {
   return this->adjustclipplanes;
 } // isAutoClipping()
@@ -987,20 +992,16 @@ So@Gui@Viewer::isAutoClipping(void) const
 // *************************************************************************
 
 /*!
-  Turn stereo viewing on. Default is off.
-
-  NB: stereo viewing has not been implemented for this component library
-  yet.
+  Turn stereo viewing on or off.
 
   \sa isStereoViewing()
 */
 
 void
-So@Gui@Viewer::setStereoViewing(SbBool /*on*/)
+So@Gui@Viewer::setStereoViewing( // virtual
+  SbBool enable )
 {
-  // FIXME: implement. 990507 mortene.
-  SoDebugError::postInfo("So@Gui@Viewer::setStereoViewing",
-                         "stereo viewing not implemented yet");
+  this->stereoviewing = enable;
 } // setStereoViewing()
 
 // *************************************************************************
@@ -1009,14 +1010,17 @@ So@Gui@Viewer::setStereoViewing(SbBool /*on*/)
   Returns a boolean indicating whether or not we're in stereo viewing
   mode.
 
+  NOTE: in the original InventorXt API, this method was virtual.  It is not
+  virtual here.
+
   \sa setStereoViewing()
 */
 
 SbBool
-So@Gui@Viewer::isStereoViewing(void) const
+So@Gui@Viewer::isStereoViewing(
+  void ) const
 {
-  // FIXME: implement. 990507 mortene.
-  return FALSE;
+  return this->stereoviewing;
 } // setStereoViewing()
 
 // *************************************************************************
@@ -1024,18 +1028,16 @@ So@Gui@Viewer::isStereoViewing(void) const
 /*!
   Set the offset between the two viewpoints when in stereo mode.
 
-  NB: stereo viewing has not been implemented for this component library
-  yet.
+  NOTE: In the original InventorXt API, this method was not virtual.
 
   \sa getStereoOffset()
 */
 
 void
-So@Gui@Viewer::setStereoOffset(const float /*dist*/)
+So@Gui@Viewer::setStereoOffset( // virtual
+  const float dist )
 {
-  // FIXME: implement. 990507 mortene.
-  SoDebugError::postInfo("So@Gui@Viewer::setStereoOffset",
-                         "stereo viewing not implemented yet");
+  this->stereooffset = dist;
 } // setStereoOffset()
 
 /*!
@@ -1045,10 +1047,10 @@ So@Gui@Viewer::setStereoOffset(const float /*dist*/)
 */
 
 float
-So@Gui@Viewer::getStereoOffset(void) const
+So@Gui@Viewer::getStereoOffset(
+  void ) const
 {
-  // FIXME: implement. 990507 mortene.
-  return 0.0f;
+  return this->stereooffset;
 } // getStereoOffset()
 
 // *************************************************************************
@@ -1143,22 +1145,6 @@ So@Gui@Viewer::addStartCallback(So@Gui@ViewerCB * func, void * data)
   this->interactionstartCallbacks->addCallback((SoCallbackListCB *)func, data);
 } // addStartCallback()
 
-// *************************************************************************
-
-/*!
-  Add a function to call when user interaction with the scene ends.
-
-  \sa removeFinishCallback(), addStartCallback()
-*/
-
-void
-So@Gui@Viewer::addFinishCallback(So@Gui@ViewerCB * func, void * data)
-{
-  this->interactionendCallbacks->addCallback((SoCallbackListCB *)func, data);
-} // addFinishCallback()
-
-// *************************************************************************
-
 /*!
   Remove one of the functions which has been set up to be called when user
   interaction with the scene starts.
@@ -1174,6 +1160,18 @@ So@Gui@Viewer::removeStartCallback(So@Gui@ViewerCB * func, void * data)
 } // removeStartCallback()
 
 // *************************************************************************
+
+/*!
+  Add a function to call when user interaction with the scene ends.
+
+  \sa removeFinishCallback(), addStartCallback()
+*/
+
+void
+So@Gui@Viewer::addFinishCallback(So@Gui@ViewerCB * func, void * data)
+{
+  this->interactionendCallbacks->addCallback((SoCallbackListCB *)func, data);
+} // addFinishCallback()
 
 /*!
   Remove one of the functions which has been set up to be called when user
@@ -1237,7 +1235,8 @@ So@Gui@Viewer::pasteView(const SbTime /*eventTime*/)
 */
 
 void
-So@Gui@Viewer::recomputeSceneSize(void)
+So@Gui@Viewer::recomputeSceneSize(
+  void )
 {
   SoDebugError::postInfo("So@Gui@Viewer::recomputeSceneSize",
                          "this method is obsoleted, don't use it");
@@ -1688,7 +1687,7 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 
 /*!
   Overloaded from parent class to be able to do the necessary two-pass
-  rendering if the drawing style is \e hidden \e line.
+  rendering e.g. if the drawing style is \e hidden \e line.
 */
 
 void
@@ -1697,6 +1696,62 @@ So@Gui@Viewer::actualRedraw(void)
   // Recalculate near/far planes.
   if ( this->isAutoClipping() )
     this->setClippingPlanes();
+
+  if (this->isStereoViewing()) {
+    // FIXME: 1) stereo viewing will not work with hidden line drawmode. 
+    // FIXME: 2) stereo viewing is currently hardcoded to Red/Cyan anaglyph mode.
+    // we'll have to sit down and design an interface to support different types
+    // of stereo (and non-stereo) rendering. pederb 20000808
+
+    SbBool parallel = FALSE; // parallel stereo didn't look too good. Always pitch camera.
+    SoCamera * camera = this->getCamera();  
+    SbVec3f camerapos = camera->position.getValue();
+    SbVec3f cameradir(0.0f, 0.0f, -1.0f);
+    SbVec3f offsetvec(1.0f, 0.0f, 0.0f);
+    float offset = this->getStereoOffset() * 0.5f;
+    SbRotation camerarot = camera->orientation.getValue();
+    camerarot.multVec(cameradir, cameradir);
+    camerarot.multVec(offsetvec, offsetvec);
+    SbVec3f focalpoint = camerapos + cameradir * camera->focalDistance.getValue();
+
+    SbBool notifystore = camera->isNotifyEnabled();
+    SbBool positionstore = camera->position.isNotifyEnabled();
+    SbBool orientationstore = camera->orientation.isNotifyEnabled();
+    // turn off notification to avoid redraws
+    camera->enableNotify(FALSE);
+    camera->position.enableNotify(FALSE);
+    camera->orientation.enableNotify(FALSE);
+    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+    glColorMask(1,0,0,1); // draw red-only
+
+    camera->position = camerapos - offsetvec * offset;
+    if (!parallel) {
+      SbVec3f dir = focalpoint - camera->position.getValue();
+      SbRotation rot(cameradir, dir);
+      camera->orientation = camerarot * rot;
+    }
+    this->getSceneManager()->render(FALSE, FALSE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glColorMask(0,1,1,1); // draw green and blue
+
+    camera->position = camerapos + offsetvec * offset;
+    if (!parallel) {
+      SbVec3f dir = focalpoint - camera->position.getValue();
+      SbRotation rot(cameradir, dir);
+      camera->orientation = camerarot * rot;
+    }
+    this->getSceneManager()->render(FALSE, FALSE);
+    
+    // restore camera values and enable notification
+    camera->position = camerapos;
+    camera->orientation = camerarot;
+    camera->position.enableNotify(positionstore);
+    camera->orientation.enableNotify(orientationstore);
+    camera->enableNotify(notifystore);
+
+    glColorMask(1,1,1,1); // restore GL color mask
+    return;
+  }
 
   if ( this->drawAsHiddenLine() ) {
 
@@ -1728,6 +1783,7 @@ So@Gui@Viewer::actualRedraw(void)
 
     return;
   }
+
 
   SbBool clearzbuffer = TRUE;
   DrawStyle style = this->currentDrawStyle();

@@ -79,14 +79,19 @@ enum SoAnyFullViewerPopupMenuItem {
   EXAMINING_ITEM,
   DECORATION_ITEM,
   HEADLIGHT_ITEM,
-  PREFERENCES_ITEM
+  PREFERENCES_ITEM,
+
+  STEREO_MENU,
+  STEREO_OFF_ITEM,
+  STEREO_ANAGLYPH_ITEM
 }; // enum SoViewerPopupMenuItem
 
 enum SoViewerPopupMenuRadioGroup {
   STILL_GROUP = 1,
   MOVE_GROUP,
   TRANSPARENCY_GROUP,
-  BUFFER_GROUP
+  BUFFER_GROUP,
+  STEREO_GROUP
 }; // enum SoViewerPopupMenuRadioGroup
 
 // ************************************************************************
@@ -111,6 +116,7 @@ public:
 
 private:
   So@Gui@FullViewer * const viewer;
+  SoAnyPopupMenu * prefmenu;
 
 }; // class SoAnyFullViewer
 
