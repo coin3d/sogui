@@ -481,9 +481,7 @@ So@Gui@RenderArea::~So@Gui@RenderArea()
 
 // *************************************************************************
 
-/*!
-  A hook invoked after window has been realized.
-*/
+// Documented in superclass.
 void
 So@Gui@RenderArea::afterRealizeHook(void)
 {
@@ -496,7 +494,7 @@ So@Gui@RenderArea::afterRealizeHook(void)
 
   if (So@Gui@Spaceball::exists())
     this->registerDevice(new So@Gui@Spaceball);
-} // afterRealizeHook()
+}
 
 /*!
   This method sets the scene graph to be rendered in the normal bitmap
