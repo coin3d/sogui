@@ -102,6 +102,9 @@ public:
   void setStencilBuffer(const SbBool enable);
   SbBool getStencilBuffer(void) const;
 
+  void setAlphaChannel(const SbBool enable);
+  SbBool getAlphaChannel(void) const;
+
   void setOverlayRender(const SbBool onoff);
   SbBool isOverlayRender(void) const;
 
