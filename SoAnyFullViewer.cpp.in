@@ -432,7 +432,7 @@ SoAnyFullViewer::menuSelection( // virtual
     viewer->setHeadlight( viewer->isHeadlight() ? FALSE : TRUE );
     break;
   case FULLSCREEN_ITEM:
-    viewer->goFullScreen( viewer->isFullScreen() ? FALSE : TRUE );
+    (void)viewer->setFullScreen( viewer->isFullScreen() ? FALSE : TRUE );
     break;
   case PREFERENCES_ITEM:
     viewer->selectedPrefs();
