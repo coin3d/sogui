@@ -200,7 +200,7 @@ static const char rcsid[] =
 */
 
 static inline SoGroup *
-getParentOfNode(SoNode * root, SoNode * node)
+GETPARENTOFNODE(SoNode * root, SoNode * node)
 {
   SoSearchAction search;
   assert(node);
@@ -365,7 +365,7 @@ So@GUI@Viewer::setCamera(SoCamera * cam)
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (this->deletecamera) {
-      SoGroup * cameraparent = getParentOfNode(this->viewerroot, this->camera);
+      SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
       cameraparent->removeChild(this->camera);
       this->deletecamera = FALSE;
     }
@@ -549,8 +549,12 @@ So@GUI@Viewer::setHeadlight(SbBool on)
       this->lightroot->addChild(new SoResetTransform);
     }
 
-    assert(this->camera);
-    SoGroup * cameraparent = getParentOfNode(this->viewerroot, this->camera);
+    if (!this->camera) { // Headlight flag set early -- just store and return.
+      this->lighton = on;
+      return;
+    }
+
+    SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
     int lidx = cameraparent->findChild(this->lightroot);
     if (lidx == -1) {
       int idx = cameraparent->findChild(this->camera);
@@ -561,12 +565,14 @@ So@GUI@Viewer::setHeadlight(SbBool on)
     }
   }
   else {
-    assert(this->lightroot);
-    SoGroup * lightparent = getParentOfNode(this->viewerroot, this->lightroot);
-    lightparent->removeChild(this->lightroot);
+    if (this->lightroot) {
+      SoGroup * lightparent = GETPARENTOFNODE(this->viewerroot,
+                                              this->lightroot);
+      lightparent->removeChild(this->lightroot);
 
-    SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
-    lorient->rotation.disconnect();
+      SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
+      lorient->rotation.disconnect();
+    }
   }
 
   this->lighton = on;
@@ -1579,9 +1585,16 @@ So@GUI@Viewer::actualRedraw(void)
     return;
   }
 
+  SbBool clearzbuffer = TRUE;
   DrawStyle style = this->currentDrawStyle();
-  SbBool clearzbuffer =
-    (style & (VIEW_LOW_RES_LINE|VIEW_LOW_RES_POINT|VIEW_BBOX)) ? FALSE : TRUE;
+  switch (style) {
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+  case VIEW_BBOX:
+    clearzbuffer = FALSE;
+  default: break; // Include "default:" case to avoid compiler warning.
+  }
+
   this->getSceneManager()->render(isClearBeforeRender(), clearzbuffer);
 } // actualRedraw()
 
@@ -1793,7 +1806,7 @@ So@GUI@Viewer::toggleCameraType(void)
     assert(0);
   }
 
-  SoGroup * cameraparent = getParentOfNode(this->viewerroot, this->camera);
+  SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
   cameraparent->insertChild(newcamera, cameraparent->findChild(this->camera));
   SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
   this->setCamera(newcamera);
@@ -1886,7 +1899,6 @@ So@GUI@Viewer::changeDrawStyle(So@GUI@Viewer::DrawStyle style)
     this->glUnlock();
     break;
   }
-
 
   // Render everything as its supposed to be done, don't override
   // any of the settings in the ``real'' graph.
