@@ -1012,17 +1012,7 @@ So@Gui@ViewerP::setClippingPlanes(void)
     }
     
     // adjust the near plane if the the value is too small.
-    if (nearval < nearlimit) {
-      nearval = nearlimit;
-    }
-  }
-
-  if (this->autoclipcb) {
-    SbVec2f nearfar(nearval, farval);
-    nearfar = this->autoclipcb(this->autoclipuserdata, nearfar);
-
-    nearval = nearfar[0];
-    farval = nearfar[1]; 
+    if (nearval < nearlimit) { nearval = nearlimit; }
   }
 
   // Some slack around the bounding box, in case the scene fits
@@ -1043,16 +1033,30 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // handled this itself?  20040908 mortene.
   if (this->camera->getTypeId().getName() == "FrustumCamera") {
     nearval = this->camera->nearDistance.getValue();
-    farval = farval * (1.0f + SLACK); 
+    farval *= (1.0f + SLACK); 
     if (farval <= nearval) {
       // nothing is visible, so just set farval to som value > nearval.
       farval = nearval + 10.0f;
     }
-    this->camera->farDistance = farval;
   }
   else {
-    this->camera->nearDistance = nearval * (1.0f - SLACK);
-    this->camera->farDistance = farval * (1.0f + SLACK);
+    nearval *= (1.0f - SLACK);
+    farval *= (1.0f + SLACK);
+  }
+
+  if (this->autoclipcb) {
+    SbVec2f nearfar(nearval, farval);
+    nearfar = this->autoclipcb(this->autoclipuserdata, nearfar);
+
+    nearval = nearfar[0];
+    farval = nearfar[1]; 
+  }
+
+  if (nearval != this->camera->nearDistance.getValue()) {
+    this->camera->nearDistance = nearval;
+  }
+  if (farval != this->camera->farDistance.getValue()) {
+    this->camera->farDistance = farval;
   }
 
   // FIXME: there's a possible optimization to take advantage of here,
@@ -2395,10 +2399,12 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
   callback function pointer itself (ie the callback function's
   closure). The second argument is the near and far clipping plane
   distances from the camera position, as calculated internally by the
-  viewer.
+  viewer, including "slack".
 
   The function callback can then modify the near and far clipping
-  plane distances to what will \e actually be used by the viewer.
+  plane distances to what will \e actually be used by the
+  viewer. These values will then be used unmodified for the viewer's
+  camera.
 
   This is a good way of dynamically modifying the near and far
   distances such that they at all times exactly matches the specific
