@@ -621,7 +621,7 @@ So@Gui@Viewer::viewAll(void)
 void
 So@Gui@Viewer::saveHomePosition(void)
 {
-  assert(this->camera);
+  if ( ! this->camera ) return; // probably a scene-less viewer
 
   this->storedorientation = this->camera->orientation.getValue();
   this->storedposition = this->camera->position.getValue();
@@ -648,7 +648,7 @@ So@Gui@Viewer::saveHomePosition(void)
 void
 So@Gui@Viewer::resetToHomePosition(void)
 {
-  assert(this->camera);
+  if ( ! this->camera ) return; // probably a scene-less viewer
 
   this->camera->orientation = this->storedorientation;
   this->camera->position = this->storedposition;
