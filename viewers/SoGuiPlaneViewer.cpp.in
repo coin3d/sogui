@@ -126,7 +126,7 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
   The public constructor, to be used by application programmers who
   want to instantiate the plain, standard So@Gui@PlaneViewer.
 */
-So@Gui@PlaneViewer::So@Gui@PlaneViewer(QWidget * parent,
+So@Gui@PlaneViewer::So@Gui@PlaneViewer(@WIDGET@ parent,
                                        const char * const name,
                                        SbBool embed,
                                        So@Gui@FullViewer::BuildFlag flag,
@@ -143,7 +143,7 @@ So@Gui@PlaneViewer::So@Gui@PlaneViewer(QWidget * parent,
   A protected constructor, to be used by application programmers who
   want to extend the So@Gui@PlaneViewer.
 */
-So@Gui@PlaneViewer::So@Gui@PlaneViewer(QWidget * parent,
+So@Gui@PlaneViewer::So@Gui@PlaneViewer(@WIDGET@ parent,
                                        const char * const name,
                                        SbBool embed,
                                        So@Gui@FullViewer::BuildFlag flag,
