@@ -37,7 +37,7 @@ class QWidget;
 #include <gtk/gtk.h>
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
-#include <wtypes.h>
+#include <windows.h>
 #endif // __COIN_SOWIN__
 
 
