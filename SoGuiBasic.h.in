@@ -36,6 +36,14 @@
 */
 
 /*!
+  \defgroup editors @Gui@ Editor Components
+*/
+
+/*!
+  \defgroup slidersets @Gui@ Slider Set Components
+*/
+
+/*!
   \defgroup misc Miscellaneous Classes
 */
 
