@@ -1,14 +1,16 @@
-CURRENT
+NODES
 
   SoGuiViewportFix - fix origo to a corner of the viewport
+
+  SoGuiPosition - set 2D position on pane
+
+  SoGuiTranslation - accumulate 2D translation on pane
 
   SoGuiPane - group node for containing a 2D interface
     - for enabling special translation/position nodes
     - for enabling special scaling nodes
 
-  SoGuiPosition - set 2D position on pane
-
-  SoGuiTranslation - accumulate 2D translation on pane
+NODEKITS
 
   SoGuiFrame - a 2d-rect emboss / frame renderer
 
@@ -18,8 +20,11 @@ CURRENT
 
   SoGuiSlider2 - an interative slider for a two-dimensional value space
 
+  SoGuiColorEditor - the machinery of the color editor component
 
-FUTURE
+  [SoGuiMaterialEditor] - the machinery of the material editor component
 
-  ColorEditor as NodeKit
+DRAGGERS
+
+  [SoGuiWindowDragger]
 
