@@ -26,6 +26,12 @@
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 #include <Inventor/SbLinear.h>
 
+// FIXME: these includes only needed because of SoWin-specific private
+// functions -- get rid of it after fixing up the header file to be a
+// 100% "pure" template. 20011210 mortene.
+#include <Inventor/events/SoMotion3Event.h>
+#include <Inventor/events/SoSpaceballButtonEvent.h>
+
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@Spaceball : public So@Gui@Device {
@@ -62,6 +68,18 @@ public:
 
 private:
   class So@Gui@SpaceballP * pimpl;
+
+#ifdef __COIN_SOWIN__ // FIXME: make a "pure" template. 20011210 mortene.
+  UINT eventMask;
+  SoMotion3Event * motionEvent;
+  SoSpaceballButtonEvent * buttonEvent;
+  HWND parentWidget;
+  float rotScale, transScale;
+  SoMotion3Event * translateMotionEvent(MSG * motionEvent);
+  SoSpaceballButtonEvent * translateButtonEvent(MSG * buttonEvent, SoButtonEvent::State whichState);
+  SoMotion3Event * translateMotionEventMagellan(MSG * motionEvent);
+#endif // __COIN_SOWIN__
+
 
 }; // class So@Gui@Spaceball
 

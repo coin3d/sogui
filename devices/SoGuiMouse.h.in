@@ -24,6 +24,10 @@
 #define SO@GUI@_MOUSE_H
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
+// FIXME: this include only needed because of SoWin-specific private
+// functions -- get rid of it after fixing up the header file to be a
+// 100% "pure" template. 20011210 mortene.
+#include <Inventor/events/SoButtonEvent.h>
 
 class SoMouseButtonEvent;
 class SoLocation2Event;
@@ -59,6 +63,10 @@ private:
   SoLocation2Event * locationevent;
   int eventmask;
 
+#ifdef __COIN_SOWIN__ // FIXME: make a "pure" template. 20011210 mortene.
+  SoLocation2Event * makeLocationEvent(MSG * msg);
+  SoMouseButtonEvent * makeButtonEvent(MSG * msg, SoButtonEvent::State state);
+#endif // __COIN_SOWIN__
 }; // class So@Gui@Mouse
 
 // *************************************************************************
