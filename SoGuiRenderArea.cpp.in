@@ -524,6 +524,9 @@ So@Gui@RenderArea::setAntialiasing(
   SbBool smoothing,
   int numPasses )
 {
+  // FIXME: is this really necessary? I think we should either ignore
+  // the call or store values for later migration if the scenemanager
+  // instance(s) haven't been made yet. 20010331 mortene.
   assert( PRIVATE(this)->normalManager != NULL );
 
   // Instead of piping the call further to
@@ -567,7 +570,12 @@ So@Gui@RenderArea::getAntialiasing(
   // compatibility. 20010331 mortene.
 
   assert( PRIVATE(this)->normalManager != NULL );
-  PRIVATE(this)->normalManager->getAntialiasing(smoothing, numPasses);
+
+  // About why we don't use SoSceneManager::getAntialiasing()
+  // directly, see comment in SoGuiRenderArea::setAntiAliasing().
+  SoGLRenderAction * glra = PRIVATE(this)->normalManager->getGLRenderAction();
+  smoothing = glra->isSmoothing();
+  numPasses = glra->getNumPasses();
 } // getAntialiasing()
 
 /*!
