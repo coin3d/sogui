@@ -115,9 +115,9 @@ SceneTexture2::field_updated_cb(void * closure, SoSensor * sensor)
   if ( scene != NULL ) {
     me->scene_sensor = new SoNodeSensor(SceneTexture2::scene_updated_cb, me);
     me->scene_sensor->attach(scene);
-    scene->touch();
+    // scene->touch();
   }
-  // SceneTexture2::scene_updated_cb(closure, sensor);
+  SceneTexture2::scene_updated_cb(closure, sensor);
 }
 
 void
