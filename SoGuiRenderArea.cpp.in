@@ -45,8 +45,8 @@ static const char rcsid[] =
 #endif // HAVE_WINDOWS_H
 #include <GL/gl.h> // glDrawBuffer()
 
-#include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
+#include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoSceneManager.h>
 
@@ -120,7 +120,7 @@ class So@Gui@RenderAreaP {
 // *************************************************************************
 
 /*!
-  \var So@Gui@RenderAreaEventCB * So@Gui@RenderArea::appEventHandler;
+  \var So@Gui@RenderAreaEventCB * So@Gui@RenderArea::appEventHandler
 
   This is an application-settable event callback that will be called with
   X events destined for the renderarea.
@@ -129,7 +129,7 @@ class So@Gui@RenderAreaP {
 */
 
 /*!
-  \var void * So@Gui@RenderArea::appEventHandlerData;
+  \var void * So@Gui@RenderArea::appEventHandlerData
 
   This member is the closure given to the application event handler.
 
@@ -185,6 +185,7 @@ So@Gui@RenderArea::constructor( // private
   THIS->normalManager->activate();
   THIS->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   THIS->overlayManager->activate();
+  THIS->overlayManager->getGLRenderAction()->setCacheContext(1);
 
   this->deviceList = (SbPList *) NULL;
   this->appEventHandler = NULL;
@@ -200,9 +201,7 @@ So@Gui@RenderArea::constructor( // private
     this->registerDevice( THIS->devices.keyboard );
   }
 
-  if ( ! build )
-    return;
-
+  if ( ! build ) return;
   this->setClassName( "So@Gui@RenderArea" );
   @WIDGET@ glarea = this->buildWidget( this->getParentWidget() );
   this->setBaseWidget( glarea );
@@ -673,6 +672,7 @@ So@Gui@RenderArea::render(
   if ( ! this->isVisible() || this->waitForExpose )
     return;
 
+  this->setOverlayRender( FALSE );
   this->glLock(); // this makes the GL context "current"
 
   SbBool drawfront =
@@ -708,6 +708,7 @@ So@Gui@RenderArea::renderOverlay(
   if ( ! this->isVisible() || this->waitForExpose )
     return;
 
+  this->setOverlayRender( TRUE );
   this->glLock(); // this makes the GL context "current"
   this->redrawOverlay();
   this->glUnlock();
@@ -967,8 +968,17 @@ So@Gui@RenderArea::actualOverlayRedraw( // virtual, protected
   void )
 {
   assert( THIS->overlayManager != NULL );
-  if ( this->isVisible() )
-    THIS->overlayManager->render( THIS->clearOverlay, THIS->clearZBuffer );
+  if ( ! this->isVisible() ) return;
+
+#if 0
+  static int first = 1;
+  if ( first ) {
+    first = 0;
+    return;
+  }
+#endif
+
+  THIS->overlayManager->render( THIS->clearOverlay, THIS->clearZBuffer );
 } // actualOverlayRedraw()
 
 /*!
@@ -1178,8 +1188,14 @@ So@Gui@RenderArea::glReshape( // virtual, derived
   this->setDevicesWindowSize( glsize );
   this->glUnlock();
 
+  this->setOverlayRender( FALSE );
+  this->glLock();
   this->actualRedraw();
+  this->glUnlock();
+  this->setOverlayRender( TRUE );
+  this->glLock();
   this->actualOverlayRedraw();
+  this->glUnlock();
 } // glReshape()
 
 /*!
