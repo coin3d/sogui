@@ -13,8 +13,8 @@
 /* Some code cleanup by the Coin team. Also added configure tests for
  * header files and added two methods:
  *
- * SbBool SPW_CheckForSpaceballX11(void * display, int winid, char * product);
- * SbBool SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent);
+ * int SPW_CheckForSpaceballX11(void * display, int winid, char * product);
+ * int SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent);
  */
 
 #if HAVE_CONFIG_H
@@ -29,16 +29,16 @@
 
 #if X_DISPLAY_MISSING
 /* just provide empty methods if X is not available */
-SbBool 
+int 
 SPW_CheckForSpaceballX11(void *, int, char *)
 {
-  return FALSE;
+  return 0;
 }
 
-SbBool 
+int 
 SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 {
-  return FALSE;
+  return 0;
 }
 
 #else /* ! X_DISPLAY_MISSING */
@@ -113,9 +113,9 @@ static int SPW_InputDispatchEx (SPW_InputDispatchStruct *);
 
 static void SPW_InputBeep (Display *, char *);
 static void SPW_InputRezero (Display *);
-static SbBool SPW_GrabDevice(Display *display, Window window,
-                                 SbBool exclusive);
-static SbBool SPW_ReleaseDevice(Display * display);
+static int SPW_GrabDevice(Display *display, Window window,
+                                 int exclusive);
+static int SPW_ReleaseDevice(Display * display);
 
 #define SPW_InputDefaultDelay       0 /* 0 Hz update */
 
@@ -123,18 +123,18 @@ static SbBool SPW_ReleaseDevice(Display * display);
   Wrapper function which makes it possible to avoid including X11 in the 
   header file.
 */
-SbBool 
+int 
 SPW_CheckForSpaceballX11(void * display, int winid, char * product)
 {
   return SPW_InputCheckForSpaceball((Display*) display, (Window) winid, product);
 }
 
 /*
-  If xevent is a spaceball event, translates xevent to sbEvent and return TRUE.
-  If xevent is not a spaceball event returns FALSE. void * pointers are 
+  If xevent is a spaceball event, translates xevent to sbEvent and return 1.
+  If xevent is not a spaceball event returns 0. void * pointers are 
   passed to avoid including the X header files in the spwinput.h header file.
 */
-SbBool
+int
 SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent)
 {
   return SPW_InputIsSpaceballEvent((Display*) display, (XEvent*) xevent, sbEvent);
@@ -155,13 +155,13 @@ SPW_TranslateEventX11(void * display, void * xevent, SPW_InputEvent * sbEvent)
 #define SPW_InputPassThruAtomName         "SpaceWarePassThruCommandEventType"
 
 /* found the spaceball */
-static SbBool SpaceballFound = FALSE;
+static int SpaceballFound = 0;
 
 /* the spaceball is using XIE */
-static SbBool SpaceballInputExtension = FALSE;
+static int SpaceballInputExtension = 0;
 
 /* the spaceball is using XCM */
-static SbBool SpaceWareAtomsDefined = FALSE;
+static int SpaceWareAtomsDefined = 0;
 
 /* the magic XCM window used for communication */
 static Window SpaceWareXCMWindowID = 0;
@@ -232,7 +232,7 @@ FindXCMWindow (Display *display)
 
   for (i = 0;  i < (int) nChildren; i++){
     char *name;
-    SbBool found = FALSE;
+    int found = 0;
 
     XFetchName (display, children[i], &name);
     if (name) {
@@ -240,12 +240,12 @@ FindXCMWindow (Display *display)
       fprintf(stderr,"FindXCMWindow: %s\n", name);
 #endif
       if (strcmp(name, "sballd_XCM") == 0) {
-        found = TRUE;
+        found = 1;
       }
       XFree(name);
     }
      
-    if (found == TRUE) {
+    if (found == 1) {
       break;
     }
   }
@@ -417,9 +417,9 @@ void SPW_InputString (Display *display, char *string)
  *---------------------------------------------------------------------------*/
 void SPW_InputResetGlobalVars (void)
 {
-  SpaceballFound = FALSE;
-  SpaceballInputExtension = FALSE;
-  SpaceWareAtomsDefined = FALSE;
+  SpaceballFound = 0;
+  SpaceballInputExtension = 0;
+  SpaceWareAtomsDefined = 0;
   SpaceWareXCMWindowID = 0;
 } /* end of SPW_InputResetGlobalVars */
 
@@ -468,24 +468,24 @@ void SPW_InputResetSpaceball (Display *display)
 void SPW_InputCloseXIE (Display *display)
 {
 #if HAVE_X11_EXTENSIONS_XINPUT_H
-  if (SpaceballInputExtension == TRUE) {
+  if (SpaceballInputExtension == 1) {
     XCloseDevice (display, pSpaceballDev);
     
-    SpaceballInputExtension = FALSE;
-    SpaceballFound = FALSE;
+    SpaceballInputExtension = 0;
+    SpaceballFound = 0;
   }
 #endif
 } /* end of SPW_InputCloseXIE */
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_InputIsXIE (void)
+ * int SPW_InputIsXIE (void)
  *
  * Args:
  *    None.
  *
  * Return Value:
- *    FALSE if XIE is disabled or TRUE if it is enabled.
+ *    0 if XIE is disabled or 1 if it is enabled.
  *
  * Description:
  *    This function determines if the Spaceball XIE driver is enabled.
@@ -495,20 +495,20 @@ void SPW_InputCloseXIE (Display *display)
  *    can determine the method of communication used.
  *
  *---------------------------------------------------------------------------*/
-SbBool SPW_InputIsXIE (void)
+int SPW_InputIsXIE (void)
 {
   return SpaceballInputExtension;
 } /* end of SPW_InputIsXIE */
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_InputIsXCM (void)
+ * int SPW_InputIsXCM (void)
  *
  * Args:
  *    None.
  *
  * Return Value:
- *    FALSE if XCM is disabled or TRUE if it is enabled.
+ *    0 if XCM is disabled or 1 if it is enabled.
  *
  * Description:
  *    This function determines f the Spaceball XCM driver is enabled.
@@ -518,7 +518,7 @@ SbBool SPW_InputIsXIE (void)
  *    can determine the method of communication used.
  *
  *---------------------------------------------------------------------------*/
-SbBool SPW_InputIsXCM (void)
+int SPW_InputIsXCM (void)
 {
   return SpaceWareAtomsDefined;
 } /* end of SPW_InputIsXCM */
@@ -592,8 +592,7 @@ void SPW_SendHandshake (Display *display)
 
 /*-----------------------------------------------------------------------------
  *
- *  SPWBool SPW_GrabDevice(Display *display, Window window,
- *                                   SbBool exclusive)
+ *  int SPW_GrabDevice(Display *display, Window window, int exclusive)
  *
  * Args:
  *    display     (r/o) The current display pointer
@@ -619,8 +618,8 @@ void SPW_SendHandshake (Display *display)
  *    is not NULL.
  *
  *---------------------------------------------------------------------------*/
-SbBool SPW_GrabDevice(Display *display, Window window,
-                      SbBool exclusive)
+int SPW_GrabDevice(Display *display, Window window,
+                      int exclusive)
 {
   if (window != 0) {
       ReturnWindowID = window;
@@ -628,12 +627,12 @@ SbBool SPW_GrabDevice(Display *display, Window window,
 
   if ((ReturnWindowID == 0) ||  /* return window not set */
       (SpaceWareXCMWindowID == 0)) {/* daemon not running */
-    return FALSE;
+    return 0;
   }
 
   SPW_strLength = 0;
 
-  if (exclusive == TRUE)
+  if (exclusive == 1)
     {
       SendString (display, "~hard");
     }
@@ -642,7 +641,7 @@ SbBool SPW_GrabDevice(Display *display, Window window,
       SendString (display, "~soft");
     }
 
-  return TRUE;
+  return 1;
 } /* end of SPW_GrabDevice */
 
 
@@ -665,29 +664,29 @@ SbBool SPW_GrabDevice(Display *display, Window window,
  *    This function does not work with XIE.
  *
  *---------------------------------------------------------------------------*/
-SbBool SPW_ReleaseDevice(Display *display)
+int SPW_ReleaseDevice(Display *display)
 {
   if ((ReturnWindowID == 0) ||  /* return window not set */
       (SpaceWareXCMWindowID == 0)) /* daemon not running */
     {
-      return FALSE;
+      return 0;
     }
 
   SPW_strLength = 0;
   SendString (display, "~relgrab"); 
-  return TRUE;
+  return 1;
 } /* end of SPW_ReleaseDevice */
 
 
 /*-----------------------------------------------------------------------------
  *
- * static SbBool FindXCMAtoms (Display *display)
+ * static int FindXCMAtoms (Display *display)
  *
  * Args:
  *    display     (r/o)  The display on which to search for the XCM atoms
  *
  * Return Value:
- *    TRUE if the XCM atoms were found, FALSE if not.
+ *    1 if the XCM atoms were found, 0 if not.
  *
  * Description:
  *     Returns True if all the XCM atoms are found.
@@ -697,12 +696,12 @@ SbBool SPW_ReleaseDevice(Display *display)
  *      values in the SPW_Input...Atom variables
  *
  *---------------------------------------------------------------------------*/
-static SbBool FindXCMAtoms (Display *display)
+static int FindXCMAtoms (Display *display)
 {
   /* if we already have the atoms don't look again */
-  if (SpaceWareAtomsDefined == TRUE)
+  if (SpaceWareAtomsDefined == 1)
     {
-      return TRUE;
+      return 1;
     }
 
   /* 
@@ -731,23 +730,23 @@ static SbBool FindXCMAtoms (Display *display)
       (SPW_InputButtonReleaseAtom == None) ||
       (SPW_InputPassThruAtom == None))
     {
-      return FALSE;
+      return 0;
     }
 
   /* set the global that tells us the atoms are defined and found */
-  SpaceWareAtomsDefined = TRUE;
-  return TRUE;
+  SpaceWareAtomsDefined = 1;
+  return 1;
 } /* end of FindXCMAtoms */
 
 /*-----------------------------------------------------------------------------
  *
- * static SbBool FindXCM (Display *display)
+ * static int FindXCM (Display *display)
  *
  * Args:
  *    display      (r/o)  The display on which to search for the XCM window
  *
  * Return Value:
- *     Returns TRUE if the XCM driver is found, FALSE if not.
+ *     Returns 1 if the XCM driver is found, 0 if not.
  *
  * Description:
  *     Find the XCM driver (window and atoms).  This function is used
@@ -758,10 +757,10 @@ static SbBool FindXCMAtoms (Display *display)
  *     None.
  *
  *---------------------------------------------------------------------------*/
-static SbBool FindXCM (Display *display)
+static int FindXCM (Display *display)
 {
   int win;   /* the XCM window */
-  SbBool atom;  /* boolean that tell us if we found the atoms */
+  int atom;  /* boolean that tell us if we found the atoms */
   
   win = FindXCMWindow (display);
   atom = FindXCMAtoms (display);
@@ -770,22 +769,22 @@ static SbBool FindXCM (Display *display)
   fprintf(stderr, "win %d atom %d\n", win, atom);
 #endif
 
-  if ( (win != 0) && (atom == TRUE)) {
-      return TRUE;
+  if ( (win != 0) && (atom == 1)) {
+      return 1;
   }
   
-  return FALSE;
+  return 0;
 } /* end of FindXCM */
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_FindXIE (Display *display)
+ * int SPW_FindXIE (Display *display)
  *
  * Args:
  *    display      (r/o)  The display on which to search for the XCM window
  *
  * Return Value:
- *     TRUE if the XIE driver was found, FALSE if not.
+ *     1 if the XIE driver was found, 0 if not.
  *
  * Description:
  *     Find the XIE Spaceball extension.
@@ -795,7 +794,7 @@ static SbBool FindXCM (Display *display)
  *
  *---------------------------------------------------------------------------*/
 
-SbBool SPW_FindXIE (Display *display)
+int SPW_FindXIE (Display *display)
 {
 #if HAVE_X11_EXTENSIONS_XINPUT_H
   int          ieMajor;      
@@ -807,16 +806,16 @@ SbBool SPW_FindXIE (Display *display)
   char        *ptr;          
 
   /* if we have already found the XIE driver don't look again */
-  if (SpaceballInputExtension == TRUE)
+  if (SpaceballInputExtension == 1)
     {
-      return TRUE;
+      return 1;
     }
 
   /* See if XIE is configured */
   if (XQueryExtension (display, "XInputExtension", &ieMajor,
                        &ieFirstEvent, &ieFirstError) == 0)
     {
-      return FALSE;
+      return 0;
     }
 
 #ifdef SPW_DEBUG
@@ -828,7 +827,7 @@ SbBool SPW_FindXIE (Display *display)
 
   /* Make sure there are valid devices */
   if (pDev == 0) {
-      return FALSE;
+      return 0;
   }
 
   /* Try to find the Spaceball device in the list */
@@ -846,7 +845,7 @@ SbBool SPW_FindXIE (Display *display)
    */
   if (i == nDev) {
     XFreeDeviceList (pDev);
-    return FALSE;
+    return 0;
   }
   
   /* record all necessary info on the Spaceball XIE driver */
@@ -884,11 +883,11 @@ SbBool SPW_FindXIE (Display *display)
                      SPW_SpaceballEventClass[1]);
   DeviceButtonRelease (pSpaceballDev, SPW_DevButtonReleaseEventType, 
                        SPW_SpaceballEventClass[2]);
-  SpaceballInputExtension = TRUE;
+  SpaceballInputExtension = 1;
 
-  return TRUE;
+  return 1;
 #else 
-  return FALSE;
+  return 0;
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
 } /* end of SPW_FindXIE */
 
@@ -914,7 +913,7 @@ SbBool SPW_FindXIE (Display *display)
 static void InitializeSpaceball (Display *display, char *version)
 {
   /* if we already found the Spaceball don't search again */
-  if (SpaceballFound == TRUE) {
+  if (SpaceballFound == 1) {
     return;
   }
 
@@ -923,8 +922,8 @@ static void InitializeSpaceball (Display *display, char *version)
   WM_DELETE_WINDOW = XInternAtom (display, "WM_DELETE_WINDOW", False);
 
    /* search for the XIE driver first */
-  if (SPW_FindXIE (display) == TRUE) {
-    SpaceballFound = TRUE;
+  if (SPW_FindXIE (display) == 1) {
+    SpaceballFound = 1;
 #ifdef SPW_DEBUG
     fprintf(stderr, "\n");
     fprintf(stderr, "Spaceball (R) device found,");
@@ -935,8 +934,8 @@ static void InitializeSpaceball (Display *display, char *version)
 #endif
   }  
   /* if we don't find the XIE driver search for the XCM driver */
-  else if (FindXCM (display) == TRUE) {
-    SpaceballFound = TRUE;
+  else if (FindXCM (display) == 1) {
+    SpaceballFound = 1;
 #ifdef SPW_DEBUG
     fprintf(stderr, "\n");
     fprintf(stderr, "Spaceball (R) device found,");
@@ -952,7 +951,7 @@ static void InitializeSpaceball (Display *display, char *version)
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_InputCheckForSpaceball (Display *display, Window window,
+ * int SPW_InputCheckForSpaceball (Display *display, Window window,
  *                                     char *product)
  *
  * Args:
@@ -961,7 +960,7 @@ static void InitializeSpaceball (Display *display, char *version)
  *    product   (r/o)  name of the application that is opening the Spaceball.
  *
  * Return Value:
- *     TRUE if the Spaceball was opened, FALSE if not.
+ *     1 if the Spaceball was opened, 0 if not.
  *
  * Description:
  *     Find the Spaceball via XIE or XCM.
@@ -971,7 +970,7 @@ static void InitializeSpaceball (Display *display, char *version)
  *     using XIE.
  *
  *---------------------------------------------------------------------------*/
-SbBool SPW_InputCheckForSpaceball (Display *display, 
+int SPW_InputCheckForSpaceball (Display *display, 
                                    Window window,
                                    char *product)
 {
@@ -985,7 +984,7 @@ SbBool SPW_InputCheckForSpaceball (Display *display,
 
   /* check to make sure the corect parameters were passed */
   if ( (display == NULL) || (window == 0)) {
-      return FALSE;
+      return 0;
   }
 
   /* build the SpaceWare version and product info string */
@@ -1005,15 +1004,15 @@ SbBool SPW_InputCheckForSpaceball (Display *display,
   
   /* try to open the Spaceball */
   InitializeSpaceball (display, version);
-  if (SpaceballFound == FALSE) {
-    return FALSE;
+  if (SpaceballFound == 0) {
+    return 0;
   }
 
 #if HAVE_X11_EXTENSIONS_XINPUT_H
 
   /* If we're using XIE, try to enable Spaceball events */
 
-  if (SPW_FindXIE (display) == TRUE) {
+  if (SPW_FindXIE (display) == 1) {
     XSelectExtensionEvent (display, window, SPW_SpaceballEventClass, 3);
   }
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
@@ -1022,7 +1021,7 @@ SbBool SPW_InputCheckForSpaceball (Display *display,
   SPW_SendHandshake (display);
 
   /* we found the Spaceball so return a success message */
-  return TRUE;
+  return 1;
 
 } /* end of SPW_InputCheckForSpaceball */
 
@@ -1056,10 +1055,10 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
   static int last_shake = 0;      /* the last time we sent a handshake   */
   static int shake_delay = 7;     /* number of events we wait before     */
   /* sending another handshake message   */
-  int isSpaceball=FALSE;
-  static int have_handshake = FALSE; /* did we get a handshake
+  int isSpaceball=0;
+  static int have_handshake = 0; /* did we get a handshake
                                         from daemon? */
-  static int have_tune = FALSE; /* do we have the tune data yet */
+  static int have_tune = 0; /* do we have the tune data yet */
   static float sbtune[6];      /* the tune multipliers */
   char *scaleVar;                   /* environment variable containg
                                        tune data */
@@ -1067,7 +1066,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
 
   /* if the event, display or spwev variables are not allocated then return */
   if ((display == NULL) || (event == NULL) || (spwev == NULL)) {
-    return FALSE;
+    return 0;
   }
 
 #ifdef SPW_DEBUG
@@ -1085,7 +1084,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     if (clientMessage->message_type == SPW_InputMotionAtom) {
       
       /* specify we found a spaceball event */
-      isSpaceball = TRUE;
+      isSpaceball = 1;
 
       /* specify the spaceball event is a motion event */
       spwev->type = SPW_InputMotionEvent;
@@ -1100,7 +1099,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     /* if the event is a button press event process it */
     else if (clientMessage->message_type == SPW_InputButtonPressAtom) {
       /* specify we found a spaceball event */
-      isSpaceball = TRUE;
+      isSpaceball = 1;
       
       /* specify the spaceball event is a button event */
       spwev->type = SPW_InputButtonPressEvent;
@@ -1113,7 +1112,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     /* if the event is a button release event process it */
     else if (clientMessage->message_type == SPW_InputButtonReleaseAtom) {
       /* specify we found a spaceball event */
-      isSpaceball = TRUE;
+      isSpaceball = 1;
       
       /* specify the spaceball event is a button event */
       spwev->type = SPW_InputButtonReleaseEvent;
@@ -1129,12 +1128,12 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
       
       /* check if the pass through event is handshaking from the daemon */
       if ( ( str[0] == '~') && ( str[1] == '~') ) {
-        have_handshake = TRUE;
+        have_handshake = 1;
       }
     }
     
     /* if we did get a spaceball event save the window ID we got it from */
-    if (isSpaceball == TRUE) {
+    if (isSpaceball == 1) {
       /* if we don't know what the XCM window is yet save it off */
       if (SpaceWareXCMWindowID == 0) {
         SpaceWareXCMWindowID = ntohl(clientMessage->data.l[0]);
@@ -1161,7 +1160,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
      * correctly so the client code can figure out when it has a
      * complete event.
      *
-     * This function returns TRUE to indicate it was a Spaceball event.
+     * This function returns 1 to indicate it was a Spaceball event.
      * In other words, it was not some other type of event the application
      * should handle.  BUT the spwev.type is set to 0 if it is not a
      * complete Spaceball motion event.  This should cause the switch
@@ -1170,7 +1169,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
      */
     
     /* specify we found a spaceball event */
-    isSpaceball = TRUE;
+    isSpaceball = 1;
     
     /* specify the event is a motion event */
     spwev->type = SPW_InputMotionEvent;
@@ -1200,7 +1199,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     XDeviceButtonEvent *button = (XDeviceButtonEvent *) event;  
     
     /* specify we found a spaceball message */
-    isSpaceball = TRUE;
+    isSpaceball = 1;
     
     /* specify the message was a button press event */
     spwev->type = SPW_InputButtonPressEvent;
@@ -1217,7 +1216,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     XDeviceButtonEvent *button = (XDeviceButtonEvent *) event;  
       
     /* specify we found a spaceball message */
-    isSpaceball = TRUE;
+    isSpaceball = 1;
     
     /* specify the message was a button press event */
     spwev->type = SPW_InputButtonReleaseEvent;
@@ -1232,8 +1231,8 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
    * if after all that we haven't determined the event to be a spaceball
    * event return a failure
    */
-  if (isSpaceball == FALSE) {
-    return FALSE;
+  if (isSpaceball == 0) {
+    return 0;
   }
   
   /*
@@ -1243,7 +1242,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
    *   have sent out SPW_MaxEventCount/shake_delay handshake messages to the
    *   daemon without a response.
    */
-  if ((have_handshake == FALSE) && ( shake_count < SPW_MaxEventCount)) {
+  if ((have_handshake == 0) && ( shake_count < SPW_MaxEventCount)) {
     if ((last_shake + shake_delay) == shake_count) {
       SPW_SendHandshake (display);
       last_shake = shake_count;
@@ -1259,7 +1258,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
    */
 
   if (spwev->type == SPW_InputMotionEvent) {
-    if (have_tune == FALSE) {
+    if (have_tune == 0) {
       scaleVar = getenv("SBALL_TUNING");
       if (scaleVar != NULL) {
         sscanf(scaleVar, "%f %f %f %f %f %f", &sbtune[0],
@@ -1277,7 +1276,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
         sbtune[4] = 1.0f;
         sbtune[5] = 1.0f;
       }
-      have_tune = TRUE;
+      have_tune = 1;
     }
 
     spwev->fData[0] *= sbtune[0];
@@ -1295,7 +1294,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     spwev->sData[5] = (int)( spwev->sData[5] * sbtune[5] );
   }
   
-  return TRUE;
+  return 1;
 } /* end of SPW_InputIsSpaceballEvent */
 
 /*-----------------------------------------------------------------------------
@@ -1326,7 +1325,7 @@ void SPW_InputBeep (Display *display, char *string)
 
 #if HAVE_X11_EXTENSIONS_XINPUT_H
   /* if we are connected via XIE use that to beep the ball */
-  if (SpaceballInputExtension == TRUE) {
+  if (SpaceballInputExtension == 1) {
 #if HAVE_X11_EXTENSIONS_SGIMISC_H
     /* SGI beep */
     int slen = strlen (string);
@@ -1367,7 +1366,7 @@ void SPW_InputBeep (Display *display, char *string)
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
 
   /* if we are not using XIE use XCM to communicate with the ball */
-  if (SpaceballInputExtension == FALSE) {
+  if (SpaceballInputExtension == 0) {
     /* setup the string to be sent */
     SPW_strLength = 0;
     sndStr[0] = '\0';
@@ -1401,7 +1400,7 @@ void SPW_InputRezero (Display *display)
 {
 #if HAVE_X11_EXTENSIONS_XINPUT_H
   /* if we are connected via XIE use that to rezero the ball */
-  if (SpaceballInputExtension == TRUE)
+  if (SpaceballInputExtension == 1)
     {
 #if HAVE_X11_EXTENSIONS_SGIMISC_H
       /* SGI rezero */
@@ -1429,7 +1428,7 @@ void SPW_InputRezero (Display *display)
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
 
   /* if we are not using XIE use XCM to communicate with the ball */
-  if (SpaceballInputExtension == FALSE) {
+  if (SpaceballInputExtension == 0) {
     /* setup the rezero string and send it */
     SPW_strLength = 0;
     SendString (display, "Z\r");
@@ -1555,13 +1554,13 @@ void SPW_InputInitDispatchStruct (SPW_InputDispatchStruct * ds)
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
+ * int SPW_InputDispatch (SPW_InputDispatchStruct *ds)
  *
  * Args: 
  *   ds     (r/o)  - input dispatch structure
  *
  * Return Value:
- *   TRUE if a redraw is required, FALSE if a redraw is not required.
+ *   1 if a redraw is required, 0 if a redraw is not required.
  *
  * Description:
  *   Determines what type of event has been returned by the Spaceball and calls
@@ -1576,23 +1575,23 @@ void SPW_InputInitDispatchStruct (SPW_InputDispatchStruct * ds)
  *
  *----------------------------------------------------------------------------*/
 
-SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
+int SPW_InputDispatch (SPW_InputDispatchStruct *ds)
 {
   float    data[7];          /* place to store Spaceball event data */
   int      i;                /* loop counter */
   int      motion_events;    /* flag tells if we have motion event*/
-  SbBool  event_pending;    /* flag tells if ther's an event pending */
+  int  event_pending;    /* flag tells if ther's an event pending */
   int      all_zero_event;   /* flag set if there's an all zero event */
-  SbBool  redraw;           /* redraw flag */
-  SbBool  continue_loop;    /* flag to keep while loop running */
+  int  redraw;           /* redraw flag */
+  int  continue_loop;    /* flag to keep while loop running */
 
   /* initialize variable */
-  redraw = FALSE;
+  redraw = 0;
   motion_events=0;
-  event_pending=TRUE;
+  event_pending=1;
   all_zero_event=0;
-  redraw = FALSE;
-  continue_loop=TRUE;
+  redraw = 0;
+  continue_loop=1;
 
 #ifdef SPW_DEBUG
   fprintf(stderr,"SPW_InputDispatch\n");   /* show where we are */
@@ -1601,7 +1600,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
   /* if dispatch struct is empty, return to caller */
   if (ds == NULL)  
     {
-      return FALSE;
+      return 0;
     }
 
   /* initialize local event data structure */
@@ -1611,7 +1610,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
     }
 
   /* compress event data while it keeps on coming */
-  while (continue_loop == TRUE)
+  while (continue_loop == 1)
     {
 
 #ifdef SPW_DEBUG
@@ -1680,7 +1679,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
                   data[i] = 0.0f;      /* clear local data */
                 }
               motion_events = 0;      /* reset number of motion events */
-              redraw = TRUE;
+              redraw = 1;
             }
           break;
         default:
@@ -1705,14 +1704,14 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
                 }
               else
                 {
-                  continue_loop = FALSE; /* no event handler -> bail */
+                  continue_loop = 0; /* no event handler -> bail */
                 }
             }
         }
       else  /* no more events to compress */
         {
-          event_pending = FALSE;
-          continue_loop = FALSE;   
+          event_pending = 0;
+          continue_loop = 0;   
         }
     } /* end of while loop */
 
@@ -1722,7 +1721,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
 #endif
 
   /* push unwanted event back onto the stack */
-  if (event_pending == TRUE)
+  if (event_pending == 1)
     {
       XPutBackEvent(ds->display, ds->xevent);
     }
@@ -1748,7 +1747,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
       if (motion_events != 0) 
         {
           (*(ds->handle_motion)) (ds->display, data, ds->pMotionAppData);
-          redraw = TRUE;
+          redraw = 1;
         }
       
       if ( (all_zero_event != 0) && (motion_events > 1))
@@ -1760,7 +1759,7 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
 
           /* handle motion and force a redraw */
           (ds->handle_motion) (ds->display, data, ds->pMotionAppData);
-          redraw = TRUE;
+          redraw = 1;
         }
     }
 
@@ -1769,13 +1768,13 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
 
 /*-----------------------------------------------------------------------------
  *
- * SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
+ * int SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
  *
  * Args: 
  *   ds     (r/o)  - input dispatch structure
  *
  * Return Value:
- *   TRUE if a redraw is required, FALSE if a redraw is not required.
+ *   1 if a redraw is required, 0 if a redraw is not required.
  *
  * Description:
  *   Determines what type of event has been returned by the Spaceball and calls
@@ -1795,21 +1794,21 @@ SbBool SPW_InputDispatch (SPW_InputDispatchStruct *ds)
  *
  *----------------------------------------------------------------------------*/
 
-SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
+int SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
 {
-  float    data[7];          /* place to store Spaceball event data */
-  int      i;                /* loop counter */
-  int      motion_events;    /* flag tells if we have motion event*/
-  int      all_zero_event;   /* flag set if there's an all zero event */
-  SbBool  redraw;           /* redraw flag */
-  SbBool  continue_loop;    /* flag to keep while loop running */
+  float data[7]; /* place to store Spaceball event data */
+  int i; /* loop counter */
+  int motion_events; /* flag tells if we have motion event*/
+  int all_zero_event; /* flag set if there's an all zero event */
+  int redraw; /* redraw flag */
+  int continue_loop; /* flag to keep while loop running */
 
   /* initialize variable */
-  redraw = FALSE;
+  redraw = 0;
   motion_events=0;
   all_zero_event=0;
-  redraw = FALSE;
-  continue_loop=TRUE;
+  redraw = 0;
+  continue_loop=1;
 
 #ifdef SPW_DEBUG
   fprintf(stderr,"SPW_InputDispatch\n");  /* show where we are */
@@ -1818,7 +1817,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
   /* if dispatch struct is empty, return to caller */
   if (ds == NULL)
     {
-      return FALSE;
+      return 0;
     }
 
   /* initialize local event data structure */
@@ -1828,7 +1827,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
     }
 
   /* compress event data while it keeps on coming */
-  while (continue_loop == TRUE)
+  while (continue_loop == 1)
     {
 
 #ifdef SPW_DEBUG
@@ -1901,7 +1900,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
                   data[i] = 0.0f;      /* clear local data */
                 }
               motion_events = 0;      /* reset number of motion events */
-              redraw = TRUE;
+              redraw = 1;
             }
           break;
         default:
@@ -1913,7 +1912,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
         {
           XPeekEvent (ds->display, ds->xevent);         /* look at an event */
           if (SPW_InputIsSpaceballEvent (ds->display, ds->xevent,
-                                         ds->spwevent) == TRUE)
+                                         ds->spwevent) == 1)
             {
               XEvent throw_away;
               XNextEvent (ds->display, &throw_away);   /* remove the event */
@@ -1926,7 +1925,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
                   /* handle event and get loop status */
                   continue_loop = (ds->handle_other)
                     (ds->display, ds->xevent, ds->pOtherAppData);
-                  if (continue_loop == TRUE)
+                  if (continue_loop == 1)
                     {
                       XNextEvent (ds->display, ds->xevent);  /* get next event */
                     }
@@ -1937,13 +1936,13 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
                 }
               else
                 {
-                  continue_loop = FALSE; /* no event handler -> bail */
+                  continue_loop = 0; /* no event handler -> bail */
                 }
             }
         }
       else  /* no more events to compress */
         {
-          continue_loop = FALSE;
+          continue_loop = 0;
         }
     } /* end of while loop */
 
@@ -1974,7 +1973,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
       if (motion_events != 0)
         {
           (*(ds->handle_motion)) (ds->display, data, ds->pMotionAppData);
-          redraw = TRUE;
+          redraw = 1;
         }
 
       if ( (all_zero_event != 0) && (motion_events > 1) )
@@ -1986,7 +1985,7 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
 
           /* handle motion and force a redraw */
           (ds->handle_motion) (ds->display, data, ds->pMotionAppData);
-          redraw = TRUE;
+          redraw = 1;
         }
     }
 
@@ -1995,4 +1994,3 @@ SbBool SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
 } /* end of SPW_InputDispatchEx */
 
 #endif /* ! X_DISPLAY_MMISSING */
-
