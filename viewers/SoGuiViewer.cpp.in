@@ -144,7 +144,7 @@
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/common/SbGuiList.h>
-
+#include <Inventor/@Gui@/nodes/SoGuiViewpointWrapper.h>
 #include <Inventor/SoDB.h>
 
 #include <Inventor/nodes/SoBaseColor.h>
@@ -2714,9 +2714,16 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
 
   // Make our own camera if none was available.
   if (!scenecamera) {
-    scenecamera = (SoCamera *) PRIVATE(this)->cameratype.createInstance();
+    if (SoGuiViewpointWrapper::hasViewpoints(root)) {
+      scenecamera = new SoGuiViewpointWrapper;
+      PRIVATE(this)->cameratype = SoGuiViewpointWrapper::getClassTypeId();
+      ((SoGuiViewpointWrapper*)scenecamera)->setSceneGraph(root);
+    }
+    else {
+      scenecamera = (SoCamera *) PRIVATE(this)->cameratype.createInstance();
+    }
     PRIVATE(this)->deletecamera = TRUE;
-
+    
     // If type==BROWSER, camera should be inserted in the private
     // viewer "supergraph", if it's equal to EDITOR it should be
     // inserted in the user-supplied scenegraph.
@@ -2740,8 +2747,9 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
         PRIVATE(this)->scenegraph = g;
       }
     }
-
-    scenecamera->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
+    if (PRIVATE(this)->cameratype != SoGuiViewpointWrapper::getClassTypeId()) {
+      scenecamera->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
+    }
   }
 
   this->setCamera(scenecamera);
@@ -3257,9 +3265,8 @@ So@Gui@Viewer::toggleCameraType(void)
 {
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
-
   this->setCameraType(PRIVATE(this)->cameratype.isDerivedFrom(perspectivetype)
-                       ? orthotype : perspectivetype);
+                      ? orthotype : perspectivetype);
 }
 
 // ************************************************************************

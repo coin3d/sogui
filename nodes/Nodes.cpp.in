@@ -43,6 +43,7 @@ SoGuiNodes::initClasses(void)
   SoGuiSlider2::initClass();
   SoGuiColorEditor::initClass();
   SoGuiMaterialEditor::initClass();
+  SoGuiViewpointWrapper::initClass();
 }
 
 // *************************************************************************
