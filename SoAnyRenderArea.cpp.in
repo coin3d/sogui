@@ -99,6 +99,7 @@ So@GUI@RenderArea::constructor( // private
   this->overlayColormapSize = 0;
 
   this->clear = TRUE;
+  this->clearZBuffer = TRUE;
   this->clearOverlay = TRUE;
   this->autoRedraw = TRUE;
 
@@ -523,7 +524,7 @@ So@GUI@RenderArea::renderOverlay(
   void )
 {
   assert( this->overlayManager != NULL );
-  this->overlayManager->render( this->clearOverlay, this->clearOverlay );
+  this->overlayManager->render( this->clearOverlay, this->clearZBuffer );
 } // renderOverlay()
 
 /*!
@@ -706,8 +707,7 @@ So@GUI@RenderArea::actualOverlayRedraw( // virtual, protected
   void )
 {
   assert( this->overlayManager != NULL );
-  this->overlayManager->render( this->clearOverlay,
-                                this->clearOverlay );
+  this->overlayManager->render( this->clearOverlay, this->clearZBuffer );
 } // actualOverlayRedraw()
 
 /*!
