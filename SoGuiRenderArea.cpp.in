@@ -354,13 +354,12 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
 /*!
   Public constructor.
 */
-So@Gui@RenderArea::So@Gui@RenderArea(
-  @WIDGET@ parent,
-  const char * name,
-  SbBool embed,
-  SbBool mouseInput,
-  SbBool keyboardInput)
-: inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
+                                     const char * name,
+                                     SbBool embed,
+                                     SbBool mouseInput,
+                                     SbBool keyboardInput)
+  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
 {
   this->constructor(mouseInput, keyboardInput, TRUE);
 } // So@Gui@RenderArea()
@@ -368,26 +367,22 @@ So@Gui@RenderArea::So@Gui@RenderArea(
 /*!
   Protected constructor used by derived classes.
 */
-So@Gui@RenderArea::So@Gui@RenderArea(// protected
-  @WIDGET@ parent,
-  const char * name,
-  SbBool embed,
-  SbBool mouseInput,
-  SbBool keyboardInput,
-  SbBool build)
-: inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
+                                     const char * name,
+                                     SbBool embed,
+                                     SbBool mouseInput,
+                                     SbBool keyboardInput,
+                                     SbBool build)
+  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
 {
   this->constructor(mouseInput, keyboardInput, build);
 } // So@Gui@RenderArea()
 
-/*!
-  Common code for all constructors.
-*/
+// Common code for all constructors.
 void
-So@Gui@RenderArea::constructor(// private
-  SbBool mouseInput,
-  SbBool keyboardInput,
-  SbBool build)
+So@Gui@RenderArea::constructor(SbBool mouseInput,
+                               SbBool keyboardInput,
+                               SbBool build)
 {
   PRIVATE(this) = new So@Gui@RenderAreaP(this);
 
@@ -442,8 +437,7 @@ So@Gui@RenderArea::constructor(// private
 /*!
   Destructor.
 */
-So@Gui@RenderArea::~So@Gui@RenderArea(
-  void)
+So@Gui@RenderArea::~So@Gui@RenderArea()
 {
   for (int i = this->deviceList->getLength() - 1; i >= 0; i--) {
     So@Gui@Device * device = (So@Gui@Device *) ((*this->deviceList)[i]);
@@ -480,8 +474,7 @@ So@Gui@RenderArea::afterRealizeHook(void)
   \sa getSceneGraph(), setOverlaySceneGraph()
 */
 void
-So@Gui@RenderArea::setSceneGraph(// virtual
-  SoNode * scene)
+So@Gui@RenderArea::setSceneGraph(SoNode * scene)  // virtual
 {
   PRIVATE(this)->normalManager->setSceneGraph(scene);
 } // setSceneGraph()
@@ -493,8 +486,7 @@ So@Gui@RenderArea::setSceneGraph(// virtual
   \sa So@Gui@RenderArea::getSceneManager()
 */
 SoNode *
-So@Gui@RenderArea::getSceneGraph(// virtual
-  void)
+So@Gui@RenderArea::getSceneGraph(void) // virtual
 {
   return PRIVATE(this)->normalManager->getSceneGraph();
 } // getSceneGraph()
@@ -513,8 +505,7 @@ So@Gui@RenderArea::getSceneGraph(// virtual
   \sa setSceneGraph(), getOverlaySceneGraph()
 */
 void
-So@Gui@RenderArea::setOverlaySceneGraph(
-  SoNode * scene)
+So@Gui@RenderArea::setOverlaySceneGraph(SoNode * scene)
 {
   // FIXME: when an overlay scenegraph is attempted registered with
   // the SoQtRenderArea -- try to make a QGLWidget with overlay
@@ -528,8 +519,7 @@ So@Gui@RenderArea::setOverlaySceneGraph(
   This method returns the scene graph for the overlay scene.
 */
 SoNode *
-So@Gui@RenderArea::getOverlaySceneGraph(
-  void)
+So@Gui@RenderArea::getOverlaySceneGraph(void)
 {
   return PRIVATE(this)->overlayManager->getSceneGraph();
 } // getOverlaySceneGraph()
@@ -541,8 +531,7 @@ So@Gui@RenderArea::getOverlaySceneGraph(
   this component.
 */
 void
-So@Gui@RenderArea::registerDevice(
-  So@Gui@Device * device)
+So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
 {
   int idx = deviceList->find(device);
   if (idx == -1)
@@ -559,8 +548,7 @@ So@Gui@RenderArea::registerDevice(
   events for this component.
 */
 void
-So@Gui@RenderArea::unregisterDevice(
-  So@Gui@Device * device)
+So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
 {
   assert(this->deviceList != NULL);
   const int idx = this->deviceList->find(device);
@@ -581,8 +569,7 @@ So@Gui@RenderArea::unregisterDevice(
   This method sets the background color of the scene.
 */
 void
-So@Gui@RenderArea::setBackgroundColor(
-  const SbColor & color)
+So@Gui@RenderArea::setBackgroundColor(const SbColor & color)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->setBackgroundColor(color);
@@ -592,8 +579,7 @@ So@Gui@RenderArea::setBackgroundColor(
   This method returns the background color for the scene.
 */
 const SbColor &
-So@Gui@RenderArea::getBackgroundColor(
-  void) const
+So@Gui@RenderArea::getBackgroundColor(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getBackgroundColor();
@@ -605,8 +591,7 @@ So@Gui@RenderArea::getBackgroundColor(
   This method sets the index of the background color for the scene.
 */
 void
-So@Gui@RenderArea::setBackgroundIndex(
-  int idx)
+So@Gui@RenderArea::setBackgroundIndex(int idx)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->setBackgroundIndex(idx);
@@ -616,8 +601,7 @@ So@Gui@RenderArea::setBackgroundIndex(
   This method returns the index of the background color for the scene.
 */
 int
-So@Gui@RenderArea::getBackgroundIndex(
-  void) const
+So@Gui@RenderArea::getBackgroundIndex(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getBackgroundIndex();
@@ -629,8 +613,7 @@ So@Gui@RenderArea::getBackgroundIndex(
   This method sets the index of the background for the overlay scene.
 */
 void
-So@Gui@RenderArea::setOverlayBackgroundIndex(
-  int idx)
+So@Gui@RenderArea::setOverlayBackgroundIndex(int idx)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   PRIVATE(this)->overlayManager->setBackgroundIndex(idx);
@@ -640,8 +623,7 @@ So@Gui@RenderArea::setOverlayBackgroundIndex(
   This method returns the index of the background for the overlay scene.
 */
 int
-So@Gui@RenderArea::getOverlayBackgroundIndex(
-  void) const
+So@Gui@RenderArea::getOverlayBackgroundIndex(void) const
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   return PRIVATE(this)->overlayManager->getBackgroundIndex();
@@ -653,10 +635,7 @@ So@Gui@RenderArea::getOverlayBackgroundIndex(
   This method sets the colormap for the scene.
 */
 void
-So@Gui@RenderArea::setColorMap(
-  int start,
-  int num,
-  const SbColor * colors)
+So@Gui@RenderArea::setColorMap(int start, int num, const SbColor * colors)
 {
   delete [] PRIVATE(this)->normalColormap;
   PRIVATE(this)->normalColormapStart = start;
@@ -670,10 +649,8 @@ So@Gui@RenderArea::setColorMap(
   This method sets the colormap for the overlay scene.
 */
 void
-So@Gui@RenderArea::setOverlayColorMap(
-  int start,
-  int num,
-  const SbColor * colors)
+So@Gui@RenderArea::setOverlayColorMap(int start, int num,
+                                      const SbColor * colors)
 {
   delete [] PRIVATE(this)->overlayColormap;
   PRIVATE(this)->overlayColormapStart = start;
@@ -689,8 +666,7 @@ So@Gui@RenderArea::setOverlayColorMap(
   This method sets the viewport region.
 */
 void
-So@Gui@RenderArea::setViewportRegion(
-  const SbViewportRegion & region)
+So@Gui@RenderArea::setViewportRegion(const SbViewportRegion & region)
 {
   if (region.getWindowSize()[0] == -1) return;
 
@@ -709,8 +685,7 @@ So@Gui@RenderArea::setViewportRegion(
   This method returns the viewport region.
 */
 const SbViewportRegion &
-So@Gui@RenderArea::getViewportRegion(
-  void) const
+So@Gui@RenderArea::getViewportRegion(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getGLRenderAction()->getViewportRegion();
@@ -722,8 +697,7 @@ So@Gui@RenderArea::getViewportRegion(
   This method sets the transparency type to be used for the scene.
 */
 void
-So@Gui@RenderArea::setTransparencyType(
-  SoGLRenderAction::TransparencyType type)
+So@Gui@RenderArea::setTransparencyType(SoGLRenderAction::TransparencyType type)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->getGLRenderAction()->setTransparencyType(type);
@@ -734,8 +708,7 @@ So@Gui@RenderArea::setTransparencyType(
   This method returns the transparency type used for the scene.
 */
 SoGLRenderAction::TransparencyType
-So@Gui@RenderArea::getTransparencyType(
-  void) const
+So@Gui@RenderArea::getTransparencyType(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getGLRenderAction()->getTransparencyType();
@@ -747,9 +720,7 @@ So@Gui@RenderArea::getTransparencyType(
   This method sets the antialiasing used for the scene.
 */
 void
-So@Gui@RenderArea::setAntialiasing(
-  SbBool smoothing,
-  int numPasses)
+So@Gui@RenderArea::setAntialiasing(SbBool smoothing, int numPasses)
 {
   // FIXME: is this really necessary? I think we should either ignore
   // the call or store values for later migration if the scenemanager
@@ -785,9 +756,7 @@ So@Gui@RenderArea::setAntialiasing(
   This method returns the antialiasing used for the scene.
 */
 void
-So@Gui@RenderArea::getAntialiasing(
-  SbBool & smoothing,
-  int & numPasses) const
+So@Gui@RenderArea::getAntialiasing(SbBool & smoothing, int & numPasses) const
 {
   // FIXME: there's an API design flaw here, as it is assumed that the
   // antialiasing setting for the renderaction in the "normal"
@@ -812,9 +781,7 @@ So@Gui@RenderArea::getAntialiasing(
   rendering.
 */
 void
-So@Gui@RenderArea::setClearBeforeRender(
-  SbBool enable,
-  SbBool zbEnable)
+So@Gui@RenderArea::setClearBeforeRender(SbBool enable, SbBool zbEnable)
 {
   PRIVATE(this)->clear = enable;
   PRIVATE(this)->clearZBuffer = zbEnable;
@@ -825,8 +792,7 @@ So@Gui@RenderArea::setClearBeforeRender(
   render.
 */
 SbBool
-So@Gui@RenderArea::isClearBeforeRender(
-  void) const
+So@Gui@RenderArea::isClearBeforeRender(void) const
 {
   return PRIVATE(this)->clear;
 } // isClearBeforeRender()
@@ -836,8 +802,7 @@ So@Gui@RenderArea::isClearBeforeRender(
   before each render.
 */
 SbBool
-So@Gui@RenderArea::isClearZBufferBeforeRender(
-  void) const
+So@Gui@RenderArea::isClearZBufferBeforeRender(void) const
 {
   return PRIVATE(this)->clearZBuffer;
 } // isClearZBufferBeforeRender()
@@ -847,8 +812,7 @@ So@Gui@RenderArea::isClearZBufferBeforeRender(
   before each render or not.
 */
 void
-So@Gui@RenderArea::setClearBeforeOverlayRender(
-  SbBool enable)
+So@Gui@RenderArea::setClearBeforeOverlayRender(SbBool enable)
 {
   PRIVATE(this)->clearOverlay = enable;
 } // setClearBeforeOverlayRender()
@@ -858,8 +822,7 @@ So@Gui@RenderArea::setClearBeforeOverlayRender(
   before each redraw or not.
 */
 SbBool
-So@Gui@RenderArea::isClearBeforeOverlayRender(
-  void) const
+So@Gui@RenderArea::isClearBeforeOverlayRender(void) const
 {
   return PRIVATE(this)->clearOverlay;
 } // isClearBeforeOverlayRender()
@@ -872,8 +835,7 @@ So@Gui@RenderArea::isClearBeforeOverlayRender(
   redraw of the scenegraph contents.
 */
 void
-So@Gui@RenderArea::setAutoRedraw(
-  SbBool enable)
+So@Gui@RenderArea::setAutoRedraw(SbBool enable)
 {
   if (enable) {
     PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
@@ -896,8 +858,7 @@ So@Gui@RenderArea::setAutoRedraw(
   not.
 */
 SbBool
-So@Gui@RenderArea::isAutoRedraw(
-  void) const
+So@Gui@RenderArea::isAutoRedraw(void) const
 {
   return PRIVATE(this)->autoRedraw;
 } // isAutoRedraw()
@@ -905,10 +866,8 @@ So@Gui@RenderArea::isAutoRedraw(
 /*!
   This method sets the redraw priority.
 */
-
 void
-So@Gui@RenderArea::setRedrawPriority(
-  uint32_t priority)
+So@Gui@RenderArea::setRedrawPriority(uint32_t priority)
 {
   PRIVATE(this)->normalManager->setRedrawPriority(priority);
   PRIVATE(this)->overlayManager->setRedrawPriority(priority);
@@ -917,10 +876,8 @@ So@Gui@RenderArea::setRedrawPriority(
 /*!
   This method returns the redraw priority.
 */
-
 uint32_t
-So@Gui@RenderArea::getRedrawPriority(
-  void) const
+So@Gui@RenderArea::getRedrawPriority(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getRedrawPriority();
@@ -929,10 +886,8 @@ So@Gui@RenderArea::getRedrawPriority(
 /*!
   This function returns the default redraw priority.
 */
-
 uint32_t
-So@Gui@RenderArea::getDefaultRedrawPriority(// static
-  void)
+So@Gui@RenderArea::getDefaultRedrawPriority(void) // static
 {
   return SoSceneManager::getDefaultRedrawPriority();
 } // getDefaultRedrawPriority()
@@ -940,10 +895,8 @@ So@Gui@RenderArea::getDefaultRedrawPriority(// static
 /*!
   This method renders the scene.
 */
-
 void
-So@Gui@RenderArea::render(
-  void)
+So@Gui@RenderArea::render(void)
 {
   this->redraw();
 } // render()
@@ -951,10 +904,8 @@ So@Gui@RenderArea::render(
 /*!
   This method renders the overlay scene.
 */
-
 void
-So@Gui@RenderArea::renderOverlay(
-  void)
+So@Gui@RenderArea::renderOverlay(void)
 {
   this->redrawOverlay();
 } // renderOverlay()
@@ -963,10 +914,8 @@ So@Gui@RenderArea::renderOverlay(
   This method schedules a redraw to happen at a later time (when the
   application has processed it's other events first).
 */
-
 void
-So@Gui@RenderArea::scheduleRedraw(
-  void)
+So@Gui@RenderArea::scheduleRedraw(void)
 {
 #if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
   SoDebugError::postInfo("So@Gui@RenderArea::scheduleRedraw",
@@ -983,10 +932,8 @@ So@Gui@RenderArea::scheduleRedraw(
 /*!
   This method schedules a redraw of the overlay scene.
 */
-
 void
-So@Gui@RenderArea::scheduleOverlayRedraw(
-  void)
+So@Gui@RenderArea::scheduleOverlayRedraw(void)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   // In case autoRedraw is OFF. The callback pointer will be reset to
@@ -1006,10 +953,8 @@ So@Gui@RenderArea::scheduleOverlayRedraw(
   original Inventor API here, but this will probably change in the
   next major revision of the library.)
 */
-
 void
-So@Gui@RenderArea::redrawOnSelectionChange(
-  SoSelection * selection)
+So@Gui@RenderArea::redrawOnSelectionChange(SoSelection * selection)
 {
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation. 20001002 mortene.
@@ -1035,10 +980,8 @@ So@Gui@RenderArea::redrawOnSelectionChange(
 
   \sa So@Gui@RenderArea::redrawOnSelectionChange()
 */
-
 void
-So@Gui@RenderArea::redrawOverlayOnSelectionChange(
-  SoSelection * selection)
+So@Gui@RenderArea::redrawOverlayOnSelectionChange(SoSelection * selection)
 {
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
@@ -1059,11 +1002,9 @@ So@Gui@RenderArea::redrawOverlayOnSelectionChange(
 /*!
   This method sets the render area event callback.
 */
-
 void
-So@Gui@RenderArea::setEventCallback(
-  So@Gui@RenderAreaEventCB * func,
-  void * user)
+So@Gui@RenderArea::setEventCallback(So@Gui@RenderAreaEventCB * func,
+                                    void * user)
 {
   this->appEventHandler = func;
   this->appEventHandlerData = user;
@@ -1072,10 +1013,8 @@ So@Gui@RenderArea::setEventCallback(
 /*!
   This method sets the normal scene SoSceneManager object.
 */
-
 void
-So@Gui@RenderArea::setSceneManager(
-  SoSceneManager * manager)
+So@Gui@RenderArea::setSceneManager(SoSceneManager * manager)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager = manager;
@@ -1099,8 +1038,7 @@ So@Gui@RenderArea::setSceneManager(
   the root node Coin uses for rendering.
 */
 SoSceneManager *
-So@Gui@RenderArea::getSceneManager(
-  void) const
+So@Gui@RenderArea::getSceneManager(void) const
 {
   return PRIVATE(this)->normalManager;
 } // getSceneManager()
@@ -1110,8 +1048,7 @@ So@Gui@RenderArea::getSceneManager(
 */
 
 void
-So@Gui@RenderArea::setOverlaySceneManager(
-  SoSceneManager * manager)
+So@Gui@RenderArea::setOverlaySceneManager(SoSceneManager * manager)
 {
   PRIVATE(this)->overlayManager = manager;
 } // setOverlaySceneManager()
@@ -1121,8 +1058,7 @@ So@Gui@RenderArea::setOverlaySceneManager(
 */
 
 SoSceneManager *
-So@Gui@RenderArea::getOverlaySceneManager(
-  void) const
+So@Gui@RenderArea::getOverlaySceneManager(void) const
 {
   return PRIVATE(this)->overlayManager;
 } // getOverlaySceneManager()
@@ -1132,8 +1068,7 @@ So@Gui@RenderArea::getOverlaySceneManager(
 */
 
 void
-So@Gui@RenderArea::setGLRenderAction(
-  SoGLRenderAction * action)
+So@Gui@RenderArea::setGLRenderAction(SoGLRenderAction * action)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->setGLRenderAction(action);
@@ -1145,10 +1080,8 @@ So@Gui@RenderArea::setGLRenderAction(
 /*!
   This method returns the SoGLRenderAction object for the normal scene.
 */
-
 SoGLRenderAction *
-So@Gui@RenderArea::getGLRenderAction(
-  void) const
+So@Gui@RenderArea::getGLRenderAction(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
   return PRIVATE(this)->normalManager->getGLRenderAction();
@@ -1158,10 +1091,8 @@ So@Gui@RenderArea::getGLRenderAction(
   This method sets the SoGLRenderAction object for rendering the overlay
   scen graph.
 */
-
 void
-So@Gui@RenderArea::setOverlayGLRenderAction(
-  SoGLRenderAction * action)
+So@Gui@RenderArea::setOverlayGLRenderAction(SoGLRenderAction * action)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   PRIVATE(this)->overlayManager->setGLRenderAction(action);
@@ -1171,10 +1102,8 @@ So@Gui@RenderArea::setOverlayGLRenderAction(
   This method returns the SoGLRenderAction object for the overlay scene
   graph.
 */
-
 SoGLRenderAction *
-So@Gui@RenderArea::getOverlayGLRenderAction(
-  void) const
+So@Gui@RenderArea::getOverlayGLRenderAction(void) const
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   return PRIVATE(this)->overlayManager->getGLRenderAction();
@@ -1183,10 +1112,8 @@ So@Gui@RenderArea::getOverlayGLRenderAction(
 /*!
   This method redraws the normal scene graph.
 */
-
 void
-So@Gui@RenderArea::redraw(// virtual, protected
-  void)
+So@Gui@RenderArea::redraw(void) // virtual, protected
 {
 #if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
   SoDebugError::postInfo("So@Gui@RenderArea::render",
@@ -1219,10 +1146,8 @@ So@Gui@RenderArea::redraw(// virtual, protected
 /*!
   This method redraws the normal scene graph.
 */
-
 void
-So@Gui@RenderArea::actualRedraw(// virtual, protected
-  void)
+So@Gui@RenderArea::actualRedraw(void) // virtual, protected
 {
   assert(PRIVATE(this)->normalManager != NULL);
   if (! this->isVisible()) return;
@@ -1232,10 +1157,8 @@ So@Gui@RenderArea::actualRedraw(// virtual, protected
 /*!
   This method redraws the overlay scene.
 */
-
 void
-So@Gui@RenderArea::redrawOverlay(// virtual, protected
-  void)
+So@Gui@RenderArea::redrawOverlay(void) // virtual, protected
 {
   if (!this->isVisible() || this->waitForExpose || !this->hasOverlayGLArea()) return;
   
@@ -1248,10 +1171,8 @@ So@Gui@RenderArea::redrawOverlay(// virtual, protected
 /*!
   This method renders the overlay scene.
 */
-
 void
-So@Gui@RenderArea::actualOverlayRedraw(// virtual, protected
-  void)
+So@Gui@RenderArea::actualOverlayRedraw(void) // virtual, protected
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   if (! this->isVisible()) return;
@@ -1261,10 +1182,8 @@ So@Gui@RenderArea::actualOverlayRedraw(// virtual, protected
 /*!
   This method is invoked to initialize the normal graphics.
 */
-
 void
-So@Gui@RenderArea::initGraphic(// virtual, protected
-  void)
+So@Gui@RenderArea::initGraphic(void) // virtual, protected
 {
   SoSceneManager * mgr = this->getSceneManager();
   if (mgr) {
@@ -1281,10 +1200,8 @@ So@Gui@RenderArea::initGraphic(// virtual, protected
 /*!
   This method is invoked to initialize the overlay graphics.
 */
-
 void
-So@Gui@RenderArea::initOverlayGraphic(// virtual, protected
-  void)
+So@Gui@RenderArea::initOverlayGraphic(void) // virtual, protected
 {
   SoSceneManager * mgr = this->getOverlaySceneManager();
   if (mgr) {
@@ -1298,8 +1215,8 @@ So@Gui@RenderArea::initOverlayGraphic(// virtual, protected
 } // initOverlayGraphic()
 
 // doc in super
-void             // virtual, protected
-So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
+void
+So@Gui@RenderArea::sizeChanged(const SbVec2s & size) // virtual, protected
 {
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("So@Gui@RenderArea::sizeChanged",
@@ -1337,8 +1254,7 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
 
 // Documented in superclass.
 void
-So@Gui@RenderArea::widgetChanged(// virtual, protected
-  @WIDGET@ widget)
+So@Gui@RenderArea::widgetChanged(@WIDGET@ widget) // virtual, protected
 {
   PRIVATE(this)->normalManager->reinitialize();
   PRIVATE(this)->overlayManager->reinitialize();
@@ -1372,10 +1288,8 @@ So@Gui@RenderArea::widgetChanged(// virtual, protected
   This method builds the So@Gui@RenderArea contents in the \a parent
   widget.
 */
-
 @WIDGET@
-So@Gui@RenderArea::buildWidget(// protected
-  @WIDGET@ parent)
+So@Gui@RenderArea::buildWidget(@WIDGET@ parent) // protected
 {
   @WIDGET@ widget = inherited::buildWidget(parent);
   if (this->deviceList != NULL) {
@@ -1403,10 +1317,8 @@ So@Gui@RenderArea::buildWidget(// protected
 /*!
   This method returns a default widget name for the base widget.
 */
-
 const char *
-So@Gui@RenderArea::getDefaultWidgetName(// virtual, protected
-  void) const
+So@Gui@RenderArea::getDefaultWidgetName(void) const // virtual, protected
 {
   static const char defaultWidgetName[] = "So@Gui@WidgetName";
   return defaultWidgetName;
@@ -1415,10 +1327,8 @@ So@Gui@RenderArea::getDefaultWidgetName(// virtual, protected
 /*!
   This method returns a default title for the component window.
 */
-
 const char *
-So@Gui@RenderArea::getDefaultTitle(// virtual, protected
-  void) const
+So@Gui@RenderArea::getDefaultTitle(void) const // virtual, protected
 {
   static const char defaultTitle[] = "@Gui@ RenderArea";
   return defaultTitle;
@@ -1427,10 +1337,8 @@ So@Gui@RenderArea::getDefaultTitle(// virtual, protected
 /*!
   This method returns a default title for the component window icon.
 */
-
 const char *
-So@Gui@RenderArea::getDefaultIconTitle(// virtual, protected
-  void) const
+So@Gui@RenderArea::getDefaultIconTitle(void) const // virtual, protected
 {
   static const char defaultIconTitle[] = "@Gui@ RenderArea";
   return defaultIconTitle;
@@ -1439,10 +1347,8 @@ So@Gui@RenderArea::getDefaultIconTitle(// virtual, protected
 /*!
   This method invokes the application event handler, if one is set.
 */
-
 SbBool
-So@Gui@RenderArea::invokeAppCB(// protected
-  @EVENT@ event)
+So@Gui@RenderArea::invokeAppCB(@EVENT@ event) // protected
 {
   if (this->appEventHandler != NULL)
     return this->appEventHandler(this->appEventHandlerData, event);
@@ -1464,8 +1370,7 @@ So@Gui@RenderArea::invokeAppCB(// protected
   \c TRUE is returned if the event was handled, otherwise \c FALSE.
 */
 SbBool
-So@Gui@RenderArea::processSoEvent(// virtual
-  const SoEvent * const event)
+So@Gui@RenderArea::processSoEvent(const SoEvent * const event) // virtual
 {
   if (PRIVATE(this)->overlayManager->processEvent(event))
     return TRUE;
@@ -1482,8 +1387,7 @@ So@Gui@RenderArea::processSoEvent(// virtual
   generic SoEvent is forwarded to So@Gui@RenderArea::processSoEvent().
  */
 void
-So@Gui@RenderArea::processEvent(// virtual, protected
-  @EVENT@ event)
+So@Gui@RenderArea::processEvent(@EVENT@ event) // virtual, protected
 {
   if (this->invokeAppCB(event))
     return;
@@ -1551,8 +1455,7 @@ So@Gui@RenderArea::glScheduleRedraw(void)
   event, or \c NULL if there are none.
 */
 const SoEvent *
-So@Gui@RenderArea::getSoEvent(
-  @EVENT@ event)
+So@Gui@RenderArea::getSoEvent(@EVENT@ event)
 {
   if (! this->deviceList)
     return (SoEvent *) NULL;
@@ -1572,8 +1475,7 @@ So@Gui@RenderArea::getSoEvent(
   classes.
 */
 void
-So@Gui@RenderArea::setDevicesWindowSize(
-  const SbVec2s size)
+So@Gui@RenderArea::setDevicesWindowSize(const SbVec2s size)
 {
   if (! this->deviceList) return;
   const int num = this->deviceList->getLength();
@@ -1584,9 +1486,7 @@ So@Gui@RenderArea::setDevicesWindowSize(
 // *************************************************************************
 
 void
-So@Gui@RenderArea::renderCB(// static
-  void * closure,
-  SoSceneManager * manager)
+So@Gui@RenderArea::renderCB(void * closure, SoSceneManager * manager)
 {
   So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
   if (manager == PRIVATE(thisptr)->normalManager)
@@ -1603,9 +1503,7 @@ So@Gui@RenderArea::renderCB(// static
   Callback for automatic redraw on SoSelection changes.
 */
 void
-So@Gui@RenderArea::selection_redraw_cb(// static
-  void * closure,
-  SoSelection * sel)
+So@Gui@RenderArea::selection_redraw_cb(void * closure, SoSelection * sel)
 {
   So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
   if (sel == PRIVATE(ra)->normalSelection)
