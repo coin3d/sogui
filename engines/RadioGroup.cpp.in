@@ -87,6 +87,7 @@ SoGuiRadioGroup::inputChanged(SoField * which)
 void
 SoGuiRadioGroup::evaluate(void)
 {
+  if ( this->index == -1 ) return; // avoid update
   SoSFBool * fields[] = {
     &(this->in0), &(this->in1), &(this->in2), &(this->in3),
     &(this->in4), &(this->in5), &(this->in6), &(this->in7),
