@@ -1,4 +1,6 @@
 =====================================================================
+NOTE: see also So@Gui@/BUGS.txt.
+=====================================================================
 
 000 SoText2 won't show with drawstyle == hidden line. Bug reported by
     Jean Davy. Reproduce with this minimal, stand-alone example:

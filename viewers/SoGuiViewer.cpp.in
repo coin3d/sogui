@@ -2356,6 +2356,12 @@ So@Gui@Viewer::isAutoClipping(
 /*!
   Turn stereo viewing on or off.
 
+  Coin does "correct" stereo rendering, using the method known as
+  "parallel axis asymmetric frustum perspective projection". For more
+  information, see this link:
+
+    http://astronomy.swin.edu.au/~pbourke/opengl/stereogl/
+
   \sa isStereoViewing()
 */
 
