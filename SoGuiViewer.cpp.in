@@ -34,9 +34,9 @@ static const char rcsid[] =
 \**************************************************************************/
 
 /*!
-  \class So@GUI@Viewer So@GUI@Viewer.h Inventor/@GUI@/viewers/So@GUI@Viewer.h
+  \class So@GUI@Viewer Inventor/@GUI@/viewers/So@GUI@Viewer.h
   \brief The So@GUI@Viewer class is the top level base viewer class.
-  \ingroup so@lGUI@viewers
+  \ingroup viewers
 
   TODO: more doc
   ...overview of what this class provides over parent class...
@@ -49,6 +49,8 @@ static const char rcsid[] =
 
   \sa So@GUI@FullViewer
 */
+
+// *************************************************************************
 
 #if HAVE_CONFIG_H
 #include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
@@ -96,6 +98,8 @@ static const char rcsid[] =
 #ifndef M_PI
 #define M_PI 3.1415926535f
 #endif // ! M_PI
+
+// *************************************************************************
 
 /*!
   \enum So@GUI@Viewer::Type
@@ -206,6 +210,55 @@ static const char rcsid[] =
   FIXME: write documentation for enum definition
 */
 
+/*!
+  \var SoCamera * So@Gui@Viewer::camera
+
+  Pointer to the viewer camera.
+*/
+
+/*!
+  \var So@Gui@Viewer::Type So@Gui@Viewer::type
+
+  The type of the viewer.
+*/
+
+/*!
+  \var SbBool So@Gui@Viewer::viewingFlag
+
+  Whether the viewer is in view mode or not.
+*/
+
+/*!
+  \var SoSeparator * So@Gui@Viewer::sceneRoot
+
+  The root of the viewer scene graph.
+*/
+
+/*!
+  \var SoNode * So@Gui@Viewer::sceneGraph
+
+  The root of the user scene graph.
+*/
+
+/*!
+  \var SbBool So@Gui@Viewer::altSwitchBack
+
+  Flag on returning from alt in pick mode?
+*/
+
+/*!
+  \var SoGetBoundingBoxAction So@Gui@Viewer::autoClipBboxAction
+
+  Action for getting the scene bounding box, for setting the clip planes.
+*/
+
+/*!
+  \var float So@Gui@Viewer::minimumNearPlane
+
+  Percentage of distance to far plane for distance to near plane.
+*/
+
+// *************************************************************************
 
 /*!
   \internal

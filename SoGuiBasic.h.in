@@ -23,6 +23,18 @@
 #ifndef SO@uGUI@_BASIC_H
 #define SO@uGUI@_BASIC_H
 
+/*!
+  \defgroup devices @Gui@ Device Classes
+*/
+
+/*!
+  \defgroup components @Gui@ Components
+*/
+
+/*!
+  \defgroup viewers @Gui@ Viewer Components
+*/
+
 // *************************************************************************
 
 template <class Type>

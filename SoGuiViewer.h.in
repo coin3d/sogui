@@ -43,10 +43,6 @@
 
 #include <Inventor/@GUI@/So@GUI@RenderArea.h>
 
-/*!
-  \defgroup so@lGUI@viewers So@GUI@ Viewer Components
-*/
-
 class SoCallbackList;
 class SoBaseColor;
 class SoCamera;
