@@ -419,17 +419,19 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
   and doesn't cover cases where nodes have multiple parents.
 */
 
-static inline SoGroup *
-GETPARENTOFNODE(SoNode * root, SoNode * node)
+static SoGroup *
+get_parent_of_node(SoNode * root, SoNode * node)
 {
+  assert(node && root && "get_parent_of_node() called with null argument");
+
   SoSearchAction search;
   search.setSearchingAll(TRUE);
-  assert(node);
   search.setNode(node);
-  assert(root);
   search.apply(root);
-  assert(search.getPath());
-  return (SoGroup *) ((SoFullPath *)search.getPath())->getNodeFromTail(1);
+  assert(search.getPath() && "node not found in scenegraph");
+  SoNode * parent = ((SoFullPath *)search.getPath())->getNodeFromTail(1);
+  assert(parent && "couldn't find parent");
+  return (SoGroup *)parent;
 }
 
 // *************************************************************************
@@ -609,7 +611,7 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (PRIVATE(this)->deletecamera) {
-      SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
+      SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
       cameraparent->removeChild(this->camera);
       PRIVATE(this)->deletecamera = FALSE;
     }
@@ -721,7 +723,7 @@ So@Gui@Viewer::setCameraType(SoType t)
         2 * focaldist * tan(oldpcam->heightAngle.getValue() / 2.0f);
     }
 
-    SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
+    SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
     cameraparent->insertChild( newcamera,
                                cameraparent->findChild( this->camera ) );
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
@@ -834,8 +836,6 @@ So@Gui@Viewer::resetToHomePosition(void)
 void
 So@Gui@Viewer::setHeadlight(SbBool on)
 {
-  SoSearchAction search;
-
   if (on) {
     if (!PRIVATE(this)->lightroot) {
       PRIVATE(this)->lightroot = new SoTransformSeparator;
@@ -858,10 +858,13 @@ So@Gui@Viewer::setHeadlight(SbBool on)
       return;
     }
 
-    SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
+    SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
     int lidx = cameraparent->findChild(PRIVATE(this)->lightroot);
     if (lidx == -1) {
       int idx = cameraparent->findChild(this->camera);
+      // FIXME: inserting the lightsource node under the same group
+      // node as the camera is a terrible idea -- it will for instance
+      // f*ck up if the camera parent is a switch node. 20010815 mortene.
       cameraparent->insertChild(PRIVATE(this)->lightroot, idx+1);
 
       SoRotation * lorient = (SoRotation *) PRIVATE(this)->lightroot->getChild(0);
@@ -870,8 +873,8 @@ So@Gui@Viewer::setHeadlight(SbBool on)
   }
   else {
     if (PRIVATE(this)->lightroot) {
-      SoGroup * lightparent = GETPARENTOFNODE(this->sceneRoot,
-                                              PRIVATE(this)->lightroot);
+      SoGroup * lightparent = get_parent_of_node(this->sceneRoot,
+                                                 PRIVATE(this)->lightroot);
       lightparent->removeChild(PRIVATE(this)->lightroot);
 
       SoRotation * lorient = (SoRotation *) PRIVATE(this)->lightroot->getChild(0);
