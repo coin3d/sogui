@@ -1,23 +1,2 @@
 NEWS
 ====
-
-2000-09-08 larsa:
-	* changed public license from QPL to LGPL.
-
-2000-03-31 larsa:
-	* removed all obsolete files (and files to be obsoleted).
-
-2000-03-16 larsa:
-	* added SoAnyPopupMenu interface.
-
-2000-03-08 larsa:
-	* removed Makefile.am/in and built these sources into the other
-	  relevant sub-libraries to avoid the Makefile.in file that changes
-	  depending on which module it is built under.
-
-2000-01-30 larsa:
-	* Started putting viewer source code into static SoAny*Viewer classes.
-
-1999-12-07 larsa:
-	* Initially created, and set up for automatic inclusion in SoQt.
-
