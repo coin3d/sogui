@@ -36,11 +36,6 @@ static const char rcsid[] =
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/widgets/SoAnyThumbWheel.h>
 
-#ifndef FALSE
-#define FALSE  0
-#define TRUE   (!FALSE)
-#endif // ! FALSE
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif // ! M_PI
@@ -85,8 +80,8 @@ SoAnyThumbWheel::SoAnyThumbWheel(
 , byteorder( ABGR )
 , boundaryhandling( MODULATE )
 , movement( AUTHENTIC )
-, dirtyTables( TRUE )
-, dirtyVariables( TRUE )
+, dirtyTables( 1 )
+, dirtyVariables( 1 )
 {
   assert( sizeof(int) == 4 && "FIXME: use int32 datatype instead" );
 
@@ -129,10 +124,10 @@ SoAnyThumbWheel::setSize(
   const int width )
 {
   if ( this->diameter != diameter ) {
-    this->dirtyTables = TRUE;
-    this->dirtyVariables = TRUE;
+    this->dirtyTables = 1;
+    this->dirtyVariables = 1;
   } else if ( this->width != width ) {
-    this->dirtyVariables = TRUE; // embossed squares grows...
+    this->dirtyVariables = 1; // embossed squares grows...
   } else {
     return;
   }
@@ -431,11 +426,11 @@ SoAnyThumbWheel::validate( // private
       this->tables[SIN][i] = sqrt( 1.0f - this->tables[COS][i] * this->tables[COS][i] );
     }
 
-    this->dirtyTables = FALSE;
+    this->dirtyTables = 0;
   }
 
   if ( this->dirtyVariables ) {
-    assert( this->dirtyTables == FALSE );
+    assert( this->dirtyTables == 0 );
     if ( (this->diameter % 2) == 0)
       this->unistep = this->tables[RAD][this->diameter/2] -
                       this->tables[RAD][(this->diameter/2)-1];
@@ -451,7 +446,7 @@ SoAnyThumbWheel::validate( // private
     this->numsquares = squares;
     this->squarelength = ((2.0f * M_PI) / (float) squares) - this->squarespacing;
 
-    this->dirtyVariables = FALSE;
+    this->dirtyVariables = 0;
   }
 } // validate()
 
@@ -553,7 +548,7 @@ SoAnyThumbWheel::drawEnabledWheel(
   float modulo = (2.0f * M_PI) / numsquares;
   float radian = modulo - (((2.0f * M_PI) / (float) numsquares) * (((float) (number - 1)) / (float) numEnabledBitmaps));
 
-  int newsquare = TRUE;
+  int newsquare = 1;
   unsigned int * buffer = (unsigned int *) bitmap;
   for ( int j = 0; j < this->diameter; j++ ) {
     unsigned int light, front, normal, shade, color;
@@ -578,18 +573,18 @@ SoAnyThumbWheel::drawEnabledWheel(
       shade   = this->swapWord( shade );
     }
 
-    static int flag = FALSE;
+    static int flag = 0;
     if ( newsquare ) {
       color=front;
-      newsquare = FALSE;
-      flag = TRUE;
+      newsquare = 0;
+      flag = 1;
     } else {
-      if ( flag == TRUE ) {
+      if ( flag == 1 ) {
         if ( j < (this->diameter * 2 / 3) )
           color = shade;
         else
           color = normal;
-        flag = FALSE;
+        flag = 0;
       } else {
         color = normal;
       }
@@ -598,13 +593,13 @@ SoAnyThumbWheel::drawEnabledWheel(
     if ( alignment == VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
-      if ( flag == TRUE ) buffer[(this->width*j)+2] = front;
+      if ( flag == 1 ) buffer[(this->width*j)+2] = front;
       else                buffer[(this->width*j)+2] = shade;
 
       for ( int i = 3; i < (this->width-2); i++ )
         buffer[(j*this->width)+i] = color;
 
-      if ( flag == TRUE ) buffer[(this->width*j)+this->width-3] = front;
+      if ( flag == 1 ) buffer[(this->width*j)+this->width-3] = front;
       else                buffer[(this->width*j)+this->width-3] = normal;
       buffer[(this->width*j)+this->width-2] = front;
       buffer[(this->width*j)+this->width-1] = front;
@@ -612,13 +607,13 @@ SoAnyThumbWheel::drawEnabledWheel(
 
       buffer[j] = front;
       buffer[j+this->diameter] = front;
-      if ( flag == TRUE ) buffer[j+(this->diameter*2)] = front;
+      if ( flag == 1 ) buffer[j+(this->diameter*2)] = front;
       else                buffer[j+(this->diameter*2)] = shade;
 
       for ( int i = 2; i < (this->width-2); i++ )
         buffer[j+(i*this->diameter)] = color;
 
-      if ( flag == TRUE ) buffer[j+(this->diameter*(this->width-3))] = front;
+      if ( flag == 1 ) buffer[j+(this->diameter*(this->width-3))] = front;
       else                buffer[j+(this->diameter*(this->width-3))] = normal;
       buffer[j+(this->diameter*(this->width-2))] = front;
       buffer[j+(this->diameter*(this->width-1))] = front;
@@ -647,7 +642,7 @@ SoAnyThumbWheel::drawEnabledWheel(
               buffer[j+(this->diameter*i)] = color;
         }
         radian = fmod( radian, modulo );
-        newsquare = TRUE;
+        newsquare = 1;
       }
     }
   }
