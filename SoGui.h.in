@@ -143,9 +143,6 @@ public:
                                           int eventType, XtEventHandler proc,
                                           XtPointer clientData);
 
-  static void selectBestVisual(Display * dpy, Visual * & visual,
-                               Colormap & cmap, int & depth);
-
 protected:
   static void getExtensionEventHandler(XEvent * event, Widget & widget,
                                        XtEventHandler & proc,
