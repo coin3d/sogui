@@ -3256,6 +3256,7 @@ So@Gui@Viewer::removeSuperimposition( // protected
   SoDebugError::post("So@Gui@Viewer::removeSuperimposition",
 		     "no such superimposition");
 #endif // SO@GUI@_DEBUG
+  return;
 } // getSuperimposedSceneGraph()
 
 // *************************************************************************
@@ -3284,6 +3285,7 @@ So@Gui@Viewer::setSuperimpositionEnabled( // protected
   SoDebugError::post("So@Gui@Viewer::setSuperimpositionEnabled",
 		     "no such superimposition");
 #endif // SO@GUI@_DEBUG
+  return;
 } // setSuperimposition()
 
 // *************************************************************************
