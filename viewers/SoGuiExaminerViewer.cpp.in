@@ -204,7 +204,7 @@ SoGuiExaminerViewerP::rotYWheelMotion(float value, float oldvalue)
   \sa isAnimationEnabled
 */
 void
-SoGuiExaminerViewer::setAnimationEnabled(const SbBool enable)
+So@Gui@ExaminerViewer::setAnimationEnabled(const SbBool enable)
 {
   PRIVATE(this)->spinanimatingallowed = enable;
   if (!enable && this->isAnimating()) { this->stopAnimating(); }
@@ -351,7 +351,7 @@ So@Gui@ExaminerViewer::isFeedbackVisible(void) const
   \sa getFeedbackSize, isFeedbackVisible, setFeedbackVisibility
 */
 void
-SoGuiExaminerViewer::setFeedbackSize(const int size)
+So@Gui@ExaminerViewer::setFeedbackSize(const int size)
 {
 #if SO@GUI@_DEBUG
   if (size < 1) {
