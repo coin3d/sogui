@@ -344,7 +344,19 @@ INPUT                  = \
  \
 @sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.h \
 @sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp \
+ \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.h \
+@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@MouseCommon.cpp \
+ \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h \
+@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@KeyboardCommon.cpp \
+ \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h \
+@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.cpp \
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@SpaceballCommon.cpp
 
 
 # If the value of the INPUT tag contains directories, you can use the 
