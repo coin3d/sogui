@@ -277,7 +277,7 @@ So@Gui@Component::getShellWidget(void) const
 */
 
 /*!
-  This method returns the default name of an So@Gui@Component widget.
+  This method returns the default name of a component widget class.
 
   It should be overridden by So@Gui@Component-derived classes so the
   topmost widget in the component gets a proper name.

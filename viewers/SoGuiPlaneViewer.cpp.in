@@ -688,3 +688,26 @@ So@Gui@PlaneViewer::setCursorRepresentation(PlaneViewerMode mode)
 }
 
 // ************************************************************************
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultWidgetName(void) const
+{
+  return "So@Gui@PlaneViewer";
+}
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultTitle(void) const
+{
+  return "Plane Viewer";
+}
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultIconTitle(void) const
+{
+  return "Plane Viewer";
+}
+
+// ************************************************************************
