@@ -31,19 +31,16 @@
   library. Typical usage is as follows (complete application code):
 
   \code
-#include <qwidget.h>
-
-#include <Inventor/nodes/SoCube.h>
-
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+#include <Inventor/nodes/SoCube.h>
 
 int
 main(int argc, char **argv)
 {
   // Initialize So@Gui@ and Open Inventor libraries. This returns a main
   // window to use.
-  QWidget * mainwin = So@Gui@::init(argv[0]);
+  @WIDGET@ mainwin = So@Gui@::init(argv[0]);
 
    // Make a dead simple scene graph, only containing a single cube.
   SoCube * cube = new SoCube;
@@ -69,10 +66,75 @@ main(int argc, char **argv)
 
 
 // Default constructor and the destructor is private (So@Gui@ class
-// consists of solely static functions).
+// consists solely of static functions).
 So@Gui@::So@Gui@(void) { }
 So@Gui@::~So@Gui@() { }
 
+
+// *************************************************************************
+
+/*!
+  \fn @WIDGET@ So@Gui@::init(const char * appname, const char * classname)
+
+  This function initializes the So@Gui@ library.
+
+  The returned @WIDGET@ is a toplevel shell widget for the
+  application, which can be used as a shell for the main component.
+
+  This method is provided for easier porting / compatibility with the
+  original SGI Inventor InventorXt library. It just adds dummy \a argc
+  and \a argv arguments and calls the So@Gui@::init() method below.
+*/
+@WIDGET@
+So@Gui@::internal_init(const char * appname, const char * classname)
+{
+  // If this is SoQt, Qt will keep a reference to the appname string
+  // -- so make it guaranteed permanent.
+  char * buf = NULL;
+  if (appname != NULL) {
+    buf = new char[strlen(appname) + 1]; // FIXME: minor memleak, free on app-exit. 20020117 mortene.
+    (void)strcpy(buf, appname);
+  }
+
+  // Fake argc and argv setup, forward to real init routine.
+  char * array[] = { buf, NULL };
+  int argc = (buf != NULL) ? 1 : 0;
+  return So@Gui@::init(argc, array, appname, classname);
+}
+
+// *************************************************************************
+
+/*!
+  This method will fill in the integers pointed to by the arguments
+  with the corresponding part of the version release number of the
+  So@Gui@ library.
+
+  A \c NULL pointer will make that part of the version number be ignored.
+
+  This method is not part of the original InventorXt API from SGI.
+*/
+void
+So@Gui@::getVersionInfo(int * major, int * minor, int * micro)
+{
+  if (major) { *major = SO@GUI@_MAJOR_VERSION; }
+  if (minor) { *minor = SO@GUI@_MINOR_VERSION; }
+  if (micro) { *micro = SO@GUI@_MICRO_VERSION; }
+}
+
+/*!
+  This method returns a string containing the version id of the
+  library.
+
+  This method is not part of the original InventorXt API from SGI.
+*/
+const char *
+So@Gui@::getVersionString(void)
+{
+  static const char version[] = SO@GUI@_VERSION;
+  return version;
+}
+
+// *************************************************************************
 
 /*!
   \typedef void So@Gui@::FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode, void * userdata)
@@ -162,3 +224,5 @@ So@Gui@::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
 {
   return SoAny::si()->setFatalErrorHandler(cb, userdata);
 }
+
+// *************************************************************************
