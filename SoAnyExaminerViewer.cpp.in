@@ -307,6 +307,9 @@ SoAnyExaminerViewer::getFeedbackSize(
 
 // ************************************************************************
 
+/*!
+*/
+
 void
 SoAnyExaminerViewer::drawAxisCross(
   void )
@@ -417,23 +420,16 @@ SoAnyExaminerViewer::drawAxisCross(
 
     for (int i=0; i < 3; i++) {
       glPushMatrix();
-      if (xturn == i) {
-        // X axis.
-        glColor3fv(SbVec3f(0.500f, 0.125f, 0.125f).getValue());
-        this->drawArrow();
-      }
-      else if (yturn == i) {
-        // Y axis.
+      if (xturn == i) {                       // X axis.
+        glColor3f( 0.500f, 0.125f, 0.125f );
+      } else if (yturn == i) {                // Y axis.
         glRotatef(90, 0, 0, 1);
-        glColor3fv(SbVec3f(0.125f, 0.500f, 0.125f).getValue());
-        this->drawArrow();
-      }
-      else {
-        // Z axis.
+        glColor3f( 0.125f, 0.500f, 0.125f );
+      } else {                                // Z axis.
         glRotatef(-90, 0, 1, 0);
-        glColor3fv(SbVec3f(0.125f, 0.125f, 0.500f).getValue());
-        this->drawArrow();
+        glColor3f( 0.125f, 0.125f, 0.500f );
       }
+      this->drawArrow();
       glPopMatrix();
     }
   }
