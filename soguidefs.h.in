@@ -33,8 +33,8 @@
 #ifdef __FILE__
 #define SO@GUI@_STUB_FILE __FILE__
 #else
-// FIXME: avoid this case by redefining the compilation rules to define the
-// current filename in some variable.  [20010919 larsa]
+/* FIXME: avoid this case by redefining the compilation rules to define the
+   current filename in some variable.  [20010919 larsa] */
 #define SO@GUI@_STUB_FILE ((char *)0L)
 #endif
 
@@ -101,11 +101,11 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
   do { \
     static int first = 1; \
     if ( first ) { \
-      first = 0; \
       SO@GUI@_FUNCTIONIDENTIFIER(s); \
       SoDebugError::postWarning(s.getString(), \
                                 "STUB: functionality not yet completed " \
                                 "(first and last warning)"); \
+      first = 0; \
     } \
   } while (0)
 
