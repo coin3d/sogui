@@ -23,7 +23,7 @@
 #ifdef __FILE__
 #define SOGUI_STUB_FILE __FILE__
 #else
-#define SOGUI_STUB_FILE ((const char *)0L)
+#define SOGUI_STUB_FILE ((char *)0L)
 #endif
 
 #ifdef __LINE__
@@ -35,7 +35,7 @@
 #ifdef __PRETTY_FUNCTION__
 #define SOGUI_STUB_FUNC __PRETTY_FUNCTION__
 #else
-#define SOGUI_STUB_FUNC ((const char *)0L)
+#define SOGUI_STUB_FUNC ((char *)0L)
 #endif
 
 // SOGUI_STUB(): this is the method which prints out stub
@@ -43,13 +43,19 @@
 
 #include <stdio.h> // fprintf()
 
+// This stupid thing is here to silence some compilers that complain on
+// constant if-expressions.
+inline int _not_null( void * arg ) { return (! arg) ? 0 : 1; }
+
 #define SOGUI_STUB() \
   do { \
     (void)fprintf(stderr, "STUB: functionality not yet completed"); \
-    if (SOGUI_STUB_FILE) { \
+    if ( _not_null(SOGUI_STUB_FILE) ) { \
       (void)fprintf(stderr, " at %s", SOGUI_STUB_FILE); \
-      if (SOGUI_STUB_LINE > 0) (void)fprintf(stderr, ":line %u", SOGUI_STUB_LINE); \
-      if (SOGUI_STUB_FUNC) (void)fprintf(stderr, ":[%s]", SOGUI_STUB_FUNC); \
+      if ( _not_null((void *)SOGUI_STUB_LINE) ) \
+        (void)fprintf(stderr, ":line %u", SOGUI_STUB_LINE); \
+      if ( _not_null(SOGUI_STUB_FUNC) ) \
+        (void)fprintf(stderr, ":[%s]", SOGUI_STUB_FUNC); \
     } \
     (void)fprintf(stderr, "\n"); \
   } while (0)
