@@ -46,6 +46,7 @@ Options:
   --msvcrt
   --datadir
   --includedir
+  --frameworkdir
   --have-feature <featurename>
   --ac-subst <string> | <sourcefile.in>
   --ac-desubst <sourcefile>
@@ -67,14 +68,8 @@ done
 if test -f $prefix/share/Coin/conf/so@gui@-$alternate.cfg; then
   configfile="$prefix/share/Coin/conf/so@gui@-$alternate.cfg"
   . $configfile
-elif test -f /Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-$alternate.cfg; then
-  configfile="/Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-$alternate.cfg"
-  . $configfile
 elif test -f $prefix/share/Coin/conf/so@gui@-default.cfg; then
   configfile="$prefix/share/Coin/conf/so@gui@-default.cfg"
-  . $configfile
-elif test -f /Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-default.cfg; then
-  configfile="/Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-default.cfg"
   . $configfile
 else
   echo >&2 "$me: no default So@Gui@ config available"
@@ -84,16 +79,17 @@ fi
 while test $# -gt 0
 do
   case $1 in
-    --usage | --help)  echo "$usage"      ;;
-    --version)         echo "$version"    ;;
-    --cppflags)        echo "$cppflags"   ;;
-    --cflags)          echo "$cflags"     ;;
-    --cxxflags)        echo "$cxxflags"   ;;
-    --ldflags)         echo "$ldflags"    ;;
-    --libs)            echo "$libs"       ;;
-    --msvcrt)          echo "$msvcrt"     ;;
-    --datadir)         echo "$datadir"    ;;
-    --includedir)      echo "$includedir" ;;
+    --usage | --help)  echo "$usage"         ;;
+    --version)         echo "$version"       ;;
+    --cppflags)        echo "$cppflags"      ;;
+    --cflags)          echo "$cflags"        ;;
+    --cxxflags)        echo "$cxxflags"      ;;
+    --ldflags)         echo "$ldflags"       ;;
+    --libs)            echo "$libs"          ;;
+    --msvcrt)          echo "$msvcrt"        ;;
+    --datadir)         echo "$datadir"       ;;
+    --includedir)      echo "$includedir"    ;;
+    --frameworkdir)    echo "$frameworkdir"  ;;
     --have-feature)
       exitcode=1
       eval "test x\${have_$2+set} = xset && exitcode=0"
