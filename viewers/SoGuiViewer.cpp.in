@@ -76,6 +76,7 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
+#include <Inventor/nodekits/SoBaseKit.h>
 
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
@@ -626,6 +627,9 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 static SoGroup *
 get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
 {
+  SbBool oldsearch = SoBaseKit::isSearchingChildren();
+  SoBaseKit::setSearchingChildren(TRUE);
+
   assert(node && root && "get_parent_of_node() called with null argument");
   if (pimpl == NULL) {
     SoSearchAction search;
@@ -635,6 +639,7 @@ get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
     assert(search.getPath() && "node not found in scenegraph");
     SoNode * parent = ((SoFullPath *)search.getPath())->getNodeFromTail(1);
     assert(parent && "couldn't find parent");
+    SoBaseKit::setSearchingChildren(oldsearch);
     return (SoGroup *)parent;
   } else {
     pimpl->searchaction->reset();
@@ -646,6 +651,7 @@ get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
       ((SoFullPath *) pimpl->searchaction->getPath())->getNodeFromTail(1);
     assert(parent && "couldn't find parent");
     pimpl->searchaction->reset();
+    SoBaseKit::setSearchingChildren(oldsearch);
     return (SoGroup *)parent;
   }
 }
@@ -1807,9 +1813,15 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   // SoSearchAction search;
   // search.setType(SoCamera::getClassTypeId());
   // search.apply(this->sceneGraph);
+  SbBool oldsearch = SoBaseKit::isSearchingChildren();
+  SoBaseKit::setSearchingChildren(TRUE);
+
   PRIVATE(this)->searchaction->reset();
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
   PRIVATE(this)->searchaction->apply(this->sceneGraph);
+
+  SoBaseKit::setSearchingChildren(oldsearch);
+
   SoCamera * scenecamera = NULL;
   if (PRIVATE(this)->searchaction->isFound()) {
     SoFullPath * fullpath =
