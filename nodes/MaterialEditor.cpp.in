@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/sensors/SoFieldSensor.h>
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
@@ -48,6 +49,19 @@ public:
   SoGuiSlider1 * slider4;
   SoGuiSlider1 * slider5;
   SoGuiSlider1 * slider6;
+
+  SoFieldSensor * ambient_slider_sensor;
+  SoFieldSensor * diffuse_slider_sensor;
+  SoFieldSensor * specular_slider_sensor;
+  SoFieldSensor * emissive_slider_sensor;
+  SoFieldSensor * shininess_slider_sensor;
+  SoFieldSensor * transparency_slider_sensor;
+  static void ambient_slider_cb(void * closure, SoSensor * sensor);
+  static void diffuse_slider_cb(void * closure, SoSensor * sensor);
+  static void specular_slider_cb(void * closure, SoSensor * sensor);
+  static void emissive_slider_cb(void * closure, SoSensor * sensor);
+  static void shininess_slider_cb(void * closure, SoSensor * sensor);
+  static void transparency_slider_cb(void * closure, SoSensor * sensor);
 
   static const char * texturescene[];
   static const char * editorscene[];
@@ -132,14 +146,35 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   ok = sphereimage->setPart("texture", texture);
   assert(ok);
 
+  /*
   PRIVATE(this)->slider5->value.connectFrom(&(PRIVATE(this)->material->shininess));
   PRIVATE(this)->slider5->value.getValue();
   PRIVATE(this)->material->shininess.connectFrom(&(PRIVATE(this)->slider5->value));
-
   PRIVATE(this)->slider6->value.connectFrom(&(PRIVATE(this)->material->transparency));
   PRIVATE(this)->slider6->value.getValue();
   PRIVATE(this)->material->transparency.connectFrom(&(PRIVATE(this)->slider6->value));
-  // sensors
+  */
+  // set up sensors
+
+  SoFieldSensor * ambient_slider_sensor;
+  SoFieldSensor * diffuse_slider_sensor;
+  SoFieldSensor * specular_slider_sensor;
+  SoFieldSensor * emissive_slider_sensor;
+  SoFieldSensor * shininess_slider_sensor;
+  SoFieldSensor * transparency_slider_sensor;
+
+  PRIVATE(this)->ambient_slider_sensor = new SoFieldSensor(MaterialEditor::ambient_slider_cb, PRIVATE(this));
+  PRIVATE(this)->diffuse_slider_sensor = new SoFieldSensor(MaterialEditor::diffuse_slider_cb, PRIVATE(this));
+  PRIVATE(this)->specular_slider_sensor = new SoFieldSensor(MaterialEditor::specular_slider_cb, PRIVATE(this));
+  PRIVATE(this)->emissive_slider_sensor = new SoFieldSensor(MaterialEditor::emissive_slider_cb, PRIVATE(this));
+  PRIVATE(this)->shininess_slider_sensor = new SoFieldSensor(MaterialEditor::shininess_slider_cb, PRIVATE(this));
+  PRIVATE(this)->transparency_slider_sensor = new SoFieldSensor(MaterialEditor::transparency_slider_cb, PRIVATE(this));
+  PRIVATE(this)->ambient_slider_sensor->attach(&(PRIVATE(this)->slider1->value));
+  PRIVATE(this)->diffuse_slider_sensor->attach(&(PRIVATE(this)->slider2->value));
+  PRIVATE(this)->specular_slider_sensor->attach(&(PRIVATE(this)->slider3->value));
+  PRIVATE(this)->emissive_slider_sensor->attach(&(PRIVATE(this)->slider4->value));
+  PRIVATE(this)->shininess_slider_sensor->attach(&(PRIVATE(this)->slider5->value));
+  PRIVATE(this)->transparency_slider_sensor->attach(&(PRIVATE(this)->slider6->value));
 }
 
 SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
@@ -226,7 +261,7 @@ MaterialEditor::editorscene[] =
   "        \"tb = (A[1] - ta) / 2\"",
   "        \"oA = vec3f(10, tb, 0)\"", // image position
   "        \"oB = vec3f(ta, ta, 0)\"", // image size
-  "        \"oC = vec3f(ta + 30, A[1] - 20, 0)\"", // radio1 position
+  "        \"oC = vec3f(ta + 30, A[1] - 25, 0)\"", // radio1 position
   "        \"oD = vec3f(0, -30, 0)\"", // ratio translation
   "      ]",
   "    } . oA",
@@ -281,9 +316,9 @@ MaterialEditor::editorscene[] =
   "      A 0 0 0 = USE pane.objectSize",
   "      expression [",
   "        \"ta = (A[0] / 2 < A[1]) ? (A[0]/2)-20 : A[1]-20\"",
-  "        \"oA = vec3f(ta + 60, A[1] - 20, 0)\"",
-  "        \"oB = vec3f(ta + 90, A[1] - 20, 0)\"",
-  "        \"oC = vec3f(ta - 90, 10, 0)\"",
+  "        \"oA = vec3f(ta + 60, A[1] - 25, 0)\"",
+  "        \"oB = vec3f(ta + 90, A[1] - 25, 0)\"",
+  "        \"oC = vec3f(ta - 100, 15, 0)\"",
   "      ]",
   "    } . oA",
   "  }",
@@ -393,8 +428,8 @@ MaterialEditor::editorscene[] =
   "  }",
 
   "  SoGuiPosition { position 0 0 0 = USE pane.objectSize }",
-  "  SoGuiTranslation { translation -30 -20 0 }",
-  "  DEF labelframe SoGuiFrame { size 20 10 0 width 2 design EMBOSS complement TRUE }",
+  "  SoGuiTranslation { translation -35 -25 0 }",
+  "  DEF labelframe SoGuiFrame { size 25 15 0 width 2 design EMBOSS complement TRUE }",
   "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider1.value } . output }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
   "  USE labelframe",
@@ -425,6 +460,94 @@ MaterialEditor::MaterialEditor(void)
   this->slider4 = NULL;
   this->slider5 = NULL;
   this->slider6 = NULL;
+  this->ambient_slider_sensor = NULL;
+  this->diffuse_slider_sensor = NULL;
+  this->specular_slider_sensor = NULL;
+  this->emissive_slider_sensor = NULL;
+  this->shininess_slider_sensor = NULL;
+  this->transparency_slider_sensor = NULL;
+}
+
+void
+MaterialEditor::ambient_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider1);
+  SbColor ambient = me->material->ambientColor.operator[](0);
+  float h, s, v;
+  ambient.getHSVValue(h, s, v);
+  v = me->slider1->value.getValue();
+  ambient.setHSVValue(h, s, v);
+  me->material->ambientColor.setValue(ambient);
+}
+
+void
+MaterialEditor::diffuse_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider2);
+  SbColor diffuse = me->material->diffuseColor.operator[](0);
+  float h, s, v;
+  diffuse.getHSVValue(h, s, v);
+  v = me->slider2->value.getValue();
+  diffuse.setHSVValue(h, s, v);
+  me->material->diffuseColor.set1Value(0, diffuse);
+}
+
+void
+MaterialEditor::specular_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider3);
+  SbColor specular = me->material->specularColor.operator[](0);
+  float h, s, v;
+  specular.getHSVValue(h, s, v);
+  v = me->slider3->value.getValue();
+  specular.setHSVValue(h, s, v);
+  me->material->specularColor.set1Value(0, specular);
+}
+
+void
+MaterialEditor::emissive_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider4);
+  SbColor emissive = me->material->emissiveColor.operator[](0);
+  float h, s, v;
+  emissive.getHSVValue(h, s, v);
+  v = me->slider4->value.getValue();
+  emissive.setHSVValue(h, s, v);
+  me->material->emissiveColor.set1Value(0, emissive);
+}
+
+void
+MaterialEditor::shininess_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider5);
+  float shininess = me->slider5->value.getValue();
+  me->material->shininess.set1Value(0, shininess);
+}
+
+void
+MaterialEditor::transparency_slider_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  assert(me->material);
+  assert(me->slider6);
+  float transparency = me->slider6->value.getValue();
+  me->material->transparency.set1Value(0, transparency);
 }
 
 #undef PUBLIC
