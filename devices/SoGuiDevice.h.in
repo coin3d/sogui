@@ -35,10 +35,12 @@ class SoEvent;
 #include <qevent.h>
 typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+#include <X11/Intrinsic.h>
+typedef void So@Gui@EventHandler(@WIDGET@, XtPointer, XEvent *, Boolean *);
+#endif // __COIN_SOXT__
 
 // *************************************************************************
-
-typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
 
 class SO@GUI@_DLL_API So@Gui@Device : public So@Gui@Object {
   SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@Device, So@Gui@Object);
