@@ -358,7 +358,7 @@ So@Gui@ExaminerViewer::setGenericFeedbackSize(
   this->axiscrossSize = size;
 
   if (this->isFeedbackVisible() && this->isViewing())
-    viewer->scheduleRedraw();
+    this->scheduleRedraw();
 } // setFeedbackSize()
 
 /*!

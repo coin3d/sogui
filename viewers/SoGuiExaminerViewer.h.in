@@ -161,8 +161,6 @@ private:
 
   SbVec2s canvas;
 
-  So@Gui@ExaminerViewer * const viewer;
-
   enum ViewerMode {
     IDLE,
     INTERACT,
