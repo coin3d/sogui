@@ -18,8 +18,6 @@
  *
  **************************************************************************/
 
-// $Id$
-
 #ifndef SO@GUI@_H
 #define SO@GUI@_H
 
@@ -96,18 +94,42 @@ public:
                              int * micro = NULL);
   static const char * getVersionString(void);
 
+  enum FatalErrors {
+    NO_OPENGL_CANVAS = 0,
+    INTERNAL_ASSERT,
+    UNSPECIFIED_ERROR
+  };
+  typedef void FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode,
+                            void * userdata);
+  static FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
+                                             void * userdata);
 
-#ifdef __COIN_SOQT__
-  enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
-  static class QApplication * getApplication(void);
-#endif // __COIN_SOQT__
+private:
+  // Since the class consists solely of static functions, hide the
+  // default constructor and the destructor so nobody can instantiate
+  // it.
+  So@Gui@(void);
+  ~So@Gui@();
+  friend class So@Gui@P; // SoQtP needs this to set up an object for the slots.
+
+  static void sensorQueueChanged(void * cbdata);
+
+  static @WIDGET@ internal_init(const char * appname, const char * classname);
+  static @WIDGET@ internal_init(int & argc, char ** argv,
+                                const char * appname, const char * classname);
+  static void internal_init(@WIDGET@ toplevelwidget);
+  static void internal_init(void);
+
+
+/// FIXME!: merge the remaining toolkit specific parts properly. 20020117 mortene. ////
 
 #ifdef __COIN_SOXT__
+public:
   static void nextEvent(XtAppContext, XEvent *);
   static Boolean dispatchEvent(XEvent * event);
   static XtAppContext getAppContext(void);
   static Display * getDisplay(void);
-  static XmString encodeString(const char * const string);
+  static XmString encodeString(const char * const str);
   static char * decodeString(XmString xstring);
   static void getPopupArgs(Display * display, int screen,
                            ArgList args, int * n);
@@ -128,57 +150,23 @@ public:
 
   static const char * getAppName(void);
   static const char * getAppClass(void);
+
+protected:
+  static void getExtensionEventHandler(XEvent * event, Widget & widget,
+                                       XtEventHandler & proc,
+                                       XtPointer & clientData);
 #endif // __COIN_SOXT__
 
-#ifdef __COIN_SOGTK__
-  friend class SoGtkComponent;
-  enum SoGtkComponentAction { CREATION, DESTRUCTION, CHANGE };
-  typedef void SoGtkComponentActionCallback(SoGtkComponent *, SoGtk::SoGtkComponentAction, void *);
-
-  static void addComponentActionCallback(SoGtkComponentActionCallback *, void *);
-  static void removeComponentActionCallback(SoGtkComponentActionCallback *, void *);
-
-  static int getComponents(SbPList & components);
-#endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
+public:
   static BOOL dispatchEvent(MSG * msg);
   static SbBool nextEvent(int appContext, MSG * msg);
   static void setInstance(HINSTANCE instance);
   static HINSTANCE getInstance(void);
   static void errorHandlerCB(const class SoError * error, void * data);
   static void doIdleTasks(void);
-#endif // __COIN_SOWIN__
-
-
-  enum FatalErrors {
-    NO_OPENGL_CANVAS = 0,
-      INTERNAL_ASSERT,
-      UNSPECIFIED_ERROR
-  };
-  typedef void FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode,
-                            void * userdata);
-  static FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
-                                             void * userdata);
-
 
 protected:
-#ifdef __COIN_SOQT__
-  bool eventFilter(QObject *, QEvent *);
-#endif // __COIN_SOQT__
-#ifdef __COIN_SOXT__
-  static void getExtensionEventHandler(XEvent * event, Widget & widget,
-                                       XtEventHandler & proc,
-                                       XtPointer & clientData);
-#endif // __COIN_SOXT__
-#ifdef __COIN_SOGTK__
-  static void invokeComponentActionCallbacks(SoGtkComponent * component,
-                                             SoGtkComponentAction action);
-
-  static gint componentCreation(SoGtkComponent * component);
-  static gint componentDestruction(SoGtkComponent * component);
-  static gint componentChange(SoGtkComponent * component);
-#endif // __COIN_SOGTK__
-#ifdef __COIN_SOWIN__
   friend class SoWinP;
 
   static SbBool isDebugLibrary(void);
@@ -197,37 +185,40 @@ protected:
 
 #endif // __COIN_SOWIN__
 
-
 #ifdef __COIN_SOQT__
+public:
+  enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
+  static class QApplication * getApplication(void);
+
+protected:
+  bool eventFilter(QObject *, QEvent *);
+
 private slots:
   void slot_timedOutSensor(void);
   void slot_idleSensor(void);
   void slot_delaytimeoutSensor(void);
 #endif // __COIN_SOQT__
 
-private:
-  // Since the class consists solely of static functions, hide the
-  // default constructor and the destructor so nobody can instantiate
-  // it.
-  So@Gui@(void);
-  ~So@Gui@();
-  friend class So@Gui@P; // SoQtP needs this to set up an object for the slots.
-
-  static void sensorQueueChanged(void * cbdata);
-
-  static @WIDGET@ internal_init(const char * appname, const char * classname);
-  static @WIDGET@ internal_init(int & argc, char ** argv,
-                                const char * appname, const char * classname);
-  static void internal_init(@WIDGET@ toplevelwidget);
-  static void internal_init(void);
-
-
-#ifdef __COIN_SOXT__
-  static void timerSensorCB(XtPointer, XtIntervalId *);
-  static void delaySensorCB(XtPointer, XtIntervalId *);
-  static Boolean idleSensorCB(XtPointer);
-#endif // __COIN_SOXT__
 #ifdef __COIN_SOGTK__
+public:
+  friend class SoGtkComponent;
+  enum SoGtkComponentAction { CREATION, DESTRUCTION, CHANGE };
+  typedef void SoGtkComponentActionCallback(SoGtkComponent *, SoGtk::SoGtkComponentAction, void *);
+
+  static void addComponentActionCallback(SoGtkComponentActionCallback *, void *);
+  static void removeComponentActionCallback(SoGtkComponentActionCallback *, void *);
+
+  static int getComponents(SbPList & components);
+
+protected:
+  static void invokeComponentActionCallbacks(SoGtkComponent * component,
+                                             SoGtkComponentAction action);
+
+  static gint componentCreation(SoGtkComponent * component);
+  static gint componentDestruction(SoGtkComponent * component);
+  static gint componentChange(SoGtkComponent * component);
+
+private:
   static gint timerSensorCB(gpointer data);
   static gint idleSensorCB(gpointer data);
   static gint delaySensorCB(gpointer data);
@@ -236,8 +227,7 @@ private:
   static SbPList * components;
   static SbPList * component_callbacks;
 #endif // __COIN_SOGTK__
-
-}; // class So@Gui@
+};
 
 // *************************************************************************
 
