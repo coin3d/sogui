@@ -39,10 +39,7 @@ static const char rcsid[] =
 #include <assert.h>
 #include <math.h>
 
-#if HAVE_WINDOWS_H
-#include <windows.h> // gl.h needs this.
-#endif // HAVE_WINDOWS_H
-#include <GL/gl.h>
+#include <Inventor/@Gui@/common/gl.h>
 
 #include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>

@@ -54,10 +54,7 @@ static const char rcsid[] =
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#if HAVE_WINDOWS_H
-#include <windows.h> // To resolve some definitions in gl.h.
-#endif // HAVE_WINDOWS_H
-#include <GL/gl.h> // glDrawBuffer()
+#include <Inventor/@Gui@/common/gl.h> // glDrawBuffer()
 
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/events/SoKeyboardEvent.h>
