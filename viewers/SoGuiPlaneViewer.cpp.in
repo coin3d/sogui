@@ -72,6 +72,10 @@
 
 #include <so@gui@defs.h>
 
+// *************************************************************************
+
+SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
+
 // ************************************************************************
 
 /*!
@@ -711,3 +715,38 @@ So@Gui@PlaneViewer::getDefaultIconTitle(void) const
 }
 
 // ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::bottomWheelMotion(float value)
+{
+  // This method set up the bottom wheel to control camera translation
+  // in the horizontal direction.
+
+  this->translateX(value - this->getBottomWheelValue());
+  inherited::bottomWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::leftWheelMotion(float value)
+{
+  // This method set up the left wheel to control camera translation
+  // in the vertical direction.
+
+  this->translateY(value - this->getLeftWheelValue());
+  inherited::leftWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::rightWheelMotion(float value)
+{
+  // This method set up the right wheel to control camera movement in
+  // the inwards direction.
+
+  this->zoom(this->getRightWheelValue() - value);
+  inherited::rightWheelMotion(value);
+}
+
+// *************************************************************************
