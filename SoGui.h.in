@@ -70,7 +70,6 @@ public:
   }
 
   static void init(@WIDGET@ toplevelwidget) { SO@GUI@_SANITY_CHECK(So@Gui@::internal_init(toplevelwidget)); }
-  static void init(void) { SO@GUI@_SANITY_CHECK(So@Gui@::internal_init()); }
 
   static void mainLoop(void);
   static void exitMainLoop(void);
@@ -118,7 +117,6 @@ private:
   static @WIDGET@ internal_init(int & argc, char ** argv,
                                 const char * appname, const char * classname);
   static void internal_init(@WIDGET@ toplevelwidget);
-  static void internal_init(void);
 
 
 /// FIXME!: merge the remaining toolkit specific parts properly. 20020117 mortene. ////
