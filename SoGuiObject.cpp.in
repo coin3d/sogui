@@ -26,7 +26,7 @@
 
 // #ifdef __COIN_SOQT__
 // #include <qmetaobject.h>
-// #include <moc_SoQtObject.cpp>
+// #include <moc_SoQtObject.icc>
 // #endif // __COIN_SOQT__
 
 #if HAVE_CONFIG_H
