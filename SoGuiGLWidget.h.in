@@ -112,9 +112,6 @@ public:
   PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
   virtual void setPixelFormat(int format);
   int getPixelFormat(void);
-
-  void setCursor(HCURSOR newCursor);
-  HCURSOR getCursor(void);
 #endif // __COIN_SOWIN__
 #ifdef __COIN_SOMAC__
   // WORK-IN-PROGRESS
