@@ -45,6 +45,7 @@ Options:
   --libs
   --msvcrt
   --datadir
+  --includedir
   --have-feature <featurename>
   --ac-subst <string> | <sourcefile.in>
   --ac-desubst <sourcefile>
@@ -77,15 +78,16 @@ fi
 while test $# -gt 0
 do
   case $1 in
-    --usage | --help)  echo "$usage"    ;;
-    --version)         echo "$version"  ;;
-    --cppflags)        echo "$cppflags" ;;
-    --cflags)          echo "$cflags"   ;;
-    --cxxflags)        echo "$cxxflags" ;;
-    --ldflags)         echo "$ldflags"  ;;
-    --libs)            echo "$libs"     ;;
-    --msvcrt)          echo "$msvcrt"   ;;
-    --datadir)         echo "$datadir"  ;;
+    --usage | --help)  echo "$usage"      ;;
+    --version)         echo "$version"    ;;
+    --cppflags)        echo "$cppflags"   ;;
+    --cflags)          echo "$cflags"     ;;
+    --cxxflags)        echo "$cxxflags"   ;;
+    --ldflags)         echo "$ldflags"    ;;
+    --libs)            echo "$libs"       ;;
+    --msvcrt)          echo "$msvcrt"     ;;
+    --datadir)         echo "$datadir"    ;;
+    --includedir)      echo "$includedir" ;;
     --have-feature)
       exitcode=1
       eval "test x\${have_$2+set} = xset && exitcode=0"
