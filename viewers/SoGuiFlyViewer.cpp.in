@@ -83,6 +83,7 @@ static const char rcsid[] =
 // #endif // SO@GUI@_DEBUG
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
+#include <string.h> // strlen() etc
 
 // ************************************************************************
 
