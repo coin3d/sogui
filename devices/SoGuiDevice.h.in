@@ -45,6 +45,10 @@ typedef void So@Gui@EventHandler(@WIDGET@, XtPointer, XEvent *, Boolean *);
 #include <gtk/gtk.h>
 typedef gint So@Gui@EventHandler(@WIDGET@, @EVENT@, gpointer);
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+#include <wtypes.h>
+typedef LRESULT So@Gui@EventHandler(@WIDGET@, UINT, WPARAM, LPARAM);
+#endif // __COIN_SOWIN__
 
 // *************************************************************************
 
