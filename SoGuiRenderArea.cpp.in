@@ -192,6 +192,8 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 class So@Gui@RenderAreaP {
 public:
 
@@ -727,6 +729,8 @@ So@Gui@RenderAreaP::getSoEvent(@EVENT@ event)
 
   return soevent;
 }
+
+#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 
@@ -1307,6 +1311,7 @@ So@Gui@RenderArea::scheduleOverlayRedraw(void)
   PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
 }
 
+#ifndef DOXYGEN_SKIP_THIS
 void
 So@Gui@RenderAreaP::replaceSoSelectionMonitor(SoSelection * newsel,
                                               SoSelection * oldsel) const
@@ -1324,6 +1329,7 @@ So@Gui@RenderAreaP::replaceSoSelectionMonitor(SoSelection * newsel,
                               PUBLIC(this));
   }
 }
+#endif // DOXYGEN_SKIP_THIS
 
 // FIXME: the interface below is badly designed, see the comment in
 // the function documentation. 20001002 mortene.

@@ -198,6 +198,7 @@ static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
 // The private data for the So@Gui@Viewer.
 class So@Gui@ViewerP {
 public:
@@ -1480,6 +1481,8 @@ So@Gui@ViewerP::recordFPS(const double rendertime)
     Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
   }
 }
+
+#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 
@@ -3175,6 +3178,7 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   return TRUE;
 }
 
+#ifndef DOXYGEN_SKIP_THIS
 void
 So@Gui@ViewerP::setStereoEye(SoCamera * thecamera,
                              const So@Gui@ViewerP::Eye eye,
@@ -3321,7 +3325,7 @@ So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
 }
-
+#endif // DOXYGEN_SKIP_THIS
 
 // Documented in superclass. Overridden from parent class to be able
 // to do the necessary two-pass rendering e.g. if the drawing style is
