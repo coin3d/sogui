@@ -21,12 +21,18 @@
  *
 \**************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
 #include <assert.h>
 
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/sensors/SoNodeSensor.h>
+#ifdef HAVE_SOVRMLMATERIAL
 #include <Inventor/VRMLnodes/SoVRMLMaterial.h>
+#endif // HAVE_SOVRMLMATERIAL
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
@@ -738,6 +744,7 @@ MaterialEditor::material_cb(void * closure, SoSensor * sensor)
       material->emissiveColor.set1Value(index, mat->emissiveColor[0]);
       material->shininess.set1Value(index, mat->shininess[0]);
       material->transparency.set1Value(index, mat->transparency[0]);
+#ifdef HAVE_SOVRMLMATERIAL
     } else if ( attachment->isOfType(SoVRMLMaterial::getClassTypeId()) ) {
       SoVRMLMaterial * material = (SoVRMLMaterial *) attachment;
       SbColor ambient = mat->ambientColor[0];
@@ -749,6 +756,7 @@ MaterialEditor::material_cb(void * closure, SoSensor * sensor)
       material->emissiveColor.setValue(mat->emissiveColor[0]);
       material->shininess.setValue(mat->shininess[0]);
       material->transparency.setValue(mat->transparency[0]);
+#endif // HAVE_SOVRMLMATERIAL
     } else {
     }
   }

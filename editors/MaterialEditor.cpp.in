@@ -1,8 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
 
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoMaterial.h>
-#include <Inventor/VRMLnodes/SoVRMLMaterial.h>
 #include <Inventor/sensors/SoNodeSensor.h>
+#ifdef HAVE_SOVRMLMATERIAL
+#include <Inventor/VRMLnodes/SoVRMLMaterial.h>
+#endif
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
@@ -117,13 +122,13 @@ So@Gui@MaterialEditor::getUpdateFrequency(void) const
 void
 So@Gui@MaterialEditor::setMaterial(const SoMaterial & material)
 {
-  // PRIVATE(this)->material->copyFrom(material);
+  // FIXME
 }
 
 void
 So@Gui@MaterialEditor::setMaterial(const SoVRMLMaterial & material)
 {
-  // PRIVATE(this)->material->copyFrom(material);
+  // FIXME
 }
 
 const SoMaterial &
@@ -139,7 +144,10 @@ SbBool
 So@Gui@MaterialEditor::isAttachedVRML(void)
 {
   SoNode * material = PRIVATE(this)->editor->material.getValue();
+#ifdef HAVE_SOVRMLMATERIAL
   return (material && material->isOfType(SoVRMLMaterial::getClassTypeId())) ? TRUE : FALSE;
+#endif
+  return FALSE;
 }
 
 const char *
