@@ -605,6 +605,11 @@ private:
 
 private:
   SoAnyFullViewer * common;
+
+  // Private class for implementation hiding. The idiom we're using is
+  // a variant of what is known as the "Cheshire Cat", and is also
+  // described as the "Bridge" pattern in «Design Patterns» by Gamma
+  // et al (aka The Gang Of Four).
   class So@Gui@FullViewerP * pimpl;
   friend class So@Gui@FullViewerP;
 };
