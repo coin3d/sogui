@@ -210,7 +210,9 @@ protected:
 
 private:
   class So@Gui@ViewerP * pimpl;
+#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@ViewerP;
+#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

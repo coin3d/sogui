@@ -112,8 +112,10 @@ protected:
 
 private:
   class So@Gui@ComponentP * pimpl;
+#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiComponentP;
   friend class So@Gui@ComponentP;
+#endif // DOXYGEN_SKIP_THIS
 
   // FIXME: get rid of remaining toolkit specifics below. 20020611 mortene.
 

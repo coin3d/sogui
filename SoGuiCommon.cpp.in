@@ -44,31 +44,46 @@
   Typical usage is as follows (complete application code):
 
   \code
-#include <Inventor/@Gui@/So@Gui@.h>
-#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
-#include <Inventor/nodes/SoCube.h>
+  #include <Inventor/@Gui@/So@Gui@.h>
+  #include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+  #include <Inventor/nodes/SoBaseColor.h>
+  #include <Inventor/nodes/SoCone.h>
+  #include <Inventor/nodes/SoSeparator.h>
+  
+  int
+  main(int argc, char ** argv)
+  {
+    // Initialize So@Gui@ and Inventor API libraries. This returns a main
+    // window to use.
+    @WIDGET@ mainwin = So@Gui@::init(argc, argv, argv[0]);
+  
+    // Make a dead simple scene graph, only containing a single
+    // yellow cone under the scenegraph root.
+    SoSeparator * root = new SoSeparator;
+    root->ref();
 
-int
-main(int argc, char ** argv)
-{
-  // Initialize So@Gui@ and Inventor API libraries. This returns a main
-  // window to use.
-  @WIDGET@ mainwin = So@Gui@::init(argc, argv, argv[0]);
+    SoBaseColor * col = new SoBaseColor;
+    col->rgb = SbColor(1, 1, 0);
+    root->addChild(col);
 
-   // Make a dead simple scene graph, only containing a single cube.
-  SoCube * cube = new SoCube;
+    root->addChild(new SoCone);
+  
+    // Use one of the convenient viewer classes.
+    So@Gui@ExaminerViewer * eviewer = new So@Gui@ExaminerViewer(mainwin);
+    eviewer->setSceneGraph(root);
+    eviewer->show();
+  
+    // Pop up the main window.
+    So@Gui@::show(mainwin);
+    // Loop until exit.
+    So@Gui@::mainLoop();
 
-  // Use one of the convenient viewer classes.
-  So@Gui@ExaminerViewer * eviewer = new So@Gui@ExaminerViewer(mainwin);
-  eviewer->setSceneGraph(cube);
-  eviewer->show();
+    // Clean up resources.
+    delete eviewer;
+    root->unref();
 
-  // Pop up the main window.
-  So@Gui@::show(mainwin);
-  // Loop until exit.
-  So@Gui@::mainLoop();
-  return 0;
-}
+    return 0;
+  }
   \endcode
 
   \sa So@Gui@Component

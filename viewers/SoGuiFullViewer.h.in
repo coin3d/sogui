@@ -125,6 +125,12 @@ protected:
   @WIDGET@ rightDecoration;
   @WIDGET@ bottomDecoration;
 
+#ifndef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+  @WIDGET@ leftWheel;
+  @WIDGET@ rightWheel;
+  @WIDGET@ bottomWheel;
+#endif // !__COIN_SOWIN__
+
   @WIDGET@ leftWheelLabel;
   char * leftWheelStr;
   float leftWheelVal;
@@ -145,25 +151,16 @@ private:
   // described as the "Bridge" pattern in «Design Patterns» by Gamma
   // et al (aka The Gang Of Four).
   class So@Gui@FullViewerP * pimpl;
+#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiFullViewerP;
   friend class So@Gui@FullViewerP;
+#endif // DOXYGEN_SKIP_THIS
 
 
 // FIXME: get rid of non-templatized code. 20020108 mortene.
 
-#ifdef __COIN_SOQT__
-protected:
-  @WIDGET@ leftWheel;
-  @WIDGET@ rightWheel;
-  @WIDGET@ bottomWheel;
-#endif // __COIN_SOQT__
-
 #ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 protected:
-  @WIDGET@ leftWheel;
-  @WIDGET@ rightWheel;
-  @WIDGET@ bottomWheel;
-
   Widget buildAppButtonsForm(Widget parent);
 
   Widget buildFunctionsSubmenu(Widget popup);
@@ -173,13 +170,6 @@ protected:
   SbBool popupEnabled;
   SbPList * viewerButtonWidgets;
 #endif // __COIN_SOXT__
-
-#ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
-protected:
-  @WIDGET@ leftWheel;
-  @WIDGET@ rightWheel;
-  @WIDGET@ bottomWheel;
-#endif // __COIN_SOGTK__
 
 #ifdef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 public:
@@ -198,7 +188,6 @@ public:
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-
 
   class SoWinThumbWheel * rightWheel;
   class SoWinThumbWheel * bottomWheel;

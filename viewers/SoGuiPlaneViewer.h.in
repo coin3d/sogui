@@ -79,8 +79,10 @@ protected:
 
 private:
   class So@Gui@PlaneViewerP * pimpl;
+#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiPlaneViewerP;
   friend class So@Gui@PlaneViewerP;
+#endif // DOXYGEN_SKIP_THIS
 
 //// FIXME!: merge the remaining So*PlaneViewer definitions. 20020111 mortene.
 

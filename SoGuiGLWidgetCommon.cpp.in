@@ -119,6 +119,27 @@ So@Gui@GLWidget::getLineWidthLimits(SbVec2f & range, float & granularity)
   this->glUnlockNormal();
 }
 
+/*!
+  Sets whether OpenGL stereo buffers (quad buffer stereo) should be
+  used.
+*/
+void
+So@Gui@GLWidget::setStereoBuffer(SbBool flag)
+{
+  // FIXME: is this really correct? 20011012 mortene.
+  this->setQuadBufferStereo(flag);
+}
+
+/*!
+  Returns whether OpenGL stereo buffers are being used.
+*/
+SbBool
+So@Gui@GLWidget::isStereoBuffer(void) const
+{
+  // FIXME: is this really correct? 20011012 mortene.
+  return this->isQuadBufferStereo();
+}
+
 // *************************************************************************
 
 #ifndef DOXYGEN_SKIP_THIS

@@ -138,8 +138,10 @@ protected:
   virtual SbBool glScheduleRedraw(void);
 
 private:
-  friend class So@Gui@RenderAreaP;
   class So@Gui@RenderAreaP * priv;
+#ifndef DOXYGEN_SKIP_THIS
+  friend class So@Gui@RenderAreaP;
+#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

@@ -78,44 +78,9 @@ public:
   void setOverlayRender(const SbBool onoff);
   SbBool isOverlayRender(void) const;
 
+  @WIDGET@ getGLWidget(void) const;
   @WIDGET@ getNormalWidget(void) const;
   @WIDGET@ getOverlayWidget(void) const;
-
-#ifdef __COIN_SOQT__
-  const QGLContext * getNormalContext(void);
-  const QGLContext * getOverlayContext(void);
-#endif // __COIN_SOQT__
-#ifdef __COIN_SOXT__
-  Window getNormalWindow(void);
-  Window getOverlayWindow(void);
-  GLXContext getNormalContext(void);
-  GLXContext getOverlayContext(void);
-
-  int getOverlayColorMapSize(void);
-  int getColorMapSize(void);
-
-  virtual void setNormalVisual(XVisualInfo * visual);
-  XVisualInfo * getNormalVisual(void);
-  virtual void setOverlayVisual(XVisualInfo * visual);
-  XVisualInfo * getOverlayVisual(void);
-#endif // __COIN_SOXT__
-#ifdef __COIN_SOWIN__
-  HWND getNormalWindow(void) const;
-  HWND getOverlayWindow(void) const;
-  HDC getNormalDC(void) const;
-  HDC getOverlayDC(void) const;
-  HGLRC getNormalContext(void) const;
-  HGLRC getOverlayContext(void) const;
-
-  void setStealFocus(SbBool doStealFocus);
-
-  virtual void setNormalVisual(PIXELFORMATDESCRIPTOR * vis);
-  PIXELFORMATDESCRIPTOR * getNormalVisual(void);
-  virtual void setOverlayVisual(PIXELFORMATDESCRIPTOR * vis);
-  PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
-  virtual void setPixelFormat(int format);
-  int getPixelFormat(void);
-#endif // __COIN_SOWIN__
 
   SbBool hasOverlayGLArea(void) const;
   SbBool hasNormalGLArea(void) const;
@@ -139,9 +104,6 @@ protected:
 
   @WIDGET@ buildWidget(@WIDGET@ parent);
 
-  // FIXME: this was public in SoXtGLWidget. 20011012 mortene.
-  @WIDGET@ getGLWidget(void) const;
-
   virtual void redraw(void) = 0;
   virtual void redrawOverlay(void);
 
@@ -159,37 +121,14 @@ protected:
   void setGlxSize(const SbVec2s size) { this->setGLSize(size); }
   SbVec2s getGlxSize(void) const { return this->getGLSize(); }
   float getGlxAspectRatio(void) const { return this->getGLAspectRatio(); }
-  void setStereoBuffer(SbBool flag) { this->setQuadBufferStereo(flag); }
-  // FIXME: is this really correct? 20011012 mortene.
-  SbBool isStereoBuffer(void) const { return this->isQuadBufferStereo(); }
+
+  void setStereoBuffer(SbBool flag);
+  SbBool isStereoBuffer(void) const;
 
   SbBool isRGBMode(void);
 
   SbBool waitForExpose;
   SbBool drawToFrontBuffer;
-
-#ifdef __COIN_SOQT__
-  virtual bool eventFilter(QObject * obj, QEvent * e);
-  static void eventHandler(QWidget *, void *, QEvent *, bool *);
-#endif // __COIN_SOQT__
-#ifdef __COIN_SOXT__
-  static void eventHandler(Widget, void *, XEvent *, Boolean *);
-  int getDisplayListShareGroup(GLXContext context);
-  Widget getGlxMgrWidget(void);
-#endif // __COIN_SOXT__
-#ifdef __COIN_SOGTK__
-  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
-  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
-#endif // __COIN_SOGTK__
-#ifdef __COIN_SOWIN__
-  static LRESULT CALLBACK glWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  static LRESULT CALLBACK mgrWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  static LRESULT eventHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-  int getDisplayListShareGroup(HGLRC ctx);
-  HWND getManagerWidget(void);
-  HWND parent;
-  HWND toplevel;
-#endif // __COIN_SOWIN__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
@@ -202,19 +141,79 @@ protected:
 
   virtual SbBool glScheduleRedraw(void);
 
-#ifdef __COIN_SOQT__
-private slots:
-  void gl_init(void);
-  void gl_reshape(int, int);
-  void gl_exposed(void);
-#endif // __COIN_SOQT__
-
 private:
   class So@Gui@GLWidgetP * pimpl;
   friend class So@Gui@GLWidgetP; // FIXME: only used by So[Gtk|Win]GLWidgetP -- get rid of it? 20011012 mortene.
 
   void buildGLWidget(void); // FIXME: could we get rid of this? 20011012 mortene.
 
+#ifdef __COIN_SOQT__
+public:
+  const QGLContext * getNormalContext(void);
+  const QGLContext * getOverlayContext(void);
+
+protected:
+  virtual bool eventFilter(QObject * obj, QEvent * e);
+  static void eventHandler(QWidget *, void *, QEvent *, bool *);
+
+private slots:
+  void gl_init(void);
+  void gl_reshape(int, int);
+  void gl_exposed(void);
+#endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+public:
+  Window getNormalWindow(void);
+  Window getOverlayWindow(void);
+  GLXContext getNormalContext(void);
+  GLXContext getOverlayContext(void);
+
+  int getOverlayColorMapSize(void);
+  int getColorMapSize(void);
+
+  virtual void setNormalVisual(XVisualInfo * visual);
+  XVisualInfo * getNormalVisual(void);
+  virtual void setOverlayVisual(XVisualInfo * visual);
+  XVisualInfo * getOverlayVisual(void);
+
+protected:
+  static void eventHandler(Widget, void *, XEvent *, Boolean *);
+  int getDisplayListShareGroup(GLXContext context);
+  Widget getGlxMgrWidget(void);
+#endif // __COIN_SOXT__
+#ifdef __COIN_SOWIN__
+public:
+  HWND getNormalWindow(void) const;
+  HWND getOverlayWindow(void) const;
+  HDC getNormalDC(void) const;
+  HDC getOverlayDC(void) const;
+  HGLRC getNormalContext(void) const;
+  HGLRC getOverlayContext(void) const;
+
+  void setStealFocus(SbBool doStealFocus);
+
+  virtual void setNormalVisual(PIXELFORMATDESCRIPTOR * vis);
+  PIXELFORMATDESCRIPTOR * getNormalVisual(void);
+  virtual void setOverlayVisual(PIXELFORMATDESCRIPTOR * vis);
+  PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
+  virtual void setPixelFormat(int format);
+  int getPixelFormat(void);
+
+protected:
+  static LRESULT CALLBACK glWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  static LRESULT CALLBACK mgrWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  static LRESULT eventHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+  int getDisplayListShareGroup(HGLRC ctx);
+  HWND getManagerWidget(void);
+  HWND parent;
+  HWND toplevel;
+#endif // __COIN_SOWIN__
+
+#ifdef __COIN_SOGTK__
+protected:
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
+#endif // __COIN_SOGTK__
 };
 
 // *************************************************************************

@@ -26,6 +26,22 @@
 // This file contains the generic, "templatize-able" parts of the
 // So*FullViewer sourcecode.
 
+/*!
+  \class So@Gui@FullViewer So@Gui@FullViewer.h Inventor/@Gui@/viewers/So@Gui@FullViewer.h
+  \brief The So@Gui@FullViewer class adds UI decorations to the viewer component.
+  \ingroup components viewers
+
+  FIXME: proper class documentation
+  ...overview of what this class provides over parent class...
+  ...keyboard combinations...mousebutton combinations...explain pan,
+  rotate, zoom, dolly, seek...explain the fact that we're moving the
+  camera, not the scene...
+  ...viewer modes (examine vs interact) w/ explanation of what they are
+  useful for...
+
+  \sa So@Gui@ConstrainedViewer, So@Gui@ExaminerViewer, So@Gui@PlaneViewer
+*/
+
 
 // *************************************************************************
 
