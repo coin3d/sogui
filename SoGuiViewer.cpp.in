@@ -36,6 +36,24 @@ static const char rcsid[] =
  *
 \**************************************************************************/
 
+/*!
+  \class So@Gui@Viewer Inventor/@Gui@/viewers/So@Gui@Viewer.h
+  \brief The So@Gui@Viewer class is the top level base viewer class.
+  \ingroup components viewers common
+
+  TODO: more doc
+  ...overview of what this class provides over parent class...
+  ...keyboard combinations: Home, s, arrow keys (but only during
+  viewing), Esc...
+  ...explain pan, rotate, zoom, dolly, seek...
+  ..explain the fact that we're moving the camera, not the scene...
+  ...viewer modes (examine vs interact) w/ explanation of what they are
+  useful for...
+
+  \sa So@Gui@FullViewer
+*/
+
+
 #include <math.h>
 
 #if HAVE_CONFIG_H
@@ -89,22 +107,16 @@ static const char rcsid[] =
 #define M_PI 3.1415926535f
 #endif // ! M_PI
 
-/*!
-  \class So@Gui@Viewer Inventor/@Gui@/viewers/So@Gui@Viewer.h
-  \brief The So@Gui@Viewer class is the top level base viewer class.
-  \ingroup components viewers common
-
-  TODO: more doc
-  ...overview of what this class provides over parent class...
-  ...keyboard combinations: Home, s, arrow keys (but only during
-  viewing), Esc...
-  ...explain pan, rotate, zoom, dolly, seek...
-  ..explain the fact that we're moving the camera, not the scene...
-  ...viewer modes (examine vs interact) w/ explanation of what they are
-  useful for...
-
-  \sa So@Gui@FullViewer
-*/
+// FIXME: this is just a temporary hack to enable the FPS counter. We
+// should really write a proper interface against it, so applications
+// can set up feedback loops to control scene complexity and get a
+// nice and steady maximum framerate, for instance.
+//
+// For anyone who want to execute that task, check what TGS has done
+// first. If their API is fine, use the same approach.
+//
+// 20001124 mortene.
+#define I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER 0
 
 // *************************************************************************
 
@@ -412,6 +424,8 @@ So@Gui@Viewer::So@Gui@Viewer(
     @WIDGET@ widget = this->buildWidget( this->getParentWidget() );
     this->setBaseWidget( widget );
   }
+
+  this->resetFrameCounter();
 } // So@Gui@Viewer()
 
 // *************************************************************************
@@ -1877,6 +1891,8 @@ So@Gui@Viewer::actualRedraw(void)
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
   else this->reallyRedraw(clearcol);
+
+  if (this->getInteractiveCount() > 0) this->recordFPS();
 } // actualRedraw()
 
 // *************************************************************************
@@ -1942,6 +1958,7 @@ So@Gui@Viewer::interactiveCountDec(void)
   if (--(this->interactionnesting) <= 0) {
     this->interactionendCallbacks->invokeCallbacks(this);
     this->interactionnesting = 0;
+    this->resetFrameCounter();
   }
 } // interactiveCountDec()
 
@@ -2478,6 +2495,237 @@ So@Gui@Viewer::sizeChanged(
 {
   inherited::sizeChanged( size );
 } // sizeChanged()
+
+// *************************************************************************
+
+/*!
+  Reset the frames-per-second counter upon window resize events,
+  abnormal delays, etc.
+
+  The methods for recording FPS values are Coin extensions, not
+  available in the original Open Inventor API.
+
+  \sa addFrametime(), recordFPS()
+*/
+void
+So@Gui@Viewer::resetFrameCounter(void)
+{
+  this->framecount = 0;
+  for(int i=0; i < So@Gui@Viewer::FRAMESARRAY_SIZE; i++) this->frames[i] = 0.0;
+  this->totalval = 0.0;
+  this->currentframetime = 0.0;
+  this->lasttimeofday = 0.0;
+}
+
+/*!
+  Adds the time spent drawing the last frame to the array of past
+  frame times.
+
+  The methods for recording FPS values are Coin extensions, not
+  available in the original Open Inventor API.
+
+  \sa resetFrameCounter(), recordFPS()
+*/
+void
+So@Gui@Viewer::addFrametime(const double ft)
+{
+  this->framecount++;
+
+  int arrayptr = (this->framecount - 1) % So@Gui@Viewer::FRAMESARRAY_SIZE;
+  double oldval = this->frames[arrayptr];
+  this->frames[arrayptr] = ft;
+  this->totalval += (ft - oldval);
+  this->currentframetime =
+    this->totalval / So@Gui@Min(this->framecount,
+                                (int) So@Gui@Viewer::FRAMESARRAY_SIZE);
+}
+
+static unsigned char fps2dfont[][12] = {
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, //
+  {  0,  0, 12, 12,  0,  8, 12, 12, 12, 12, 12,  0 }, // !
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 20, 20, 20 }, // "
+  {  0,  0, 18, 18, 18, 63, 18, 18, 63, 18, 18,  0 }, // #
+  {  0,  8, 28, 42, 10, 10, 12, 24, 40, 42, 28,  8 }, // $
+  {  0,  0,  6, 73, 41, 22,  8, 52, 74, 73, 48,  0 }, // %
+  {  0, 12, 18, 18, 12, 25, 37, 34, 34, 29,  0,  0 }, // &
+  { 12, 12, 24,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // '
+  {  0,  6,  8,  8, 16, 16, 16, 16, 16,  8,  8,  6 }, // (
+  {  0, 48,  8,  8,  4,  4,  4,  4,  4,  8,  8, 48 }, // )
+  {  0,  0,  0,  0,  0,  0,  8, 42, 20, 42,  8,  0 }, // *
+  {  0,  0,  0,  8,  8,  8,127,  8,  8,  8,  0,  0 }, // +
+  {  0, 24, 12, 12,  0,  0,  0,  0,  0,  0,  0,  0 }, // ,
+  {  0,  0,  0,  0,  0,  0,127,  0,  0,  0,  0,  0 }, // -
+  {  0,  0, 24, 24,  0,  0,  0,  0,  0,  0,  0,  0 }, // .
+  {  0, 32, 32, 16, 16,  8,  8,  8,  4,  4,  2,  2 }, // /
+  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 28,  0 }, // 0
+  {  0,  0,  8,  8,  8,  8,  8,  8, 40, 24,  8,  0 }, // 1
+  {  0,  0, 62, 32, 16,  8,  4,  2,  2, 34, 28,  0 }, // 2
+  {  0,  0, 28, 34,  2,  2, 12,  2,  2, 34, 28,  0 }, // 3
+  {  0,  0,  4,  4,  4,126, 68, 36, 20, 12,  4,  0 }, // 4
+  {  0,  0, 28, 34,  2,  2,  2, 60, 32, 32, 62,  0 }, // 5
+  {  0,  0, 28, 34, 34, 34, 60, 32, 32, 34, 28,  0 }, // 6
+  {  0,  0, 16, 16, 16,  8,  8,  4,  2,  2, 62,  0 }, // 7
+  {  0,  0, 28, 34, 34, 34, 28, 34, 34, 34, 28,  0 }, // 8
+  {  0,  0, 28, 34,  2,  2, 30, 34, 34, 34, 28,  0 }, // 9
+  {  0,  0, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // :
+  {  0, 48, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // ;
+  {  0,  0,  0,  2,  4,  8, 16,  8,  4,  2,  0,  0 }, // <
+  {  0,  0,  0,  0,  0,127,  0,127,  0,  0,  0,  0 }, // =
+  {  0,  0,  0, 16,  8,  4,  2,  4,  8, 16,  0,  0 }, // >
+  {  0,  0, 16, 16,  0, 16, 28,  2,  2,  2, 60,  0 }, // ?
+  {  0,  0, 28, 32, 73, 86, 82, 82, 78, 34, 28,  0 }, // @
+  {  0,  0, 33, 33, 33, 63, 18, 18, 18, 12, 12,  0 }, // A
+  {  0,  0, 60, 34, 34, 34, 60, 34, 34, 34, 60,  0 }, // B
+  {  0,  0, 14, 16, 32, 32, 32, 32, 32, 18, 14,  0 }, // C
+  {  0,  0, 56, 36, 34, 34, 34, 34, 34, 36, 56,  0 }, // D
+  {  0,  0, 62, 32, 32, 32, 60, 32, 32, 32, 62,  0 }, // E
+  {  0,  0, 16, 16, 16, 16, 30, 16, 16, 16, 30,  0 }, // F
+  {  0,  0, 14, 18, 34, 34, 32, 32, 32, 18, 14,  0 }, // G
+  {  0,  0, 34, 34, 34, 34, 62, 34, 34, 34, 34,  0 }, // H
+  {  0,  0, 62,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // I
+  {  0,  0,112,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // J
+  {  0,  0, 33, 33, 34, 36, 56, 40, 36, 34, 33,  0 }, // K
+  {  0,  0, 30, 16, 16, 16, 16, 16, 16, 16, 16,  0 }, // L
+  {  0,  0, 33, 33, 33, 45, 45, 45, 51, 51, 33,  0 }, // M
+  {  0,  0, 34, 34, 38, 38, 42, 42, 50, 50, 34,  0 }, // N
+  {  0,  0, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // O
+  {  0,  0, 32, 32, 32, 60, 34, 34, 34, 34, 60,  0 }, // P
+  {  3,  6, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // Q
+  {  0,  0, 34, 34, 34, 36, 60, 34, 34, 34, 60,  0 }, // R
+  {  0,  0, 60,  2,  2,  6, 28, 48, 32, 32, 30,  0 }, // S
+  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,127,  0 }, // T
+  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 34,  0 }, // U
+  {  0,  0, 12, 12, 18, 18, 18, 33, 33, 33, 33,  0 }, // V
+  {  0,  0, 34, 34, 34, 54, 85, 73, 73, 73, 65,  0 }, // W
+  {  0,  0, 34, 34, 20, 20,  8, 20, 20, 34, 34,  0 }, // X
+  {  0,  0,  8,  8,  8,  8, 20, 20, 34, 34, 34,  0 }, // Y
+  {  0,  0, 62, 32, 16, 16,  8,  4,  4,  2, 62,  0 }, // Z
+  {  0, 14,  8,  8,  8,  8,  8,  8,  8,  8,  8, 14 }, // [
+  {  0,  2,  2,  4,  4,  8,  8,  8, 16, 16, 32, 32 }, // [backslash]
+  {  0, 56,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // ]
+  {  0,  0,  0,  0,  0, 34, 34, 20, 20,  8,  8,  0 }, // ^
+  {  0,127,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // _
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 24, 24, 12 }, // `
+  {  0,  0, 29, 34, 34, 30,  2, 34, 28,  0,  0,  0 }, // a
+  {  0,  0, 60, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // b
+  {  0,  0, 14, 16, 32, 32, 32, 16, 14,  0,  0,  0 }, // c
+  {  0,  0, 26, 38, 34, 34, 34, 34, 30,  2,  2,  2 }, // d
+  {  0,  0, 28, 34, 32, 62, 34, 34, 28,  0,  0,  0 }, // e
+  {  0,  0, 16, 16, 16, 16, 16, 16, 62, 16, 16, 14 }, // f
+  { 28,  2,  2, 26, 38, 34, 34, 34, 30,  0,  0,  0 }, // g
+  {  0,  0, 34, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // h
+  {  0,  0,  8,  8,  8,  8,  8,  8, 56,  0,  8,  8 }, // i
+  { 56,  4,  4,  4,  4,  4,  4,  4, 60,  0,  4,  4 }, // j
+  {  0,  0, 33, 34, 36, 56, 40, 36, 34, 32, 32, 32 }, // k
+  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // l
+  {  0,  0, 73, 73, 73, 73, 73,109, 82,  0,  0,  0 }, // m
+  {  0,  0, 34, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // n
+  {  0,  0, 28, 34, 34, 34, 34, 34, 28,  0,  0,  0 }, // o
+  { 32, 32, 60, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // p
+  {  2,  2, 26, 38, 34, 34, 34, 34, 30,  0,  0,  0 }, // q
+  {  0,  0, 16, 16, 16, 16, 16, 24, 22,  0,  0,  0 }, // r
+  {  0,  0, 60,  2,  2, 28, 32, 32, 30,  0,  0,  0 }, // s
+  {  0,  0, 14, 16, 16, 16, 16, 16, 62, 16, 16,  0 }, // t
+  {  0,  0, 26, 38, 34, 34, 34, 34, 34,  0,  0,  0 }, // u
+  {  0,  0,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // v
+  {  0,  0, 34, 34, 34, 85, 73, 73, 65,  0,  0,  0 }, // w
+  {  0,  0, 34, 34, 20,  8, 20, 34, 34,  0,  0,  0 }, // x
+  { 48, 16,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // y
+  {  0,  0, 62, 32, 16,  8,  4,  2, 62,  0,  0,  0 }, // z
+  {  0,  6,  8,  8,  8,  4, 24,  4,  8,  8,  8,  6 }, // {
+  {  0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 }, // |
+  {  0, 48,  8,  8,  8, 16, 12, 16,  8,  8,  8, 48 }, // }
+  {  0,  0,  0,  0,  0,  0, 78, 57,  0,  0,  0,  0 }  // ~
+};
+
+static void
+printString(const char * s)
+{
+#if defined(__COIN__)
+  int i,n;
+  n = strlen(s);
+  for (i = 0; i < n; i++)
+    glBitmap(8, 12, 0.0, 2.0, 10.0, 0.0, fps2dfont[s[i] - 32]);
+#endif
+}
+
+static void
+Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
+{
+  // Store GL state.
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_TEXTURE_2D);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+        
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0.0, glsize[0], 0.0, glsize[1], -1, 1);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glColor3f(0.0, 0.0, 0.0);
+  glRasterPos2f(position[0] + 1, position[1]);
+  printString( str );
+  glRasterPos2f(position[0] - 1, position[1]);
+  printString( str );
+  glRasterPos2f(position[0], position[1] + 1);
+  printString( str );
+  glRasterPos2f(position[0], position[1] - 1);
+  printString( str );
+
+  glColor3f(1.0, 1.0, 0.0);
+  glRasterPos2f(position[0], position[1]);
+  printString( str );
+  
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+
+  glPopAttrib();
+}
+
+
+/*!
+  Draw a text string showing the current frame-per-seconds value in
+  the lower left corner of the OpenGL canvas (after recording
+  information needed to calculate the fps).
+
+  The methods for recording FPS values are Coin extensions, not
+  available in the original Open Inventor API.
+
+  \sa resetFrameCounter(), addFrametime()
+*/
+void
+So@Gui@Viewer::recordFPS(void)
+{
+#if I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER
+  double frametime, timeofday = SbTime::getTimeOfDay().getValue();
+  if((this->lasttimeofday == 0.0) ||
+     ((timeofday - this->lasttimeofday) > 1.0)) {
+    this->resetFrameCounter();
+    
+    frametime = 0.0;
+    this->lasttimeofday = timeofday;
+  }
+  else {
+    frametime = timeofday - this->lasttimeofday;
+    this->lasttimeofday = timeofday;
+    this->addFrametime(frametime);
+
+    char buffer[64];
+    int nr = sprintf(buffer, "%.1f fps", 1.0/this->currentframetime);
+    assert(nr < 64);
+    Draw2DString(buffer, this->getGlxSize(), SbVec2f(10, 10));
+  }
+#endif // I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER
+}
 
 // *************************************************************************
 

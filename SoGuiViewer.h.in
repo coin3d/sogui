@@ -295,6 +295,18 @@ private:
 
   SbBool stereoviewing;
   float stereooffset;
+
+  // Methods to keep track of frames-per-second value. Not available
+  // in the original Inventor API -- Coin extension.
+  void resetFrameCounter(void);
+  void addFrametime(const double ft);
+  void recordFPS(void);
+  // These variables and methods are used to keep track of the
+  // frames-per-second counter.
+  enum { FRAMESARRAY_SIZE = 10}; // Const value trick for old compilers.
+  double lasttimeofday, frames[FRAMESARRAY_SIZE], totalval, currentframetime;
+  int framecount;
+
 }; // class So@Gui@Viewer
 
 // *************************************************************************
