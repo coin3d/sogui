@@ -26,7 +26,8 @@ static const char rcsid[] =
   all the FullViewer components for Coin.
 */
 
-#include <Inventor/@GUI@/widgets/SoAnyPopupMenu.h>
+#include <Inventor/@GUI@/So@GUI@Component.h>
+#include <Inventor/@GUI@/widgets/So@GUI@PopupMenu.h>
 #include <Inventor/@GUI@/viewers/SoAnyFullViewer.h>
 
 // ************************************************************************
@@ -35,7 +36,7 @@ SoAnyPopupMenu *
 SoAnyFullViewer::buildStandardPopupMenu(
   void )
 {
-  SoAnyPopupMenu * menu = new SoAnyPopupMenu;
+  SoAnyPopupMenu * menu = new So@GUI@PopupMenu;
 
   menu->NewMenu( "rootmenu", ROOT_MENU );
 
