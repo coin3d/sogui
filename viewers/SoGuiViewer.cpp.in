@@ -1797,10 +1797,12 @@ So@Gui@Viewer::~So@Gui@Viewer()
 // Note: the following function documentation block will also be used
 // for all the miscellaneous viewer subclasses, so keep it general.
 /*!
-  Set the camera we want to view the scene with.
+  Set the camera we want the viewer to manipulate when interacting with
+  the viewer controls.
 
-  The camera passed in as an argument to this method \e must be part
-  of the viewer's scenegraph.
+  The camera passed in as an argument to this method \e must already be
+  part of the viewer's scenegraph.  You do not inject viewpoint cameras to
+  the viewer with this method.
 
   If the application code doesn't explicitly set up a camera through
   this method, the viewer will automatically scan through the
