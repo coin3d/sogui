@@ -1,6 +1,9 @@
 NEWS
 ====
 
+2000-09-08 larsa:
+	* changed public license from QPL to LGPL.
+
 2000-03-31 larsa:
 	* removed all obsolete files (and files to be obsoleted).
 
