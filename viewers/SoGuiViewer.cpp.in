@@ -324,6 +324,13 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
 
 So@Gui@ViewerP::~So@Gui@ViewerP()
 {
+  // This impossible to miss reminder was inserted so we don't
+  // accidentally let an So* v2 slip out the door without fixing this
+  // API design flaw. 20030625 mortene.
+#if (SO@GUI@_MAJOR_VERSION == 2)
+#error This is a reminder: when jumping to version 2 of an So* toolkit, the viewer destructors (at least, possibly also further up in the inheritance hierarchy) should be made virtual.
+#endif // version = 2
+
   if ( this->superimpositions != NULL ) delete this->superimpositions;
   delete this->searchaction;
   delete this->matrixaction;
