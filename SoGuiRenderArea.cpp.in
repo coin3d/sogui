@@ -125,7 +125,7 @@ So@GUI@RenderArea::constructor( // private
 
   if ( build ) {
     this->setClassName( "So@GUI@RenderArea" );
-    Widget glarea = this->buildWidget( this->getParentWidget() );
+    @WIDGET@ glarea = this->buildWidget( this->getParentWidget() );
     this->setBaseWidget( glarea );
     this->setSize( SbVec2s( 400, 400 ) );
   }
