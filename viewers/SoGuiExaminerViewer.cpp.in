@@ -286,10 +286,10 @@ void
 So@Gui@ExaminerViewer::setFeedbackVisibility(const SbBool enable)
 {
   if (enable == PRIVATE(this)->axiscrossEnabled) {
-#if SO@GUI@_DEBUG
+#ifdef SO@GUI@_EXTRA_DEBUG
     SoDebugError::postWarning("So@Gui@ExaminerViewer::setFeedbackVisibility",
                               "feedback visibility already set to %s", enable ? "TRUE" : "FALSE");
-#endif // SO@GUI@_DEBUG
+#endif // SO@GUI@_EXTRA_DEBUG
     return;
   }
   PRIVATE(this)->axiscrossEnabled = enable;
