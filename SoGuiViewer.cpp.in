@@ -696,12 +696,16 @@ So@Gui@Viewer::setCameraType(SoType t)
       newpcam = (SoPerspectiveCamera *)newcamera;
       oldocam = (SoOrthographicCamera *)this->camera;
 
-      if ( focaldist != 0.0f ) // focalDistance==0.0f happens for empty scenes.
+      // focalDistance==0.0f happens for empty scenes.
+      if ( focaldist != 0.0f ) {
         newpcam->heightAngle =
           2.0f * atan( oldocam->height.getValue() / 2.0f / focaldist );
-      else
+      }
+      else {
         newpcam->heightAngle = 0.0f;
-    } else {
+      }
+    }
+    else {
       newocam = (SoOrthographicCamera *)newcamera;
       oldpcam = (SoPerspectiveCamera *)this->camera;
       newocam->height =
@@ -2205,6 +2209,38 @@ So@Gui@Viewer::toggleCameraType(void)
   this->setCameraType( PRIVATE(this)->cameratype.isDerivedFrom( perspectivetype )
                        ? orthotype : perspectivetype );
 } // toggleCameraType()
+
+// ************************************************************************
+
+/*!
+  Copies the settings of \a camera into our current camera.  Cameras
+  must be of the same class type.
+ */
+void
+So@Gui@Viewer::changeCameraValues( // virtual, protected
+  SoCamera * camera )
+{
+  assert(camera != NULL);
+
+  SoCamera * cam = this->getCamera();
+  if (!cam) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
+                              "no current camera in the scenegraph");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+  if (cam->getTypeId() != camera->getTypeId()) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
+                              "tried to copy data from camera of "
+                              "different type");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+  cam->copyFieldValues(camera, FALSE);
+}
 
 // *************************************************************************
 
