@@ -508,7 +508,8 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
         camera->orientation.getValue().multVec(dir,dir);
         camera->position = camera->position.getValue() + dir;
         camera->orientation = 
-        camera->orientation.getValue() * event->getRotation();
+        event->getRotation() * camera->orientation.getValue();
+        processed = TRUE;
         processed = TRUE;
       }
       else {
