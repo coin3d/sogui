@@ -73,6 +73,9 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 #if ! defined(SO@GUI@_MICRO_VERSION)
 #undef SO@GUI@_MICRO_VERSION
 #endif /* ! SO@GUI@_MICRO_VERSION */
+#if ! defined(SO@GUI@_BETA_VERSION)
+#undef SO@GUI@_BETA_VERSION
+#endif /* ! SO@GUI@_BETA_VERSION */
 #if ! defined(SO@GUI@_VERSION)
 #undef SO@GUI@_VERSION
 #endif /* ! SO@GUI@_VERSION */
