@@ -423,7 +423,7 @@ SoAnyThumbWheel::Validate( // private
     }
 
     float radius = ((float) this->diameter + 1.0f) / 2.0f;
-    float range = 2.0f * M_PI;
+//    float range = 2.0f * M_PI;
     float acos0times2 = 2.0f*acos( 0.0f );
 
     for ( i = 0; i < this->diameter; i++ ) {
