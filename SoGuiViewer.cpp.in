@@ -173,8 +173,7 @@ public:
   // Automatic setting of clipping planes
   void setClippingPlanes(void);
 
-  // Methods to keep track of frames-per-second value. Not available
-  // in the original Inventor API -- Coin extension.
+  // Methods to keep track of frames-per-second value.
   void resetFrameCounter(void);
   void addFrametime(const double ft);
   void recordFPS(void);
@@ -208,15 +207,33 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 
 /*!
   \enum So@Gui@Viewer::Type
-  FIXME: write documentation for enum
+
+  Hints about what context the viewer will be used in.  Usually not
+  very interesting for the application programmer, it doesn't matter
+  much which value is used for the viewer type.  This "feature" of the
+  viewer is included just to be compatible with the old SGI Inventor
+  API.
 */
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::BROWSER
-  FIXME: write documentation for enum definition
+
+  If a user-supplied scenegraph passed into the setSceneGraph()
+  function does not contain a camera, setting the viewer type to
+  BROWSER will make the viewer in that case automatically set up a
+  camera outside the scene, as part of the viewer's private and hidden
+  "supergraph".
 */
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::EDITOR
-  FIXME: write documentation for enum definition
+
+  If a user-supplied scenegraph passed into the setSceneGraph()
+  function does not contain a camera, setting the viewer type to
+  EDITOR will make the viewer in that case automatically set up a
+  camera \e in the user-supplied scene.
+
+  So if you want to avoid having the So@Gui@Viewer class muck about
+  with your supplied scenegraph, set the type-flag to
+  So@Gui@Viewer::BROWSER instead.
 */
 
 /*!
@@ -328,7 +345,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::type
 
-  The type of the viewer.
+  (Just included for compatibility reasons. Can safely be ignored.)
 */
 
 /*!
@@ -395,9 +412,20 @@ get_parent_of_node(SoNode * root, SoNode * node)
 // *************************************************************************
 
 /*!
-  Constructor. \a parent, \a name and \a embed are passed on
-  to So@Gui@RenderArea, so see the documentation for that constructor for
-  for more information on those.
+  Constructor. \a parent, \a name and \a embed are passed on to
+  So@Gui@RenderArea, so see the documentation for our parent
+  constructor for for more information on those.
+
+  The \a t type setting hints about what context the viewer will be
+  used in.  Usually not very interesting for the application
+  programmer, but if you want to make sure the So@Gui@Viewer class
+  doesn't muck about with your supplied scenegraph, set the type-flag
+  to So@Gui@Viewer::BROWSER.  (This "feature" of the viewer is
+  included just to be compatible with the old SGI Inventor API.)
+
+  The \a build flag decides whether or not to delay building the
+  widgets / window which is going to make up the components of the
+  viewer.
 */
 
 So@Gui@Viewer::So@Gui@Viewer(
@@ -444,7 +472,7 @@ So@Gui@Viewer::So@Gui@Viewer(
   this->sceneRoot->boundingBoxCaching.setValue(SoSeparator::OFF);
 
   // Headlight. By inserting this before any scenegraph camera, the
-  // light will always be pointing in correct direction.
+  // light will always be pointing in the correct direction.
   {
     PRIVATE(this)->headlight = new SoDirectionalLight;
     PRIVATE(this)->headlight->direction.setValue(1, -1, -10);
@@ -838,7 +866,7 @@ So@Gui@Viewer::getHeadlight(void) const
 
 void
 So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
-                         So@Gui@Viewer::DrawStyle style)
+                            So@Gui@Viewer::DrawStyle style)
 {
 #if SO@GUI@_DEBUG
   if ((type != STILL) && (type != INTERACTIVE)) {
@@ -1310,6 +1338,7 @@ void
 So@Gui@Viewer::recomputeSceneSize(
   void )
 {
+  // FIXME: implement and use SO@GUI@_OBSOLETED(). 20010815 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::recomputeSceneSize",
                          "this method is obsoleted, don't use it");
 } // recomputeSceneSize()
@@ -1557,14 +1586,13 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     return;
   }
 
-  // If the SoRenderArea hasn't yet set up its pointer to the SoViewer
-  // "viewer root" (i.e. the viewer-generated root above the
-  // user-supplied root), do that first.
-  if (!inherited::getSceneGraph()) inherited::setSceneGraph(this->sceneRoot);
+  // If the So@Gui@RenderArea hasn't yet set up its pointer to the
+  // So@Gui@Viewer "viewer root" (i.e. the viewer-generated root above
+  // the user-supplied root), do that first.
+  if (!inherited::getSceneGraph()) { inherited::setSceneGraph(this->sceneRoot); }
 
   if ( this->sceneGraph ) {
-    if (this->getCamera())
-      this->setCamera(NULL);
+    if (this->getCamera()) { this->setCamera(NULL); }
     // Release the old user-supplied graph.
     this->sceneRoot->removeChild(this->sceneGraph);
   }
@@ -1574,13 +1602,13 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
 
   this->sceneRoot->addChild(this->sceneGraph);
 
-  // Search for a camera already present.
+  // Search for a camera in the user-supplied scenegraph.
   SoSearchAction search;
   search.setType(SoCamera::getClassTypeId());
   search.apply(this->sceneGraph);
-  SoCamera * scenecamera = NULL;
   SoFullPath * fullpath = (SoFullPath *)search.getPath();
-  if (fullpath) scenecamera = (SoCamera *)fullpath->getTail();
+  SoCamera * scenecamera = NULL;
+  if (fullpath) { scenecamera = (SoCamera *)fullpath->getTail(); }
 
 #if 0 // debug
   SoDebugError::postInfo("So@Gui@Viewer::setSceneGraph",
@@ -1593,14 +1621,21 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     scenecamera = (SoCamera *)PRIVATE(this)->cameratype.createInstance();
     PRIVATE(this)->deletecamera = TRUE;
 
+    // If type==BROWSER, camera should be inserted in the private
+    // viewer "supergraph", if it's equal to EDITOR it should be
+    // inserted in the user-supplied scenegraph.
     if ( this->type == So@Gui@Viewer::BROWSER ) {
       this->sceneRoot->insertChild(scenecamera, 1);
     }
-    else {
+    else { // this->type == So@Gui@Viewer::EDITOR
       if (this->sceneGraph->isOfType(SoGroup::getClassTypeId())) {
+        // At the uppermost leftmost position in the user-supplied
+        // scenegraph.
         ((SoGroup *)this->sceneGraph)->insertChild(scenecamera, 0);
       }
       else {
+        // Make an extra depth level to fit the camera node into the
+        // user-scenegraph.
         SoGroup * g = new SoGroup;
         g->addChild(scenecamera);
         g->addChild(this->sceneGraph);
