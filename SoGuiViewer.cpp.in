@@ -95,10 +95,6 @@ static const char rcsid[] =
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
-#if HAVE_CONFIG_H
-#include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
-#endif // HAVE_CONFIG_H
-
 #if HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoPolygonOffset.h>
 #endif // HAVE_SOPOLYGONOFFSET
