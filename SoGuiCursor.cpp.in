@@ -133,8 +133,12 @@ void
 So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
 { 
   this->shape = shape;
-  this->cc = new CustomCursor;
-  *(this->cc) = *cc;
+
+  if (cc) {
+    assert(shape == CUSTOM_BITMAP);
+    this->cc = new CustomCursor;
+    *(this->cc) = *cc;
+  }
 
   if (first) {
     zoom.dim = SbVec2s(16, 16);
