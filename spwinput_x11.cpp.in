@@ -178,15 +178,13 @@ static Atom SPW_InputButtonPressAtom;      /* Spaceball button press Atom */
 static Atom SPW_InputButtonReleaseAtom;    /* Spaceball button release Atom */
 static Atom SPW_InputPassThruAtom;  /* Main daemon communication Atom */
 
-static Atom WM_PROTOCOLS, WM_SAVE_YOURSELF, 
-            WM_DELETE_WINDOW;               /* Atoms daemon will use */
+static Atom WM_SAVE_YOURSELF;               /* Atoms daemon will use */
 
 #if HAVE_X11_EXTENSIONS_XINPUT_H
 
-static int SpaceballDevID = 0;                 /* XIE ID for the Spaceball device */
+static XID SpaceballDevID = 0;                 /* XIE ID for the Spaceball device */
 static XDevice *pSpaceballDev = NULL;          /* The spaceball XIE structure */
 static XEventClass SPW_SpaceballEventClass[3]; /* XIE Events classes          */
-static int num_valuators;               /* number of axes in Input extension */
 
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
 
@@ -322,7 +320,7 @@ static void StringFlush (Display *display, Window win)
   /* force zero on end of data */
   event.data.b[SPW_strLength] = 0;
 
-  event.data.l[4] = htonl(win);
+  event.data.l[4] = (long)htonl(win);
   
 #ifdef SPW_DEBUG
   fprintf (stderr,"StringFlush %s\n", event.data.b);
@@ -759,7 +757,7 @@ static int FindXCMAtoms (Display *display)
  *---------------------------------------------------------------------------*/
 static int FindXCM (Display *display)
 {
-  int win;   /* the XCM window */
+  unsigned long win;   /* the XCM window */
   int atom;  /* boolean that tell us if we found the atoms */
   
   win = FindXCMWindow (display);
@@ -852,27 +850,6 @@ int SPW_FindXIE (Display *display)
   SpaceballDevID = pDev[i].id;
   pSpaceballDev = XOpenDevice (display, SpaceballDevID);
   
-  /*
-   * get the number of valuators to help determine if 
-   * our driver is being used
-   */
-  ptr = (char*) pDev[i].inputclassinfo;
-  for (j = 0; j < pDev[i].num_classes; j++) {
-    XAnyClassInfo *info = (XAnyClassInfo*)ptr;
-
-    if (
-#if defined(__cplusplus) || defined(c_plusplus)  
-        info->c_class == ValuatorClass
-#else /* !__cplusplus */
-        info->class == ValuatorClass;
-#endif /* __cplusplus */
-        ) {
-      num_valuators = ((XValuatorInfo*)info)->num_axes;
-      break;
-    }
-    ptr += info->length;
-  }
-
   /* clean up the device list */ 
   XFreeDeviceList (pDev);
 
@@ -918,8 +895,8 @@ static void InitializeSpaceball (Display *display, char *version)
   }
 
   /* Create some more Atoms the Daemon uses  */
-  WM_PROTOCOLS = XInternAtom (display, "WM_PROTOCOLS", False);
-  WM_DELETE_WINDOW = XInternAtom (display, "WM_DELETE_WINDOW", False);
+  (void)XInternAtom (display, "WM_PROTOCOLS", False);
+  (void)XInternAtom (display, "WM_DELETE_WINDOW", False);
 
    /* search for the XIE driver first */
   if (SPW_FindXIE (display) == 1) {
@@ -1144,7 +1121,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
 #if HAVE_X11_EXTENSIONS_XINPUT_H
   /* check to see if the event is a spaceball XIE motion event */
   else if ((event->type == SPW_DevMotionEventType) &&
-           (((XDeviceMotionEvent *)event)->deviceid == (XID) SpaceballDevID)) {
+           (((XDeviceMotionEvent *)event)->deviceid == SpaceballDevID)) {
     /* cast the event to a XIE event */
     XDeviceMotionEvent *motion = (XDeviceMotionEvent *)event;
     int i;                                     /* Counter loop index */
@@ -1194,7 +1171,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
   
   /* check to see if the event is a spaceball XIE button press event */
   else if ((event->type == SPW_DevButtonPressEventType) &&
-           (((XDeviceButtonEvent *)event)->deviceid == (XID) SpaceballDevID)) {
+           (((XDeviceButtonEvent *)event)->deviceid == SpaceballDevID)) {
     /* cast the event to a XIE event */
     XDeviceButtonEvent *button = (XDeviceButtonEvent *) event;  
     
@@ -1211,7 +1188,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
   
   /* check to see if the event is a spaceball XIE button release event */
   else if ((event->type==SPW_DevButtonReleaseEventType) &&
-           (((XDeviceButtonEvent *)event)->deviceid == (XID) SpaceballDevID)) {
+           (((XDeviceButtonEvent *)event)->deviceid == SpaceballDevID)) {
     /* cast the event to a XIE event */
     XDeviceButtonEvent *button = (XDeviceButtonEvent *) event;  
       
@@ -1332,14 +1309,14 @@ void SPW_InputBeep (Display *display, char *string)
     static char buf[32];
     char *cp = buf;
     
-    slen = SbMin(slen, 32 - 3);
+    if (slen > 29) slen = 29;
     *cp++ = '\r';
     *cp++ = 'B';
     strcpy (cp, string);
     cp  += slen;
     *cp++ = '\r';
     *cp  = NULL;
-    XSGIDeviceControl (display, SpaceballDevID, "sbprivate", buf);
+    XSGIDeviceControl (display, (int)SpaceballDevID, "sbprivate", buf);
     XFlush (display);
     
 #elif HAVE_X11_XPROTO_H 
@@ -1406,7 +1383,7 @@ void SPW_InputRezero (Display *display)
       /* SGI rezero */
       static char *cmd = "\rZ\r";
 
-      XSGIDeviceControl (display, SpaceballDevID, "sbprivate", cmd);
+      XSGIDeviceControl (display, (int)SpaceballDevID, "sbprivate", cmd);
       XFlush (display);
 
 #elif HAVE_X11_XPROTO_H
@@ -1482,7 +1459,6 @@ void SPW_InputSetPulseRate (Display *display, unsigned short rate)
 int SPW_InputXPending (Display *display, int delay)
 {
   int            numevents;  /* the number of event on the X queue */
-  int            select_ret; /* return value from the select call */
   struct timeval short_wait; /* time struct needed for select call */
 
   fd_set Xfds;
@@ -1512,12 +1488,8 @@ int SPW_InputXPending (Display *display, int delay)
   FD_ZERO (&Xfds);
   FD_SET (ConnectionNumber (display), &Xfds);
 
-  select_ret = select (ConnectionNumber (display) + 1, &Xfds, NULL,
-                       NULL, &short_wait);
-
-#ifdef SPW_DEBUG 
-  fprintf(stderr,"   select return %d\n", select_ret);
-#endif
+  (void)select (ConnectionNumber (display) + 1, &Xfds, NULL,
+                NULL, &short_wait);
 
   /* check the event queue again */
   numevents = XPending (display);
