@@ -40,6 +40,8 @@ class SbPList;
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
 #include <windows.h>
+#include <Inventor/SoDB.h>
+#include <Inventor/errors/SoDebugError.h>
 #endif // __COIN_SOWIN__
 
 #include <Inventor/SbBasic.h>
@@ -56,6 +58,28 @@ class SO@GUI@_DLL_API So@Gui@
   @COMPONENTHEADER@
 
 public:
+#ifdef __COIN_SOWIN__
+  static HWND init(const char * const appName,
+                   const char * const className = "SoWin")
+  {
+    SOWIN_SANITY_CHECK(HWND retval = SoWin::internal_init(appName, className));
+    return retval;
+  }
+
+  static HWND init(int argc, char ** argv,
+                   const char * const appName,
+                   const char * const className = "SoWin")
+  {
+    SOWIN_SANITY_CHECK(HWND retval = SoWin::internal_init(argc, argv, appName, className));
+    return retval;
+  }
+
+  static void init(HWND const topLevelWidget)
+  { SOWIN_SANITY_CHECK(SoWin::internal_init(topLevelWidget)); }
+
+  static void init(void)
+  { SOWIN_SANITY_CHECK(SoWin::internal_init()); }
+#else // ! __COIN_SOWIN__
   static @WIDGET@ init(const char * const appName,
                        const char * const className = "So@Gui@");
 
@@ -64,6 +88,7 @@ public:
                        const char * const className = "So@Gui@");
 
   static void init(@WIDGET@ const topLevelWidget);
+#endif // ! __COIN_SOWIN__
 
   static void mainLoop(void);
   static void exitMainLoop(void);
@@ -130,7 +155,14 @@ public:
   static int getComponents(SbPList & components);
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
-  static void init(void);
+  static HWND internal_init(const char * const appName,
+                            const char * const className);
+  static HWND internal_init(int argc, char ** argv,
+                            const char * const appName,
+                             const char * const className);
+  static void internal_init(HWND const topLevelWidget);
+  static void internal_init(void);
+
   static BOOL dispatchEvent(MSG * msg);
   static SbBool nextEvent(int appContext, MSG * msg);
   static void setInstance(HINSTANCE instance);
@@ -170,6 +202,11 @@ protected:
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
   friend class SoWinP;
+
+  static SbBool isDebugLibrary(void);
+  static SbBool isCompatible(unsigned int major, unsigned int minor);
+  static SoWinABIType getABIType(void);
+  static void abort(SoWinABIError error);
 
   static void registerWindowClass(const char * const className);
   static void unRegisterWindowClass(const char * const className);
