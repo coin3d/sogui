@@ -911,3 +911,11 @@ So@GUI@RenderArea::glInit( // virtual, derived
 } // glInit()
 
 // *************************************************************************
+
+// silence some compilers.
+const char *
+getSo@GUI@RenderAreaRCSId(void)
+{
+  return rcsid;
+}
+
