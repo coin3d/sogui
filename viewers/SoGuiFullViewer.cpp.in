@@ -1295,6 +1295,9 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
     break;
   }
 
+  // FIXME: should perhaps override transparency type to be screendoor
+  // if we detect that the OpenGL canvas has 0 alpha bits available?
+  // 20030626 mortene.
   switch (menuitemid) {
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
     PUBLIC(this)->setTransparencyType(SoGLRenderAction::SCREEN_DOOR);
