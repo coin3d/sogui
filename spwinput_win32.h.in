@@ -39,7 +39,7 @@ enum ErrorCode
    DLL_VAR_LOAD_FAILURE
    };
 
-enum SpwRetVal *pDllSpwRetVal;
+static enum SpwRetVal *pDllSpwRetVal;
 
 /* some macros */
 #define SPW_FALSE   (0)
@@ -384,7 +384,6 @@ enum SpwRetVal             /* Error return values.                           */
    SI_ITEM_NOT_FOUND	     /* Item not found                                 */
    };
 
-typedef enum SpwRetVal SpwReturnValue;
 
 /* interface specifications define parameter passing to DLL functions */
 #ifdef __cplusplus
@@ -420,35 +419,40 @@ typedef enum SpwRetVal (WINAPI *PFNSI_GETDEVICEINFO) (SiHdl hdl, SiDevInfo *pInf
 typedef (WINAPI *PFNSPW_ERRORSTRING) (enum SpwRetVal val);
 typedef SiDevID (WINAPI *PFNSI_DEVICEINDEX) (int idx);
 
+#ifdef __cplusplus
+}
+#endif
+
 /* function pointers to functions in DLL */
+static PFNSI_INIT              pfnSiInit;
+static PFNSI_TERMINATE         pfnSiTerminate;
+static PFNSI_OPENWININIT       pfnSiOpenWinInit;
+static PFNSI_GETNUMDEVICES     pfnSiGetNumDevices;
+static PFNSI_GETDEVICEID       pfnSiGetDeviceID;
+static PFNSI_DISPATCH          pfnSiDispatch;
+static PFNSI_OPEN              pfnSiOpen;
+static PFNSI_CLOSE             pfnSiClose;
+static PFNSI_DEVICEINDEX       pfnSiDeviceIndex;
+static PFNSI_GETEVENTWININIT   pfnSiGetEventWinInit;
+static PFNSI_GETEVENT          pfnSiGetEvent;
+static PFNSI_ISSPACEWAREEVENT  pfnSiIsSpaceWareEvent;
+static PFNSI_BEEP              pfnSiBeep;
+static PFNSI_REZERO            pfnSiRezero;
+static PFNSI_GRABDEVICE        pfnSiGrabDevice;
+static PFNSI_RELEASEDEVICE     pfnSiReleaseDevice;
+static PFNSI_BUTTONPRESSED     pfnSiButtonPressed;
+static PFNSI_BUTTONRELEASED    pfnSiButtonReleased;
+static PFNSI_SETUIMODE         pfnSiSetUiMode;
+static PFNSI_SETTYPEMASK       pfnSiSetypeMask;
+static PFNSI_GETDEVICEPORT     pfnSiGetDevicePort;
+static PFNSI_GETDRIVERINFO     pfnSiGetDriverInfo;
+static PFNSI_GETLIBRARYINFO    pfnSiGetLibraryInfo;
+static PFNSI_GETDEVICEINFO     pfnSiGetDeviceInfo;
+static PFNSPW_ERRORSTRING      pfnSpwErrorString;
 
-PFNSI_INIT              pfnSiInit;
-PFNSI_TERMINATE         pfnSiTerminate;
-PFNSI_OPENWININIT       pfnSiOpenWinInit;
-PFNSI_GETNUMDEVICES     pfnSiGetNumDevices;
-PFNSI_GETDEVICEID       pfnSiGetDeviceID;
-PFNSI_DISPATCH          pfnSiDispatch;
-PFNSI_OPEN              pfnSiOpen;
-PFNSI_CLOSE             pfnSiClose;
-PFNSI_DEVICEINDEX       pfnSiDeviceIndex;
-PFNSI_GETEVENTWININIT   pfnSiGetEventWinInit;
-PFNSI_GETEVENT          pfnSiGetEvent;
-PFNSI_ISSPACEWAREEVENT  pfnSiIsSpaceWareEvent;
-PFNSI_BEEP              pfnSiBeep;
-PFNSI_REZERO            pfnSiRezero;
-PFNSI_GRABDEVICE        pfnSiGrabDevice;
-PFNSI_RELEASEDEVICE     pfnSiReleaseDevice;
-PFNSI_BUTTONPRESSED     pfnSiButtonPressed;
-PFNSI_BUTTONRELEASED    pfnSiButtonReleased;
-PFNSI_SETUIMODE         pfnSiSetUiMode;
-PFNSI_SETTYPEMASK       pfnSiSetypeMask;
-PFNSI_GETDEVICEPORT     pfnSiGetDevicePort;
-PFNSI_GETDRIVERINFO     pfnSiGetDriverInfo;
-PFNSI_GETLIBRARYINFO    pfnSiGetLibraryInfo;
-PFNSI_GETDEVICEINFO     pfnSiGetDeviceInfo;
-PFNSPW_ERRORSTRING      pfnSpwErrorString;
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* externally used functions */
 int SiGetPortList (SiDevPort **ppPort);
 void SiFreePortList (SiDevPort *pPort);
@@ -483,12 +487,19 @@ void           SiGetLibraryInfo (SiVerInfo *pInfo);
 enum           SpwRetVal SiGetDeviceInfo (SiHdl hdl, SiDevInfo *pInfo);
 char * SpwErrorString (enum SpwRetVal val);
 
+#ifdef __cplusplus
+}
+#endif
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
 int SPW_CheckForSpaceballWin32(void * win);
-int SPW_TranslateEventWin32(void * display, void * msg, SPW_InputEvent * sbEvent);
-SiHdl SPW_getDeviceHandle();
-void SPW_closeSpaceBall();
-int SPW_SpaceBallExists();
+int SPW_TranslateEventWin32(void * msg, SPW_InputEvent * sbEvent);
+void SPW_disableSpaceBallWin32(void);
+int SPW_SpaceBallExistsWin32(void);
 
 #ifdef __cplusplus
 }

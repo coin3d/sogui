@@ -38,6 +38,7 @@ static LPCTSTR DllLibrary = "siappdll";
 
 static LPCSTR strDLLRetVal          = "SpwErrorVal";
 
+/*typedef enum SpwRetVal SpwReturnValue;*/
 /* Names of functions contained in DLL; used to find their addresses at load
    time */
 
@@ -76,77 +77,79 @@ enum SpwRetVal SpwErrorVal;
 /* Device handle */
 SiHdl Spw_DeviceHandle = SI_NO_HANDLE;
 
-SiHdl SPW_getDeviceHandle()
+/* Check to see if we can open a device handle to the spaceball */
+int SPW_SpaceBallExistsWin32(void)
 {
-  return Spw_DeviceHandle;
+  SiOpenData oData;
+  SiOpenWinInit(&oData,NULL);  
+  return (SiOpen("", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &oData) != SI_NO_HANDLE) ? TRUE : FALSE;
 }
 
-int SPW_SpaceBallExists()
-{
-  return Spw_DeviceHandle != SI_NO_HANDLE;
-}
-
-/* checks if can detect a spaceball, and open a handle to it */
+/* check if can open a handle to the spaceball, load the driver functions
+   and start receiving input from the spaceball */
 int SPW_CheckForSpaceballWin32(void * win)
 {
+  char classname[25];
+  SiOpenData oData;
+
   if (Spw_DeviceHandle == SI_NO_HANDLE) {
-    SiOpenData oData;
-    SiOpenWinInit(&oData, (HWND)win);
-    Spw_DeviceHandle = SiOpen("", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &oData);
-    if (Spw_DeviceHandle != SI_NO_HANDLE) {
-      SiSetUiMode(Spw_DeviceHandle, SI_UI_ALL_CONTROLS);
-      return TRUE;
+    if (SiInitialize() != SPW_DLL_LOAD_ERROR) {
+      GetClassName((HWND)win, classname, sizeof(classname));
+      SiOpenWinInit(&oData, (HWND)win);
+      
+      Spw_DeviceHandle = SiOpen(classname, SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &oData);
+
+      if (Spw_DeviceHandle != SI_NO_HANDLE) {
+        SiSetUiMode(Spw_DeviceHandle, SI_UI_ALL_CONTROLS);
+        return TRUE;
+      }
+      else {
+        SiTerminate();
+        return FALSE;
+      }
     }
-    else {
-      SiTerminate();
-      return FALSE;
-    }
-  }
-  return TRUE;
-  
+    else return FALSE;
+  } 
+  else return TRUE;
 }
 
-/* translates a Win32 event to a SPW_InputEvent. This makes the implementation
-   of spaceball support for SoQt on windows very simple */
-int SPW_TranslateEventWin32(void * display, MSG * msg, SPW_InputEvent * sbEvent)
+/* translates a Win32 event to a SPW_InputEvent. */
+int SPW_TranslateEventWin32(MSG * msg, SPW_InputEvent * sbEvent)
 {
-  SiGetEventData eventdata;
   SiSpwEvent spwEvent;
+  SiGetEventData eventdata;
 
   if (Spw_DeviceHandle != SI_NO_HANDLE) {
 
     SiGetEventWinInit (&eventdata, msg->message, msg->wParam, msg->lParam);
     if (SiGetEvent (Spw_DeviceHandle, 0, &eventdata, &spwEvent) == SI_IS_EVENT) {
 
-      sbEvent->sData[0] = (short)spwEvent.u.spwData.mData[0];
-      sbEvent->sData[1] = (short)spwEvent.u.spwData.mData[1];
-      sbEvent->sData[2] = (short)spwEvent.u.spwData.mData[2];
-      sbEvent->sData[3] = (short)spwEvent.u.spwData.mData[3];
-      sbEvent->sData[4] = (short)spwEvent.u.spwData.mData[4];
-      sbEvent->sData[5] = (short)spwEvent.u.spwData.mData[5];
-
-      if (spwEvent.type == SI_MOTION_EVENT) {
-        sbEvent->type = SPW_InputMotionEvent;
+      int i;
+      switch(spwEvent.type) {
+        case SI_MOTION_EVENT:
+          sbEvent->type = SPW_InputMotionEvent;      
+          for(i=0; i<6; i++) {
+            sbEvent->sData[i] = (short)spwEvent.u.spwData.mData[i];
+          }  
+          break;
+        case SI_BUTTON_EVENT:
+          sbEvent->type = SPW_InputButtonPressEvent;
+          sbEvent->buttonState.pressed = (SiButtonPressed(&spwEvent) != SI_NO_BUTTON);
+          sbEvent->buttonState.released = (SiButtonReleased(&spwEvent) != SI_NO_BUTTON);
+          break;
       }
-
-      if (spwEvent.type == SI_BUTTON_EVENT) {
-        sbEvent->type = SPW_InputButtonPressEvent;
-      }
-
       return TRUE;
     }
   }
   return FALSE;
 }
 
-/* terminate the spaceball */
-void SPW_closeSpaceBall()
+/* Stop receiving input from the spaceball */
+void SPW_disableSpaceBallWin32(void)
 {
-  if (Spw_DeviceHandle != SI_NO_HANDLE) {
-      SiClose(Spw_DeviceHandle);
-      SiTerminate();
-      Spw_DeviceHandle = SI_NO_HANDLE;
-    }
+  SiClose(Spw_DeviceHandle);
+  SiTerminate();
+  Spw_DeviceHandle = SI_NO_HANDLE;
 }
 
 
