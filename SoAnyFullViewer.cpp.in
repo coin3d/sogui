@@ -296,7 +296,7 @@ SoAnyFullViewer::menuSelection( // virtual
     break;
 
   default:
-    SoDebugError::postInfo( "So@GUI@FullViewer::eventFilter",
+    SoDebugError::postInfo( "So@GUI@FullViewer::menuSelection",
       "popup menu handling for item %d is not implemented", menuitemid );
     break;
   } // switch ( menuitemid )
