@@ -53,7 +53,9 @@ public:
 
   enum GraphicsByteOrder {
     ABGR,
-    RGBA
+    RGBA,
+    ARGB,
+    BGRA
   };
 
   void SetGraphicsByteOrder( const GraphicsByteOrder byteorder );
@@ -74,6 +76,7 @@ public:
   WheelRangeBoundaryHandling GetWheelRangeBoundaryHandling(void) const;
 
 private:
+  unsigned int swapWord(unsigned int) const;
   int diameter, width;
   int disabledred, disabledgreen, disabledblue;
   int red, green, blue;

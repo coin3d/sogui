@@ -463,15 +463,27 @@ SoAnyThumbWheel::Validate( // private
 
 // ************************************************************************
 
-inline int
-swapWord(
-  int orig )
+inline unsigned int
+SoAnyThumbWheel::swapWord(
+  unsigned int orig) const
 {
+  // orig is RGBA
   int copy = 0;
-  copy |= (orig & 0x000000ff) << 24;
-  copy |= (orig & 0x0000ff00) << 8;
-  copy |= (orig & 0x00ff0000) >> 8;
-  copy |= (orig & 0xff000000) >> 24;
+  if (this->byteorder == ABGR) {
+    copy = (orig & 0x000000ff) <<  24;
+    copy |= (orig & 0x0000ff00) << 8;
+    copy |= (orig & 0x00ff0000) >> 8;
+    copy |= (orig & 0xff000000) >> 24;
+  }
+  else if (this->byteorder == ARGB) {
+    copy = orig >> 8;             // RGB
+    copy |= (orig & 0xff) << 24;  // A
+  }
+  else if (this->byteorder == BGRA) {
+    copy = orig & 0x00ff00ff;          // G & A
+    copy |= (orig & 0x0000ff00) << 16; // B
+    copy |= (orig & 0xff000000) >> 16; // R
+  }
   return copy;
 } // swapWord()
 
@@ -504,11 +516,11 @@ SoAnyThumbWheel::DrawDisabledWheel( // private
     normal = (normal << 24) | (normal << 16) | (normal << 8);
     shade  =  (shade << 24) |  (shade << 16) |  (shade << 8);
 
-    if ( this->byteorder == ABGR ) {
-      light  = swapWord(  light );
-      front  = swapWord(  front );
-      normal = swapWord( normal );
-      shade  = swapWord(  shade );
+    if ( this->byteorder != RGBA) {
+      light  = this->swapWord(  light );
+      front  = this->swapWord(  front );
+      normal = this->swapWord( normal );
+      shade  = this->swapWord(  shade );
     }
 
     if ( direction == SoAnyThumbWheel::VERTICAL ) {
@@ -567,11 +579,11 @@ SoAnyThumbWheel::DrawEnabledWheel(
              (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->shade) ) << 16) +
              (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->shade) ) << 8);
 
-    if ( this->byteorder == ABGR ) {
-      light   = swapWord( light );
-      normal  = swapWord( normal );
-      front   = swapWord( front );
-      shade   = swapWord( shade );
+    if ( this->byteorder != RGBA ) {
+      light   = this->swapWord( light );
+      normal  = this->swapWord( normal );
+      front   = this->swapWord( front );
+      shade   = this->swapWord( shade );
     }
 
     static int flag = FALSE;
