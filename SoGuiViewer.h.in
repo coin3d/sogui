@@ -226,45 +226,20 @@ protected:
   virtual void toggleCameraType(void);
 
 protected:
-  // FIXME: even more data than this should be protected
   SoCamera * camera;
   So@Gui@Viewer::Type type;
   SbBool viewingFlag;
   SbBool altSwitchBack;
 
   SoGetBoundingBoxAction * autoClipBboxAction;
-  float minimumNearPlane; // % of far plane
+  float minimumNearPlane;
 
-  SoSeparator * sceneRoot; // viewerroot
-  SoNode * sceneGraph; // userroot
+  SoSeparator * sceneRoot;
+  SoNode * sceneGraph;
 
 private:
   class So@Gui@ViewerP * pimpl;
-
-  void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
-  
-  // Seek functionality
-  static void seeksensorCB( void * data, SoSensor * );
-
-  // Drawstyles
-  void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
-  SbBool drawInteractiveAsStill(void) const;
-  SbBool drawAsHiddenLine(void) const;
-  So@Gui@Viewer::DrawStyle currentDrawStyle(void) const;
-
-  // Automatic setting of clipping planes
-  void setClippingPlanes(void);
-
-  // Methods to keep track of frames-per-second value. Not available
-  // in the original Inventor API -- Coin extension.
-  void resetFrameCounter(void);
-  void addFrametime(const double ft);
-  void recordFPS(void);
-
-  // Misc
-  static void interactivestartCB( void *, So@Gui@Viewer * thisp );
-  static void interactiveendCB( void *, So@Gui@Viewer * thisp );
-  void moveCameraScreen( const SbVec2f & screenpos );
+  friend class So@Gui@ViewerP;
 
 }; // class So@Gui@Viewer
 

@@ -199,6 +199,31 @@ public:
   SbBool stereoviewing;
   float stereooffset;
 
+  void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
+
+  // Seek functionality
+  static void seeksensorCB( void * data, SoSensor * );
+
+  // Drawstyles
+  void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
+  SbBool drawInteractiveAsStill(void) const;
+  SbBool drawAsHiddenLine(void) const;
+  So@Gui@Viewer::DrawStyle currentDrawStyle(void) const;
+
+  // Automatic setting of clipping planes
+  void setClippingPlanes(void);
+
+  // Methods to keep track of frames-per-second value. Not available
+  // in the original Inventor API -- Coin extension.
+  void resetFrameCounter(void);
+  void addFrametime(const double ft);
+  void recordFPS(void);
+
+  // Misc
+  static void interactivestartCB( void *, So@Gui@Viewer * thisp );
+  static void interactiveendCB( void *, So@Gui@Viewer * thisp );
+  void moveCameraScreen( const SbVec2f & screenpos );
+
   So@Gui@Viewer * pub;
 };
 
@@ -442,7 +467,7 @@ So@Gui@Viewer::So@Gui@Viewer(
   THIS->seektopoint = TRUE;
   THIS->seekperiod = 2.0f;
   THIS->inseekmode = FALSE;
-  THIS->seeksensor = new SoTimerSensor(So@Gui@Viewer::seeksensorCB, this);
+  THIS->seeksensor = new SoTimerSensor(So@Gui@ViewerP::seeksensorCB, this);
 
   this->sceneRoot = new SoSeparator;
   this->sceneRoot->ref();
@@ -508,8 +533,8 @@ So@Gui@Viewer::So@Gui@Viewer(
   THIS->lighton = TRUE;
   THIS->lightroot = NULL;
 
-  this->addStartCallback(So@Gui@Viewer::interactivestartCB);
-  this->addFinishCallback(So@Gui@Viewer::interactiveendCB);
+  this->addStartCallback(So@Gui@ViewerP::interactivestartCB);
+  this->addFinishCallback(So@Gui@ViewerP::interactiveendCB);
 
   THIS->adjustclipplanes = TRUE;
   this->autoClipBboxAction = NULL;
@@ -523,7 +548,7 @@ So@Gui@Viewer::So@Gui@Viewer(
     this->setBaseWidget( widget );
   }
 
-  this->resetFrameCounter();
+  THIS->resetFrameCounter();
 } // So@Gui@Viewer()
 
 // *************************************************************************
@@ -778,7 +803,7 @@ So@Gui@Viewer::resetToHomePosition(void)
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
     ((SoPerspectiveCamera *)this->camera)->heightAngle = THIS->storedheightval;
 
-  this->setClippingPlanes();
+  THIS->setClippingPlanes();
   this->camera->focalDistance =
     (this->camera->farDistance.getValue() +
      this->camera->nearDistance.getValue())/2;
@@ -916,7 +941,7 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
   }
 
   THIS->drawstyles[type] = style;
-  this->changeDrawStyle(this->currentDrawStyle());
+  THIS->changeDrawStyle(THIS->currentDrawStyle());
 } // setDrawStyle()
 
 // *************************************************************************
@@ -1834,51 +1859,51 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 
 
 void 
-So@Gui@Viewer::reallyRedraw(const SbBool clearcol, const SbBool clearz)
+So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 {
   if ( this->drawAsHiddenLine() ) {
 
     // First pass: render as filled, but with the background color.
 
-    THIS->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
-    THIS->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
-    THIS->socomplexity->type.setIgnored(TRUE); // as-is rendering space
-    THIS->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    this->solightmodel->model.setIgnored( FALSE ); // override as SoLightModel::BASE
+    this->sodrawstyle->style.setIgnored( TRUE ); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored( TRUE ); // as-is rendering space
+    this->socomplexity->value.setIgnored( TRUE ); // as-is complexity on non-simple shapes
     // textureQuality field of socomplexity node is always 0.0
 
-    THIS->sobasecolor->rgb.setValue(this->getBackgroundColor());
-    THIS->sobasecolor->rgb.setIgnored(FALSE);
-    THIS->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
-    THIS->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+    this->sobasecolor->rgb.setValue( pub->getBackgroundColor() );
+    this->sobasecolor->rgb.setIgnored( FALSE );
+    this->somaterialbinding->value.setIgnored( FALSE ); // override with OVERALL
+    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
-    this->getSceneManager()->render(clearcol, clearz);
-
+    pub->getSceneManager()->render( clearcol, clearz );
 
     // Second pass, render wireframe on top.
 
-    THIS->sodrawstyle->style = SoDrawStyle::LINES;
-    THIS->sodrawstyle->style.setIgnored(FALSE); // force lines
-    THIS->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
-    THIS->somaterialbinding->value.setIgnored(TRUE); // as-is
-    THIS->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored( FALSE ); // force lines
+    this->sobasecolor->rgb.setIgnored(TRUE ); // use as-is line colors
+    this->somaterialbinding->value.setIgnored( TRUE ); // as-is
+    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
     
-    this->getSceneManager()->render(FALSE, FALSE);
+    pub->getSceneManager()->render(FALSE, FALSE);
 
     return;
   }
 
 
   SbBool clearzbuffer = TRUE;
-  DrawStyle style = this->currentDrawStyle();
-  switch (style) {
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-  case VIEW_BBOX:
+  So@Gui@Viewer::DrawStyle style = this->currentDrawStyle();
+  switch ( style ) {
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
     clearzbuffer = FALSE;
-  default: break; // Include "default:" case to avoid compiler warning.
+  default:
+    break; // Include "default:" case to avoid compiler warning.
   }
 
-  this->getSceneManager()->render(clearcol, clearzbuffer && clearz);
+  pub->getSceneManager()->render( clearcol, clearzbuffer && clearz );
 }
 
 
@@ -1892,7 +1917,7 @@ So@Gui@Viewer::actualRedraw(void)
 {
   // Recalculate near/far planes.
   if ( this->isAutoClipping() )
-    this->setClippingPlanes();
+    THIS->setClippingPlanes();
 
   SbBool clearcol = this->isClearBeforeRender();
 
@@ -1968,11 +1993,11 @@ So@Gui@Viewer::actualRedraw(void)
       glColorMask(1,0,0,1); // draw red-only
       camera->setStereoAdjustment(this->getStereoOffset());
       camera->setStereoMode(SoCamera::LEFT_VIEW);
-      this->reallyRedraw(FALSE, FALSE);
+      THIS->reallyRedraw(FALSE, FALSE);
       
       camera->setStereoMode(SoCamera::RIGHT_VIEW);
       glColorMask(0,1,1,1); // draw green and blue
-      this->reallyRedraw(FALSE, TRUE);
+      THIS->reallyRedraw(FALSE, TRUE);
       camera->setStereoMode(SoCamera::MONOSCOPIC);
       glColorMask(1,1,1,1); // restore GL color mask
     }
@@ -1981,18 +2006,19 @@ So@Gui@Viewer::actualRedraw(void)
       glDrawBuffer(GL_BACK_LEFT);
       camera->setStereoAdjustment(this->getStereoOffset());
       camera->setStereoMode(SoCamera::LEFT_VIEW);
-      this->reallyRedraw(clearcol);
+      THIS->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::RIGHT_VIEW);
       glDrawBuffer(GL_BACK_RIGHT);
-      this->reallyRedraw(clearcol);
+      THIS->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::MONOSCOPIC);
       glDrawBuffer(GL_BACK);
     }
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
-  else this->reallyRedraw(clearcol);
+  else THIS->reallyRedraw(clearcol);
 
-  if (this->getInteractiveCount() > 0) this->recordFPS();
+  if ( this->getInteractiveCount() > 0 )
+    THIS->recordFPS();
 } // actualRedraw()
 
 // *************************************************************************
@@ -2058,7 +2084,7 @@ So@Gui@Viewer::interactiveCountDec(void)
   if (--(THIS->interactionnesting) <= 0) {
     THIS->interactionendCallbacks->invokeCallbacks(this);
     THIS->interactionnesting = 0;
-    this->resetFrameCounter();
+    THIS->resetFrameCounter();
   }
 } // interactiveCountDec()
 
@@ -2193,15 +2219,15 @@ So@Gui@Viewer::toggleCameraType(void)
 */
 
 SbBool
-So@Gui@Viewer::drawInteractiveAsStill(void) const
+So@Gui@ViewerP::drawInteractiveAsStill(void) const
 {
-  SbBool moveasstill = THIS->drawstyles[INTERACTIVE] == VIEW_SAME_AS_STILL;
-  if (!moveasstill)
-    moveasstill = THIS->drawstyles[INTERACTIVE] == THIS->drawstyles[STILL];
-  if (!moveasstill)
+  SbBool moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_SAME_AS_STILL;
+  if ( ! moveasstill )
+    moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == this->drawstyles[So@Gui@Viewer::STILL];
+  if ( ! moveasstill )
     moveasstill =
-      THIS->drawstyles[INTERACTIVE] == VIEW_NO_TEXTURE &&
-      THIS->drawstyles[STILL] != VIEW_AS_IS;
+      this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_NO_TEXTURE &&
+      this->drawstyles[So@Gui@Viewer::STILL] != So@Gui@Viewer::VIEW_AS_IS;
   return moveasstill;
 } // drawInteractiveAsStill()
 
@@ -2214,14 +2240,15 @@ So@Gui@Viewer::drawInteractiveAsStill(void) const
 */
 
 So@Gui@Viewer::DrawStyle
-So@Gui@Viewer::currentDrawStyle(void) const
+So@Gui@ViewerP::currentDrawStyle(
+  void ) const
 {
-  SbBool interactivemode = this->getInteractiveCount() > 0 ? TRUE : FALSE;
+  SbBool interactivemode = pub->getInteractiveCount() > 0 ? TRUE : FALSE;
 
   if (!interactivemode || this->drawInteractiveAsStill())
-    return THIS->drawstyles[STILL];
+    return this->drawstyles[So@Gui@Viewer::STILL];
   else
-    return THIS->drawstyles[INTERACTIVE];
+    return this->drawstyles[So@Gui@Viewer::INTERACTIVE];
 } // currentDrawStyle()
 
 // *************************************************************************
@@ -2234,9 +2261,10 @@ So@Gui@Viewer::currentDrawStyle(void) const
 */
 
 SbBool
-So@Gui@Viewer::drawAsHiddenLine(void) const
+So@Gui@ViewerP::drawAsHiddenLine(
+  void ) const
 {
-  return ((this->currentDrawStyle() == VIEW_HIDDEN_LINE) ? TRUE : FALSE);
+  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_HIDDEN_LINE) ? TRUE : FALSE);
 } // drawAsHiddenLine()
 
 // *************************************************************************
@@ -2250,58 +2278,58 @@ So@Gui@Viewer::drawAsHiddenLine(void) const
 */
 
 void
-So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
+So@Gui@ViewerP::changeDrawStyle(
+  So@Gui@Viewer::DrawStyle style )
 {
   // Turn on/off Z-buffering based on the style setting.
   switch (style) {
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-  case VIEW_BBOX:
-    this->glLock();
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+    pub->glLock();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glDisable(GL_DEPTH_TEST);
-    this->glUnlock();
+    pub->glUnlock();
     break;
     
   default:
-    this->glLock();
+    pub->glLock();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glEnable(GL_DEPTH_TEST);
-    this->glUnlock();
+    pub->glUnlock();
     break;
   }
 
   // Render everything as its supposed to be done, don't override
   // any of the settings in the ``real'' graph.
-  if (style == VIEW_AS_IS) {
-    THIS->drawstyleroot->whichChild = SO_SWITCH_NONE;
+  if (style == So@Gui@Viewer::VIEW_AS_IS) {
+    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
     return;
   }
 
-  THIS->drawstyleroot->whichChild = SO_SWITCH_ALL;
-  if (style == VIEW_HIDDEN_LINE) {
-    THIS->hiddenlineroot->whichChild = SO_SWITCH_ALL;
+  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
+  if (style == So@Gui@Viewer::VIEW_HIDDEN_LINE) {
+    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
     return;
-  }
-  else {
-    THIS->hiddenlineroot->whichChild = SO_SWITCH_NONE;
+  } else {
+    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
   }
 
   // Set or unset lightmodel override.
   switch (style) {
-  case VIEW_NO_TEXTURE:
-  case VIEW_LOW_COMPLEXITY:
-    THIS->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+    this->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
     break;
 
-  case VIEW_LINE:
-  case VIEW_POINT:
-  case VIEW_BBOX:
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-    THIS->solightmodel->model.setIgnored(FALSE); // force BASE lighting
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->solightmodel->model.setIgnored(FALSE); // force BASE lighting
     break;
 
   default:
@@ -2311,22 +2339,22 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
 
   // Set or unset drawstyle override.
   switch (style) {
-  case VIEW_NO_TEXTURE:
-  case VIEW_LOW_COMPLEXITY:
-    THIS->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+    this->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
     break;
 
-  case VIEW_LINE:
-  case VIEW_LOW_RES_LINE:
-  case VIEW_BBOX:
-    THIS->sodrawstyle->style = SoDrawStyle::LINES;
-    THIS->sodrawstyle->style.setIgnored(FALSE); // force line rendering
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force line rendering
     break;
 
-  case VIEW_POINT:
-  case VIEW_LOW_RES_POINT:
-    THIS->sodrawstyle->style = SoDrawStyle::POINTS;
-    THIS->sodrawstyle->style.setIgnored(FALSE); // force point rendering
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->sodrawstyle->style = SoDrawStyle::POINTS;
+    this->sodrawstyle->style.setIgnored(FALSE); // force point rendering
     break;
 
   default:
@@ -2335,17 +2363,17 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
 
   // Set or unset complexity value override.
   switch (style) {
-  case VIEW_NO_TEXTURE:
-  case VIEW_LINE:
-  case VIEW_POINT:
-  case VIEW_BBOX:
-    THIS->socomplexity->value.setIgnored(TRUE); // as-is complexity
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity
     break;
 
-  case VIEW_LOW_COMPLEXITY:
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-    THIS->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
     break;
 
   default:
@@ -2354,18 +2382,18 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
 
   // Set or unset complexity type override.
   switch (style) {
-  case VIEW_NO_TEXTURE:
-  case VIEW_LOW_COMPLEXITY:
-  case VIEW_LINE:
-  case VIEW_POINT:
-  case VIEW_LOW_RES_LINE:
-  case VIEW_LOW_RES_POINT:
-    THIS->socomplexity->type.setIgnored(TRUE); // as-is
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->type.setIgnored(TRUE); // as-is
     break;
 
-  case VIEW_BBOX:
-    THIS->socomplexity->type = SoComplexity::BOUNDING_BOX;
-    THIS->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->socomplexity->type = SoComplexity::BOUNDING_BOX;
+    this->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
     break;
 
   default:
@@ -2380,14 +2408,14 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
                          "\tcomplexity type: 0x%02x, (isIgnored() == %s)\n"
                          "\tcomplexity value: %f, (isIgnored() == %s)\n"
                          "",
-                         THIS->sodrawstyle->style.getValue(),
-                         THIS->sodrawstyle->style.isIgnored() ? "T" : "F",
-                         THIS->solightmodel->model.getValue(),
-                         THIS->solightmodel->model.isIgnored() ? "T" : "F",
-                         THIS->socomplexity->type.getValue(),
-                         THIS->socomplexity->type.isIgnored() ? "T" : "F",
-                         THIS->socomplexity->value.getValue(),
-                         THIS->socomplexity->value.isIgnored() ? "T" : "F");
+                         this->sodrawstyle->style.getValue(),
+                         this->sodrawstyle->style.isIgnored() ? "T" : "F",
+                         this->solightmodel->model.getValue(),
+                         this->solightmodel->model.isIgnored() ? "T" : "F",
+                         this->socomplexity->type.getValue(),
+                         this->socomplexity->type.isIgnored() ? "T" : "F",
+                         this->socomplexity->value.getValue(),
+                         this->socomplexity->value.isIgnored() ? "T" : "F");
 #endif // debug
 } // changeDrawStyle()
 
@@ -2405,26 +2433,26 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
 */
 
 void
-So@Gui@Viewer::setClippingPlanes(
+So@Gui@ViewerP::setClippingPlanes(
   void )
 {
   // This is necessary to avoid a crash in case there is no scene
   // graph specified by the user.
-  if ( this->camera == NULL ) return;
+  if ( pub->camera == NULL ) return;
 
-  if ( this->autoClipBboxAction == NULL )
-    this->autoClipBboxAction =
-      new SoGetBoundingBoxAction( this->getViewportRegion() );
+  if ( pub->autoClipBboxAction == NULL )
+    pub->autoClipBboxAction =
+      new SoGetBoundingBoxAction( pub->getViewportRegion() );
   else
-    this->autoClipBboxAction->setViewportRegion( this->getViewportRegion() );
+    pub->autoClipBboxAction->setViewportRegion( pub->getViewportRegion() );
 
-  this->autoClipBboxAction->apply( this->sceneRoot );
+  pub->autoClipBboxAction->apply( pub->sceneRoot );
 
-  SbXfBox3f xbox = this->autoClipBboxAction->getXfBoundingBox();
+  SbXfBox3f xbox = pub->autoClipBboxAction->getXfBoundingBox();
   SbMatrix mat;
-  mat.setTranslate(- this->camera->position.getValue());
+  mat.setTranslate(- pub->camera->position.getValue());
   xbox.transform(mat);
-  mat = this->camera->orientation.getValue().inverse();
+  mat = pub->camera->orientation.getValue().inverse();
   xbox.transform(mat);
   SbBox3f box = xbox.project();
 
@@ -2444,7 +2472,7 @@ So@Gui@Viewer::setClippingPlanes(
 
   float farslack = SLACK * farval;
   
-  if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+  if (pub->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
     // Disallow negative near clipping plane distance, and make sure the
     // z-buffer depth utilization is kept below a certain threshold.
     nearval = farslack > nearval ? farslack : nearval;
@@ -2452,14 +2480,14 @@ So@Gui@Viewer::setClippingPlanes(
 
   // Give a bit of slack to avoid artifacts when scene fits exactly
   // inside bounding box.
-  this->camera->nearDistance = nearval * (1.0f - SLACK);
-  this->camera->farDistance = farval * (1.0f + SLACK);
+  pub->camera->nearDistance = nearval * (1.0f - SLACK);
+  pub->camera->farDistance = farval * (1.0f + SLACK);
 
 #if 0 // debug
   SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
                          "near, far: %f (%f), %f (%f)",
-                         nearval, this->camera->nearDistance.getValue(),
-                         farval, this->camera->farDistance.getValue());
+                         nearval, pub->camera->nearDistance.getValue(),
+                         farval, pub->camera->farDistance.getValue());
 #endif // debug
 } // setClippingPlanes()
 
@@ -2473,9 +2501,10 @@ So@Gui@Viewer::setClippingPlanes(
 */
 
 void
-So@Gui@Viewer::moveCameraScreen(const SbVec2f & screenpos)
+So@Gui@ViewerP::moveCameraScreen(
+  const SbVec2f & screenpos )
 {
-  SoCamera * cam = this->getCamera();
+  SoCamera * cam = pub->getCamera();
   assert(cam);
 
 #if SO@GUI@_DEBUG && 0 // debug
@@ -2487,16 +2516,16 @@ So@Gui@Viewer::moveCameraScreen(const SbVec2f & screenpos)
                          cam->position.getValue()[2]);
 #endif // debug
 
-  SbViewVolume vv = cam->getViewVolume(this->getGLAspectRatio());
-  SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
+  SbViewVolume vv = cam->getViewVolume( pub->getGLAspectRatio() );
+  SbPlane panplane = vv.getPlane( cam->focalDistance.getValue() );
 
   SbLine line;
-  vv.projectPointToLine(screenpos + SbVec2f(0.5, 0.5f), line);
+  vv.projectPointToLine( screenpos + SbVec2f(0.5, 0.5f), line );
   SbVec3f current_planept;
-  panplane.intersect(line, current_planept);
-  vv.projectPointToLine(SbVec2f(0.5f, 0.5f), line);
+  panplane.intersect( line, current_planept );
+  vv.projectPointToLine( SbVec2f(0.5f, 0.5f), line );
   SbVec3f old_planept;
-  panplane.intersect(line, old_planept);
+  panplane.intersect( line, old_planept );
 
   // Reposition camera according to the vector difference between the
   // projected points.
@@ -2520,21 +2549,19 @@ So@Gui@Viewer::moveCameraScreen(const SbVec2f & screenpos)
 */
 
 void
-So@Gui@Viewer::interactivestartCB(void *, So@Gui@Viewer * thisp)
+So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during interaction.
-  if (thisp->pimpl->buffertype == BUFFER_INTERACTIVE) {
+  if ( thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
     thisp->pimpl->localsetbuffertype = TRUE;
-    thisp->inherited::setDoubleBuffer(TRUE);
+    thisp->inherited::setDoubleBuffer( TRUE );
     thisp->pimpl->localsetbuffertype = FALSE;
   }
 
   // Use the dynamic drawstyle.
-  if (!thisp->drawInteractiveAsStill())
-    thisp->changeDrawStyle(thisp->pimpl->drawstyles[INTERACTIVE]);
+  if (!thisp->pimpl->drawInteractiveAsStill())
+    thisp->pimpl->changeDrawStyle(thisp->pimpl->drawstyles[So@Gui@Viewer::INTERACTIVE]);
 } // interactivestartCB()
-
-// *************************************************************************
 
 /*!
   \internal
@@ -2544,19 +2571,19 @@ So@Gui@Viewer::interactivestartCB(void *, So@Gui@Viewer * thisp)
 */
 
 void
-So@Gui@Viewer::interactiveendCB(void *, So@Gui@Viewer * thisp)
+So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during
   // interaction, singelbuffering while the camera is static.
-  if (thisp->pimpl->buffertype == BUFFER_INTERACTIVE) {
+  if (thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
     thisp->pimpl->localsetbuffertype = TRUE;
     thisp->inherited::setDoubleBuffer(FALSE);
     thisp->pimpl->localsetbuffertype = FALSE;
   }
 
   // Back to static drawstyle.
-  if (!thisp->drawInteractiveAsStill())
-    thisp->changeDrawStyle(thisp->pimpl->drawstyles[STILL]);
+  if (!thisp->pimpl->drawInteractiveAsStill())
+    thisp->pimpl->changeDrawStyle(thisp->pimpl->drawstyles[So@Gui@Viewer::STILL]);
 } // interactiveendCB()
 
 // *************************************************************************
@@ -2568,7 +2595,7 @@ So@Gui@Viewer::interactiveendCB(void *, So@Gui@Viewer * thisp)
 */
 
 void
-So@Gui@Viewer::seeksensorCB(void * data, SoSensor * s)
+So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
 {
   SbTime currenttime = SbTime::getTimeOfDay();
 
@@ -2612,13 +2639,14 @@ So@Gui@Viewer::sizeChanged(
   \sa addFrametime(), recordFPS()
 */
 void
-So@Gui@Viewer::resetFrameCounter(void)
+So@Gui@ViewerP::resetFrameCounter(void)
 {
-  THIS->framecount = 0;
-  for(int i=0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++) THIS->frames[i] = 0.0;
-  THIS->totalval = 0.0;
-  THIS->currentframetime = 0.0;
-  THIS->lasttimeofday = 0.0;
+  this->framecount = 0;
+  for ( int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++ )
+    this->frames[i] = 0.0;
+  this->totalval = 0.0;
+  this->currentframetime = 0.0;
+  this->lasttimeofday = 0.0;
 }
 
 /*!
@@ -2630,18 +2658,18 @@ So@Gui@Viewer::resetFrameCounter(void)
 
   \sa resetFrameCounter(), recordFPS()
 */
-void
-So@Gui@Viewer::addFrametime(const double ft)
-{
-  THIS->framecount++;
 
-  int arrayptr = (THIS->framecount - 1) % So@Gui@ViewerP::FRAMESARRAY_SIZE;
-  double oldval = THIS->frames[arrayptr];
-  THIS->frames[arrayptr] = ft;
-  THIS->totalval += (ft - oldval);
-  THIS->currentframetime =
-    THIS->totalval / So@Gui@Min(THIS->framecount,
-                                (int) So@Gui@ViewerP::FRAMESARRAY_SIZE);
+void
+So@Gui@ViewerP::addFrametime(const double ft)
+{
+  this->framecount++;
+
+  int arrayptr = (this->framecount - 1) % FRAMESARRAY_SIZE;
+  double oldval = this->frames[arrayptr];
+  this->frames[arrayptr] = ft;
+  this->totalval += (ft - oldval);
+  this->currentframetime =
+    this->totalval / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
 }
 
 static unsigned char fps2dfont[][12] = {
@@ -2817,9 +2845,9 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
   \sa resetFrameCounter(), addFrametime()
 */
 void
-So@Gui@Viewer::recordFPS(void)
+So@Gui@ViewerP::recordFPS(void)
 {
-  if (COIN_SHOW_FPS_COUNTER == -1) {
+  if ( COIN_SHOW_FPS_COUNTER == -1 ) {
     char * env = getenv("COIN_SHOW_FPS_COUNTER");
     if (env) COIN_SHOW_FPS_COUNTER = atoi(env);
     else COIN_SHOW_FPS_COUNTER = 0;
@@ -2827,22 +2855,22 @@ So@Gui@Viewer::recordFPS(void)
 
   if (COIN_SHOW_FPS_COUNTER) {
     double frametime, timeofday = SbTime::getTimeOfDay().getValue();
-    if((THIS->lasttimeofday == 0.0) ||
-       ((timeofday - THIS->lasttimeofday) > 1.0)) {
+    if((this->lasttimeofday == 0.0) ||
+       ((timeofday - this->lasttimeofday) > 1.0)) {
       this->resetFrameCounter();
     
       frametime = 0.0;
-      THIS->lasttimeofday = timeofday;
+      this->lasttimeofday = timeofday;
     }
     else {
-      frametime = timeofday - THIS->lasttimeofday;
-      THIS->lasttimeofday = timeofday;
-      this->addFrametime(frametime);
+      frametime = timeofday - this->lasttimeofday;
+      this->lasttimeofday = timeofday;
+      this->addFrametime( frametime );
 
       char buffer[64];
-      int nr = sprintf(buffer, "%.1f fps", 1.0/THIS->currentframetime);
+      int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
       assert(nr < 64);
-      Draw2DString(buffer, this->getGLSize(), SbVec2f(10, 10));
+      Draw2DString(buffer, pub->getGLSize(), SbVec2f(10, 10));
     }
   }
 }
@@ -2893,16 +2921,16 @@ So@Gui@Viewer::processSoEvent( // virtual
         this->resetToHomePosition();
         return TRUE;
       case SoKeyboardEvent::LEFT_ARROW:
-        this->moveCameraScreen( SbVec2f( -0.1f, 0.0f ) );
+        THIS->moveCameraScreen( SbVec2f( -0.1f, 0.0f ) );
         return TRUE;
       case SoKeyboardEvent::UP_ARROW:
-        this->moveCameraScreen( SbVec2f( 0.0f, 0.1f ) );
+        THIS->moveCameraScreen( SbVec2f( 0.0f, 0.1f ) );
         return TRUE;
       case SoKeyboardEvent::RIGHT_ARROW:
-        this->moveCameraScreen( SbVec2f( 0.1f, 0.0f ) );
+        THIS->moveCameraScreen( SbVec2f( 0.1f, 0.0f ) );
         return TRUE;
       case SoKeyboardEvent::DOWN_ARROW:
-        this->moveCameraScreen( SbVec2f( 0.0f, -0.1f ) );
+        THIS->moveCameraScreen( SbVec2f( 0.0f, -0.1f ) );
         return TRUE;
       default:
         break;
