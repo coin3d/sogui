@@ -298,6 +298,7 @@ So@GUI@Viewer::So@GUI@Viewer(
     this->polygonoffsetparent = new SoSwitch;
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
     this->sopolygonoffset = new SoPolygonOffset;
+    this->sopolygonoffset->setOverride(TRUE);
     this->polygonoffsetparent->addChild(this->sopolygonoffset);
     this->hiddenlineroot->addChild(this->polygonoffsetparent);
 
@@ -1558,18 +1559,29 @@ So@GUI@Viewer::actualRedraw(void)
     this->setClippingPlanes();
 
   if ( this->drawAsHiddenLine() ) {
-    this->sodrawstyle->style = SoDrawStyle::FILLED;
-    this->somaterialbinding->value.setIgnored(FALSE);
+
+    // First pass: render as filled, but with the background color.
+
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    // textureQuality field of socomplexity node is always 0.0
+
     this->sobasecolor->rgb.setValue(this->getBackgroundColor());
     this->sobasecolor->rgb.setIgnored(FALSE);
-
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
     this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
     this->getSceneManager()->render(this->isClearBeforeRender(), TRUE);
 
+
+    // Second pass, render wireframe on top.
+
     this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->somaterialbinding->value.setIgnored(TRUE);
-    this->sobasecolor->rgb.setIgnored(TRUE);
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
+    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
+    this->somaterialbinding->value.setIgnored(TRUE); // as-is
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
 
     this->getSceneManager()->render(FALSE, FALSE);
@@ -1870,69 +1882,117 @@ So@GUI@Viewer::changeDrawStyle(So@GUI@Viewer::DrawStyle style)
 {
   // Turn on/off Z-buffering based on the style setting.
   glLock();
-  DrawStyle s = this->currentDrawStyle();
-  if (s & (VIEW_LOW_RES_LINE|VIEW_LOW_RES_POINT|VIEW_BBOX))
+  switch (style) {
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+  case VIEW_BBOX:
     glDisable(GL_DEPTH_TEST);
-  else
+    break;
+    
+  default:
     glEnable(GL_DEPTH_TEST);
+    break;
+  }
   glUnlock();
 
 
-  this->drawstyleroot->whichChild = SO_SWITCH_NONE;
-
   // Render everything as its supposed to be done, don't override
   // any of the settings in the ``real'' graph.
-  if (style == VIEW_AS_IS) return;
-
-  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
-
-  // Further settings for rendering as hidden line will be done in the
-  // overloaded actualRedraw().
-  if (style == VIEW_HIDDEN_LINE) {
-    this->socomplexity->type.setIgnored(TRUE);
-    this->socomplexity->value.setIgnored(TRUE);
-    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
+  if (style == VIEW_AS_IS) {
+    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
     return;
   }
 
-  this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
-
-  // Set ignore flags.
-  SbBool ignored =
-    ((VIEW_NO_TEXTURE|VIEW_LOW_COMPLEXITY) & style) ? TRUE : FALSE;
-  this->sodrawstyle->style.setIgnored(ignored);
-  this->solightmodel->model.setIgnored(ignored);
-  ignored = ((VIEW_NO_TEXTURE|VIEW_LOW_COMPLEXITY|VIEW_LINE|VIEW_POINT) &
-             style) ? TRUE : FALSE;
-  this->socomplexity->type.setIgnored(ignored);
-  ignored = ((VIEW_NO_TEXTURE|VIEW_LINE|VIEW_POINT|VIEW_BBOX) & style) ?
-    TRUE : FALSE;
-  this->socomplexity->value.setIgnored(ignored);
-  ignored = ((VIEW_NO_TEXTURE|VIEW_LOW_COMPLEXITY|VIEW_LINE|VIEW_LOW_RES_LINE|
-              VIEW_POINT|VIEW_LOW_RES_POINT|VIEW_BBOX) & style) ? TRUE : FALSE;
-
-  // Set draw style.
-  if (!this->sodrawstyle->style.isIgnored()) {
-    SoDrawStyle::Style ds;
-    if (style & (VIEW_LINE|VIEW_LOW_RES_LINE|VIEW_BBOX))
-      ds = SoDrawStyle::LINES;
-    else if (style & (VIEW_POINT|VIEW_LOW_RES_POINT))
-      ds = SoDrawStyle::POINTS;
-    else assert(0);
-
-    this->sodrawstyle->style = ds;
+  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
+  if (style == VIEW_HIDDEN_LINE) {
+    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
+    return;
+  }
+  else {
+    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
   }
 
-  // Set rendering complexity type.
-  if (!this->socomplexity->type.isIgnored()) {
-    SoComplexity::Type t;
-    if (style & (VIEW_LINE|VIEW_LOW_RES_LINE))
-      t = SoComplexity::OBJECT_SPACE;
-    else if (style & VIEW_BBOX)
-      t = SoComplexity::BOUNDING_BOX;
-    else assert(0);
+  // Set or unset lightmodel override.
+  switch (style) {
+  case VIEW_NO_TEXTURE:
+  case VIEW_LOW_COMPLEXITY:
+    this->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
+    break;
 
-    this->socomplexity->type = t;
+  case VIEW_LINE:
+  case VIEW_POINT:
+  case VIEW_BBOX:
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+    this->solightmodel->model.setIgnored(FALSE); // force BASE lighting
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+
+  // Set or unset drawstyle override.
+  switch (style) {
+  case VIEW_NO_TEXTURE:
+  case VIEW_LOW_COMPLEXITY:
+    this->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
+    break;
+
+  case VIEW_LINE:
+  case VIEW_LOW_RES_LINE:
+  case VIEW_BBOX:
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force line rendering
+    break;
+
+  case VIEW_POINT:
+  case VIEW_LOW_RES_POINT:
+    this->sodrawstyle->style = SoDrawStyle::POINTS;
+    this->sodrawstyle->style.setIgnored(FALSE); // force point rendering
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+  // Set or unset complexity value override.
+  switch (style) {
+  case VIEW_NO_TEXTURE:
+  case VIEW_LINE:
+  case VIEW_POINT:
+  case VIEW_BBOX:
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity
+    break;
+
+  case VIEW_LOW_COMPLEXITY:
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+    this->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+  // Set or unset complexity type override.
+  switch (style) {
+  case VIEW_NO_TEXTURE:
+  case VIEW_LOW_COMPLEXITY:
+  case VIEW_LINE:
+  case VIEW_POINT:
+  case VIEW_LOW_RES_LINE:
+  case VIEW_LOW_RES_POINT:
+    this->socomplexity->type.setIgnored(TRUE); // as-is
+    break;
+
+  case VIEW_BBOX:
+    this->socomplexity->type = SoComplexity::BOUNDING_BOX;
+    this->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
+    break;
+
+  default:
+    assert(FALSE); break;
   }
 
 #if 0 // debug
