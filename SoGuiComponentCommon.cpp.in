@@ -52,8 +52,6 @@
 /*!
   \fn void So@Gui@Component::initClasses(void)
 
-  \internal
-
   This function initializes the type system for all the component
   classes.  It is called indirectly for you when you call
   So@Gui@::init().
