@@ -970,7 +970,8 @@ SoAnyExaminerViewer::processSoEvent(
 
     if ( this->button1down || this->button3down ) processed = TRUE;
 
-    if ( this->button1down && this->button3down ) {
+    if ( (this->button1down && this->button3down) ||
+         (this->button3down && this->controldown) ) {
       this->zoomByCursor( posn, prevnormalized );
     }
     else if ( this->button1down ) {
