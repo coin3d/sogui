@@ -199,8 +199,6 @@ private:
   void setCursorRepresentation(int mode);
 
   // friends and family
-  class SoAnyPlaneViewer * common;
-  friend class SoAnyPlaneViewer;
   class SoGtkPlaneViewerP * pimpl;
   friend class SoGtkPlaneViewerP;
 #endif // ! __COIN_SOGTK__
