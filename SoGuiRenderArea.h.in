@@ -101,6 +101,8 @@ public:
   void setOverlayGLRenderAction(SoGLRenderAction * action);
   SoGLRenderAction * getOverlayGLRenderAction(void) const;
 
+  SbBool sendSoEvent(const SoEvent * event);
+
 protected:
   So@Gui@RenderArea(
     @WIDGET@ parent,

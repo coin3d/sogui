@@ -1579,7 +1579,6 @@ So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * pub)
 
   this->devices.mouse = NULL;
   this->devices.keyboard = NULL;
-
 } // So@Gui@RenderAreaP()
 
 /*!
@@ -1592,6 +1591,19 @@ So@Gui@RenderAreaP::~So@Gui@RenderAreaP()
   delete [] this->normalColormap;
   delete [] this->overlayColormap;
 } // ~So@Gui@RenderAreaP()
+
+// *************************************************************************
+
+/*!
+  This method posts and processes an SoEvent object to the
+  So@Gui@RenderArea-based component and returns the result value from the
+  event handler.  This is a synchronous operation.
+*/
+SbBool
+So@Gui@RenderArea::sendSoEvent(const SoEvent * event)
+{
+  return this->processSoEvent(event);
+} // handleSoEvent()
 
 // *************************************************************************
 
