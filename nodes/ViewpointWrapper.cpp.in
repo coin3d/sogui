@@ -27,6 +27,8 @@
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
 #include <Inventor/actions/SoSearchAction.h>
+#include <Inventor/fields/SoSFBool.h>        
+#include <Inventor/fields/SoSFTime.h>
 #include <assert.h>
 
 #ifdef HAVE_CONFIG_H
