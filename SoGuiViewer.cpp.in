@@ -78,7 +78,7 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoRotation.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
-#include <Inventor/nodes/SoResetTransform.h>
+#include <Inventor/nodes/SoTransformSeparator.h>
 
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <Inventor/actions/SoSearchAction.h>
@@ -608,13 +608,12 @@ So@GUI@Viewer::setHeadlight(SbBool on)
 
   if (on) {
     if (!this->lightroot) {
-      this->lightroot = new SoGroup;
+      this->lightroot = new SoTransformSeparator;
       this->lightroot->ref(); // Matched by an unref() in the destructor.
       this->lightroot->addChild(new SoRotation);
       SoDirectionalLight * dl = new SoDirectionalLight;
       dl->direction.setValue(1, -1, -10);
       this->lightroot->addChild(dl);
-      this->lightroot->addChild(new SoResetTransform);
     }
 
     if (!this->camera) { // Headlight flag set early -- just store and return.
