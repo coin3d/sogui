@@ -21,8 +21,6 @@
  *
 \**************************************************************************/
 
-// $Id$
-
 #ifndef SO@GUI@_FULLVIEWER_H
 #define SO@GUI@_FULLVIEWER_H
 
@@ -207,6 +205,8 @@ protected:
 
   virtual void openViewerHelpCard(void);
 
+  virtual void createPrefSheet(void);
+
 protected:
   @WIDGET@ leftDecoration;
   @WIDGET@ rightDecoration;
@@ -344,18 +344,6 @@ protected:
   Widget buildFunctionsSubmenu(Widget popup);
   Widget buildDrawStyleSubmenu(Widget popup);
 
-  static void leftWheelStartCB(Widget, XtPointer, XtPointer);
-  static void leftWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void leftWheelFinishCB(Widget, XtPointer, XtPointer);
-
-  static void bottomWheelStartCB(Widget, XtPointer, XtPointer);
-  static void bottomWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void bottomWheelFinishCB(Widget, XtPointer, XtPointer);
-
-  static void rightWheelStartCB(Widget, XtPointer, XtPointer);
-  static void rightWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void rightWheelFinishCB(Widget, XtPointer, XtPointer);
-
   char * prefstring;
   char * popupTitle;
   SbBool popupEnabled;
@@ -364,7 +352,6 @@ protected:
   Widget prefshell;
   Widget prefsheet;
 
-  virtual void createPrefSheet(void);
   void createPrefSheetShellAndForm(Widget & shell, Widget & form);
   void createDefaultPrefSheetParts(Widget * widgets, int & num, Widget form);
   void layoutPartsAndMapPrefSheet(Widget * widgets, int num, Widget form, Widget shell);
@@ -393,6 +380,18 @@ protected:
   static void seekPrefSheetToggle2CB(Widget, XtPointer, XtPointer);
 
 private:
+  static void leftWheelStartCB(Widget, XtPointer, XtPointer);
+  static void leftWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void leftWheelFinishCB(Widget, XtPointer, XtPointer);
+
+  static void bottomWheelStartCB(Widget, XtPointer, XtPointer);
+  static void bottomWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void bottomWheelFinishCB(Widget, XtPointer, XtPointer);
+
+  static void rightWheelStartCB(Widget, XtPointer, XtPointer);
+  static void rightWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void rightWheelFinishCB(Widget, XtPointer, XtPointer);
+
   void selectedViewing(void);
   void selectedDecoration(void);
   void selectedHeadlight(void);
@@ -588,7 +587,6 @@ public:
   HWND renderAreaWidget;
 
 protected:
-  virtual void createPrefSheet(void);
   void showDecorationWidgets(SbBool onOff);
 
 private:

@@ -104,6 +104,31 @@
 
 // ************************************************************************
 
+// Note: common documentation for all subclasses aswell.
+/*!
+  \fn void So@Gui@FullViewer::createPrefSheet(void)
+
+  Create preferences sheet.
+
+  This is a hook for constructing the preferences window in the
+  derived viewer classes.
+
+  Basically, derived classes will do the following in this method:
+
+  \code
+    if (! this->prefshell) {
+      createPrefSheetShellAndForm(this->prefshell, this->prefsheet);
+      createDefaultPrefSheetParts(this->prefparts, this->numprefparts,
+        this->prefsheet);
+      // add parts specific for derived viewer
+    }
+    layoutPartsAndMapPrefSheet(this->prefparts, this->numprefparts,
+                               this->prefsheet, this->prefshell);
+  \endcode
+*/
+
+// ************************************************************************
+
 // Note: the following function documentation blocks for thumbwheel
 // handling will also be used for all the miscellaneous viewer
 // subclasses, so keep'em general.
