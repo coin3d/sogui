@@ -164,7 +164,7 @@
 */
 
 /*!
-  \fn So@Gui@ExaminerViewer::So@Gui@ExaminerViewer(QWidget * parent, const char * name, SbBool embed, So@Gui@FullViewer::BuildFlag flag, So@Gui@Viewer::Type type, SbBool build)
+  \fn So@Gui@ExaminerViewer::So@Gui@ExaminerViewer(@WIDGET@ parent, const char * name, SbBool embed, So@Gui@FullViewer::BuildFlag flag, So@Gui@Viewer::Type type, SbBool build)
 
   Constructor. See parent class for explanation of arguments.
 */
