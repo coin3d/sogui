@@ -726,6 +726,8 @@ So@Gui@RenderArea::redrawOnSelectionChange(
   // the function documentation. 20001002 mortene.
 
   if ( this->normalSelection )
+    // FIXME: should we ref() and unref() to make sure we can't get a
+    // crash here? 20001002 mortene.
     this->normalSelection->removeChangeCallback( selection_redraw_cb, this );
 
   this->normalSelection = selection;
@@ -752,6 +754,8 @@ So@Gui@RenderArea::redrawOverlayOnSelectionChange(
   // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
 
   if ( this->overlaySelection )
+    // FIXME: should we ref() and unref() to make sure we can't get a
+    // crash here? 20001002 mortene.
     this->overlaySelection->removeChangeCallback( selection_redraw_cb, this );
 
   this->overlaySelection = selection;
