@@ -31,6 +31,13 @@ public:
   SoAnyStateStack(void);
   ~SoAnyStateStack(void);
 
+  void setDefaultState( const int state );
+
+//  newModifier();
+//  newState();
+//  setStateModifierReqs();
+//  setModifierEnabled();
+
   int getCurrentState(void) const;
 
   void addStateChangeCallback(
@@ -51,6 +58,7 @@ protected:
     const int oldstate, const int newstate ) const;
 
 private:
+  int defaultstate;
   SbPList * states;
   SbPList * callbacks;
 

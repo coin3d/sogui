@@ -58,7 +58,7 @@ SoAnyStateStack::~SoAnyStateStack(
   delete this->states;
 
   const int numCallbacks = this->callbacks->getLength();
-  for ( int i = 0; i < numCallbacks; i++ )
+  for ( i = 0; i < numCallbacks; i++ )
     delete (CallbackData *) (*this->callbacks)[i];
   delete this->callbacks;
 } // ~SoAnyStateStack()
@@ -72,8 +72,9 @@ int
 SoAnyStateStack::getCurrentState(
   void ) const
 {
-  assert( this->states->getLength() > 0 );
-  return (*this->states)[this->states->getLength()-1];
+  if ( this->states->getLength() == 0 )
+    return this->defaultstate;
+  return (int) (*this->states)[this->states->getLength()-1];
 } // getState()
 
 // *************************************************************************
