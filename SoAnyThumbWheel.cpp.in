@@ -25,9 +25,9 @@ static const char rcsid[] =
   "$Id$";
 #endif // SO@GUI@_DEBUG
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include <Inventor/@Gui@/widgets/SoAnyThumbWheel.h>
 
