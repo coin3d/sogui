@@ -26,8 +26,8 @@
   \brief The So@Gui@InputFocus class is an abstraction for widget focus events as an input device.
   \ingroup devices
 
-  Use this device to get events when the mouse pointer enters or
-  leaves a specific widget.
+  This device class is a "virtual device" which can be used to get
+  events when the mouse pointer enters or leaves a specific widget.
 */
 
 // *************************************************************************
@@ -48,22 +48,20 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@InputFocus);
 /*!
   \enum So@Gui@InputFocus::Events
 
-  Enumeration over supported event types. Only the given events will
-  be detected.
+  Bit-wise enumeration over events handled by the So@Gui@InputFocus
+  device class.  Used in the So@Gui@InputFocus constructor.
 */
 
 /*!
   \var So@Gui@InputFocus::Events So@Gui@InputFocus::ENTER_WINDOW
 
-  Maskbit for receiving events when the mouse pointer enters the
-  registered widget.
+  Maskbit for receiving events when focus comes to a widget.
 */
 
 /*!
   \var So@Gui@InputFocus::Events So@Gui@InputFocus::LEAVE_WINDOW
 
-  Maskbit for receiving events when the mouse pointer leaves the
-  registered widget.
+  Maskbit for receiving events when focus leaves a widget.
 */
 
 /*!
