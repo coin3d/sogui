@@ -643,6 +643,7 @@ SoAny::loadSceneGraph(char * buffer, unsigned int bufsize) // static
 SoNode *
 SoAny::scanSceneForName(SoNode * scene, const char * name, SbBool searchAll)
 {
+  assert(scene->getRefCount() > 0);
   SoPath * path;
   if ( SoAny::finder == NULL )
     SoAny::finder = new SoSearchAction;
