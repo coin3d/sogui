@@ -21,8 +21,18 @@
 #ifndef SO@GUI@_CURSOR_H
 #define SO@GUI@_CURSOR_H
 
+#include <Inventor/SbLinear.h>
+
+
 class So@Gui@Cursor {
 public:
+  struct CustomCursor {
+    SbVec2s dim;
+    SbVec2s hotspot;
+    unsigned char * bitmap;
+    unsigned char * mask;
+  };
+
 
   // FIXME: add more default shapes. 20011119 pederb.
   enum Shape {
@@ -33,16 +43,23 @@ public:
   
   So@Gui@Cursor(void);
   So@Gui@Cursor(const Shape shape);
+  So@Gui@Cursor(const CustomCursor * cc);
   ~So@Gui@Cursor();
-
-  // FIXME 2001-11-19, peder. It should be possible to set custom
-  // bitmaps as cursors
 
   Shape getShape(void) const;
   void setShape(const Shape shape);
+
+  const CustomCursor & getCustomCursor(void) const;
+
+  static const So@Gui@Cursor & getZoomCursor(void);
+  static const So@Gui@Cursor & getPanCursor(void);
+  static const So@Gui@Cursor & getRotateCursor(void);
   
 private:
+  void commonConstructor(const Shape shape, const CustomCursor * cc);
+
   Shape shape;
+  CustomCursor * cc;
 };
 
 #endif // ! SO@GUI@_CURSOR_H

@@ -24,6 +24,9 @@
   \ingroup common
 */
 
+#include <Inventor/@Gui@/So@Gui@Cursor.h>
+#include <assert.h>
+
 /*!
   \enum So@Gui@Component::Shape
   For enumerating built-in shape types.
@@ -45,30 +48,121 @@
   A custom cursor.
 */
 
+/*** Graphic data for the mouse pointer bitmaps. ***********************/
 
-#include <Inventor/@Gui@/So@Gui@Cursor.h>
+static unsigned char zoom_bitmap[] =
+{
+ 0xff,0xff,0xfd,0xbc,0x7f,0xf8,0x3f,0xf0,0x9f,0xe4,0xcf,0xcc,0xff,0xfc,0xff,
+ 0xfc,0xff,0xfc,0xff,0xfc,0xcf,0xcc,0x9f,0xe4,0x3f,0xf0,0x7f,0xf8,0xff,0xfc,
+ 0xff,0xff
+};
+
+static unsigned char zoom_mask_bitmap[] =
+{
+ 0x00,0x0f,0x80,0x1f,0xc0,0x3f,0xe0,0x7f,0xf0,0xff,0xf0,0xff,0xf0,0xff,0x00,
+ 0x0f,0x00,0x0f,0xf0,0xff,0xf0,0xff,0xf0,0xff,0xe0,0x7f,0xc0,0x3f,0x80,0x1f,
+ 0x00,0x0f
+};
+
+static unsigned char pan_bitmap[] =
+{
+ 0xff,0xff,0x7f,0xfe,0x3f,0xfc,0x1f,0xf8,0x7f,0xfe,0x77,0xee,0x73,0xce,0x01,
+ 0x80,0x01,0x80,0x73,0xce,0x77,0xee,0x7f,0xfe,0x1f,0xf8,0x3f,0xfc,0x7f,0xfe,
+ 0xff,0xff
+};
+
+static unsigned char pan_mask_bitmap[] =
+{
+ 0xc0,0x03,0xe0,0x03,0xe0,0x07,0xf0,0x0f,0xe8,0x17,0xdc,0x3b,0xff,0xff,0xff,
+ 0xff,0xff,0xff,0xff,0xff,0xdc,0x3b,0xe8,0x17,0xf0,0x0f,0xe0,0x07,0xc0,0x03,
+ 0xc0,0x03
+};
+
+static unsigned char rotate_bitmap[] = {
+ 0xff,0xff,0x1f,0xb8,0x0f,0x90,0xe7,0x83,0xf7,0x87,0xff,0x83,0xff,0x81,0xff,
+ 0xff,0xff,0xff,0x81,0xff,0xc1,0xff,0xe1,0xef,0xc1,0xe7,0x09,0xf0,0x1d,0xf8,
+ 0xff,0xff
+};
+
+static unsigned char rotate_mask_bitmap[] = {
+ 0xf0,0xef,0xf8,0xff,0xfc,0xff,0xfc,0xff,0x3c,0xfe,0x1c,0xff,0x00,0xff,0x00,
+ 0xff,0xff,0x00,0xff,0x00,0xff,0x38,0x7f,0x3c,0xff,0x3f,0xff,0x3f,0xff,0x1f,
+ 0xf7,0x0f
+};
+
+/***********************************************************************/
+
+
+static So@Gui@Cursor::CustomCursor zoom;
+static So@Gui@Cursor::CustomCursor pan;
+static So@Gui@Cursor::CustomCursor rotate;
+static SbBool first = TRUE;
+
 
 /*!
   Default constructor. Creates a default cursor.
 */
 So@Gui@Cursor::So@Gui@Cursor(void)
-  : shape(DEFAULT)
 {
+  this->commonConstructor(So@Gui@Cursor::DEFAULT, NULL);
 }
 
 /*!
   Constructor with Shape argument.
 */
 So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
-  : shape(shape)
 { 
+  assert(shape != CUSTOM_BITMAP && "don't use this constructor for making CUSTOM_BITMAP cursors");
+  this->commonConstructor(shape, NULL);
 }
+
+/*!
+  Constructs a new custom bitmap cursor from \a cc.
+
+  Note that only a \e shallow copy will be made of the CustomCursor
+  bitmap and mask references, so don't deallocate the memory they use
+  until the So@Gui@Cursor has been destructed.
+*/
+So@Gui@Cursor::So@Gui@Cursor(const CustomCursor * cc)
+{ 
+  this->commonConstructor(CUSTOM_BITMAP, cc);
+}
+
+// Private common constructor.
+void
+So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
+{ 
+  this->shape = shape;
+  this->cc = new CustomCursor;
+  *(this->cc) = *cc;
+
+  if (first) {
+    zoom.dim = SbVec2s(16, 16);
+    zoom.hotspot = SbVec2s(5, 7);
+    zoom.bitmap = zoom_bitmap;
+    zoom.mask = zoom_mask_bitmap;
+
+    pan.dim = SbVec2s(16, 16);
+    pan.hotspot = SbVec2s(7, 7);
+    pan.bitmap = pan_bitmap;
+    pan.mask = pan_mask_bitmap;
+
+    rotate.dim = SbVec2s(16, 16);
+    rotate.hotspot = SbVec2s(6, 8);
+    rotate.bitmap = rotate_bitmap;
+    rotate.mask = rotate_mask_bitmap;
+
+    first = FALSE;
+  }
+}
+
 
 /*!
   Destructor
 */
 So@Gui@Cursor::~So@Gui@Cursor()
 {
+  delete this->cc;
 }
 
 /*!
@@ -90,4 +184,44 @@ void
 So@Gui@Cursor::setShape(const Shape shape)
 {
   this->shape = shape;
+}
+
+/*!
+  Returns a reference to the current custom bitmap cursor.
+
+  Do not call this method unless So@Gui@Cursor::getShape() returns
+  So@Gui@Cursor::CUSTOM_BITMAP.
+*/
+const So@Gui@Cursor::CustomCursor &
+So@Gui@Cursor::getCustomCursor(void) const
+{
+  assert(cc!=NULL && "not a custom bitmap cursor");
+  return *(this->cc);
+}
+
+const So@Gui@Cursor &
+So@Gui@Cursor::getZoomCursor(void)
+{
+  static So@Gui@Cursor * zoomcursor = NULL;
+  // FIXME: memory leak. 20011120 mortene.
+  if (!zoomcursor) { zoomcursor = new So@Gui@Cursor(&zoom); }
+  return *zoomcursor;
+}
+
+const So@Gui@Cursor &
+So@Gui@Cursor::getPanCursor(void)
+{
+  static So@Gui@Cursor * pancursor = NULL;
+  // FIXME: memory leak. 20011120 mortene.
+  if (!pancursor) { pancursor = new So@Gui@Cursor(&pan); }
+  return *pancursor;
+}
+
+const So@Gui@Cursor &
+So@Gui@Cursor::getRotateCursor(void)
+{
+  static So@Gui@Cursor * rotatecursor = NULL;
+  // FIXME: memory leak. 20011120 mortene.
+  if (!rotatecursor) { rotatecursor = new So@Gui@Cursor(&rotate); }
+  return *rotatecursor;
 }

@@ -23,6 +23,10 @@
 #ifndef SO@GUI@_CURSORS_H
 #define SO@GUI@_CURSORS_H
 
+// OBSOLETED FILE: use So@Gui@Cursor instead. Remove eventually as
+// So@Gui@Component is implemented properly in all So@Gui@
+// toolkits. 20011120 mortene.
+
 // *************************************************************************
 
 #define so_@gui@_zoom_width 16
