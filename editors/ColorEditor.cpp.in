@@ -28,6 +28,7 @@
 #include <Inventor/fields/SoSFColor.h>
 #include <Inventor/fields/SoMFColor.h>
 #include <Inventor/fields/SoMFUInt32.h>
+#include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 
@@ -123,6 +124,7 @@ public:
   static void update_cb(void * closure, SoSensor * sensor);
   static void delete_cb(void * closure, SoSensor * sensor);
 
+  SoSwitch * layouts;
   SoGuiSlider1 * slider_r; // red
   SoGuiSlider1 * slider_g; // green
   SoGuiSlider1 * slider_b; // blue
@@ -174,7 +176,7 @@ ColorEditor::scenegraph[] = {
   "      } . oB",
   "    }",
   "    DEF layouts Switch {",
-  "      whichChild 6",
+  "      whichChild -1",
   "      DEF instances Group {", // never to be rendered...
   "        DEF slider_r SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "        DEF slider_g SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
@@ -185,10 +187,10 @@ ColorEditor::scenegraph[] = {
   "        DEF slider_translation SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
   "        DEF slider_frame SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
   "      }",
-  "      DEF sliders_NONE Group {",
-  "      }",
+  "      DEF sliders_NONE Group {", // in case we search for names once, instead of indexing
+  "      }",                        // children directly inside setCurrentSliders()
   "      DEF sliders_INTENSITY Group {",
-  "        USE slider_frame", // frames before sliders - knobs need to paint over frames
+  "        USE slider_frame", // frames before sliders - the knobs must paint over frames
   "        USE slider_v",
   "      }",
   "      DEF sliders_RGB Group {",
@@ -239,7 +241,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool 
   PRIVATE(this)->api = this;
   PRIVATE(this)->wysiwyg = FALSE;
   PRIVATE(this)->color = SbColor(0, 0, 0);
-  PRIVATE(this)->sliders = RGB;
+  PRIVATE(this)->sliders = NONE;
   PRIVATE(this)->update = AFTER_ACCEPT;
 
   PRIVATE(this)->attachment = DETACHED;
@@ -251,6 +253,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool 
   PRIVATE(this)->mfindex = 0;
 
   PRIVATE(this)->updating = FALSE;
+  PRIVATE(this)->layouts = NULL;
   PRIVATE(this)->sensor_r = NULL;
   PRIVATE(this)->sensor_g = NULL;
   PRIVATE(this)->sensor_b = NULL;
@@ -263,6 +266,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool 
   SoNode * root = SoAny::loadSceneGraph(ColorEditor::scenegraph);
   if ( root ) {
     root->ref();
+    PRIVATE(this)->layouts = (SoSwitch *) SoAny::scanSceneForName(root, "layouts");
     PRIVATE(this)->slider_r = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_r", TRUE);
     PRIVATE(this)->slider_g = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_g", TRUE);
     PRIVATE(this)->slider_b = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "slider_b", TRUE);
@@ -312,6 +316,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool 
       PRIVATE(this)->sensor_v->setPriority(0);
       PRIVATE(this)->sensor_v->attach(&(PRIVATE(this)->slider_v->value));
     }
+    this->setCurrentSliders(So@Gui@ColorEditor::RGB);
     this->setSceneGraph(root);
     root->unref();
   }
@@ -587,7 +592,32 @@ void
 So@Gui@ColorEditor::setCurrentSliders(So@Gui@ColorEditor::Sliders which)
 {
   PRIVATE(this)->sliders = which;
-  // FIXME: update scene graph
+  assert(PRIVATE(this)->layouts != NULL);
+  switch ( which ) {
+  case NONE:
+    PRIVATE(this)->layouts->whichChild.setValue(1); // -1 works too
+    break;
+  case INTENSITY:
+    PRIVATE(this)->layouts->whichChild.setValue(2);
+    break;
+  case RGB:
+    PRIVATE(this)->layouts->whichChild.setValue(3);
+    break;
+  case HSV:
+    PRIVATE(this)->layouts->whichChild.setValue(4);
+    break;
+  case RGB_V:
+    PRIVATE(this)->layouts->whichChild.setValue(5);
+    break;
+  case RGB_HSV:
+    PRIVATE(this)->layouts->whichChild.setValue(6);
+    break;
+  default:
+    if ( SO@GUI@_DEBUG )
+      SoDebugError::postWarning("So@Gui@ColorEditor::setCurrentSliders", "unknown slider set");
+    PRIVATE(this)->layouts->whichChild.setValue(-1);
+    break;
+  }
 }
 
 /*!
@@ -643,6 +673,7 @@ ColorEditor::attachedToColor(const SbColor & color)
   this->slider_h->value.setValue(h);
   this->slider_s->value.setValue(s);
   this->slider_v->value.setValue(v);
+  // FIXME: update textures, at least if wysiwyg mode is enabled
   this->updating = FALSE;
 }
 
