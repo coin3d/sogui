@@ -314,55 +314,54 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
-@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.h \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp \
-@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@Component.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Component.h \
-@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidgetCommon.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.h \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.h \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.h \
-@sogui_src_dir@/src/Inventor/@Gui@/viewers/FullViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.h \
-@sogui_src_dir@/src/Inventor/@Gui@/viewers/PlaneViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
-@sogui_src_dir@/src/Inventor/@Gui@/viewers/ExaminerViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h \
- \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.h \
-@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp \
- \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.h \
-@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@MouseCommon.cpp \
- \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h \
-@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@KeyboardCommon.cpp \
- \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h \
-@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@SpaceballCommon.cpp \
- \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.h \
-@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.cpp
-
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@Component.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Component.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidgetCommon.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@Viewer.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/viewers/FullViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FullViewer.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/viewers/PlaneViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/viewers/ExaminerViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h \
+	\
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Device.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp \
+	\
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Mouse.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@MouseCommon.cpp \
+	\
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Keyboard.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@KeyboardCommon.cpp \
+	\
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h \
+	@path_tag@@sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.cpp \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@SpaceballCommon.cpp \
+	\
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.h \
+	@path_tag@@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.cpp
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
