@@ -72,7 +72,7 @@ elif test -f $prefix/share/Coin/conf/so@gui@-default.cfg; then
   configfile="$prefix/share/Coin/conf/so@gui@-default.cfg"
   . $configfile
 else
-  echo >&2 "$me: no default So@Gui@ config available"
+  echo >&2 "$me: no default So@Gui@ config available in $prefix/share/Coin/conf/"
   exit 1
 fi
 
