@@ -323,6 +323,11 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
     glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxdims);
     s.sprintf("GL_MAX_VIEWPORT_DIMS==<%d, %d>\n", maxdims[0], maxdims[1]);
     info += s;
+
+    GLint texdim;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texdim);
+    s.sprintf("GL_MAX_TEXTURE_SIZE==%d\n", texdim);
+    info += s;
   }
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
