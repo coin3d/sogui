@@ -97,7 +97,11 @@ protected:
     SbTime * time;
   } log;
 
-  struct {
+  // The Microsoft Visual C++ v6.0 compiler needs a name on this class
+  // to be able to generate a constructor (which it wants to have for
+  // running the the SbVec2s constructors). So don't try to be clever
+  // and make it anonymous.
+  struct Pointer {
     SbVec2s now, then;
   } pointer;
 
