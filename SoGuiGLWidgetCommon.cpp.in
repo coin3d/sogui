@@ -242,18 +242,6 @@
 */
 
 /*!
-  \fn void So@Gui@GLWidget::setAlphaChannel(const SbBool enable)
-
-  Enables/disables the alpha channel for the OpenGL context.
-*/
-
-/*!
-  \fn SbBool So@Gui@GLWidget::getAlphaChannel(void) const
-
-  Returns whether the alpha channel is enabled for the OpenGL context.
-*/
-
-/*!
   \fn void So@Gui@GLWidget::setDrawToFrontBufferEnable(const SbBool enable)
 
   If this is set to \c TRUE, rendering will happen in the front buffer
