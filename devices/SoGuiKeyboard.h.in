@@ -25,7 +25,6 @@
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 
-class SbDict;
 class SoKeyboardEvent;
 
 // *************************************************************************
@@ -38,16 +37,24 @@ class SO@GUI@_DLL_API So@Gui@Keyboard : public So@Gui@Device {
 
 public:
   enum Events {
-    KEY_PRESS    = 0x01,
-    KEY_RELEASE  = 0x02,
-    ALL_EVENTS   = 0x03
+    // FIXME: check if the define matches with X11 is really
+    // necessary. If not, remove the comments below, if so, document
+    // properly this dependency. 20011229 mortene.
+
+    KEY_PRESS = 0x01, // matches X11's KeyPressMask define
+    KEY_RELEASE = 0x02, // matches X11's KeyReleaseMask define
+    ALL_EVENTS = KEY_PRESS | KEY_RELEASE
   };
 
   So@Gui@Keyboard(int eventmask = ALL_EVENTS);
   virtual ~So@Gui@Keyboard(void);
 
   virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                      void * closure);
+                      void * closure
+#ifdef __COIN_SOXT__ // FIXME: get rid of this abominable #ifdef. 20011229 mortene.
+                      , Window window = NULL
+#endif // __COIN_SOXT__
+                      );
   virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler,
                        void * closure);
 
@@ -56,7 +63,7 @@ public:
 private:
   int eventmask;
   SoKeyboardEvent * kbdevent;
-}; // class So@Gui@Keyboard
+};
 
 // *************************************************************************
 
