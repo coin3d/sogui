@@ -118,8 +118,10 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Mouse);
 
 // *************************************************************************
 
-SoGuiMouseP::SoGuiMouseP(void)
+SoGuiMouseP::SoGuiMouseP(So@Gui@Mouse * p)
 {
+  this->pub = p;
+
   // Allocate system-neutral event objects once and reuse.
   this->buttonevent = new SoMouseButtonEvent;
   this->locationevent = new SoLocation2Event;

@@ -31,12 +31,15 @@ class SoLocation2Event;
 
 class SoGuiMouseP {
 public:
-  SoGuiMouseP(void);
+  SoGuiMouseP(class So@Gui@Mouse * p);
   ~SoGuiMouseP();
 
   SoMouseButtonEvent * buttonevent;
   SoLocation2Event * locationevent;
   int eventmask;
+
+private:
+  class So@Gui@Mouse * pub;
 };
 
 #define PRIVATE(p) (p->pimpl)
