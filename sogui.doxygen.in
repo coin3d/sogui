@@ -318,10 +318,11 @@ INPUT                  = \
  @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp \
  \
  @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@Component.cpp \
- @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@ComponentCommon.cpp \
  @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Component.h \
  \
  @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidgetCommon.cpp \
  @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@GLWidget.h \
  \
  @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
