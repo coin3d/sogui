@@ -1729,14 +1729,49 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
                           "invoked, <%d, %d>", size[0], size[1]);
 #endif // SO@GUI@_DEBUG
 
+  SbVec2s newsize(size);
+
   if (size[0] == -1)
     return;
 
   assert(PRIVATE(this)->normalManager != NULL);
   assert(PRIVATE(this)->overlayManager != NULL);
 
-  this->setGLSize(size);
+// Workaround for a bug in Qt/Mac 3.1.0 and 3.1.1:
+// If the OpenGL context overlaps with the QSizeGrip widget (generated
+// by default), resizing does not work any more. The workaround is to
+// leave 15 pixels at the lower border of the window blank...
+
+#if (defined Q_WS_MAC && (QT_VERSION == 0x030100) || (QT_VERSION == 0x030101))
+
+  if (this->getTypeId() == So@Gui@RenderArea::getClassTypeId()) {              
+    // SoQtRenderArea used as standalone component 
+    newsize -= SbVec2s(0, 15); 
+
+    // spit out a warning that this is a Qt/Mac bug, not an SoQt problem
+    const char * env = SoAny::si()->getenv("SOQT_NO_QTMAC_BUG_WARNINGS");
+    if (!env || !atoi(env)) {        
+      SoDebugError::postWarning("SoQtFullViewer::sizeChanged",
+                                "\nThis version of Qt/Mac contains a bug "
+                                "that makes it necessary to leave the\n"
+                                "lowermost 15 pixels of the viewer window "
+                                "blank. Warnings about Qt/Mac bugs\n"
+                                "can be turned off permanently by setting the "
+                                "environment variable\n"
+                                "SOQT_NO_QTMAC_BUG_WARNINGS=1.");
+    } 
+  } 
+
+#endif
+
+// Remember to test if the problem above has been fixed in next Qt version(s)
+#if (defined Q_WS_MAC && QT_VERSION > 0x030101) 
+#error Qt/Mac 3.1.1 OpenGL canvas bug fixed in this version? Need to check. 
+#endif   
+
+  this->setGLSize(newsize);
   const SbVec2s glsize = this->getGLSize();
+
 
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("So@Gui@RenderArea::sizeChanged",
