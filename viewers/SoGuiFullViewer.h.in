@@ -33,13 +33,89 @@ typedef void CreateAppPushButtonCB(LPMEASUREITEMSTRUCT lpmis, void * userData);
 
 
 class So@Gui@PopupMenu;
-class SoAnyFullViewer;
+
+// FIXME: do the following 2 enums really have to be public? 20020111 mortene.
+
+enum So@Gui@FullViewerPopupMenuItem {
+  // FIXME: there's code in (some of) the popupmenu widgets which
+  // assumes the root id is equal to 0.  Yup, lousy design. :-/
+  // Anyway, don't change it until those cases are fixed.
+  // 20010810 mortene.
+  ROOT_MENU = 0,
+  ROOT_MENU_TITLE,
+
+  FUNCTIONS_MENU,
+  HELP_ITEM,
+  HOME_ITEM,
+  SET_HOME_ITEM,
+  VIEW_ALL_ITEM,
+  SEEK_ITEM,
+  COPY_VIEW_ITEM,
+  PASTE_VIEW_ITEM,
+
+  DRAWSTYLES_MENU,
+  DRAWSTYLES_STILL_MENU,
+  AS_IS_ITEM,
+  HIDDEN_LINE_ITEM,
+  WIREFRAME_OVERLAY_ITEM,
+  NO_TEXTURE_ITEM,
+  LOW_RESOLUTION_ITEM,
+  WIREFRAME_ITEM,
+  POINTS_ITEM,
+  BOUNDING_BOX_ITEM,
+
+  DRAWSTYLES_ANIMATING_MENU,
+  MOVE_SAME_AS_STILL_ITEM,
+  MOVE_NO_TEXTURE_ITEM,
+  MOVE_LOW_RES_ITEM,
+  MOVE_WIREFRAME_ITEM,
+  MOVE_LOW_RES_WIREFRAME_ITEM,
+  MOVE_POINTS_ITEM,
+  MOVE_LOW_RES_POINTS_ITEM,
+  MOVE_BOUNDING_BOX_ITEM,
+
+  TRANSPARENCY_TYPE_MENU,
+  SCREEN_DOOR_TRANSPARENCY_ITEM,
+  ADD_TRANSPARENCY_ITEM,
+  DELAYED_ADD_TRANSPARENCY_ITEM,
+  SORTED_OBJECT_ADD_TRANSPARENCY_ITEM,
+  BLEND_TRANSPARENCY_ITEM,
+  DELAYED_BLEND_TRANSPARENCY_ITEM,
+  SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM,
+  // These two are Coin extensions.
+  SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM,
+  SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM,
+
+  RENDER_BUFFER_TYPE_MENU,
+  SINGLE_BUFFER_ITEM,
+  DOUBLE_BUFFER_ITEM,
+  INTERACTIVE_BUFFER_ITEM,
+
+  EXAMINING_ITEM,
+  DECORATION_ITEM,
+  HEADLIGHT_ITEM,
+  FULLSCREEN_ITEM,
+  PREFERENCES_ITEM,
+
+  STEREO_MENU,
+  STEREO_OFF_ITEM,
+  STEREO_ANAGLYPH_ITEM,
+  STEREO_QUADBUFFER_ITEM
+};
+
+enum So@Gui@ViewerPopupMenuRadioGroup {
+  STILL_GROUP = 1,
+  MOVE_GROUP,
+  TRANSPARENCY_GROUP,
+  BUFFER_GROUP,
+  STEREO_GROUP
+};
+
 
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@FullViewer : public So@Gui@Viewer {
   SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@FullViewer, So@Gui@Viewer);
-  friend class SoAnyFullViewer;
   @COMPONENTHEADER@
 
 public:
@@ -147,7 +223,19 @@ protected:
   So@Gui@PopupMenu * prefmenu;
 
 private:
-  SoAnyFullViewer * common;
+  So@Gui@PopupMenu * setupStandardPopupMenu(void);
+  void prepareMenu(So@Gui@PopupMenu * menu);
+
+  void setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
+                                  So@Gui@Viewer::DrawStyle value);
+
+  void drawstyleActivated(int menuitemid);
+
+  void menuSelection(int menuitemid);
+  static void menuSelectionCallback(int menuitemid, void * userdata);
+
+  SbString popupmenutitle;
+
 
   // Private class for implementation hiding. The idiom we're using is
   // a variant of what is known as the "Cheshire Cat", and is also
@@ -323,7 +411,6 @@ private:
   static void seekbuttonCB(Widget, XtPointer, XtPointer);
   void copyviewSelected(void);
   void pasteviewSelected(void);
-  void drawstyleActivated(int);
 
   Widget seektimefield;
   Widget pointtoggle, objecttoggle;
@@ -431,6 +518,7 @@ protected:
 
 private:
   // hooks for SoAnyFullViewer
+  // (FIXME: SoAnyFullViewer has been phased out. 20020111 mortene.)
 
   // menu selections
   void selectedPrefs(void);
