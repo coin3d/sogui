@@ -60,7 +60,7 @@ SoGuiTranslation::doAction(SoAction * action)
   // SoDebugError::postInfo("SoGuiTranslation::doAction", "invoked by %s", action->getTypeId().getName().getString());
   int i;
   SoGuiPane * pane = NULL;
-  const SoPath * path = action->getCurPath();
+  const SoFullPath * path = (const SoFullPath *) action->getCurPath();
   for ( i = path->getLength() - 1; (i >= 0) && (pane == NULL); i-- ) {
     SoNode * node = path->getNode(i);
     assert(node);
@@ -100,7 +100,7 @@ SoGuiTranslation::getMatrix(SoGetMatrixAction * action)
   SoDebugError::postInfo("SoGuiTranslation::getMatrix", "invoked");
   int i;
   SoGuiPane * pane = NULL;
-  const SoPath * path = action->getCurPath();
+  const SoFullPath * path = (const SoFullPath *) action->getCurPath();
   for ( i = path->getLength() - 1; (i >= 0) && (pane == NULL); i-- ) {
     SoNode * node = path->getNode(i);
     assert(node);
