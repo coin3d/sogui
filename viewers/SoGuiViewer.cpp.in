@@ -1886,26 +1886,12 @@ So@Gui@Viewer::setCameraType(SoType t)
                               cameraparent->findChild(PRIVATE(this)->camera));
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? PRIVATE(this)->camera : NULL;
 
-    // Store the current home position, as it will be implicitly reset
-    // by setCamera().
-    SoNode * tmpstoredcamera = NULL;
-    if (PRIVATE(this)->storedcamera) {
-      SoType camtype = PRIVATE(this)->storedcamera->getTypeId();
-      assert(camtype.isDerivedFrom(SoNode::getClassTypeId()));
-      assert(camtype.canCreateInstance());
-      tmpstoredcamera = (SoNode *)camtype.createInstance();
-      tmpstoredcamera->copyContents(PRIVATE(this)->storedcamera, FALSE);
-      tmpstoredcamera->ref();
-    }
+    // The setCamera() invokation below will set the saved "home"
+    // position of the camera to the current camera position. We make
+    // no attempt to avoid this, as it would involve nasty hacks, and
+    // it shouldn't really matter.
 
     this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
-
-    // Restore home position.
-    if (tmpstoredcamera) {
-      assert(PRIVATE(this)->storedcamera);
-      PRIVATE(this)->storedcamera->copyContents(tmpstoredcamera, FALSE);
-      tmpstoredcamera->unref();
-    }
 
     PRIVATE(this)->deletecamera = TRUE;
     if (oldcamera) { cameraparent->removeChild(oldcamera); }
