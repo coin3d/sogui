@@ -222,6 +222,12 @@ So@Gui@RenderArea::constructor( // private
 So@Gui@RenderArea::~So@Gui@RenderArea(
   void )
 {
+  for ( int i = this->deviceList->getLength() - 1; i >= 0; i-- ) {
+    So@Gui@Device * device = (So@Gui@Device *) ((*this->deviceList)[i]);
+    this->unregisterDevice( device );
+    delete device;
+  }
+  delete this->deviceList;
   delete THIS;
 } // ~So@Gui@RenderArea()
 
