@@ -45,7 +45,7 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/widgets/SoAnyPopupMenu.h>
-#include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
+#include <Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h>
 
 // *************************************************************************
 
@@ -74,7 +74,7 @@ public:
 SoAnyPopupMenu *
 SoAnyPopupMenu::createInstance(void)
 {
-  return new So@Gui@PopupMenu();
+  return new @Gui@NativePopupMenu();
 }
 
 
