@@ -39,9 +39,11 @@ Usage: $me [OPTIONS]
 Options:
   --alternate=<string>
   --cppflags
+  --cflags
   --cxxflags
   --ldflags
   --libs
+  --msvcrt
   --datadir
   --have-feature <featurename>
   --ac-subst <string> | <sourcefile.in>
@@ -78,9 +80,11 @@ do
     --usage | --help)  echo "$usage"    ;;
     --version)         echo "$version"  ;;
     --cppflags)        echo "$cppflags" ;;
+    --cflags)          echo "$cflags"   ;;
     --cxxflags)        echo "$cxxflags" ;;
     --ldflags)         echo "$ldflags"  ;;
     --libs)            echo "$libs"     ;;
+    --msvcrt)          echo "$msvcrt"   ;;
     --datadir)         echo "$datadir"  ;;
     --have-feature)
       exitcode=1
