@@ -48,7 +48,6 @@ public:
       ROOT_MENU_TITLE,
 
       FUNCTIONS_MENU,
-      HELP_ITEM,
       HOME_ITEM,
       SET_HOME_ITEM,
       VIEW_ALL_ITEM,

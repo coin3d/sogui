@@ -349,15 +349,6 @@ So@Gui@Component::getDefaultIconTitle(void) const
 */
 
 /*!
-  \fn void So@Gui@Component::openHelpCard(const char * const name)
-
-  Open a dialog providing help about use of this component.
-
-  NB: no help system has been implemented yet, so for the time being
-  this will only pop up an error message.
-*/
-
-/*!
   \fn void So@Gui@Component::setWindowCloseCallback(So@Gui@ComponentCB * const func, void * const data)
 
   Set up a callback function to use when the component gets closed. A

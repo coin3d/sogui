@@ -66,8 +66,6 @@ protected:
 
   virtual void rightWheelMotion(float value);
 
-  virtual void openViewerHelpCard(void);
-
   virtual void afterRealizeHook(void);
 
 private:

@@ -1098,15 +1098,6 @@ So@Gui@ExaminerViewer::getDefaultIconTitle(void) const
 
 // *************************************************************************
 
-// Documented in superclass.
-void
-So@Gui@ExaminerViewer::openViewerHelpCard(void)
-{
-  this->openHelpCard("So@Gui@ExaminerViewer.help");
-}
-
-// *************************************************************************
-
 // Documented in superclass. Overrides this method to be able to draw
 // the axis cross, if selected, and to keep a continuous animation
 // upon spin.

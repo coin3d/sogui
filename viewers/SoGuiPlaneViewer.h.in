@@ -74,7 +74,6 @@ protected:
   virtual void rightWheelFinish(void);
 
   virtual void createViewerButtons(@WIDGET@ parent, SbPList * buttons);
-  virtual void openViewerHelpCard(void);
 
   virtual void afterRealizeHook(void);
 

@@ -389,21 +389,6 @@ So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
 
 // *************************************************************************
 
-/*!
-  Override this method to provide functionality when the user clicks
-  the Help button. Default implementation does nothing.
-*/
-void
-So@Gui@FullViewer::openViewerHelpCard(void)
-{
-#if SO@GUI@_DEBUG
-  SoDebugError::postWarning("So@Gui@FullViewer::openViewerHelpCard",
-                            "should be overridden");
-#endif // SO@GUI@_DEBUG
-}
-
-// *************************************************************************
-
 // FIXME: get rid of this hack and make this file truly
 // "generic". 20020109 mortene.
 #ifndef __COIN_SOWIN__
@@ -483,8 +468,6 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->addMenuItem(ROOT_MENU, HEADLIGHT_ITEM);
   menu->addMenuItem(ROOT_MENU, FULLSCREEN_ITEM);
 
-  menu->newMenuItem("help", HELP_ITEM);
-  menu->setMenuItemTitle(HELP_ITEM, _("Help"));
   menu->newMenuItem("home", HOME_ITEM);
   menu->setMenuItemTitle(HOME_ITEM, _("Home"));
   menu->newMenuItem("set_home", SET_HOME_ITEM);
@@ -494,7 +477,6 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->newMenuItem("seek", SEEK_ITEM);
   menu->setMenuItemTitle(SEEK_ITEM, _("Seek"));
 
-  menu->addMenuItem(FUNCTIONS_MENU, HELP_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, HOME_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, SET_HOME_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, VIEW_ALL_ITEM);
@@ -777,9 +759,6 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     (void)PUBLIC(this)->setFullScreen(PUBLIC(this)->isFullScreen() ? FALSE : TRUE);
     break;
 
-  case HELP_ITEM:
-    PUBLIC(this)->openViewerHelpCard();
-    break;
   case HOME_ITEM:
     PUBLIC(this)->resetToHomePosition();
     break;

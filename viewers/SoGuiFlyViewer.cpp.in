@@ -1044,15 +1044,6 @@ So@Gui@FlyViewer::rightWheelMotion(float value)
 
 // doc in super
 void
-So@Gui@FlyViewer::openViewerHelpCard(void)
-{
-  // FIXME: mark obsoleted. 20010907 mortene.
-}
-
-// ************************************************************************
-
-// doc in super
-void
 So@Gui@FlyViewer::afterRealizeHook(void)
 {
   PRIVATE(this)->updateCursorRepresentation();

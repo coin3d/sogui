@@ -595,15 +595,6 @@ So@Gui@PlaneViewer::afterRealizeHook(void)
 
 // ************************************************************************
 
-// Documented in superclass.
-void
-So@Gui@PlaneViewer::openViewerHelpCard(void)
-{
-  this->openHelpCard("So@Gui@PlaneViewer.help");
-}
-
-// *************************************************************************
-
 // Remaining code is for the SoGuiPlaneViewerP "private implementation" class.
 
 #define PUBLIC(ptr) (ptr->pub)

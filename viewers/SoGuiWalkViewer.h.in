@@ -64,8 +64,6 @@ protected:
 
   virtual @WIDGET@ buildLeftTrim(@WIDGET@ parent);
 
-  virtual void openViewerHelpCard(void);
-
 private:
   class So@Gui@WalkViewerP * pimpl;
   friend class SoGuiWalkViewerP;
