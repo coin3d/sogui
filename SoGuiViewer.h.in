@@ -73,6 +73,7 @@ typedef void So@Gui@ViewerDecimationPercentageCB(
 // *************************************************************************
 
 class SO@GUI@_DLL_EXPORT So@Gui@Viewer : public So@Gui@RenderArea {
+  SO@GUI@_TYPED_ABSTRACT_OBJECT_HEADER(So@Gui@Viewer);
   typedef So@Gui@RenderArea inherited;
   @COMPONENTHEADER@
 
@@ -203,14 +204,6 @@ protected:
     SbBool embed,
     Type type,
     SbBool buildNow );
-#if SO@GUI@_HAVE_WINWIDGET
-  So@Gui@Viewer(
-    @WINWIDGET@ parent,
-    const char * name,
-    SbBool embed,
-    Type type,
-    SbBool buildNow );
-#endif // SO@GUI@_HAVE_WINWIDGET
   ~So@Gui@Viewer( void );
 
   virtual void sizeChanged( const SbVec2s size );

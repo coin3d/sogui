@@ -42,6 +42,7 @@
 // Inventor.
 #include <Inventor/SoSceneManager.h>
 
+#include <Inventor/@Gui@/So@Gui@TypedObject.h>
 #include <Inventor/@Gui@/So@Gui@GLWidget.h>
 
 class SbColor;
