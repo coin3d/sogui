@@ -1015,18 +1015,16 @@ So@Gui@ViewerP::setClippingPlanes(void)
     if (nearval < nearlimit) {
       nearval = nearlimit;
     }
-    
-    if (this->autoclipcb) {
-      SbVec2f nearfar;
-      nearfar[0] = nearval;
-      nearfar[1] = farval;
-      
-      nearfar = this->autoclipcb(this->autoclipuserdata, nearfar);
-      
-      nearval = nearfar[0];
-      farval = nearfar[1]; 
-    }
   }
+
+  if (this->autoclipcb) {
+    SbVec2f nearfar(nearval, farval);
+    nearfar = this->autoclipcb(this->autoclipuserdata, nearfar);
+
+    nearval = nearfar[0];
+    farval = nearfar[1]; 
+  }
+
   // Some slack around the bounding box, in case the scene fits
   // exactly inside it. This is done to minimize the chance of
   // artifacts caused by the limitation of the z-buffer
@@ -1038,6 +1036,11 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // FrustumCamera can be found in the SmallChange CVS module. We
   // should not change the nearDistance for this camera, as this will
   // modify the frustum.
+  //
+  // FIXME: quite the hack that So@Gui@ needs to know about the
+  // FrustumCamera class. Wouldn't it be better if FrustumCamera
+  // instead registered a callback with setAutoClippingStrategy() and
+  // handled this itself?  20040908 mortene.
   if (this->camera->getTypeId().getName() == "FrustumCamera") {
     nearval = this->camera->nearDistance.getValue();
     farval = farval * (1.0f + SLACK); 
@@ -2567,6 +2570,7 @@ So@Gui@Viewer::isStereoViewing(void) const
   So@Gui@Viewer::StereoType value is So@Gui@Viewer::STEREO_NONE.
 
   \sa So@Gui@Viewer::StereoType
+  \since So@Gui@ 1.2
 */
 SbBool
 So@Gui@Viewer::setStereoType(So@Gui@Viewer::StereoType s)
