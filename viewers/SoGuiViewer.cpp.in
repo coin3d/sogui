@@ -178,6 +178,7 @@ public:
   So@Gui@Viewer::BufferType buffertype;
   SbBool stereoviewing;
   float stereooffset;
+  SbColor wireframeoverlaycolor;
 
   void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
 
@@ -788,6 +789,8 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
 
   PRIVATE(this)->stereoviewing = FALSE;
   PRIVATE(this)->stereooffset = 0.1f;
+
+  PRIVATE(this)->wireframeoverlaycolor = SbColor(1.0f, 0.0f, 0.0f);
 
   if (build) {
     this->setClassName("So@Gui@Viewer");
@@ -1805,6 +1808,31 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 // *************************************************************************
 
 /*!
+  Set the color of the overlay wireframe to \a color.
+
+  \sa getWireframeOverlayColor()
+*/
+void So@Gui@Viewer::setWireframeOverlayColor(const SbColor & color)
+{
+  PRIVATE(this)->wireframeoverlaycolor = color;
+}
+
+// *************************************************************************
+
+/*!
+  Returns the current color of the overlay wireframe. The default
+  color is [1,0,0], ie pure red.
+
+  \sa setWireframeOverlayColor()
+*/
+const SbColor &So@Gui@Viewer::getWireframeOverlayColor(void) const
+{
+  return PRIVATE(this)->wireframeoverlaycolor;
+}
+
+// *************************************************************************
+
+/*!
   Overloaded to update the local bufferingtype variable.
 
   \sa setBufferingType(), getBufferingType()
@@ -2128,7 +2156,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     pub->getSceneManager()->render(clearcol, clearz);
 
     // Second pass, render wireframe on top.
-    this->sobasecolor->rgb.setValue(SbColor(1.0f, 0.0f, 0.0f));
+    this->sobasecolor->rgb.setValue(this->wireframeoverlaycolor);
     this->sobasecolor->rgb.setIgnored(FALSE);
     this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
 

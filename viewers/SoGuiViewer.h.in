@@ -196,6 +196,9 @@ public:
       So@Gui@ViewerDecimationPercentageCB * cb, void * data = NULL);
   float getCurrentDecimationPercentage(void) const;
 
+  void setWireframeOverlayColor(const SbColor & color);
+  const SbColor & getWireframeOverlayColor(void) const;
+
   // Overloaded from parent class.
   virtual void setDoubleBuffer(const SbBool enable);
 
