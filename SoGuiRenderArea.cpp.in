@@ -36,16 +36,19 @@ static const char rcsid[] =
  *
 \**************************************************************************/
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#if HAVE_WINDOWS_H
+#include <windows.h> // To resolve some definitions in gl.h.
+#endif // HAVE_WINDOWS_H
 #include <GL/gl.h> // glDrawBuffer()
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoSceneManager.h>
-
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif // HAVE_CONFIG_H
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Basic.h>
