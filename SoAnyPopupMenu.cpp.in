@@ -295,11 +295,21 @@ SoAnyPopupMenu::PopUp(
   if ( groupid == -1 )
     return itemid;
   const int numGroupedItems = this->menuitems->getLength();
+  int groupsize = 0;
   for ( int i = 0; i < numGroupedItems; i++ ) {
     if ( (*this->radiogroups)[i] == groupid ) {
       int item = (*this->menuitems)[i];
-      this->menu->SetMenuItemMarked( item, (item == itemid) ? TRUE : FALSE );
+      if ( item != itemid ) {
+        this->menu->SetMenuItemMarked( item, FALSE );
+        groupsize++;
+      }
     }
+  }
+  if ( groupsize > 0 ) {
+    this->menu->SetMenuItemMarked( itemid, TRUE );
+  } else {
+    this->menu->SetMenuItemMarked(
+      itemid, ! this->menu->GetMenuItemMarked( itemid ) );
   }
   return itemid;
 } // PopUp()
