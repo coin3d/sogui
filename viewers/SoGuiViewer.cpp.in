@@ -104,8 +104,12 @@ static const char rcsid[] =
 #define M_PI 3.1415926535f
 #endif // ! M_PI
 
+// (note: this *must* be a #define, not a static variable -- to avoid
+// initialization race conditions with the static variables being set
+// to the value of this)
+#define UNINITIALIZED_ENVVAR -1 // value of envvars before tested
+
 // environment variables
-static int UNINITIALIZED_ENVVAR = -1; // value of envvars before tested
 static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
 // *************************************************************************
@@ -663,14 +667,12 @@ get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
   widgets / window which is going to make up the components of the
   viewer.
 */
-
-So@Gui@Viewer::So@Gui@Viewer(
-  @WIDGET@ parent,
-  const char * name,
-  SbBool embed,
-  So@Gui@Viewer::Type t,
-  SbBool build)
-: inherited(parent, name, embed, TRUE, TRUE, FALSE)
+So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
+                             const char * name,
+                             SbBool embed,
+                             So@Gui@Viewer::Type t,
+                             SbBool build)
+  : inherited(parent, name, embed, TRUE, TRUE, FALSE)
 {
   PRIVATE(this) = new So@Gui@ViewerP(this);
 
@@ -843,23 +845,23 @@ So@Gui@Viewer::setCameraType(SoType t)
        (!oldisperspective && !newisperspective)) // Same old, same old..
     return;
 
-#if SO@GUI@_DEBUG
-  SbBool valid = TRUE;
-  if (t == SoType::badType()) valid = FALSE;
-  if (valid) {
-    valid = FALSE;
-    if (newisperspective) valid = TRUE;
-    if (t.isDerivedFrom(orthotype)) valid = TRUE;
-  }
+  if (SO@GUI@_DEBUG) {
+    SbBool valid = TRUE;
+    if (t == SoType::badType()) valid = FALSE;
+    if (valid) {
+      valid = FALSE;
+      if (newisperspective) valid = TRUE;
+      if (t.isDerivedFrom(orthotype)) valid = TRUE;
+    }
 
-  if (!valid) {
-    SoDebugError::post("So@Gui@Viewer::setCameraType",
-                       "not a valid camera type: '%s'",
-                       t == SoType::badType() ?
-                       "badType" : t.getName().getString());
-    return;
+    if (!valid) {
+      SoDebugError::post("So@Gui@Viewer::setCameraType",
+                         "not a valid camera type: '%s'",
+                         t == SoType::badType() ?
+                         "badType" : t.getName().getString());
+      return;
+    }
   }
-#endif // SO@GUI@_DEBUG
 
   if (this->camera != NULL) {
     SoCamera * newcamera = (SoCamera *)t.createInstance();
@@ -1062,20 +1064,20 @@ void
 So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
                             So@Gui@Viewer::DrawStyle style)
 {
-#if SO@GUI@_DEBUG
-  if ((type != STILL) && (type != INTERACTIVE)) {
-    SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
-                              "unknown drawstyle type setting 0x%x", type);
-    return;
+  if (SO@GUI@_DEBUG) {
+    if ((type != STILL) && (type != INTERACTIVE)) {
+      SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
+                                "unknown drawstyle type setting 0x%x", type);
+      return;
+    }
   }
-#endif // SO@GUI@_DEBUG
 
   if (style == this->getDrawStyle(type)) {
-#if SO@GUI@_DEBUG && 0 // SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
-                              "drawstyle for type 0x%02x already 0x%02x",
-                              type, style);
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG && 0) { // debug
+      SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
+                                "drawstyle for type 0x%02x already 0x%02x",
+                                type, style);
+    }
     return;
   }
 
@@ -1095,13 +1097,14 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
 So@Gui@Viewer::DrawStyle
 So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
 {
-#if SO@GUI@_DEBUG
-  if ((type != STILL) && (type != INTERACTIVE)) {
-    SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
-                              "unknown drawstyle type setting 0x%x", type);
-    return PRIVATE(this)->drawstyles[STILL];
+  if (SO@GUI@_DEBUG) {
+    if ((type != STILL) && (type != INTERACTIVE)) {
+      SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
+                                "unknown drawstyle type setting 0x%x", type);
+      return PRIVATE(this)->drawstyles[STILL];
+    }
   }
-#endif // SO@GUI@_DEBUG
+
   return PRIVATE(this)->drawstyles[type];
 } // getDrawStyle()
 
@@ -1129,10 +1132,10 @@ So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
   if (type != BUFFER_SINGLE &&
       type != BUFFER_DOUBLE &&
       type != BUFFER_INTERACTIVE) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setBufferingType",
-                              "unknown buffer type 0x%x", type);
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setBufferingType",
+                                "unknown buffer type 0x%x", type);
+    }
     return;
   }
 
@@ -1177,10 +1180,10 @@ So@Gui@Viewer::setViewing(
   SbBool enable)
 {
   if (this->viewingFlag == enable) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setViewing",
-                               "unnecessary called");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setViewing",
+                                "unnecessary called");
+    }
     return;
   }
 
@@ -1255,15 +1258,16 @@ void
 So@Gui@Viewer::setAutoClipping(
   SbBool enable)
 {
-#if SO@GUI@_DEBUG
-  if (PRIVATE(this)->adjustclipplanes == enable) {
-    SoDebugError::postWarning("So@Gui@Viewer::setAutoClipping",
-                              "unnecessary called");
-    return;
+  if (SO@GUI@_DEBUG) {
+    if (PRIVATE(this)->adjustclipplanes == enable) {
+      SoDebugError::postWarning("So@Gui@Viewer::setAutoClipping",
+                                "unnecessary called");
+      return;
+    }
   }
-#endif // SO@GUI@_DEBUG
+
   PRIVATE(this)->adjustclipplanes = enable;
-  if (enable) this->scheduleRedraw();
+  if (enable) { this->scheduleRedraw(); }
 } // setAutoClipping()
 
 // *************************************************************************
@@ -1360,13 +1364,14 @@ So@Gui@Viewer::getStereoOffset(
 void
 So@Gui@Viewer::setDetailSeek(const SbBool on)
 {
-#if SO@GUI@_DEBUG
-  if (PRIVATE(this)->seektopoint == on) {
-    SoDebugError::postWarning("So@Gui@Viewer::setDetailSeek",
-                              "unnecessary called");
-    return;
+  if (SO@GUI@_DEBUG) {
+    if (PRIVATE(this)->seektopoint == on) {
+      SoDebugError::postWarning("So@Gui@Viewer::setDetailSeek",
+                                "unnecessary called");
+      return;
+    }
   }
-#endif // SO@GUI@_DEBUG
+
   PRIVATE(this)->seektopoint = on;
 } // setDetailSeek()
 
@@ -1401,11 +1406,11 @@ void
 So@Gui@Viewer::setSeekTime(const float seconds)
 {
   if (seconds < 0.0f) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setSeekTime",
-                              "an attempt was made to set a negative seek "
-                              "time duration");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setSeekTime",
+                                "an attempt was made to set a negative seek "
+                                "time duration");
+    }
     return;
   }
   PRIVATE(this)->seekperiod = seconds;
@@ -1767,10 +1772,10 @@ void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
   if (root == this->sceneGraph) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setSceneGraph",
-                               "called with the same root as already set");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setSceneGraph",
+                                "called with the same root as already set");
+    }
     return;
   }
 
@@ -1876,12 +1881,11 @@ So@Gui@Viewer::getSceneGraph(void)
 void
 So@Gui@Viewer::setSeekMode(SbBool enable)
 {
-#if SO@GUI@_DEBUG
-  // user might have switched mode during seek, so if enable == FALSE,
-  // isViewing() is irrelevant.
-  if (enable)
-    assert(this->isViewing());
-#endif // SO@GUI@_DEBUG
+  if (SO@GUI@_DEBUG) {
+    // User might have switched mode during seek, so if enable==FALSE,
+    // isViewing() is irrelevant.
+    if (enable) { assert(this->isViewing()); }
+  }
 
   if (! enable && PRIVATE(this)->seeksensor->isScheduled()) {
     PRIVATE(this)->seeksensor->unschedule();
@@ -2246,8 +2250,7 @@ So@Gui@Viewer::actualRedraw(void)
     if (!first && zWasEnabled) glEnable(GL_DEPTH_TEST);
   }
 
-  if (this->getInteractiveCount() > 0)
-    PRIVATE(this)->recordFPS();
+  if (this->getInteractiveCount() > 0) { PRIVATE(this)->recordFPS(); }
 } // actualRedraw()
 
 // *************************************************************************
@@ -2320,13 +2323,13 @@ So@Gui@Viewer::interactiveCountDec(void)
   // the viewer in INTERACT mode. When the seek is completed, the
   // count will become -1.  20010912 mortene.
 
-#if SO@GUI@_DEBUG
-  if (PRIVATE(this)->interactionnesting <= 0) {
-    SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
-                               "interaction count nesting went below zero. "
-                               "This is due to an internal So@Gui@ bug.");
+  if (SO@GUI@_DEBUG) {
+    if (PRIVATE(this)->interactionnesting <= 0) {
+      SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
+                                "interaction count nesting went below zero. "
+                                "This is due to an internal So@Gui@ bug.");
+    }
   }
-#endif // SO@GUI@_DEBUG
 
   if (--(PRIVATE(this)->interactionnesting) <= 0) {
     PRIVATE(this)->interactionendCallbacks->invokeCallbacks(this);
@@ -2372,11 +2375,11 @@ void
 So@Gui@Viewer::setSeekDistance(const float distance)
 {
   if (distance <= 0.0f) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::setSeekDistance",
-                              "invalid seek distance value: %f",
-                              distance);
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setSeekDistance",
+                                "invalid seek distance value: %f",
+                                distance);
+    }
     return;
   }
   PRIVATE(this)->seekdistance = distance;
@@ -2411,15 +2414,16 @@ So@Gui@Viewer::getSeekDistance(void) const
 void
 So@Gui@Viewer::setSeekValueAsPercentage(const SbBool on)
 {
-#if SO@GUI@_DEBUG
-  if ((on && this->isSeekValuePercentage()) ||
-      (!on && !this->isSeekValuePercentage())) {
-    SoDebugError::postWarning("So@Gui@Viewer::setSeekDistanceAsPercentage",
-                              "unnecessary called, value already %s",
-                              on ? "on" : "off");
-    return;
+  if (SO@GUI@_DEBUG) {
+    if ((on && this->isSeekValuePercentage()) ||
+        (!on && !this->isSeekValuePercentage())) {
+      SoDebugError::postWarning("So@Gui@Viewer::setSeekDistanceAsPercentage",
+                                "unnecessary called, value already %s",
+                                on ? "on" : "off");
+      return;
+    }
   }
-#endif // SO@GUI@_DEBUG
+
   PRIVATE(this)->seekdistanceabs = on ? FALSE : TRUE;
 } // setSeekValkueAsPercentage()
 
@@ -2481,18 +2485,18 @@ So@Gui@Viewer::changeCameraValues(// virtual, protected
 
   SoCamera * cam = this->getCamera();
   if (!cam) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
-                              "no current camera in the scenegraph");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
+                                "no current camera in the scenegraph");
+    }
     return;
   }
   if (cam->getTypeId() != camera->getTypeId()) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
-                              "tried to copy data from camera of "
-                              "different type");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
+                                "tried to copy data from camera of "
+                                "different type");
+    }
     return;
   }
 
@@ -2720,7 +2724,7 @@ So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
                          this->socomplexity->value.getValue(),
                          this->socomplexity->value.isIgnored() ? "T" : "F");
 #endif // debug
-} // changeDrawStyle()
+}
 
 // *************************************************************************
 
@@ -2791,13 +2795,13 @@ So@Gui@ViewerP::setClippingPlanes(void)
   pub->camera->nearDistance = nearval * (1.0f - SLACK);
   pub->camera->farDistance = farval * (1.0f + SLACK);
 
-#if 0 // debug
-  SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
-                         "near, far: %f (%f), %f (%f)",
-                         nearval, pub->camera->nearDistance.getValue(),
-                         farval, pub->camera->farDistance.getValue());
-#endif // debug
-} // setClippingPlanes()
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
+                           "near, far: %f (%f), %f (%f)",
+                           nearval, pub->camera->nearDistance.getValue(),
+                           farval, pub->camera->farDistance.getValue());
+  }
+}
 
 // *************************************************************************
 
@@ -2814,14 +2818,14 @@ So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
   SoCamera * cam = pub->getCamera();
   assert(cam);
 
-#if SO@GUI@_DEBUG && 0 // debug
-  SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
-                         "screenpos: <%f, %f>, campos: <%f, %f, %f>",
-                         screenpos[0], screenpos[1],
-                         cam->position.getValue()[0],
-                         cam->position.getValue()[1],
-                         cam->position.getValue()[2]);
-#endif // debug
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
+                           "screenpos: <%f, %f>, campos: <%f, %f, %f>",
+                           screenpos[0], screenpos[1],
+                           cam->position.getValue()[0],
+                           cam->position.getValue()[1],
+                           cam->position.getValue()[2]);
+  }
 
   SbViewVolume vv = cam->getViewVolume(pub->getGLAspectRatio());
   SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
@@ -2838,14 +2842,14 @@ So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
   // projected points.
   cam->position = cam->position.getValue() - (current_planept - old_planept);
 
-#if SO@GUI@_DEBUG && 0 // debug
-  SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
-                         "newcampos: <%f, %f, %f>",
-                         cam->position.getValue()[0],
-                         cam->position.getValue()[1],
-                         cam->position.getValue()[2]);
-#endif // debug
-} // moveCameraScreen()
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
+                           "newcampos: <%f, %f, %f>",
+                           cam->position.getValue()[0],
+                           cam->position.getValue()[1],
+                           cam->position.getValue()[2]);
+  }
+}
 
 // *************************************************************************
 
@@ -2854,7 +2858,6 @@ So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
 
   Called when viewer enters interactive mode (animation, drag, ...).
 */
-
 void
 So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
@@ -2868,7 +2871,7 @@ So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
   // Use the dynamic drawstyle.
   if (!PRIVATE(thisp)->drawInteractiveAsStill())
     PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::INTERACTIVE]);
-} // interactivestartCB()
+}
 
 /*!
   \internal
@@ -2876,7 +2879,6 @@ So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
   Called when viewer goes out of interactive mode and into
   "frozen" mode.
 */
-
 void
 So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
 {
@@ -2891,7 +2893,7 @@ So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
   // Back to static drawstyle.
   if (!PRIVATE(thisp)->drawInteractiveAsStill())
     PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::STILL]);
-} // interactiveendCB()
+}
 
 // *************************************************************************
 
@@ -2900,7 +2902,6 @@ So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
 
   Called repeatedly during the seek animation.
 */
-
 void
 So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
 {
@@ -2924,7 +2925,7 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
                       t);
 
   if (end) thisp->setSeekMode(FALSE);
-} // seeksensorCB()
+}
 
 // *************************************************************************
 
@@ -2933,7 +2934,7 @@ void
 So@Gui@Viewer::sizeChanged(const SbVec2s & size)
 {
   inherited::sizeChanged(size);
-} // sizeChanged()
+}
 
 // *************************************************************************
 
@@ -3186,8 +3187,7 @@ So@Gui@ViewerP::recordFPS(void)
 
 // doc in super
 SbBool
-So@Gui@Viewer::processSoEvent(// virtual
-  const SoEvent * const event)
+So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 {
   const SoType type(event->getTypeId());
 
@@ -3242,25 +3242,22 @@ So@Gui@Viewer::processSoEvent(// virtual
     } while (FALSE);
   }
 
-  if (! this->isViewing())
-    return inherited::processSoEvent(event);
+  if (! this->isViewing()) { return inherited::processSoEvent(event); }
 
   return FALSE;
-} // processSoEvent()
+}
 
 // *************************************************************************
 
 /*!
   This method is obsoleted.
 */
-
 SbBool
-So@Gui@Viewer::processCommonEvents(
-  @EVENT@ event)
+So@Gui@Viewer::processCommonEvents(@EVENT@ event)
 {
   if (this->invokeAppCB(event)) return TRUE;
   return FALSE;
-} // processCommonEvents()
+}
 
 // *************************************************************************
 
@@ -3286,10 +3283,11 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
   if (!PRIVATE(this)->searchaction->isFound()) {
     // FIXME: set up default environment if there is no camera in the
     // superimposition scene
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo("So@Gui@Viewer::addSuperimposition",
-                           "cameraless superimpositions are not supported yet");
-#endif // SO@GUI@_DEBUG
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postInfo("So@Gui@Viewer::addSuperimposition",
+                             "cameraless superimpositions are not "
+                             "supported yet");
+    }
     return;
   }
   scene->ref();
@@ -3318,12 +3316,12 @@ So@Gui@Viewer::removeSuperimposition(SoNode * scene)
   return;
 
  error:
-#if SO@GUI@_DEBUG
-  SoDebugError::post("So@Gui@Viewer::removeSuperimposition",
-		     "no such superimposition");
-#endif // SO@GUI@_DEBUG
+  if (SO@GUI@_DEBUG) {
+    SoDebugError::post("So@Gui@Viewer::removeSuperimposition",
+                       "no such superimposition");
+  }
   return;
-} // getSuperimposedSceneGraph()
+}
 
 // *************************************************************************
 
@@ -3346,12 +3344,12 @@ So@Gui@Viewer::setSuperimpositionEnabled(SoNode * scene,
   return;
 
  error:
-#if SO@GUI@_DEBUG
-  SoDebugError::post("So@Gui@Viewer::setSuperimpositionEnabled",
-		     "no such superimposition");
-#endif // SO@GUI@_DEBUG
+  if (SO@GUI@_DEBUG) {
+    SoDebugError::post("So@Gui@Viewer::setSuperimpositionEnabled",
+                       "no such superimposition");
+  }
   return;
-} // setSuperimposition()
+}
 
 // *************************************************************************
 
@@ -3371,12 +3369,12 @@ So@Gui@Viewer::getSuperimpositionEnabled(SoNode * scene) const
   return (*PRIVATE(this)->superimpositionsenabled)[idx];
 
  error:
-#if SO@GUI@_DEBUG
-  SoDebugError::post("So@Gui@Viewer::getSuperimpositionEnabled",
-		     "no such superimposition");
-#endif // SO@GUI@_DEBUG
+  if (SO@GUI@_DEBUG) {
+    SoDebugError::post("So@Gui@Viewer::getSuperimpositionEnabled",
+                       "no such superimposition");
+  }
   return FALSE;
-} // getSuperimposition()
+}
 
 /*!  
   Returns the coordinate system the current camera is located in. If
