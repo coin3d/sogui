@@ -73,6 +73,7 @@
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
+#include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <string.h> // strlen() etc
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
 
@@ -103,26 +104,39 @@ public:
   int getMode(void) { return this->viewermode; }
 
 #define SO@GUI@_MIN_STEP     0.2f
-#define SO@GUI@_INC_FACTOR   1.6f
+#define SO@GUI@_INC_FACTOR   1.2f
 #define SO@GUI@_MAX_SPEED   20.0f
 
   SbTime * lastrender;
-  float currentspeed, maxspeed, speedfactor;
+
+  float currentspeed;
+  
+  // Maximum speed, target for currentspeed during
+  // acceleration/decceleration.
+  float maxspeed; 
+
+  // Scales speed. Calculated in updateSpeedScalingFactor.
+  float speed_scaling_factor; 
+  
+  // Used to calculate a new max_speed, on the basis on 'where' we are
+  // in the speed landscape, see {increment|decrement}MaxSpeed(). 
+  int max_speed_factor; 
+
+  // Speed
+  void incrementMaxSpeed();
+  void decrementMaxSpeed();
+  void updateMaxSpeed();
+  void updateSpeedScalingFactor();
 
   void updateSpeedIndicator(void);
+  void updateCamera( SoCamera * camera, float dt );
 
   float calculateChangeInTime();
   void  updateCurrentSpeed( float dt );
 
-  void updateCamera( SoCamera * camera, float dt );
+
 
   
-  // Speed
-  void incrementMaxSpeed();
-  void decrementMaxSpeed();
-
-  float getCurrentSpeed()
-  { return currentspeed; }
 
   // Current keyboard state.
   SbBool button1down;
@@ -132,6 +146,7 @@ public:
   SbBool lshiftdown;
   SbBool rshiftdown;
 
+  // View, speed display, renderingstate.
   SoSearchAction * searcher;
 
   SoNode * superimposition;
@@ -147,9 +162,13 @@ public:
   SoSwitch * scurrentspeedswitch;
   SoSwitch * crossswitch;
 
+  SoNode * getSuperimpositionNode(const char * name);
+
   void superimpositionevent(SoAction * action);
   static void superimposition_cb(void * closure, SoAction * action);
 
+
+  // 
   float tilt_increment; // Angle-adjustment between View-up and direction 
   float pan_increment;  // Rotation-adjustment around View-up
 
@@ -157,8 +176,6 @@ public:
   SbVec2s tiltpos;
   SbRotation tiltrotation;
   SbVec3f tiltup;
-
-  SoNode * getSuperimpositionNode(const char * name);
 
   // FIXME: Refactor event handlers and PUBLIC(this)->processSoEvent
   // in a way similar to that in SoGuiExaminerViewer, where only
@@ -178,16 +195,8 @@ So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
   this->viewermode = FLYING;
   this->currentspeed = 0.0f;
   this->maxspeed = 0.0f;
-
-  // the speed factor ought to be adjusted according to the scene
-  // graph bounding box in case of enormous models 
-  // 
-  // FIXME: This scaling factor is not used (and as far as I can se,
-  // it haven't been used, either). But it is definetly necessary to
-  // scale the speed according to BBox size. Just try the FlyViwer
-  // with models with different scales, and you'll see what I
-  // mean. 20021017 rolvs.
-  this->speedfactor = 1.0f;
+  this->speed_scaling_factor = 0.4f;
+  this->max_speed_factor = 0;
   this->stranslation = NULL;
   this->sscale = NULL;
   this->button1down = FALSE;
@@ -408,12 +417,6 @@ So@Gui@FlyViewerP::dolly(const float delta) const
 void
 So@Gui@FlyViewerP::setMode(ViewerMode newmode)
 {
-  switch (newmode) {
-    // Assuming interesting things will happen here..
-  default:
-    break;
-  }
-
   this->viewermode = newmode;
   this->updateCursorRepresentation();
 }
@@ -669,7 +672,6 @@ So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
       SoCamera * camera = PUBLIC(this)->getCamera();
       if (camera == NULL) 
         return TRUE; // probably sceneless
-
       SbVec3f up(this->tiltup);
       SbVec3f dir;
       SbRotation orientation(this->tiltrotation);
@@ -799,11 +801,6 @@ void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
   this->currentspeed +=
     (((this->currentspeed +
       this->maxspeed * factor) / 2.0f)- this->currentspeed) * dt;
-
-  // need some lower epsilon since the above may not get down to 0...
-  if ((this->currentspeed <  0.001f) &&
-      (this->currentspeed > -0.001f))
-    this->currentspeed = 0.0f;
 }
 
 void
@@ -821,7 +818,7 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
   camera->position.setValue(camera->position.getValue() +
                             dir * (this->currentspeed 
                                    * dt
-                                   * this->speedfactor));
+                                   * this->speed_scaling_factor));
 
   // FIXME: Make sure that the angle between direction and up-vector
   // stays larger than zero, or else it gets 'locked' in an undefined
@@ -835,60 +832,62 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
 void
 So@Gui@FlyViewerP::incrementMaxSpeed()
 {
-  // FIXME: Use an integer factor that get's incremented with this
-  // function to calculate the maxSpeed instead. Needs a refactoring
-  // that encapsulates the enquiery of the maxspeed member variable.
-  // The maxspeed could then be calculated with something like this:
-  // maxspeed = factor * pow(some_base, abs(factor)). This will
-  // obsolete tests where maxvelocity is compared to a epsilon for
-  // Zero size, for example. It will still behave in the same manner
-  // as before (and the InventorXT fly-viewer). 20021017 rolvs.
-
-  if (this->maxspeed == 0)
-    this->maxspeed = SO@GUI@_MIN_STEP;
-  else if ((this->maxspeed >= -SO@GUI@_MIN_STEP) &&
-           (this->maxspeed < 0.0f))
-    this->maxspeed = 0.0f;
-  else if (this->maxspeed > 0)
-    this->maxspeed *= SO@GUI@_INC_FACTOR;
-  else
-    this->maxspeed /= SO@GUI@_INC_FACTOR;
-  
-  if (this->maxspeed > SO@GUI@_MAX_SPEED)
-    this->maxspeed = SO@GUI@_MAX_SPEED;
-  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
-    this->maxspeed = -SO@GUI@_MAX_SPEED;
-
-  if( this->maxspeed == 0.0f )
-    this->currentspeed = 0.0f;
+  this->max_speed_factor++;
+  updateMaxSpeed();
 }
 
 
 void
 So@Gui@FlyViewerP::decrementMaxSpeed()
 {	
-  // FIXME: See fixme-comment on incrementMaxSpeed.
-  // 20021017 rolvs
+  this->max_speed_factor--;
+  updateMaxSpeed();
+}
 
-  if ((this->maxspeed > 0.0f) &&
-      (this->maxspeed <= SO@GUI@_MIN_STEP))
-    this->maxspeed = 0.0f;
-  else if (this->maxspeed == 0.0f)
-    this->maxspeed = -SO@GUI@_MIN_STEP;
-  else if (this->maxspeed > 0){
-    this->maxspeed /= SO@GUI@_INC_FACTOR;
-  }
-  else{
-    this->maxspeed *= SO@GUI@_INC_FACTOR;
-  }
+
+void So@Gui@FlyViewerP::updateSpeedScalingFactor()
+{
+  SoNode *n = PUBLIC(this)->getSceneGraph();
+  if( n == NULL )
+    return; // Scenegraph not set yet?
+
+  SoGetBoundingBoxAction bbact( PUBLIC(this)->getViewportRegion() );
+  bbact.apply( n );  
   
-  if (this->maxspeed > SO@GUI@_MAX_SPEED)
-    this->maxspeed = SO@GUI@_MAX_SPEED;
-  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
-    this->maxspeed = -SO@GUI@_MAX_SPEED;
+  SbBox3f bbox = bbact.getBoundingBox();
+  float bbox_diagonal = (bbox.getMax() - bbox.getMin()).length();
+  
+  // FIXME: It should be possible to create a simple scaling function,
+  // based on some logaritmic evaluation. 20021017 rolvs.
+  if( bbox_diagonal>100 )
+    this->speed_scaling_factor = log10(bbox_diagonal);
+  if( bbox_diagonal>10 && bbox_diagonal < 100 )
+    this->speed_scaling_factor = 0.4f; 
+  else if( bbox_diagonal>1 && bbox_diagonal<10 )
+    this->speed_scaling_factor = 0.3f; 
+  else if( bbox_diagonal>0.1 && bbox_diagonal<1)
+    this->speed_scaling_factor = 0.1f; 
+  else
+    this->speed_scaling_factor = 0.1f*bbox_diagonal;
+}
 
-  if( this->maxspeed == 0.0f )
-    this->currentspeed = 0.0f;
+
+void So@Gui@FlyViewerP::updateMaxSpeed()
+{
+  updateSpeedScalingFactor();
+
+  this->maxspeed = 
+    this->max_speed_factor 
+    * pow( SO@GUI@_INC_FACTOR, abs( this->max_speed_factor ) )
+    * this->speed_scaling_factor;
+
+  if( this->maxspeed > SO@GUI@_MAX_SPEED )
+    this->maxspeed = SO@GUI@_MAX_SPEED;
+  else if( this->maxspeed < -1*SO@GUI@_MAX_SPEED )
+    this->maxspeed = -1*SO@GUI@_MAX_SPEED;
+
+  if( this->max_speed_factor == 0 )
+    this->currentspeed = 0;
 }
 
 
