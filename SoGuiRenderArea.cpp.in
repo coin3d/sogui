@@ -39,10 +39,18 @@ static const char rcsid[] =
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/SoSceneManager.h>
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
 #include <so@lGUI@defs.h>
 #include <Inventor/@GUI@/So@GUI@Basic.h>
 #include <Inventor/@GUI@/devices/So@GUI@Mouse.h>
 #include <Inventor/@GUI@/devices/So@GUI@Keyboard.h>
+#include <Inventor/@GUI@/devices/So@GUI@Spaceball.h>
+#ifdef HAVE_JOYSTICK_LINUX
+#include <Inventor/@GUI@/devices/So@GUI@LinuxJoystick.h>
+#endif // HAVE_JOYSTICK_LINUX
 
 #include <Inventor/@GUI@/So@GUI@RenderArea.h>
 
@@ -121,6 +129,13 @@ So@GUI@RenderArea::constructor( // private
   this->devices.mouse = mouseInput ? new So@GUI@Mouse : NULL;
   this->devices.keyboard = keyboardInput ? new So@GUI@Keyboard : NULL;
   this->devices.extra = NULL;
+
+  if ( So@GUI@Spaceball::exists() )
+    this->registerDevice( new So@GUI@Spaceball );
+#ifdef HAVE_JOYSTICK_LINUX
+  if ( So@GUI@LinuxJoystick::exists() )
+    this->registerDevice( new So@GUI@LinuxJoystick );
+#endif // HAVE_JOYSTICK_LINUX
 
   this->appEventHandler = NULL;
 
@@ -213,13 +228,14 @@ So@GUI@RenderArea::unregisterDevice(
 {
   assert( this->devices.extra != NULL );
   int idx = this->devices.extra->find( device );
-  if ( idx != -1 )
+  if ( idx != -1 ) {
     this->devices.extra->remove( idx );
 #if SO@uGUI@_DEBUG
-  else
+  } else {
     SoDebugError::post( "So@GUI@RenderArea::unregisterDevice",
         "tried to remove nonexisting device" );
 #endif // SO@uGUI@_DEBUG
+  }
 } // unregisterDevice()
 
 // *************************************************************************
@@ -809,14 +825,21 @@ So@GUI@RenderArea::widgetChanged( // virtual, protected
 So@GUI@RenderArea::buildWidget( // protected
   @WIDGET@ parent )
 {
-  return inherited::buildWidget( parent );
+  @WIDGET@ widget = inherited::buildWidget( parent );
+  if ( this->devices.extra != NULL ) {
+    for ( int i = 0; i < this->devices.extra->getLength(); i++ ) {
+      So@GUI@Device * device = (So@GUI@Device *) (*this->devices.extra)[i];
+      device->enable( this->getGLWidget(),
+        inherited::eventHandler, this );
+    }
+  }
 /*
   this->setBorder( TRUE );
   @WIDGET@ widget = inherited::buildWidget( parent );
   if ( this->getSize()[0] == -1 )
     this->setSize( SbVec2s(400, 400) );
-  return widget;
 */
+  return widget;
 } // buildWidget()
 
 /*!
