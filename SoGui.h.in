@@ -44,6 +44,7 @@ class SbPList;
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
+#include <Inventor/SbString.h>
 
 // *************************************************************************
 
@@ -137,6 +138,17 @@ public:
   static void errorHandlerCB(const class SoError * error, void * data);
   static void doIdleTasks(void);
 #endif // __COIN_SOWIN__
+
+
+  enum FatalErrors {
+    NO_OPENGL_CANVAS = 0,
+      INTERNAL_ASSERT,
+      UNSPECIFIED_ERROR
+  };
+  typedef void FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode,
+                            void * userdata);
+  static FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
+                                             void * userdata);
 
 
 protected:

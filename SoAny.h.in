@@ -24,28 +24,35 @@
 #define SOANY_H
 
 #include <Inventor/SbPList.h>
+#include <Inventor/@Gui@/So@Gui@.h>
 
 // ************************************************************************
 
 class SoAny {
-  SoAny(void);
-  ~SoAny();
-  static void cleanup_si(void);
-
 public:
-  // single instance (Singelton design pattern)
+  // use the singleton design pattern for access to 
   static SoAny * si(void);
-
-public:
 
   void * getSharedGLContext(void * display, void * screen);
   void registerGLContext(void * context, void * display, void * screen);
   void unregisterGLContext(void * context);
   int getSharedCacheContextId(void * context);
-  
+
+  So@Gui@::FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
+                                               void * userdata);
+  SbBool invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode);
+
 private:
-  // use SbPList to be able to compile for both Coin and SGI/TGS Inventor
+  SoAny(void);
+  ~SoAny();
+  static void cleanup_si(void);
+
+  // (use SbPList to be able to compile properly on SGI/TGS Inventor
+  // aswell as Coin)
   SbPList cclist;
+
+  So@Gui@::FatalErrorCB * fatalcb;
+  void * userdata;
 }; // class SoAny
 
 // ************************************************************************

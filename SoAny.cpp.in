@@ -24,6 +24,10 @@
   \class SoAny SoAny.h
   \brief The SoAny class is a collection of common toolkit methods.
   \ingroup common
+
+  SoAny will contain internal (ie not accessible to the application
+  programmer) functionality that should be "globally" visible to all
+  parts of the toolkit.
 */
 
 #include <Inventor/@Gui@/SoAny.h>
@@ -111,6 +115,7 @@ int soany_cache_context::oiv_counter = 0;
 
 // private constructor
 SoAny::SoAny(void) 
+  : fatalcb(NULL)
 {
 }
  
@@ -217,4 +222,48 @@ SoAny::getSharedCacheContextId(void * context)
                             "Shared context handling is not implemented for this toolkit.");
 #endif // COIN_DEBUG
   return 0;
+}
+
+/*!
+  Set up a fatal error handler in case of "impossible" errors.  Calls
+  to this function are calls forwarded from
+  So@Gui@::setFatalErrorHandler().
+
+  Returns previous fatal error handler callback, or \c NULL if none.
+
+  \sa So@Gui@::setFatalErrorHandler()
+ */
+So@Gui@::FatalErrorCB *
+SoAny::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
+{
+  So@Gui@::FatalErrorCB * oldcb = this->fatalcb;
+  this->fatalcb = cb;
+  this->userdata = userdata;
+  return oldcb;
+}
+
+/*!
+  In the case of a fatal error condition in the library, this method
+  should be used to invoke the application fatal error handler.
+
+  Returns \c TRUE if an error handler was set up, or \c FALSE if none.
+
+  If no handler was set up, a dialog box with the error string will be
+  shown and then the application will exit.
+
+  \sa SoAny::setFatalErrorHandler()
+ */
+SbBool
+SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
+{
+  if (this->fatalcb == NULL) {
+    So@Gui@::createSimpleErrorDialog(NULL,
+                                     "Fatal application error",
+                                     errmsg.getString(),
+                                     "Application will exit.");
+    return FALSE;
+  }
+
+  fatalcb(errmsg, errcode, this->userdata);
+  return TRUE;
 }
