@@ -801,8 +801,8 @@ So@GUI@RenderArea::widgetChanged( // virtual, protected
 So@GUI@RenderArea::buildWidget( // protected
   @WIDGET@ parent )
 {
-  @WIDGET@ widget = inherited::buildWidget( parent );
   this->setBorder( TRUE );
+  @WIDGET@ widget = inherited::buildWidget( parent );
   if ( this->getSize()[0] == -1 )
     this->setSize( SbVec2s(400, 400) );
   return widget;
