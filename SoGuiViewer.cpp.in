@@ -1658,7 +1658,7 @@ So@Gui@Viewer::isSeekMode(void) const
 SbBool
 So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 {
-  assert(this->camera);
+  if ( ! this->camera ) return;
 
   SoRayPickAction rpaction(this->getViewportRegion());
   rpaction.setPoint(screenpos);
