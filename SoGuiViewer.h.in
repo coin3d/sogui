@@ -191,7 +191,7 @@ public:
   float getCurrentDecimationPercentage(void) const;
 
   // Overloaded from parent class.
-  virtual void setDoubleBuffer( SbBool enable );
+  virtual void setDoubleBuffer( const SbBool enable );
 
   virtual void setSceneGraph( SoNode * root );
   virtual SoNode * getSceneGraph(void);

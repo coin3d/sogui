@@ -1636,7 +1636,7 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 */
 
 void
-So@Gui@Viewer::setDoubleBuffer(SbBool on)
+So@Gui@Viewer::setDoubleBuffer( const SbBool on )
 {
   if (!PRIVATE(this)->localsetbuffertype)
     PRIVATE(this)->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
