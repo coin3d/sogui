@@ -586,9 +586,12 @@ So@Gui@Viewer::~So@Gui@Viewer(
 // *************************************************************************
 
 /*!
-  Set the camera we want to view the scene with. This will
-  set it up with the headlight and register it for later retrieval
-  (from getCamera()) and subsequent use.
+  Set the camera we want to view the scene with. This will set it up
+  with the headlight and register it for later retrieval (from
+  getCamera()) and subsequent use.
+
+  The camera passed in as an argument to this method must be part of
+  the viewer's scenegraph.
 
   \sa getCamera()
 */
