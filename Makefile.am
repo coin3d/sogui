@@ -3,10 +3,10 @@
 #  src/Inventor/*/common/Makefile.am
 #
 
-noinst_LTLIBRARIES = libSoCommon.la
-
-INCLUDES = -I.
+INCLUDES = -I. -I$(top_srcdir)/src -I$(top_builddir)/src
 LIBS = 
+
+noinst_LTLIBRARIES = libSoCommon.la
 
 libSoCommon_la_SOURCES = \
 	SoAnyFullViewer.cpp \

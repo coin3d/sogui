@@ -83,19 +83,15 @@ LT_RELEASE = @LT_RELEASE@
 LT_REVISION = @LT_REVISION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
-MOC = @MOC@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-SOQT_BINARY_AGE = @SOQT_BINARY_AGE@
-SOQT_EXTRA_CPPFLAGS = @SOQT_EXTRA_CPPFLAGS@
-SOQT_EXTRA_LDFLAGS = @SOQT_EXTRA_LDFLAGS@
-SOQT_EXTRA_LIBS = @SOQT_EXTRA_LIBS@
-SOQT_INTERFACE_AGE = @SOQT_INTERFACE_AGE@
-SOQT_MAJOR_VERSION = @SOQT_MAJOR_VERSION@
-SOQT_MICRO_VERSION = @SOQT_MICRO_VERSION@
-SOQT_MINOR_VERSION = @SOQT_MINOR_VERSION@
-SOQT_VERSION = @SOQT_VERSION@
+SOXT_BINARY_AGE = @SOXT_BINARY_AGE@
+SOXT_INTERFACE_AGE = @SOXT_INTERFACE_AGE@
+SOXT_MAJOR_VERSION = @SOXT_MAJOR_VERSION@
+SOXT_MICRO_VERSION = @SOXT_MICRO_VERSION@
+SOXT_MINOR_VERSION = @SOXT_MINOR_VERSION@
+SOXT_VERSION = @SOXT_VERSION@
 VERSION = @VERSION@
 WIDGET = @WIDGET@
 install_sh = @install_sh@
@@ -109,10 +105,10 @@ uGUI = @uGUI@
 #
 
 
-noinst_LTLIBRARIES = libSoCommon.la
-
-INCLUDES = -I.
+INCLUDES = -I. -I$(top_srcdir)/src -I$(top_builddir)/src
 LIBS = 
+
+noinst_LTLIBRARIES = libSoCommon.la
 
 libSoCommon_la_SOURCES = \
 	SoAnyFullViewer.cpp \
@@ -124,7 +120,7 @@ libSoCommon_la_SOURCES = \
 	ThumbWheel.cpp \
 	ThumbWheel.h
 
-subdir = src/Inventor/Qt/common
+subdir = src/Inventor/Xt/common
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -171,7 +167,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .c .cpp .h .lo .o
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Inventor/Qt/common/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Inventor/Xt/common/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
