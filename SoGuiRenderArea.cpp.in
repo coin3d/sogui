@@ -150,11 +150,11 @@ So@Gui@RenderArea::constructor( // private
   SbBool build )
 {
   this->normalManager = new SoSceneManager;
-  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
+  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   this->normalManager->activate();
 
   this->overlayManager = new SoSceneManager;
-  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
+  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   this->overlayManager->activate();
 
   this->normalColormap = NULL;
@@ -572,8 +572,8 @@ So@Gui@RenderArea::setAutoRedraw(
   SbBool enable )
 {
   if ( enable ) {
-    this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
-    this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
+    this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+    this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   }
   else {
     this->normalManager->setRenderCallback( NULL, NULL );
@@ -706,7 +706,7 @@ So@Gui@RenderArea::scheduleRedraw(
   assert( this->normalManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
+  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   this->normalManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleRedraw()
 
@@ -721,7 +721,7 @@ So@Gui@RenderArea::scheduleOverlayRedraw(
   assert( this->overlayManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
+  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   this->overlayManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleOverlayRedraw()
 
