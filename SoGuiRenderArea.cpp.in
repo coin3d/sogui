@@ -1360,7 +1360,23 @@ So@Gui@RenderArea::getOverlayGLRenderAction(void) const
 }
 
 /*!
-  This method redraws the normal scene graph.
+  This method is called from the render() method and takes care of
+  setting up the context for OpenGL rendering (by making the OpenGL
+  canvas the current context and specifying either the front or back
+  buffer for rendering, depending on whether we're in singlebuffer or
+  doublebuffer mode).
+
+  After setting up the OpenGL context, it calls actualRedraw() for the
+  actual scenegraph rendering to take place.
+
+  Finally, the OpenGL buffers are either swapped back-to-front (for
+  doublebuffering) or flushed (for singlebuffering), and our OpenGL
+  context is unlocked.
+
+  The application programmer may override this method if extreme
+  low-level control of the rendering process is necessary. Usually,
+  you should be able to get away with overriding actualRedraw() for
+  special cases, though.
 */
 void
 So@Gui@RenderArea::redraw(void)
