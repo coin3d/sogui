@@ -350,7 +350,7 @@ SoAnyMaterialList::getMaterialDirectory(
 
   // get the path to search for materials in
   SbBool path_allocated = FALSE;
-  const char * path = this->dirpath;
+  char * path = this->dirpath;
   if ( ! path ) path = getenv( "SO_MATERIAL_DIR" );
   if ( path == NULL ) {
     path = getenv( "WALLET" );

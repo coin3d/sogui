@@ -75,7 +75,7 @@ private:
 
 private:
   SbPList * callbacks;
-  const char * dirpath;
+  char * dirpath;
   So@GUI@MaterialDirectory * directory;
 
 }; // class SoAnyMaterialList

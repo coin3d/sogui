@@ -83,7 +83,7 @@ define([matnum], m4_eval(matnum+1))dnl
 
 void
 SoAnyMaterialList::setupBuiltinMaterials( // private
-  So@GUI@MaterialDirectory * index ) const
+  So@GUI@MaterialDirectory * const index ) const
 {
   assert( index != NULL );
   index->numGroups = 0;
