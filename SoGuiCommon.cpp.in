@@ -22,12 +22,10 @@
 
 /* For the Doxygen tool. */
 
+/*! \defgroup misc Miscellaneous Classes */
 /*! \defgroup devices @Gui@ Device Classes */
 /*! \defgroup components @Gui@ Components */
 /*! \defgroup viewers @Gui@ Viewer Components */
-/*! \defgroup editors @Gui@ Editor Components */
-/*! \defgroup slidersets @Gui@ Slider Set Components */
-/*! \defgroup misc Miscellaneous Classes */
 
 
 /*!

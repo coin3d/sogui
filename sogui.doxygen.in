@@ -308,10 +308,13 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h
+INPUT                  = \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
+ @sogui_src_dir@/src/Inventor/@Gui@/So@Gui@.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Common.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@.h \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.h \
+ @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Object.cpp
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 

@@ -32,61 +32,116 @@
 
 /*!
   \class So@Gui@Object Inventor/@Gui@/So@Gui@Object.h
-  \brief The So@Gui@Object class is for run-time type checking of the So@Gui@
-  objects.
-*/
+  \brief The So@Gui@Object class is the common superclass for all So@Gui@ component classes.
+  \ingroup misc
+
+  The purpose of making this class the superclass of all So@Gui@
+  device, component and viewer classes is to be able to do run-time
+  type checking of the So@Gui@ objects.
+
+
+  You can place the macro SO@GUI@_OBJECT_HEADER(classname,parentname)
+  within a class definition header for So@Gui@ extension components to
+  automatically make the necessary definitions for setting up a
+  run-time type system for your extension classes:
+
+  \code
+  #ifndef MYSPECIALVIEWER_H
+  #define MYSPECIALVIEWER_H
+
+  class MySpecialViewer : public So@Gui@ExaminerViewer {
+    SO@GUI@_OBJECT_HEADER(MySpecialViewer, So@Gui@ExaminerViewer);
+    // [rest of class definition follows]
+  };
+
+  #endif // !MYSPECIALVIEWER_H
+  \endcode
+
+  Then put the SO@GUI@_OBJECT_SOURCE(classname) macro within the
+  actual implementation sourcecode file to include the necessary
+  implementation code for the run-time system:
+
+  \code
+  #include <MySpecialViewer.h>
+
+  SOQT_OBJECT_SOURCE(MySpecialViewer);
+
+  // [rest of class implementation]
+  \endcode
+
+
+  See also the documentation of the SoType class in Coin or Inventor.
+ */
 
 // *************************************************************************
 
 /*!
-  \var SoType So@Gui@Object::classTypeId
-  FIXME: write doc
-*/
-
-/*!
   \fn SoType So@Gui@Object::getTypeId
-  FIXME: write doc
-*/
 
-SoType So@Gui@Object::classTypeId; // static
+  Returns the type identification of an object derived from a class
+  inheriting So@Gui@Object.  This is used for run-time type checking
+  and "downward" casting.
+
+  Usage example:
+
+  \code
+  void foo(So@Gui@Viewer * comp)
+  {
+    if (comp->getTypeId() == So@Gui@ExaminerViewer::getClassTypeId()) {
+      // safe downward cast, knows the type
+      So@Gui@ExaminerViewer * exviewer = (So@Gui@ExaminerViewer *)comp;
+      /// [then something] ///
+    }
+    else if (comp->getTypeId().isOfType(So@Gui@FlyViewer::getClassTypeId())) {
+      // safe downward cast, knows the type
+      So@Gui@FlyViewer * flyviewer = (So@Gui@FlyViewer *)comp;
+      // then something else
+    }
+  }
+  \endcode
+*/
+// FIXME: add doc above to explain how external developers can use the
+// type system for their own extension classes. 20020502 mortene.
+
+// This is a private variable.
+SoType So@Gui@Object::classTypeId;
 
 /*!
-  FIXME: write doc
+  Sets up initialization for data common to all instances of this
+  class, submitting necessary information to the internal So@Gui@ type
+  system.
 */
-
 void
-So@Gui@Object::initClass(// static
-  void)
+So@Gui@Object::initClass(void)
 {
   assert(So@Gui@Object::classTypeId == SoType::badType());
   So@Gui@Object::classTypeId =
     SoType::createType(SoType::badType(), "So@Gui@Object");
-} // initClass()
+}
 
 /*!
-  FIXME: write doc
+  Returns \c TRUE if the type of this object is either of the same
+  type or inherited from \a type.
 */
-
 SbBool
-So@Gui@Object::isOfType(
-  SoType type) const
+So@Gui@Object::isOfType(SoType type) const
 {
   return this->getTypeId().isDerivedFrom(type);
-} // isOfType()
+}
 
 /*!
-  FIXME: write doc
+  This static method returns the SoType object associated with
+  objects of this class.
 */
-
 SoType
-So@Gui@Object::getClassTypeId(// static
-  void) 
+So@Gui@Object::getClassTypeId(void) 
 {
   return So@Gui@Object::classTypeId;
-} // getClassTypeId()
+}
 
 /*!
-  FIXME: write doc
+  Initialize the type system of So@Gui@Object, all So@Gui@ device
+  classes and all So@Gui@ components (including viewers).
 */
 void
 So@Gui@Object::init(void)
