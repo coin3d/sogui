@@ -37,6 +37,11 @@ static const char rcsid[] =
       left mouse button to start the seek zoom animation. (Hitting "s"
       again before clicking will cancel the seek operation.)</li>
 
+  <li>"u" puts the viewer in up-vector pick mode. Click some geometry
+      with the left mouse button to set the camera's
+      up-vector. (Hitting "u" again before clicking will cancel the
+      pick operation.) </li>
+
   </ul>
 
   FIXME: document (all mouse controls, all keyboard controls, ...)
@@ -44,6 +49,8 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
+#include <Inventor/events/SoKeyboardEvent.h>
+#include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/nodes/SoCamera.h>
 #if SO@GUI@_DEBUG
 #include <Inventor/errors/SoDebugError.h>
@@ -60,12 +67,13 @@ public:
   }
 
   enum ViewerMode {
-    FLYING, WAITING_FOR_SEEK
+    FLYING, WAITING_FOR_SEEK, WAITING_FOR_UP_PICK
   };
 
   void dolly( const float delta ) const;
   void updateCursorRepresentation( void ); // in SoNativeFlyViewer.cpp
   void setMode( ViewerMode newmode );
+  int getMode( void ) { return this->viewermode; }
 
 private:
   So@Gui@FlyViewer * viewer;
@@ -231,14 +239,44 @@ So@Gui@FlyViewer::getDefaultIconTitle( // virtual
 // ************************************************************************
 
 // doc in super
-void
-So@Gui@FlyViewer::processEvent( // virtual
-  @EVENT@ event )
+SbBool
+So@Gui@FlyViewer::processSoEvent( // virtual
+  const SoEvent * const event )
 {
-  if ( this->processCommonEvents( event ) ) { return; }
-  // FIXME: take care of our specific events here. 20010907 mortene.
-  inherited::processEvent( event );
-} // processEvent()
+  // Keyboard handling
+  if ( event->isOfType( SoKeyboardEvent::getClassTypeId() ) ) {
+    const SoKeyboardEvent * const ke = (const SoKeyboardEvent *) event;
+    const SbBool release = ke->getState() == SoButtonEvent::UP ? TRUE : FALSE;
+    if ( release ) {
+      if ( ke->getKey() == SoKeyboardEvent::U ) {
+        // either to switch to up-vector pick mode, or back to fly
+        // mode if pick-mode already activated (ie cancel the
+        // up-vector pick operation)
+        SbBool uppickmode =
+          PRIVATE( this )->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
+        PRIVATE( this )->setMode( uppickmode ? So@Gui@FlyViewerP::FLYING :
+                                  So@Gui@FlyViewerP::WAITING_FOR_UP_PICK );
+        return TRUE;
+      }
+    }
+  }
+
+  // Mousebutton handling
+  else if ( event->isOfType( SoMouseButtonEvent::getClassTypeId() ) ) {
+    const SoMouseButtonEvent * const me = (const SoMouseButtonEvent *) event;
+    const SbBool press = me->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
+    if ( press ) {
+      if ( PRIVATE( this )->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK ) {
+        this->findUpDirection( event->getPosition( ) );
+        PRIVATE( this )->setMode( So@Gui@FlyViewerP::FLYING );
+        return TRUE;
+      }
+    }
+  }
+
+
+  return inherited::processSoEvent( event );
+} // processSoEvent()
 
 // ************************************************************************
 
