@@ -1367,12 +1367,22 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 void
 So@Gui@ViewerP::recordFPS(const double rendertime)
 {
+  const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
+  if ( !env ) {
+    COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
+  } else {
+    COIN_SHOW_FPS_COUNTER = atoi(env);
+  }
+
+#if 0
+  // disabled to make fps-couter dynamically adjustable
   if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
     const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
     COIN_SHOW_FPS_COUNTER = env ? atoi(env) : 0;
   }
+#endif
 
-  if (COIN_SHOW_FPS_COUNTER) {
+  if (COIN_SHOW_FPS_COUNTER > 0) {
     SbVec2f fps = this->addFrametime(rendertime);
 
     char buffer[64];
