@@ -480,6 +480,12 @@ So@Gui@ColorEditor::getUpdateFrequency(void) const
   return (So@Gui@ColorEditor::UpdateFrequency) PRIVATE(this)->editor->update.getValue();
 }
 
+SoGuiColorEditor *
+So@Gui@ColorEditor::getEditor(void) const
+{
+  return PRIVATE(this)->editor;
+}
+
 // *************************************************************************
 
 const char *

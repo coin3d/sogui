@@ -76,6 +76,8 @@ public:
   void setUpdateFrequency(UpdateFrequency freq);
   UpdateFrequency getUpdateFrequency(void) const;
 
+  SoGuiColorEditor * getEditor(void) const;
+
 protected:
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
