@@ -1469,16 +1469,22 @@ So@GUI@Viewer::getSceneGraph(void)
 */
 
 void
-So@GUI@Viewer::setSeekMode(SbBool on)
+So@GUI@Viewer::setSeekMode(
+  SbBool enable )
 {
-  assert(this->isViewing());
+#if SO@GUI@_DEBUG
+  // user might have switched mode during seek, so if enable == FALSE,
+  // isViewing() is irrelevant.
+  if ( enable )
+    assert( this->isViewing() );
+#endif // SO@GUI@_DEBUG
 
-  if (!on && this->seeksensor->isScheduled()) {
+  if ( ! enable && this->seeksensor->isScheduled() ) {
     this->seeksensor->unschedule();
     this->interactiveCountDec();
   }
 
-  this->inseekmode = on;
+  this->inseekmode = enable;
 } // setSeekMode()
 
 // *************************************************************************
