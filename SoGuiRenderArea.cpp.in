@@ -283,9 +283,11 @@ So@Gui@RenderArea::afterRealizeHook(void)
 } // afterRealizeHook()
 
 /*!
-  This method sets the scene graph for the normal scene.
-*/
+  This method sets the scene graph to be rendered in the normal bitmap
+  planes.
 
+  \sa getSceneGraph(), setOverlaySceneGraph()
+*/
 void
 So@Gui@RenderArea::setSceneGraph( // virtual
   SoNode * scene )
@@ -294,9 +296,9 @@ So@Gui@RenderArea::setSceneGraph( // virtual
 } // setSceneGraph()
 
 /*!
-  This method returns the scene graph for the normal scene.
+  This method returns a reference to the scene graph root node as set
+  by the user.
 */
-
 SoNode *
 So@Gui@RenderArea::getSceneGraph( // virtual
   void )
@@ -305,9 +307,18 @@ So@Gui@RenderArea::getSceneGraph( // virtual
 } // getSceneGraph()
 
 /*!
-  This method sets the scene graph for the overlay scene.
-*/
+  This method sets the scene graph to render for the overlay bitmap
+  planes.
 
+  Important note: not all graphics hardware and / or drivers for
+  graphics hardware support overlay planes, so application programmers
+  are adviced to find some other way of accomplishing what they want
+  to do before resorting to using overlay planes.  Using overlay
+  planes will in practice severely limit the portability of
+  applications which depend on them being available.
+
+  \sa setSceneGraph(), getOverlaySceneGraph()
+*/
 void
 So@Gui@RenderArea::setOverlaySceneGraph(
   SoNode * scene )
@@ -323,7 +334,6 @@ So@Gui@RenderArea::setOverlaySceneGraph(
 /*!
   This method returns the scene graph for the overlay scene.
 */
-
 SoNode *
 So@Gui@RenderArea::getOverlaySceneGraph(
   void )
