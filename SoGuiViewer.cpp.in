@@ -106,8 +106,11 @@ static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 // The private data for the So@Gui@Viewer.
 class So@Gui@ViewerP {
 public:
-  So@Gui@ViewerP( So@Gui@Viewer * publ );
+  So@Gui@ViewerP(So@Gui@Viewer * publ);
   ~So@Gui@ViewerP(void);
+
+  SoSeparator * createSuperScene(void);
+  static const char * superSceneGraph[];
 
   // Seek functionality
   SoTimerSensor * seeksensor;
@@ -183,6 +186,8 @@ public:
   static void interactiveendCB( void *, So@Gui@Viewer * thisp );
   void moveCameraScreen( const SbVec2f & screenpos );
 
+  SoSearchAction * searchaction;
+
   So@Gui@Viewer * pub;
 };
 
@@ -190,12 +195,146 @@ So@Gui@ViewerP::So@Gui@ViewerP(
   So@Gui@Viewer * publ )
 {
   this->pub = publ;
+  this->searchaction = new SoSearchAction;
 } // So@Gui@ViewerP()
 
-So@Gui@ViewerP::~So@Gui@ViewerP(
-  void )
+So@Gui@ViewerP::~So@Gui@ViewerP(void)
 {
+  delete this->searchaction;
 }
+
+SoSeparator *
+So@Gui@ViewerP::createSuperScene(void)
+{
+  int i, bufsize;
+  for (i = bufsize = 0; So@Gui@ViewerP::superSceneGraph[i]; i++ )
+    bufsize += strlen(So@Gui@ViewerP::superSceneGraph[i]) + 1;
+  char * buf = new char [bufsize + 1];
+  for (i = bufsize = 0; So@Gui@ViewerP::superSceneGraph[i]; i++ ) {
+    strcpy(buf + bufsize, So@Gui@ViewerP::superSceneGraph[i]);
+    bufsize += strlen(So@Gui@ViewerP::superSceneGraph[i]);
+    buf[bufsize] = '\n';
+    bufsize++;
+  }
+  SoInput * input = new SoInput;
+  input->setBuffer(buf, bufsize);
+  SoNode * root = NULL;
+  SbBool ok = SoDB::read(input, root);
+  delete input;
+  delete [] buf;
+  if ( !ok ) {
+    SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
+		       "couldn't create viewer superscene");
+    return NULL;
+  }
+  assert(root->isOfType(SoSeparator::getClassTypeId()));
+  root->ref();
+
+  this->searchaction->reset();
+  this->searchaction->setSearchingAll(TRUE);
+  this->searchaction->setInterest(SoSearchAction::FIRST);
+
+#define LOCATE_NODE(member, type, name) \
+  do { \
+    member = NULL; \
+    this->searchaction->setName(SbName(name)); \
+    this->searchaction->apply(root); \
+    if ( this->searchaction->isFound() ) { \
+      SoNode * node = this->searchaction->getPath()->getTail(); \
+      assert(node != NULL); \
+      if ( node->isOfType(type::getClassTypeId()) ) \
+        member = (type *) node; \
+    } else { \
+      SoDebugError::post("So@Gui@ViewerP::createSuperScene", \
+                         "didn't locate node \"%s\"", name); \
+    } \
+  } while ( FALSE )
+
+  LOCATE_NODE(this->headlight, SoDirectionalLight, "headlight");
+  LOCATE_NODE(this->drawstyleroot, SoSwitch, "drawstyleroot");
+  LOCATE_NODE(this->hiddenlineroot, SoSwitch, "hiddenlineroot");
+  LOCATE_NODE(this->polygonoffsetparent, SoSwitch, "polygonoffsetparent");
+
+  LOCATE_NODE(this->sobasecolor, SoBaseColor, "sobasecolor");
+  LOCATE_NODE(this->socomplexity, SoComplexity, "socomplexity");
+  LOCATE_NODE(this->sodrawstyle, SoDrawStyle, "sodrawstyle");
+  LOCATE_NODE(this->solightmodel, SoLightModel, "solightmodel");
+  LOCATE_NODE(this->somaterialbinding, SoMaterialBinding, "somaterialbinding");
+  if ( this->sobasecolor ) this->sobasecolor->setOverride(TRUE);
+  if ( this->socomplexity ) this->socomplexity->setOverride(TRUE);
+  if ( this->sodrawstyle ) this->sodrawstyle->setOverride(TRUE);
+  if ( this->solightmodel ) this->solightmodel->setOverride(TRUE);
+  if ( this->somaterialbinding ) this->somaterialbinding->setOverride(TRUE);
+#ifdef HAVE_POLYGONOFFSET
+  LOCATE_NODE(this->sopolygonoffset, SoPolygonOffset, "sopolygonoffset");
+  if ( this->sopolygonoffset ) this->sopolygonoffset->setOverride(TRUE);
+#endif
+
+#undef LOCATE_NODE
+  this->searchaction->reset();
+
+  root->unrefNoDelete();
+  return (SoSeparator *) root;
+}
+
+const char * So@Gui@ViewerP::superSceneGraph[] =
+{
+  "#Inventor V2.1 ascii",
+  "",
+  "Separator {",
+  "  renderCaching OFF",
+  "  renderCulling OFF",
+  "  pickCulling OFF",
+  "  boundingBoxCaching OFF",
+
+  // Headlight. By inserting this before any scenegraph camera, the
+  // light will always be pointing in the correct direction.
+  "  DEF headlight DirectionalLight {",
+  "    direction 1 -1 -10",
+  "  }",
+  "  DEF drawstyleroot Switch {",
+  "    whichChild -1",
+  "    DEF solightmodel LightModel {",
+  "      model BASE_COLOR",
+  "    }",
+  "    DEF sodrawstyle DrawStyle {",
+  "      pointSize ~",
+  "      lineWidth ~",
+  "      linePattern ~",
+  "    }",
+  "    DEF socomplexity Complexity {",
+  "      textureQuality 0.0",
+  "      value 0.1",
+  "    }",
+  "  }",
+  "  DEF hiddenlineroot Switch {",
+  "    whichChild -1",
+  "    DEF sobasecolor BaseColor { }",
+  "    DEF somaterialbinding MaterialBinding {",
+  "      value OVERALL",
+  "    }",
+  "    DEF polygonoffsetparent Switch {",
+  "      whichChild -1",
+#if HAVE_SOPOLYGONOFFSET
+  "      DEF sopolygonoffset PolygonOffset { }",
+#endif // HAVE_SOPOLYGONOFFSET
+  "    }",
+  "  }",
+
+  "", // ...
+  // can identifiers start with _?  need something "reserved"...
+  "  DEF _userscene Switch {",
+  // to be switched off when searching only viewer supergraph.
+  // need to toggle whichChild without notification happening, and
+  // schedule notification if subscene changes when whichChild is
+  // -1
+  "  }",
+  // ortho subgraph for viewer to use for scene/view superimposition
+  "  DEF _superimpose Separator {",
+  "  }",
+  "}",
+  NULL
+};
 
 #define PRIVATE(ptr) (ptr->pimpl)
 
@@ -464,73 +603,8 @@ So@Gui@Viewer::So@Gui@Viewer(
   PRIVATE(this)->inseekmode = FALSE;
   PRIVATE(this)->seeksensor = new SoTimerSensor(So@Gui@ViewerP::seeksensorCB, this);
 
-  this->sceneRoot = new SoSeparator;
+  this->sceneRoot = PRIVATE(this)->createSuperScene();
   this->sceneRoot->ref();
-  this->sceneRoot->renderCaching.setValue(SoSeparator::OFF);
-  this->sceneRoot->renderCulling.setValue(SoSeparator::OFF);
-  this->sceneRoot->pickCulling.setValue(SoSeparator::OFF);
-  this->sceneRoot->boundingBoxCaching.setValue(SoSeparator::OFF);
-
-  // Headlight. By inserting this before any scenegraph camera, the
-  // light will always be pointing in the correct direction.
-  {
-    PRIVATE(this)->headlight = new SoDirectionalLight;
-    PRIVATE(this)->headlight->direction.setValue(1, -1, -10);
-    this->sceneRoot->addChild(PRIVATE(this)->headlight);
-  }
-
-  // Drawstyle subgraph.
-  {
-    PRIVATE(this)->drawstyleroot = new SoSwitch;
-
-    PRIVATE(this)->solightmodel = new SoLightModel;
-    PRIVATE(this)->solightmodel->setOverride(TRUE);
-    PRIVATE(this)->solightmodel->model = SoLightModel::BASE_COLOR;
-
-    PRIVATE(this)->sodrawstyle = new SoDrawStyle;
-    PRIVATE(this)->sodrawstyle->setOverride(TRUE);
-    PRIVATE(this)->sodrawstyle->pointSize.setIgnored(TRUE);
-    PRIVATE(this)->sodrawstyle->lineWidth.setIgnored(TRUE);
-    PRIVATE(this)->sodrawstyle->linePattern.setIgnored(TRUE);
-
-    PRIVATE(this)->socomplexity = new SoComplexity;
-    PRIVATE(this)->socomplexity->setOverride(TRUE);
-    PRIVATE(this)->socomplexity->textureQuality = 0.0f;
-    PRIVATE(this)->socomplexity->value = 0.1f;
-
-    PRIVATE(this)->drawstyleroot->addChild(PRIVATE(this)->solightmodel);
-    PRIVATE(this)->drawstyleroot->addChild(PRIVATE(this)->sodrawstyle);
-    PRIVATE(this)->drawstyleroot->addChild(PRIVATE(this)->socomplexity);
-    this->sceneRoot->addChild(PRIVATE(this)->drawstyleroot);
-    PRIVATE(this)->drawstyleroot->whichChild = SO_SWITCH_NONE;
-  }
-
-  // Hidden line rendering subgraph.
-  {
-    PRIVATE(this)->hiddenlineroot = new SoSwitch;
-
-    PRIVATE(this)->sobasecolor = new SoBaseColor;
-    PRIVATE(this)->sobasecolor->setOverride(TRUE);
-    PRIVATE(this)->hiddenlineroot->addChild(PRIVATE(this)->sobasecolor);
-
-    PRIVATE(this)->somaterialbinding = new SoMaterialBinding;
-    PRIVATE(this)->somaterialbinding->setOverride(TRUE);
-    PRIVATE(this)->somaterialbinding->value = SoMaterialBinding::OVERALL;
-    PRIVATE(this)->hiddenlineroot->addChild(PRIVATE(this)->somaterialbinding);
-
-    PRIVATE(this)->polygonoffsetparent = new SoSwitch;
-    PRIVATE(this)->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
-#if HAVE_SOPOLYGONOFFSET
-    PRIVATE(this)->sopolygonoffset = new SoPolygonOffset;
-    PRIVATE(this)->sopolygonoffset->setOverride(TRUE);
-    PRIVATE(this)->polygonoffsetparent->addChild(PRIVATE(this)->sopolygonoffset);
-#endif // HAVE_SOPOLYGONOFFSET
-    PRIVATE(this)->hiddenlineroot->addChild(PRIVATE(this)->polygonoffsetparent);
-
-    PRIVATE(this)->drawstyleroot->addChild(PRIVATE(this)->hiddenlineroot);
-    PRIVATE(this)->hiddenlineroot->whichChild = SO_SWITCH_NONE;
-  }
-
 
   PRIVATE(this)->drawstyles[STILL] = VIEW_AS_IS;
   PRIVATE(this)->drawstyles[INTERACTIVE] = VIEW_SAME_AS_STILL;
