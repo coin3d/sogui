@@ -154,8 +154,6 @@ private:
 public:
   Window getNormalWindow(void);
   Window getOverlayWindow(void);
-  GLXContext getNormalContext(void);
-  GLXContext getOverlayContext(void);
 
   int getOverlayColorMapSize(void);
   int getColorMapSize(void);
