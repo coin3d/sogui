@@ -56,14 +56,14 @@ SoAnyPopupMenu::NewMenu(
   char * name,
   int menuid )
 {
-  this->menu->NewMenu( name, menuid );
+  return this->menu->NewMenu( name, menuid );
 } // NewMenu()
 
 int
 SoAnyPopupMenu::GetMenu(
   char * name )
 {
-  this->menu->GetMenu( name );
+  return this->menu->GetMenu( name );
 } // GetMenu()
 
 void
@@ -87,7 +87,7 @@ int
 SoAnyPopupMenu::NewMenuItem(
   char * name, int itemid )
 {
-  this->menu->NewMenuItem( name, itemid );
+  return this->menu->NewMenuItem( name, itemid );
 } // NewMenuItem()
 
 int
@@ -183,7 +183,7 @@ SoAnyPopupMenu::PopUp(
   int screenx,
   int screeny )
 {
-  this->menu->PopUp( screenx, screeny );
+  return this->menu->PopUp( screenx, screeny );
 } // PopUp()
 
 // *************************************************************************
