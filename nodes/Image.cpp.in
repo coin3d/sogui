@@ -29,6 +29,7 @@
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiImage.h>
+#include <assert.h>
 
 // *************************************************************************
 

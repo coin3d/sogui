@@ -37,6 +37,7 @@
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiFrame.h>
+#include <assert.h>
 
 // *************************************************************************
 

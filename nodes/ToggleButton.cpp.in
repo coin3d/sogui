@@ -30,6 +30,7 @@
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiToggleButton.h>
+#include <assert.h>
 
 // *************************************************************************
 

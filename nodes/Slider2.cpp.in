@@ -53,6 +53,7 @@
 
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
+#include <assert.h>
 
 // *************************************************************************
 
