@@ -34,6 +34,15 @@ public:
   SoAnyPlaneViewer( So@GUI@PlaneViewer * const viewer );
   ~SoAnyPlaneViewer(void);
 
+  void translateX( const float delta ) const;
+  void translateY( const float delta ) const;
+  void rotateZ( const float angle ) const;
+
+  void viewPlaneX(void) const;
+  void viewPlaneY(void) const;
+  void viewPlaneZ(void) const;
+
+  // old interface
   float transYWheelMotion( const float value, const float oldvalue,
     SoCamera * const camera );
   float transXWheelMotion( const float value, const float oldvalue,
