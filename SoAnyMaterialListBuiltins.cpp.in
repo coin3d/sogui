@@ -38,13 +38,17 @@ static const char rcsid[] =
 
 #include <Inventor/@GUI@/SoAnyMaterialList.h>
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#ifdef WITH_STATIC_DEFAULTS
 #include <materials/materials.h>
+#endif // WITH_STATIC_DEFAULTS
 
 // *************************************************************************
 
-
-// *************************************************************************
-
+#ifdef WITH_STATIC_DEFAULTS
 static
 const char *
 builtin_material_names[] = {
@@ -518,6 +522,7 @@ builtin_material_names[] = {
     "winter.34",
   NULL
 }; // builtin_material_names
+#endif // WITH_STATIC_DEFAULTS
 
 // *************************************************************************
 
@@ -533,9 +538,12 @@ SoAnyMaterialList::setupBuiltinMaterials( // private
   So@GUI@MaterialDirectory * index ) const
 {
   assert( index != NULL );
+  index->numGroups = 0;
+  index->groups = NULL;
+#ifdef WITH_STATIC_DEFAULTS
   index->flags |= SO@uGUI@_BUILTIN_MATERIALS;
-  index->groups = new So@GUI@MaterialGroup * [ 13 ];
   index->numGroups = 13;
+  index->groups = new So@GUI@MaterialGroup * [ 13 ];
   for ( int i = 0; i < index->numGroups; i++ ) {
     index->groups[i] = new So@GUI@MaterialGroup;
     index->groups[i]->numMaterials = 35;
@@ -1468,6 +1476,7 @@ SoAnyMaterialList::setupBuiltinMaterials( // private
   index->groups[12]->materials[33]->data = winter33_iv;
   index->groups[12]->materials[34]->name = builtin_material_names[467];
   index->groups[12]->materials[34]->data = winter34_iv;
+#endif // ! WITH_STATIC_DEFAULTS
 } // setupBuiltinMaterials()
 
 // *************************************************************************

@@ -38,17 +38,21 @@ static const char rcsid[] =
 
 #include <Inventor/@GUI@/SoAnyMaterialList.h>
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#ifdef WITH_STATIC_DEFAULTS
 #include <materials/materials.h>
+#endif // WITH_STATIC_DEFAULTS
 
 include(libm4.m4)
 divert(0)dnl
 // *************************************************************************
-
 define([SOANY_BUILTIN_MATERIAL_GROUPS], [13])dnl
 define([SOANY_BUILTIN_MATERIAL_GROUP_SIZE], [35])dnl
 
-// *************************************************************************
-
+#ifdef WITH_STATIC_DEFAULTS
 static
 const char *
 changequote(,)dnl
@@ -66,6 +70,7 @@ define([matnum], m4_eval(matnum+1))dnl
 ])dnl
   NULL
 }; // builtin_material_names
+#endif // WITH_STATIC_DEFAULTS
 
 // *************************************************************************
 
@@ -81,10 +86,13 @@ SoAnyMaterialList::setupBuiltinMaterials( // private
   So@GUI@MaterialDirectory * index ) const
 {
   assert( index != NULL );
+  index->numGroups = 0;
+  index->groups = NULL;
+#ifdef WITH_STATIC_DEFAULTS
 changequote(,)dnl
   index->flags |= SO@uGUI@_BUILTIN_MATERIALS;
-  index->groups = new So@GUI@MaterialGroup * [ SOANY_BUILTIN_MATERIAL_GROUPS ];
   index->numGroups = SOANY_BUILTIN_MATERIAL_GROUPS;
+  index->groups = new So@GUI@MaterialGroup * [ SOANY_BUILTIN_MATERIAL_GROUPS ];
   for ( int i = 0; i < index->numGroups; i++ ) {
     index->groups[i] = new So@GUI@MaterialGroup;
     index->groups[i]->numMaterials = SOANY_BUILTIN_MATERIAL_GROUP_SIZE;
@@ -109,6 +117,7 @@ changequote([,])dnl
 ])dnl
 define([matnum], m4_eval(matnum+1))dnl
 ])dnl
+#endif // ! WITH_STATIC_DEFAULTS
 } // setupBuiltinMaterials()
 
 // *************************************************************************
