@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 // *************************************************************************
 
 /*!
@@ -227,7 +222,7 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->matrixaction = new SoGetMatrixAction(SbViewportRegion(100,100));
   this->superimpositions = NULL;
   this->superimpositionsenabled = NULL;
-} // So@Gui@ViewerP()
+}
 
 So@Gui@ViewerP::~So@Gui@ViewerP(void)
 {
@@ -742,7 +737,7 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
     this->setSuperimpositionEnabled(PRIVATE(this)->fpsRoot, FALSE);
   }
   PRIVATE(this)->resetFrameCounter();
-} // So@Gui@Viewer()
+}
 
 // *************************************************************************
 
@@ -769,7 +764,7 @@ So@Gui@Viewer::~So@Gui@Viewer(
     }
   }
   delete PRIVATE(this);
-} // ~So@Gui@Viewer()
+}
 
 // *************************************************************************
 
@@ -833,7 +828,7 @@ SoCamera *
 So@Gui@Viewer::getCamera(void) const
 {
   return this->camera;
-} // getCamera()
+}
 
 // *************************************************************************
 
@@ -895,6 +890,24 @@ So@Gui@Viewer::setCameraType(SoType t)
 
     float focaldist = this->camera->focalDistance.getValue();
 
+    // Try to transfer values from one camera type to the
+    // other.
+    //
+    // FIXME: this code is really not applying the correct solution,
+    // trying to convert between SoOrthographic::height and
+    // SoPerspectiveCamera::heightAngle. What we should really try to
+    // do is:
+    //
+    //       * when going from orthocam -> perspectivecam: set the
+    //       heightAngle field to it's default value (45°), and move
+    //       camera to a position where the scene/model would fill
+    //       about the same screenspace as it did in the orthocam
+    //
+    //       * when going from perspectivecam -> orthocam: keep the
+    //       current position, but tune the view-volume height so the
+    //       scene/model takes up about the same screenspace
+    //
+    // 20020522 mortene.
     if (newisperspective) {
       newpcam = (SoPerspectiveCamera *)newcamera;
       oldocam = (SoOrthographicCamera *)this->camera;
@@ -905,7 +918,8 @@ So@Gui@Viewer::setCameraType(SoType t)
           2.0f * atan(oldocam->height.getValue() / 2.0f / focaldist);
       }
       else {
-        newpcam->heightAngle = 0.0f;
+        // 45° is the default value of this field in SoPerspectiveCamera.
+        newpcam->heightAngle = M_PI / 4.0f;
       }
     }
     else {
@@ -918,16 +932,18 @@ So@Gui@Viewer::setCameraType(SoType t)
     SoGroup * cameraparent =
       get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
     cameraparent->insertChild(newcamera,
-                               cameraparent->findChild(this->camera));
+                              cameraparent->findChild(this->camera));
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
+
     this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
+
     PRIVATE(this)->deletecamera = TRUE;
     if (oldcamera) { cameraparent->removeChild(oldcamera); }
   }
   else { // A camera has not been instantiated for the scene.
     PRIVATE(this)->cameratype = t; // No call to setCamera(), so set type explicitly.
   }
-} // setCameraType()
+}
 
 // *************************************************************************
 
@@ -945,7 +961,7 @@ SoType
 So@Gui@Viewer::getCameraType(void) const
 {
   return PRIVATE(this)->cameratype;
-} // getCameraType()
+}
 
 // *************************************************************************
 
@@ -958,7 +974,7 @@ So@Gui@Viewer::viewAll(void)
 {
   if (this->camera && this->sceneGraph)
     this->camera->viewAll(this->sceneGraph, this->getViewportRegion());
-} // viewAll()
+}
 
 // *************************************************************************
 
@@ -986,7 +1002,7 @@ So@Gui@Viewer::saveHomePosition(void)
     PRIVATE(this)->storedheightval =
       ((SoPerspectiveCamera *)this->camera)->heightAngle.getValue();
   }
-} // saveHomePosition()
+}
 
 // *************************************************************************
 
@@ -1013,7 +1029,7 @@ So@Gui@Viewer::resetToHomePosition(void)
   this->camera->focalDistance =
     (this->camera->farDistance.getValue() +
      this->camera->nearDistance.getValue())/2;
-} // resetToHomePosition()
+}
 
 // *************************************************************************
 
@@ -1029,7 +1045,7 @@ void
 So@Gui@Viewer::setHeadlight(SbBool on)
 {
   PRIVATE(this)->headlight->on = on;
-} // setHeadlight()
+}
 
 // *************************************************************************
 
@@ -1043,7 +1059,7 @@ SbBool
 So@Gui@Viewer::isHeadlight(void) const
 {
   return PRIVATE(this)->headlight->on.getValue();
-} // isheadlight()
+}
 
 // *************************************************************************
 
@@ -1060,7 +1076,7 @@ SoDirectionalLight *
 So@Gui@Viewer::getHeadlight(void) const
 {
   return PRIVATE(this)->headlight;
-} // getHeadlight()
+}
 
 // *************************************************************************
 
@@ -1101,7 +1117,7 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
 
   PRIVATE(this)->drawstyles[type] = style;
   PRIVATE(this)->changeDrawStyle(PRIVATE(this)->currentDrawStyle());
-} // setDrawStyle()
+}
 
 // *************************************************************************
 
@@ -1124,7 +1140,7 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
   }
 
   return PRIVATE(this)->drawstyles[type];
-} // getDrawStyle()
+}
 
 // *************************************************************************
 
@@ -1162,7 +1178,7 @@ So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
   PRIVATE(this)->localsetbuffertype = TRUE;
   inherited::setDoubleBuffer(type == BUFFER_DOUBLE);
   PRIVATE(this)->localsetbuffertype = FALSE;
-} // setBufferingType()
+}
 
 // *************************************************************************
 
@@ -1176,7 +1192,7 @@ So@Gui@Viewer::BufferType
 So@Gui@Viewer::getBufferingType(void) const
 {
   return PRIVATE(this)->buffertype;
-} // getBufferingType()
+}
 
 // *************************************************************************
 
@@ -1214,7 +1230,7 @@ So@Gui@Viewer::setViewing(SbBool enable)
     if (action != NULL)
       SoLocateHighlight::turnOffCurrentHighlight(action);
   }
-} // setViewing()
+}
 
 // *************************************************************************
 
@@ -1248,7 +1264,7 @@ void
 So@Gui@Viewer::setCursorEnabled(SbBool on)
 {
   PRIVATE(this)->cursoron = on;
-} // setCursorEnabled()
+}
 
 // *************************************************************************
 
@@ -1262,7 +1278,7 @@ SbBool
 So@Gui@Viewer::isCursorEnabled(void) const
 {
   return PRIVATE(this)->cursoron;
-} // isCursorEnabled()
+}
 
 // *************************************************************************
 
@@ -1289,7 +1305,7 @@ So@Gui@Viewer::setAutoClipping(
 
   PRIVATE(this)->adjustclipplanes = enable;
   if (enable) { this->scheduleRedraw(); }
-} // setAutoClipping()
+}
 
 // *************************************************************************
 
@@ -1304,7 +1320,7 @@ So@Gui@Viewer::isAutoClipping(
   void) const
 {
   return PRIVATE(this)->adjustclipplanes;
-} // isAutoClipping()
+}
 
 // *************************************************************************
 
@@ -1320,7 +1336,7 @@ So@Gui@Viewer::setStereoViewing(// virtual
 {
   PRIVATE(this)->stereoviewing = enable;
   this->scheduleRedraw();
-} // setStereoViewing()
+}
 
 // *************************************************************************
 
@@ -1339,7 +1355,7 @@ So@Gui@Viewer::isStereoViewing(
   void) const
 {
   return PRIVATE(this)->stereoviewing;
-} // setStereoViewing()
+}
 
 // *************************************************************************
 
@@ -1357,7 +1373,7 @@ So@Gui@Viewer::setStereoOffset(// virtual
 {
   PRIVATE(this)->stereooffset = dist;
   this->scheduleRedraw();
-} // setStereoOffset()
+}
 
 /*!
   Return the offset distance between the two viewpoints when in stereo mode.
@@ -1370,7 +1386,7 @@ So@Gui@Viewer::getStereoOffset(
   void) const
 {
   return PRIVATE(this)->stereooffset;
-} // getStereoOffset()
+}
 
 // *************************************************************************
 
@@ -1394,7 +1410,7 @@ So@Gui@Viewer::setDetailSeek(const SbBool on)
   }
 
   PRIVATE(this)->seektopoint = on;
-} // setDetailSeek()
+}
 
 // *************************************************************************
 
@@ -1409,7 +1425,7 @@ SbBool
 So@Gui@Viewer::isDetailSeek(void) const
 {
   return PRIVATE(this)->seektopoint;
-} // isDetailSeek()
+}
 
 // *************************************************************************
 
@@ -1435,7 +1451,7 @@ So@Gui@Viewer::setSeekTime(const float seconds)
     return;
   }
   PRIVATE(this)->seekperiod = seconds;
-} // setSeekTime()
+}
 
 // *************************************************************************
 
@@ -1449,7 +1465,7 @@ float
 So@Gui@Viewer::getSeekTime(void) const
 {
   return PRIVATE(this)->seekperiod;
-} // getSeekTime()
+}
 
 // *************************************************************************
 
@@ -1463,7 +1479,7 @@ void
 So@Gui@Viewer::addStartCallback(So@Gui@ViewerCB * func, void * data)
 {
   PRIVATE(this)->interactionstartCallbacks->addCallback((SoCallbackListCB *)func, data);
-} // addStartCallback()
+}
 
 /*!
   Remove one of the functions which has been set up to be called when user
@@ -1477,7 +1493,7 @@ So@Gui@Viewer::removeStartCallback(So@Gui@ViewerCB * func, void * data)
 {
   PRIVATE(this)->interactionstartCallbacks->removeCallback((SoCallbackListCB *)func,
                                                   data);
-} // removeStartCallback()
+}
 
 // *************************************************************************
 
@@ -1491,7 +1507,7 @@ void
 So@Gui@Viewer::addFinishCallback(So@Gui@ViewerCB * func, void * data)
 {
   PRIVATE(this)->interactionendCallbacks->addCallback((SoCallbackListCB *)func, data);
-} // addFinishCallback()
+}
 
 /*!
   Remove one of the functions which has been set up to be called when user
@@ -1505,7 +1521,7 @@ So@Gui@Viewer::removeFinishCallback(So@Gui@ViewerCB * func, void * data)
 {
   PRIVATE(this)->interactionendCallbacks->removeCallback((SoCallbackListCB *)func,
                                                 data);
-} // removeFinishCallback()
+}
 
 // *************************************************************************
 
@@ -1523,7 +1539,7 @@ So@Gui@Viewer::copyView(const SbTime eventTime)
 {
   // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
   SO@GUI@_STUB();
-} // copyView()
+}
 
 // *************************************************************************
 
@@ -1540,7 +1556,7 @@ So@Gui@Viewer::pasteView(const SbTime eventTime)
 {
   // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
   SO@GUI@_STUB();
-} // pasteView()
+}
 
 // *************************************************************************
 
@@ -1555,7 +1571,7 @@ So@Gui@Viewer::recomputeSceneSize(
   // FIXME: implement and use SO@GUI@_OBSOLETED(). 20010815 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::recomputeSceneSize",
                          "this method is obsoleted, don't use it");
-} // recomputeSceneSize()
+}
 
 // *************************************************************************
 
@@ -1567,7 +1583,7 @@ void
 So@Gui@Viewer::setDecimationStrategy(const So@Gui@Viewer::DecimationStrategy /*strategy*/)
 {
   SO@GUI@_STUB();
-} // setDecimationStrategy()
+}
 
 // *************************************************************************
 
@@ -1592,7 +1608,7 @@ void
 So@Gui@Viewer::setGoalNumberOfTriangles(const int32_t /*goal*/)
 {
   SO@GUI@_STUB();
-} // setGoalNumberOfTriangles()
+}
 
 // *************************************************************************
 
@@ -1605,7 +1621,7 @@ So@Gui@Viewer::getGoalNumberOfTriangles(void) const
 {
   SO@GUI@_STUB();
   return -1;
-} // getGoalNumberOfTriangles()
+}
 
 // *************************************************************************
 
@@ -1617,7 +1633,7 @@ void
 So@Gui@Viewer::setGoalFramesPerSecond(const float /*goal*/)
 {
   SO@GUI@_STUB();
-} // setGoalFramesPerSecond()
+}
 
 // *************************************************************************
 
@@ -1630,7 +1646,7 @@ So@Gui@Viewer::getGoalFramesPerSecond(void) const
 {
   SO@GUI@_STUB();
   return 72.0f;
-} // getGoalFramesPerSecond()
+}
 
 // *************************************************************************
 
@@ -1642,7 +1658,7 @@ void
 So@Gui@Viewer::setFixedPercentage(const float /*percent*/)
 {
   SO@GUI@_STUB();
-} // setFixedPercentage()
+}
 
 // *************************************************************************
 
@@ -1655,7 +1671,7 @@ So@Gui@Viewer::getFixedPercentage(void) const
 {
   SO@GUI@_STUB();
   return 100.0f;
-} // getFixedPercentage()
+}
 
 // *************************************************************************
 
@@ -1667,7 +1683,7 @@ void
 So@Gui@Viewer::enableFullRenderingWhenStill(const SbBool /*on*/)
 {
   SO@GUI@_STUB();
-} // enableFullRendering()
+}
 
 // *************************************************************************
 
@@ -1680,7 +1696,7 @@ So@Gui@Viewer::isFullRenderingWhenStill(void) const
 {
   SO@GUI@_STUB();
   return TRUE;
-} // isFullRendering()
+}
 
 /*!
   Large Model Visualization; not implemented yet.
@@ -1691,7 +1707,7 @@ So@Gui@Viewer::isStillNow(void) const
 {
   SO@GUI@_STUB();
   return this->getInteractiveCount() == 0;
-} // isStillNow()
+}
 
 // *************************************************************************
 
@@ -1703,7 +1719,7 @@ void
 So@Gui@Viewer::setFramesPerSecondCallback(So@Gui@ViewerFPSCB * /*callback*/, void * /*data*/)
 {
   SO@GUI@_STUB();
-} // setFramesPerSecond()
+}
 
 // *************************************************************************
 
@@ -1715,7 +1731,7 @@ void
 So@Gui@Viewer::setNumSamples(const int /*numFrames*/)
 {
   SO@GUI@_STUB();
-} // setNumSamples()
+}
 
 // *************************************************************************
 
@@ -1728,7 +1744,7 @@ So@Gui@Viewer::getNumSamples(void) const
 {
   SO@GUI@_STUB();
   return 10;
-} // getNumSamples()
+}
 
 // *************************************************************************
 
@@ -1740,7 +1756,7 @@ void
 So@Gui@Viewer::setDecimationPercentageCallback(So@Gui@ViewerDecimationPercentageCB * /*cb*/, void * /*data*/)
 {
   SO@GUI@_STUB();
-} // setDecimationPercentageCallback()
+}
 
 // *************************************************************************
 
@@ -1753,7 +1769,7 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 {
   SO@GUI@_STUB();
   return 100.0f;
-} // getCurrentDecimateionPercentage()
+}
 
 // *************************************************************************
 
@@ -1770,7 +1786,7 @@ So@Gui@Viewer::setDoubleBuffer(const SbBool on)
     PRIVATE(this)->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
 
   inherited::setDoubleBuffer(on);
-} // setDoubleBuffer()
+}
 
 // *************************************************************************
 
@@ -1879,7 +1895,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   }
 
   this->setCamera(scenecamera);
-} // setSceneGraph()
+}
 
 // *************************************************************************
 
@@ -1891,7 +1907,7 @@ So@Gui@Viewer::getSceneGraph(void)
   // graph set by the user, without the extras added by the viewer to
   // control rendering.
   return this->sceneGraph;
-} // getSceneGraph()
+}
 
 // *************************************************************************
 
@@ -2022,7 +2038,7 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   this->interactiveCountInc();
 
   return TRUE;
-} // seeekToPoint()
+}
 
 // *************************************************************************
 
@@ -2311,7 +2327,7 @@ So@Gui@Viewer::interactiveCountInc(void)
                          PRIVATE(this)->interactionnesting - 1,
                          PRIVATE(this)->interactionnesting);
 #endif // debug
-} // interactiveCountInc()
+}
 
 // *************************************************************************
 
@@ -2367,7 +2383,7 @@ So@Gui@Viewer::interactiveCountDec(void)
     PRIVATE(this)->interactionnesting = 0;
     PRIVATE(this)->resetFrameCounter();
   }
-} // interactiveCountDec()
+}
 
 // *************************************************************************
 
@@ -2382,7 +2398,7 @@ int
 So@Gui@Viewer::getInteractiveCount(void) const
 {
   return PRIVATE(this)->interactionnesting;
-} // getInteractiveCount()
+}
 
 // *************************************************************************
 
@@ -2414,7 +2430,7 @@ So@Gui@Viewer::setSeekDistance(const float distance)
     return;
   }
   PRIVATE(this)->seekdistance = distance;
-} // setSeekDistance()
+}
 
 // *************************************************************************
 
@@ -2430,7 +2446,7 @@ float
 So@Gui@Viewer::getSeekDistance(void) const
 {
   return PRIVATE(this)->seekdistance;
-} // getSeekDistance()
+}
 
 // *************************************************************************
 
@@ -2456,7 +2472,7 @@ So@Gui@Viewer::setSeekValueAsPercentage(const SbBool on)
   }
 
   PRIVATE(this)->seekdistanceabs = on ? FALSE : TRUE;
-} // setSeekValkueAsPercentage()
+}
 
 // *************************************************************************
 
@@ -2472,7 +2488,7 @@ SbBool
 So@Gui@Viewer::isSeekValuePercentage(void) const
 {
   return PRIVATE(this)->seekdistanceabs ? FALSE : TRUE;
-} // isSeekValuePercentage()
+}
 
 // ************************************************************************
 
@@ -2502,7 +2518,7 @@ So@Gui@Viewer::toggleCameraType(void)
 
   this->setCameraType(PRIVATE(this)->cameratype.isDerivedFrom(perspectivetype)
                        ? orthotype : perspectivetype);
-} // toggleCameraType()
+}
 
 // ************************************************************************
 
@@ -2556,7 +2572,7 @@ So@Gui@ViewerP::drawInteractiveAsStill(void) const
       this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_NO_TEXTURE &&
       this->drawstyles[So@Gui@Viewer::STILL] != So@Gui@Viewer::VIEW_AS_IS;
   return moveasstill;
-} // drawInteractiveAsStill()
+}
 
 // *************************************************************************
 
@@ -2576,7 +2592,7 @@ So@Gui@ViewerP::currentDrawStyle(
     return this->drawstyles[So@Gui@Viewer::STILL];
   else
     return this->drawstyles[So@Gui@Viewer::INTERACTIVE];
-} // currentDrawStyle()
+}
 
 // *************************************************************************
 
@@ -2591,7 +2607,7 @@ SbBool
 So@Gui@ViewerP::drawAsHiddenLine(void) const
 {
   return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_HIDDEN_LINE) ? TRUE : FALSE);
-} // drawAsHiddenLine()
+}
 
 /*!
   \internal
@@ -2604,7 +2620,7 @@ SbBool
 So@Gui@ViewerP::drawAsWireframeOverlay(void) const
 {
   return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY) ? TRUE : FALSE);
-} // drawAsWireframeOverlay()
+}
 
 
 // *************************************************************************
@@ -3371,7 +3387,7 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
   scene->ref();
   PRIVATE(this)->superimpositions->append(scene);
   PRIVATE(this)->superimpositionsenabled->append(TRUE);
-} // setSuperimposedSceneGraph()
+}
 
 // *************************************************************************
 
@@ -3472,7 +3488,3 @@ So@Gui@Viewer::getCameraCoordinateSystem(SbMatrix & matrix, SbMatrix & inverse)
 }
 
 // *************************************************************************
-
-#if SO@GUI@_DEBUG
-static const char * getSo@Gui@ViewerRCSId(void) { return rcsid; }
-#endif // SO@GUI@_DEBUG
