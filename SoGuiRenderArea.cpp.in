@@ -782,6 +782,9 @@ So@Gui@RenderArea::setGLRenderAction(
 {
   assert( this->normalManager != NULL );
   this->normalManager->setGLRenderAction( action );
+  // Force an update of the SoGLRenderAction to the correct
+  // updatearea, aspectratio, etc.
+  this->sizeChanged(this->getSize());
 } // setGLRenderAction()
 
 /*!
