@@ -27,7 +27,7 @@ static const char rcsid[] =
 
 /*!
   \class So@Gui@ConstrainedViewer Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h
-  \brief The So@Gui@ConstrainedViewer class FIXME: document
+  \brief The So@Gui@ConstrainedViewer class is the superclass for viewers with constrains on the viewpoint.
   \ingroup components viewers common
 */
 // FIXME: document class properly. 20010905 mortene.
@@ -56,7 +56,6 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@ConstrainedViewer);
 /*!
   Constructor.
 */
-
 So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
   @WIDGET@ parent,
   const char * const name,
@@ -88,7 +87,6 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
 /*!
   Virtual destructor.
 */
-
 So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
 {
   delete PRIVATE( this );
@@ -99,13 +97,12 @@ So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
 /*!
   Set up-direction vector for the camera viewpoint.
 */
-
 void
 So@Gui@ConstrainedViewer::setUpDirection(
   const SbVec3f & dir )
 {
   this->upVector = dir;
-  // FIXME: do checkForCameraUpConstrain() here? 20010907 mortene.
+  // FIXME: re-set camera orientation if necessary here? 20010907 mortene.
 } // setUpDirection()
 
 // ************************************************************************
@@ -113,7 +110,6 @@ So@Gui@ConstrainedViewer::setUpDirection(
 /*!
   Return up-direction vector for the camera viewpoint.
 */
-
 const SbVec3f &
 So@Gui@ConstrainedViewer::getUpDirection( void ) const
 {
@@ -162,7 +158,7 @@ void
 So@Gui@ConstrainedViewer::recomputeSceneSize( // virtual
   void )
 {
-  SO@GUI@_STUB();
+  SO@GUI@_STUB();  // FIXME: re-calculate sceneHeight value. 20010907 mortene.
   inherited::recomputeSceneSize();
 } // recomputeSceneGraph()
 
