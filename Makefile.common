@@ -392,7 +392,10 @@ $(top_builddir)/src/Inventor/@Gui@/widgets/So@Gui@PopupMenu.cpp: $(top_srcdir)/s
 ## build/
 
 $(top_builddir)/build/so@gui@.doxygen: $(top_srcdir)/build/so@gui@.doxygen.in $(top_builddir)/config.status
-	@( cd $(top_builddir); $(SHELL) config.status --file=build/so@gui@.doxygen )
+	@( cd $(top_builddir); \
+	   if test -d build; then :; else mkdir build; fi; \
+	   ./config.status --file=build/so@gui@.doxygen:build/so@gui@.doxygen.in; \
+	   $(srcdir)/cfg/doxy4win.pl build/so@gui@.doxygen )
 
 ## man/man1/
 
