@@ -131,7 +131,10 @@ protected:
   static char * getlabel(unsigned int what);
   SbBool firstRealize;
 
-  virtual Boolean eventHandler(Widget widget, XEvent * event);
+  // FIXME: should this really be protected? Same goes for the other
+  // toolkits' eventHandler() functions. They also have nameclashes
+  // with the static So*GLWidget::eventHandler() function. 20011024 mortene.
+  virtual Boolean sysEventHandler(Widget widget, XEvent * event);
 #endif // __COIN_SOXT__
 
   void registerWidget(@WIDGET@ widget);
