@@ -1,5 +1,5 @@
-#ifndef COIN_GUIVIEWPORTFIX_H
-#define COIN_GUIVIEWPORTFIX_H
+#ifndef COIN_SOGUIVIEWPORTFIX_H
+#define COIN_SOGUIVIEWPORTFIX_H
 
 /**************************************************************************\
  *
@@ -68,4 +68,4 @@ private:
 
 };
 
-#endif // !COIN_GUIVIEWPORTFIX_H
+#endif // !COIN_SOGUIVIEWPORTFIX_H

@@ -1,5 +1,5 @@
-#ifndef COIN_GUISLIDER1_H
-#define COIN_GUISLIDER1_H
+#ifndef COIN_SOGUISLIDER1_H
+#define COIN_SOGUISLIDER1_H
 
 /**************************************************************************\
  *
@@ -94,4 +94,4 @@ private:
 
 };
 
-#endif // !COIN_GUISLIDER1_H
+#endif // !COIN_SOGUISLIDER1_H

@@ -1,5 +1,5 @@
-#ifndef COIN_GUIPOSITION_H
-#define COIN_GUIPOSITION_H
+#ifndef COIN_SOGUIPOSITION_H
+#define COIN_SOGUIPOSITION_H
 
 /**************************************************************************\
  *
@@ -56,4 +56,4 @@ private:
 
 };
 
-#endif // !COIN_GUIPOSITION_H
+#endif // !COIN_SOGUIPOSITION_H

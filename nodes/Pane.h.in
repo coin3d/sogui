@@ -1,5 +1,5 @@
-#ifndef COIN_GUIPANE_H
-#define COIN_GUIPANE_H
+#ifndef COIN_SOGUIPANE_H
+#define COIN_SOGUIPANE_H
 
 /**************************************************************************\
  *
@@ -73,4 +73,4 @@ private:
 
 };
 
-#endif // !COIN_GUIPANE_H
+#endif // !COIN_SOGUIPANE_H

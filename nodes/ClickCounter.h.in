@@ -1,5 +1,5 @@
-#ifndef COIN_GUICLICKCOUNTER_H
-#define COIN_GUICLICKCOUNTER_H
+#ifndef COIN_SOGUICLICKCOUNTER_H
+#define COIN_SOGUICLICKCOUNTER_H
 
 /**************************************************************************\
  *
@@ -78,4 +78,4 @@ private:
 
 };
 
-#endif // !COIN_GUICLICKCOUNTER_H
+#endif // !COIN_SOGUICLICKCOUNTER_H
