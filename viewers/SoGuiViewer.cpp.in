@@ -82,6 +82,7 @@ static const char rcsid[] =
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoRayPickAction.h>
 
+#include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoCallbackList.h>
 #include <Inventor/sensors/SoTimerSensor.h>
@@ -1169,15 +1170,14 @@ So@Gui@Viewer::getBufferingType(void) const
   Set view mode.
 
   If the view mode is on, user events will be caught and used to
-  influence the camera position/orientation. If view mode is off,
-  all events in the viewer canvas will be passed along to the scene
-  graph.
+  influence the camera position / orientation. If view mode is off,
+  all events in the viewer canvas (like for instance keypresses or
+  mouseclicks and -movements) will be passed along to the scene graph.
 
   Default is to have the view mode active.
 
   \sa getViewing()
 */
-
 void
 So@Gui@Viewer::setViewing(SbBool enable)
 {
@@ -1205,14 +1205,17 @@ So@Gui@Viewer::setViewing(SbBool enable)
 /*!
   Return state of view mode.
 
+  \c TRUE means that the mode of the viewer is set such that user
+  interaction with the mouse is used to modify the position and
+  orientation of the camera.
+
   \sa setViewing()
 */
-
 SbBool
 So@Gui@Viewer::isViewing(void) const
 {
   return this->viewingFlag;
-} // isViewing()
+}
 
 // *************************************************************************
 
@@ -3189,64 +3192,73 @@ So@Gui@ViewerP::recordFPS(void)
 
 // *************************************************************************
 
-// doc in super
+// Documented in superclass.
 SbBool
 So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 {
   const SoType type(event->getTypeId());
+  const SoKeyboardEvent * keyevent = NULL;
 
   if (type.isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
-    do {
-      SoKeyboardEvent * const keyevent = (SoKeyboardEvent *) event;
-
-      if (keyevent->getState() != SoButtonEvent::DOWN)
-        break;
-
-      // key events for both view and interact mode
-
-      switch (keyevent->getKey()) {
-      case SoKeyboardEvent::ESCAPE:
-        this->setViewing(this->isViewing() ? FALSE : TRUE);
-        return TRUE;
-      default:
-        break;
-      } // switch (keyevent->getKey())
-
-      if (! this->isViewing())
-        break;
-
-      // key events just for the view mode
-
-      switch (keyevent->getKey()) {
-      case SoKeyboardEvent::S:
-        this->setSeekMode(this->isSeekMode() ? FALSE : TRUE);
-        return TRUE;
-      case SoKeyboardEvent::Q:
-        this->hide();
-        So@Gui@::exitMainLoop();
-        return TRUE;
-      case SoKeyboardEvent::HOME:
-        this->resetToHomePosition();
-        return TRUE;
-      case SoKeyboardEvent::LEFT_ARROW:
-        PRIVATE(this)->moveCameraScreen(SbVec2f(-0.1f, 0.0f));
-        return TRUE;
-      case SoKeyboardEvent::UP_ARROW:
-        PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, 0.1f));
-        return TRUE;
-      case SoKeyboardEvent::RIGHT_ARROW:
-        PRIVATE(this)->moveCameraScreen(SbVec2f(0.1f, 0.0f));
-        return TRUE;
-      case SoKeyboardEvent::DOWN_ARROW:
-        PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, -0.1f));
-        return TRUE;
-      default:
-        break;
-      } // switch (keyevent->getKey())
-    } while (FALSE);
+    keyevent = (SoKeyboardEvent *) event;
+    // the ESC key switches between view and interact mode
+    if (keyevent->getKey() == SoKeyboardEvent::ESCAPE &&
+        keyevent->getState() == SoButtonEvent::DOWN) {
+      this->setViewing(this->isViewing() ? FALSE : TRUE);
+      return TRUE;
+    }
   }
 
-  if (! this->isViewing()) { return inherited::processSoEvent(event); }
+  // If not viewing, break off further handling and pass the event on
+  // to the So@Gui@RenderArea, which will pass it on to the
+  // scenegraph.
+  if (!this->isViewing()) { return inherited::processSoEvent(event); }
+
+
+  if (keyevent && (keyevent->getState() == SoButtonEvent::DOWN)) {
+    switch (keyevent->getKey()) {
+    case SoKeyboardEvent::S:
+      this->setSeekMode(this->isSeekMode() ? FALSE : TRUE);
+      return TRUE;
+    case SoKeyboardEvent::Q:
+      this->hide();
+      So@Gui@::exitMainLoop();
+      return TRUE;
+    case SoKeyboardEvent::HOME:
+      this->resetToHomePosition();
+      return TRUE;
+    case SoKeyboardEvent::LEFT_ARROW:
+      PRIVATE(this)->moveCameraScreen(SbVec2f(-0.1f, 0.0f));
+      return TRUE;
+    case SoKeyboardEvent::UP_ARROW:
+      PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, 0.1f));
+      return TRUE;
+    case SoKeyboardEvent::RIGHT_ARROW:
+      PRIVATE(this)->moveCameraScreen(SbVec2f(0.1f, 0.0f));
+      return TRUE;
+    case SoKeyboardEvent::DOWN_ARROW:
+      PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, -0.1f));
+      return TRUE;
+    default:
+      break;
+    }
+  }
+
+  if (this->isSeekMode()) {
+    if (type.isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
+      SoMouseButtonEvent * const e = (SoMouseButtonEvent *) event;
+      if (e->getButton() == SoMouseButtonEvent::BUTTON1) {
+        if (e->getState() == SoButtonEvent::DOWN) {
+          this->seekToPoint(e->getPosition());
+        }
+        else {
+          // We got an LMB UP-event while in seek-mode, and we just
+          // swallow the event.
+        }
+        return TRUE;
+      }
+    }
+  }
 
   return FALSE;
 }

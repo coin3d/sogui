@@ -1392,14 +1392,16 @@ So@Gui@RenderArea::invokeAppCB(@EVENT@ event) // protected
 /*!
   Toolkit-native events are attempted converted to Coin-generic events
   in the So@Gui@RenderArea::processEvent() method.  If this succeeds,
-  they are forwarded to this method, which again will forward them to
-  the scenegraph.
+  they are forwarded to this method.
 
-  This is a virtual method, and is overloaded in it's subclasses to
+  This is a virtual method, and is overridden in it's subclasses to
   catch events of particular interest to the viewer classes, for
   instance.
 
-  \c TRUE is returned if the event was handled, otherwise \c FALSE.
+  Returns \c TRUE iff the event was processed, if not it should be
+  passed on further up in the inheritance hierarchy by the caller.
+  This last point is extremely important to take note of if you are
+  expanding the toolkit with your own viewer class.
 */
 SbBool
 So@Gui@RenderArea::processSoEvent(const SoEvent * const event)

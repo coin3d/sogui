@@ -498,13 +498,15 @@ So@Gui@FlyViewer::getDefaultIconTitle(// virtual
 
 // ************************************************************************
 
-// doc in super
+// Documented in superclass.
 SbBool
-So@Gui@FlyViewer::processSoEvent(// virtual
-  const SoEvent * const event)
+So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
 {
-  if (!this->isViewing())
-    return inherited::processSoEvent(event);
+  // We're in "interact" mode (ie *not* the camera modification mode),
+  // so don't handle the event here. It should either be forwarded to
+  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // it's an ESC press (to switch modes).
+  if (!this->isViewing()) { return inherited::processSoEvent(event); }
 
   // Keyboard handling
   if (event->isOfType(SoKeyboardEvent::getClassTypeId())) {

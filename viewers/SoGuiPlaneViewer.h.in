@@ -96,8 +96,6 @@ private:
 
   void drawRotateGraphics(void) const;
 
-  SbBool processGenericSoEvent(const SoEvent * const event);
-
   enum PlaneViewerMode {
     IDLE_MODE,
 

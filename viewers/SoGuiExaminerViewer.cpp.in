@@ -762,41 +762,33 @@ So@Gui@ExaminerViewer::actualGenericRedraw(
 #define MOTION3_EVENT_TYPE      (SoMotion3Event::getClassTypeId())
 #define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
 
-/*!
-  This method processes SoEvents instead of native GUI toolkit events,
-  so the code can be shared between all the SoGUI libraries.
-
-  Returns \c TRUE iff the event was processed, if not it should be
-  passed on further up in the inheritance hierarchy by the caller.
-*/
-
+// Documented in superclass.
 SbBool
-So@Gui@ExaminerViewer::processGenericSoEvent(
-  const SoEvent * const ev)
+So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
 {
 #if SO@GUI@_DEBUG && 0 // debug
-  SoDebugError::postInfo("So@Gui@ExaminerViewer::processGenericSoEvent",
+  SoDebugError::postInfo("So@Gui@ExaminerViewer::processSoEvent",
                           "[invoked], event '%s'",
                           ev->getTypeId().getName().getString());
 #endif // debug
 
-  if (! this->isViewing()) // event is for scene graph
-    return FALSE;
-
-  // Added 2001-11-01, pederb. Let SoAnyFullViewer handle events when
-  // in seek mode.
-  if (this->isSeekMode())
-    return FALSE;
+  // We're in "interact" mode (ie *not* the camera modification mode),
+  // so don't handle the event here. It should either be forwarded to
+  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // it's an ESC press (to switch modes).
+  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
+    
+  // Events during seeks are ignored, except those which influence the
+  // seek mode itself -- these are handled further up the inheritance
+  // hierarchy.
+  if (this->isSeekMode()) { return inherited::processSoEvent(ev); }
 
   this->canvas = this->getGLSize();
-
   const SoType type(ev->getTypeId());
-
   const SbVec2f prevnormalized = this->lastmouseposition;
-
   const SbVec2s pos(ev->getPosition());
   const SbVec2f posn((float) pos[0] / (float) So@Gui@Max((int)(canvas[0]-1), 1),
-                      (float) pos[1] / (float) So@Gui@Max((int)(canvas[1]-1), 1));
+                     (float) pos[1] / (float) So@Gui@Max((int)(canvas[1]-1), 1));
 
   this->lastmouseposition = posn;
 
@@ -1058,8 +1050,10 @@ So@Gui@ExaminerViewer::processGenericSoEvent(
     this->setMode(mode);
   }
 
-  return processed;
-} // processSoEvent()
+  // If not handled in this class, pass on upwards in the inheritance
+  // hierarchy.
+  return processed || inherited::processSoEvent(ev);
+}
 
 // *************************************************************************
 // Methods used for spin animation tracking.

@@ -352,19 +352,19 @@ So@Gui@PlaneViewer::drawRotateGraphics(
 
 // ************************************************************************
 
-/*!
-  Process a generic Inventor event.
-*/
-
 #define MOUSE_BUTTON_EVENT_TYPE (SoMouseButtonEvent::getClassTypeId())
 #define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
 #define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
 
+// Documented in superclass.
 SbBool
-So@Gui@PlaneViewer::processGenericSoEvent(const SoEvent * const ev)
+So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 {
-  if (! this->isViewing())
-    return FALSE;
+  // We're in "interact" mode (ie *not* the camera modification mode),
+  // so don't handle the event here. It should either be forwarded to
+  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // it's an ESC press (to switch modes).
+  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
 
   const SoType type(ev->getTypeId());
 
@@ -409,6 +409,8 @@ So@Gui@PlaneViewer::processGenericSoEvent(const SoEvent * const ev)
         break;
 
       case SoMouseButtonEvent::BUTTON2:
+        // FIXME: shouldn't these events be passed on to the
+        // superclass? 20020113 mortene.
         return FALSE;
 
       case SoMouseButtonEvent::BUTTON3:
@@ -518,6 +520,8 @@ So@Gui@PlaneViewer::processGenericSoEvent(const SoEvent * const ev)
 
   } // KEYBOARD_EVENT_TYPE
 
+  // FIXME: shouldn't unhandled events be passed on to the superclass?
+  // 20020113 mortene.
   return FALSE;
 }
 

@@ -33,9 +33,6 @@
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 
-#define MOUSEBUTTON_EVENT  SoMouseButtonEvent::getClassTypeId()
-#define KEYBOARD_EVENT     SoKeyboardEvent::getClassTypeId()
-
 
 /*!
   Set title of popup menu.
@@ -746,52 +743,35 @@ So@Gui@FullViewer::drawstyleActivated(
 
 // ************************************************************************
 
+// Documented in superclass.
 SbBool
 So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
 {
-  if (! this->isViewing()) // scene event
-    return FALSE;
+  // We're in "interact" mode (ie *not* the camera modification mode),
+  // so don't handle the event here. It should either be forwarded to
+  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // it's an ESC press (to switch modes).
+  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
 
-  const SoType type(ev->getTypeId());
+  // Note: with the original SGI InventorXt, the popup menu is also
+  // activated by RMB clicks in non-viewing mode. We want to allow RMB
+  // clicks to pass through to the scenegraph in non-viewing mode, so
+  // we don't copy that behavior.
 
-  if (type.isDerivedFrom(MOUSEBUTTON_EVENT)) {
-    SoMouseButtonEvent * const event = (SoMouseButtonEvent *) ev;
-    const int button = event->getButton();
-    if ((button == SoMouseButtonEvent::BUTTON1) &&
-         this->isSeekMode()) {
-      if (event->getState() == SoButtonEvent::DOWN)
-        this->seekToPoint(event->getPosition());
-      return TRUE;
-    }
-    if ((button == SoMouseButtonEvent::BUTTON2)) {
+  if (ev->getTypeId().isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
+    SoMouseButtonEvent * const e = (SoMouseButtonEvent *) ev;
+    if ((e->getButton() == SoMouseButtonEvent::BUTTON2)) {
       if (this->isPopupMenuEnabled()) {
-        if (event->getState() == SoButtonEvent::DOWN) {
-          this->openPopupMenu(event->getPosition());
+        if (e->getState() == SoButtonEvent::DOWN) {
+          this->openPopupMenu(e->getPosition());
         }
-        // steal all rmb-events if the viewer uses the popup-menu
+        // Steal all RMB-events if the viewer uses the popup-menu.
         return TRUE;
       }
     }
-    return FALSE;
   }
 
-  if (type.isDerivedFrom(KEYBOARD_EVENT)) {
-    SoKeyboardEvent * const event = (SoKeyboardEvent *) ev;
-    if (event->getState() == SoButtonEvent::DOWN) {
-      if (event->getKey() == SoKeyboardEvent::S) {
-        this->setSeekMode(this->isSeekMode() ? FALSE : TRUE);
-        return TRUE;
-      }
-      return FALSE;
-    }
-    if (event->getState() == SoButtonEvent::UP) {
-      if (event->getKey() == SoKeyboardEvent::S) return TRUE;
-      return FALSE;
-    }
-    return FALSE;
-  }
-
-  return FALSE;
+  return inherited::processSoEvent(ev);
 }
 
 

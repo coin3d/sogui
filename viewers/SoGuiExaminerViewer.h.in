@@ -86,7 +86,6 @@ protected:
   virtual void openViewerHelpCard(void);
 
   virtual SbBool processSoEvent(const SoEvent * const event);
-  virtual void processEvent(@EVENT@ anyevent);
   virtual void setSeekMode(SbBool enable);
   virtual void actualRedraw(void);
 
@@ -99,7 +98,6 @@ private:
 
   void setGenericAnimationEnabled(const SbBool enable);
   void setGenericFeedbackSize(const int size);
-  SbBool processGenericSoEvent(const SoEvent * const event);
   void actualGenericRedraw(void);
 
   void setMotion3OnCamera(SbBool enable);
