@@ -57,12 +57,12 @@ static const char rcsid[] =
 */
 
 SoAnyFullViewer::SoAnyFullViewer(
-  So@Gui@FullViewer * const _viewer )
-  : viewer( _viewer ),
+  So@Gui@FullViewer * const v )
+  : viewer( v ),
     prefmenu( NULL ),
     popupmenutitle( _( "Viewer settings" ) )
 {
-  assert( _viewer != NULL );
+  assert( v != NULL );
 } // SoAnyFullViewer()
 
 /*!
@@ -423,42 +423,42 @@ SoAnyFullViewer::menuSelection( // virtual
     break;
 
   case EXAMINING_ITEM:
-    viewer->setViewing( viewer->isViewing() ? FALSE : TRUE );
+    this->viewer->setViewing( this->viewer->isViewing() ? FALSE : TRUE );
     break;
   case DECORATION_ITEM:
-    viewer->setDecoration( viewer->isDecoration() ? FALSE : TRUE );
+    this->viewer->setDecoration( this->viewer->isDecoration() ? FALSE : TRUE );
     break;
   case HEADLIGHT_ITEM:
-    viewer->setHeadlight( viewer->isHeadlight() ? FALSE : TRUE );
+    this->viewer->setHeadlight( this->viewer->isHeadlight() ? FALSE : TRUE );
     break;
   case FULLSCREEN_ITEM:
-    (void)viewer->setFullScreen( viewer->isFullScreen() ? FALSE : TRUE );
+    (void)this->viewer->setFullScreen( this->viewer->isFullScreen() ? FALSE : TRUE );
     break;
   case PREFERENCES_ITEM:
-    viewer->selectedPrefs();
+    this->viewer->selectedPrefs();
     break;
 
   case HELP_ITEM:
-    viewer->openViewerHelpCard();
+    this->viewer->openViewerHelpCard();
     break;
   case HOME_ITEM:
-    viewer->resetToHomePosition();
+    this->viewer->resetToHomePosition();
     break;
   case SET_HOME_ITEM:
-    viewer->saveHomePosition();
+    this->viewer->saveHomePosition();
     break;
   case VIEW_ALL_ITEM:
-    viewer->viewAll();
+    this->viewer->viewAll();
     break;
   case SEEK_ITEM:
-    viewer->seekbuttonClicked();
+    this->viewer->seekbuttonClicked();
     break;
   case COPY_VIEW_ITEM:
-    viewer->copyView( SbTime::getTimeOfDay() );
+    this->viewer->copyView( SbTime::getTimeOfDay() );
 
     break;
   case PASTE_VIEW_ITEM:
-    viewer->pasteView( SbTime::getTimeOfDay() );
+    this->viewer->pasteView( SbTime::getTimeOfDay() );
     break;
 
   case AS_IS_ITEM:
@@ -549,25 +549,25 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
   So@Gui@Viewer::DrawType type,
   So@Gui@Viewer::DrawStyle value )
 {
-  assert( viewer->prefmenu != NULL );
+  assert( this->viewer->prefmenu != NULL );
 
   switch ( type ) {
   case So@Gui@Viewer::STILL:
     switch ( value ) {
     case So@Gui@Viewer::VIEW_AS_IS:
-      viewer->prefmenu->setMenuItemMarked( AS_IS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( AS_IS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_HIDDEN_LINE:
-      viewer->prefmenu->setMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY:
-      viewer->prefmenu->setMenuItemMarked( WIREFRAME_OVERLAY_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( WIREFRAME_OVERLAY_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      viewer->prefmenu->setMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      viewer->prefmenu->setMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
 #if SO@GUI@_DEBUG
@@ -575,7 +575,7 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
                                 "Use VIEW_LINE, not VIEW_LOW_RES_LINE for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_LINE:
-      viewer->prefmenu->setMenuItemMarked( WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
 #if SO@GUI@_DEBUG
@@ -583,10 +583,10 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
                                 "Use VIEW_POINT, not VIEW_LOW_RES_POINT for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_POINT:
-      viewer->prefmenu->setMenuItemMarked( POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      viewer->prefmenu->setMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
       break;
     default:
       assert( 0 && "unsupported default switch-case" );
@@ -597,28 +597,28 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
   case So@Gui@Viewer::INTERACTIVE:
     switch ( value ) {
     case So@Gui@Viewer::VIEW_SAME_AS_STILL:
-      viewer->prefmenu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      viewer->prefmenu->setMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LINE:
-      viewer->prefmenu->setMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_POINT:
-      viewer->prefmenu->setMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      viewer->prefmenu->setMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
       break;
     default:
       assert( 0 && "unsupported default switch-case" );
@@ -644,13 +644,13 @@ SoAnyFullViewer::drawstyleActivated(
 {
   switch ( menuitemid ) {
   case SINGLE_BUFFER_ITEM:
-    viewer->setBufferingType( So@Gui@Viewer::BUFFER_SINGLE );
+    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_SINGLE );
     return;
   case DOUBLE_BUFFER_ITEM:
-    viewer->setBufferingType( So@Gui@Viewer::BUFFER_DOUBLE );
+    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_DOUBLE );
     return;
   case INTERACTIVE_BUFFER_ITEM:
-    viewer->setBufferingType( So@Gui@Viewer::BUFFER_INTERACTIVE );
+    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_INTERACTIVE );
     return;
   default:
     break;
@@ -777,7 +777,7 @@ SoAnyFullViewer::drawstyleActivated(
     break;
   } // switch ( menuitemid )
 
-  viewer->setDrawStyle( type, val );
+  this->viewer->setDrawStyle( type, val );
 } // drawstyleActivated()
 
 // ************************************************************************
@@ -786,7 +786,7 @@ SbBool
 SoAnyFullViewer::processSoEvent(
   const SoEvent * const ev )
 {
-  if ( ! viewer->isViewing() ) // scene event
+  if ( ! this->viewer->isViewing() ) // scene event
     return FALSE;
 
   const SoType type( ev->getTypeId() );
@@ -795,15 +795,19 @@ SoAnyFullViewer::processSoEvent(
     SoMouseButtonEvent * const event = (SoMouseButtonEvent *) ev;
     const int button = event->getButton();
     if ( (button == SoMouseButtonEvent::BUTTON1) &&
-         viewer->isSeekMode() ) {
+         this->viewer->isSeekMode() ) {
       if ( event->getState() == SoButtonEvent::DOWN )
-        viewer->seekToPoint( event->getPosition() );
+        this->viewer->seekToPoint( event->getPosition() );
       return TRUE;
     }
     if ( (button == SoMouseButtonEvent::BUTTON2) ) {
-      if ( event->getState() == SoButtonEvent::DOWN && viewer->prefmenu )
-        viewer->openPopupMenu( event->getPosition() );
-      return TRUE;
+      if ( this->viewer->isPopupMenuEnabled( ) ) {
+        if ( event->getState() == SoButtonEvent::DOWN ) {
+          this->viewer->openPopupMenu( event->getPosition() );
+        }
+        // steal all rmb-events if the viewer uses the popup-menu
+        return TRUE;
+      }
     }
     return FALSE;
   }
@@ -812,7 +816,7 @@ SoAnyFullViewer::processSoEvent(
     SoKeyboardEvent * const event = (SoKeyboardEvent *) ev;
     if ( event->getState() == SoButtonEvent::DOWN ) {
       if ( event->getKey() == SoKeyboardEvent::S ) {
-        viewer->setSeekMode( viewer->isSeekMode() ? FALSE : TRUE );
+        this->viewer->setSeekMode( this->viewer->isSeekMode() ? FALSE : TRUE );
         return TRUE;
       }
       return FALSE;
