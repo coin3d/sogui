@@ -29,6 +29,7 @@
 
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/So@Gui@GLWidget.h>
+#include <Inventor/@Gui@/So@Gui@GLWidgetP.h>
 
 /*!
   \fn @WIDGET@ So@Gui@GLWidget::buildWidget(@WIDGET@ parent)
@@ -117,3 +118,24 @@ So@Gui@GLWidget::getLineWidthLimits(SbVec2f & range, float & granularity)
 
   this->glUnlockNormal();
 }
+
+// *************************************************************************
+
+#ifndef DOXYGEN_SKIP_THIS
+
+// Remaining code is for the SoGuiGLWidgetP "private implementation"
+// class.
+
+
+SoGuiGLWidgetP::SoGuiGLWidgetP(So@Gui@GLWidget * publ)
+{
+  this->pub = publ;
+}
+
+SoGuiGLWidgetP::~SoGuiGLWidgetP()
+{
+}
+
+#endif // DOXYGEN_SKIP_THIS
+
+// *************************************************************************

@@ -45,6 +45,7 @@
 
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/So@Gui@Component.h>
+#include <Inventor/@Gui@/So@Gui@ComponentP.h>
 
 /*!
   \fn void So@Gui@Component::initClasses(void)
@@ -420,3 +421,25 @@ So@Gui@Component::getDefaultIconTitle(void) const
   }
   \endcode
 */
+
+
+// *************************************************************************
+
+#ifndef DOXYGEN_SKIP_THIS
+
+// Remaining code is for the SoGuiComponentP "private implementation"
+// class.
+
+
+SoGuiComponentP::SoGuiComponentP(So@Gui@Component * publ)
+{
+  this->pub = publ;
+}
+
+SoGuiComponentP::~SoGuiComponentP()
+{
+}
+
+#endif // DOXYGEN_SKIP_THIS
+
+// *************************************************************************
