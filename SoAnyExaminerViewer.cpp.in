@@ -121,8 +121,8 @@ SoAnyExaminerViewer::~SoAnyExaminerViewer(
   void )
 {
   delete this->spinprojector;
-  delete this->log.position;
-  delete this->log.time;
+  delete[] this->log.position;
+  delete[] this->log.time;
 } // ~SoAnyExaminerViewer()
 
 // ************************************************************************
