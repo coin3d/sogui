@@ -1998,13 +1998,29 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->socomplexity->textureQuality.setIgnored(FALSE);
 
     pub->getSceneManager()->render(FALSE, FALSE);
-    
+
+    SbBool oldnot;
+
     // disable override nodes
+    (void) this->sobasecolor->rgb.enableNotify(FALSE);
     this->sobasecolor->rgb.setIgnored(TRUE);
+    (void) this->sobasecolor->rgb.enableNotify(TRUE);
+
+    (void) this->somaterialbinding->value.enableNotify(FALSE);
     this->somaterialbinding->value.setIgnored(TRUE);
+    (void) this->somaterialbinding->value.enableNotify(TRUE);
+
+    (void) this->solightmodel->model.enableNotify(FALSE);
     this->solightmodel->model.setIgnored(TRUE);
+    (void) this->solightmodel->model.enableNotify(TRUE);
+
+    (void) this->socomplexity->textureQuality.enableNotify(FALSE);
     this->socomplexity->textureQuality.setIgnored(TRUE);
+    (void) this->socomplexity->textureQuality.enableNotify(TRUE);
+
+    (void) this->sodrawstyle->style.enableNotify(FALSE);
     this->sodrawstyle->style.setIgnored(TRUE);
+    (void) this->sodrawstyle->style.enableNotify(TRUE);
     return;
   }
 
