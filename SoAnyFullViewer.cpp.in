@@ -19,8 +19,10 @@
 
 // @configure_input@
 
+#if SO@uGUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@uGUI@_DEBUG
 
 /*!
   \class SoAnyFullViewer SoAnyFullViewer.h
@@ -635,5 +637,7 @@ SoAnyFullViewer::drawstyleActivated(
 
 // ************************************************************************
 
+#if SO@uGUI@_DEBUG
 static const char * getSoAnyFullViewerRCSId(void) { return rcsid; }
+#endif // SO@uGUI@_DEBUG
 
