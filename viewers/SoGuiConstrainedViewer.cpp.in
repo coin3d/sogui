@@ -26,9 +26,14 @@
 /*!
   \class So@Gui@ConstrainedViewer Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h
   \brief The So@Gui@ConstrainedViewer class is the superclass for viewers with constrains on the viewpoint.
-  \ingroup components viewers common
+  \ingroup components viewers
+
+  This abstract viewer class adds new methods to keep the camera in an
+  upright position according to some arbitrary up-direction. The
+  up-direction can be decided by either the application programmer (by
+  using So@Gui@ConstrainedViewer::setUpDirection()) or the end-user,
+  through interaction mechanisms defined by the subclasses.
 */
-// FIXME: document class properly. 20010905 mortene.
 
 #include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
 #include <Inventor/actions/SoRayPickAction.h>
@@ -36,15 +41,6 @@
 #include <Inventor/SoPickedPoint.h>
 #include <Inventor/nodes/SoCamera.h>
 #include <so@gui@defs.h>
-
-/*!
-  \var SbVec3f So@Gui@ConstrainedViewer::upVector
-  The camera's "up" vector is contrained to be in this direction.
-*/
-/*!
-  \var float So@Gui@ConstrainedViewer::sceneHeight
-  FIXME: doc
-*/
 
 // ************************************************************************
 
@@ -59,6 +55,7 @@ public:
   void rotateCamera(const float delta) const;
 
   SbVec3f upvechome;
+  SbVec3f upvector; // The camera's "up" vector is contrained to be in this direction.
 
 private:
   So@Gui@ConstrainedViewer * publ;
@@ -103,9 +100,8 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer(@WIDGET@ parent,
   this->setBottomWheelString("Rotate");
   this->setRightWheelString("Dolly");
 
-  this->sceneHeight = 0.0f;
-  this->upVector = SbVec3f(0.0f, 1.0f, 0.0f);
-  PRIVATE(this)->upvechome = this->upVector;
+  PRIVATE(this)->upvector = SbVec3f(0.0f, 1.0f, 0.0f);
+  PRIVATE(this)->upvechome = PRIVATE(this)->upvector;
 
   if (build) {
     @WIDGET@ viewer = this->buildWidget(this->getParentWidget());
@@ -131,8 +127,8 @@ So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer()
 void
 So@Gui@ConstrainedViewer::setUpDirection(const SbVec3f & dir)
 {
-  SbRotation change(this->upVector, dir);
-  this->upVector = dir;
+  SbRotation change(PRIVATE(this)->upvector, dir);
+  PRIVATE(this)->upvector = dir;
 
   SoCamera * cam = this->getCamera();
   if (cam == NULL) { return; } // can happen for empty scene, for instance
@@ -149,7 +145,7 @@ So@Gui@ConstrainedViewer::setUpDirection(const SbVec3f & dir)
 const SbVec3f &
 So@Gui@ConstrainedViewer::getUpDirection(void) const
 {
-  return this->upVector;
+  return PRIVATE(this)->upvector;
 }
 
 // ************************************************************************
@@ -169,7 +165,7 @@ void
 So@Gui@ConstrainedViewer::saveHomePosition(void)
 {
   inherited::saveHomePosition();
-  PRIVATE(this)->upvechome = this->upVector;
+  PRIVATE(this)->upvechome = PRIVATE(this)->upvector;
 }
 
 // ************************************************************************
@@ -179,7 +175,7 @@ void
 So@Gui@ConstrainedViewer::resetToHomePosition(void)
 {
   inherited::resetToHomePosition();
-  this->upVector = PRIVATE(this)->upvechome;
+  PRIVATE(this)->upvector = PRIVATE(this)->upvechome;
   // should be unnecessary to reset camera position here (camera
   // should have been in a valid state on the last saveHomePosition()
   // call)
@@ -279,7 +275,7 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain(void)
   SbVec3f camrightdir;
   camorient.multVec(SbVec3f(1, 0, 0), camrightdir);
 
-  SbVec3f correctrightdir = campointdir.cross(this->upVector);
+  SbVec3f correctrightdir = campointdir.cross(PRIVATE(this)->upvector);
   if (correctrightdir.length() == 0.0f) { return; } // upvector == pointdir
 
   SbRotation r(camrightdir, correctrightdir);

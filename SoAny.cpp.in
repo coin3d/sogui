@@ -26,7 +26,6 @@
 /*!
   \class SoAny SoAny.h
   \brief The SoAny class is a collection of common toolkit methods.
-  \ingroup common
 
   SoAny contains internal (ie not accessible to the application
   programmer) functionality which needs to be "globally" visible to

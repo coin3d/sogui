@@ -39,7 +39,7 @@
 /*!
   \class So@Gui@RenderArea Inventor/@Gui@/So@Gui@RenderArea.h
   \brief The So@Gui@RenderArea class adds scenegraph handling and event management.
-  \ingroup components common
+  \ingroup components viewers
 
   The So@Gui@RenderArea class is a component that adds scenegraph
   management and input device event handling to the So@Gui@GLWidget

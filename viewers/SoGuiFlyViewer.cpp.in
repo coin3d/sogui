@@ -27,7 +27,7 @@
   \class So@Gui@FlyViewer Inventor/@Gui@/viewers/So@Gui@FlyViewer.h
   \brief The So@Gui@FlyViewer class implements controls for moving
   the camera in a "flying" motion.
-  \ingroup so@gui@viewers
+  \ingroup viewers
 
   Controls:
   <ul>

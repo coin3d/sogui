@@ -134,7 +134,7 @@ So@Gui@::init(const char * appname, const char * classname)
 }
 
 /*!
-  \fn @WIDGET@ So@Gui@::init(int argc, char ** argv, const char * appname, const char * classname)
+  \fn @WIDGET@ So@Gui@::init(int & argc, char ** argv, const char * appname, const char * classname)
 
   This function initializes the So@Gui@ library, as well as the
   Inventor API. The latter is done by calling \a SoDB::init(), \a
@@ -312,6 +312,26 @@ So@Gui@::isCompatible(unsigned int major, unsigned int minor)
 }
 
 /*!
+  \enum So@Gui@::ABIType
+  Numerical identifiers to identify how the library was built.
+*/
+/*!
+  \var So@Gui@::ABIType So@Gui@::DLL
+  The So@Gui@ library was built as a dynamic link library (aka "shared
+  library").
+*/
+/*!
+  \var So@Gui@::ABIType So@Gui@::LIB
+  The So@Gui@ library was built as a static library.
+*/
+/*!
+  \var So@Gui@::ABIType So@Gui@::UNKNOWN
+  The So@Gui@ introspection mechanisms can not decide how the library
+  was built.
+*/
+
+
+/*!
   Returns an indication on how the library was compiled: as a dynamic
   library, or as a static library.
 
@@ -330,6 +350,9 @@ So@Gui@::getABIType(void)
   return So@Gui@::LIB;
 #endif
 #endif
+  // FIXME: this is rather lame, we have enough information in the
+  // configure / build process to always know whether we're building
+  // static or dynamic. 20020618 mortene.
   return So@Gui@::UNKNOWN;
 }
 

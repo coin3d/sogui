@@ -31,7 +31,7 @@
 /*!
   \class So@Gui@ExaminerViewer So@Gui@ExaminerViewer.h Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h
   \brief The So@Gui@ExaminerViewer class is a 3D-model examination viewer.
-  \ingroup so@gui@viewers
+  \ingroup components viewers
 
   FIXME: more doc
   ...functionality for rotation, pan, zoom, etc...
