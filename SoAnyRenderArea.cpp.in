@@ -1,0 +1,653 @@
+/**************************************************************************
+ *
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This file is part of the Coin library.
+ *
+ *  This file may be distributed under the terms of the Q Public License
+ *  as defined by Troll Tech AS of Norway and appearing in the file
+ *  LICENSE.QPL included in the packaging of this file.
+ *
+ *  If you want to use Coin in applications not covered by licenses
+ *  compatible with the QPL, you can contact SIM to aquire a
+ *  Professional Edition license for Coin.
+ *
+ *  Systems in Motion AS, Prof. Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ sales@sim.no Voice: +47 22114160 Fax: +47 67172912
+ *
+ **************************************************************************/
+
+//  $Id$
+
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/misc/SoBasic.h>
+#include <Inventor/SoSceneManager.h>
+
+#include <Inventor/@GUI@/devices/So@GUI@Mouse.h>
+#include <Inventor/@GUI@/devices/So@GUI@Keyboard.h>
+
+#include <Inventor/@GUI@/So@GUI@RenderArea.h>
+
+#define DEFAULT_GL_MODE (SO_GL_RGB | SO_GL_ZBUFFER | SO_GL_DOUBLE)
+
+// *************************************************************************
+
+/*!
+*/
+
+So@GUI@RenderArea::So@GUI@RenderArea(
+  @WIDGET@ parent,
+  const char * name,
+  SbBool inParent,
+  SbBool mouseInput,
+  SbBool keyboardInput )
+: inherited( parent, name, inParent, DEFAULT_GL_MODE, FALSE )
+{
+  this->constructor( mouseInput, keyboardInput );
+  this->setBaseWidget( this->buildWidget( inParent ? parent : NULL ) );
+  if ( this->getSize()[0] == -1 )
+    this->setSize( SbVec2s(400, 400) );
+} // So@GUI@RenderArea()
+
+/*!
+*/
+
+So@GUI@RenderArea::So@GUI@RenderArea( // protected
+  @WIDGET@ parent,
+  const char * name,
+  SbBool inParent,
+  SbBool mouseInput,
+  SbBool keyboardInput,
+  SbBool build )
+: inherited( parent, name, inParent, DEFAULT_GL_MODE, FALSE )
+{
+  this->constructor( mouseInput, keyboardInput );
+  if ( build ) {
+    this->setBaseWidget( this->buildWidget( inParent ? parent : NULL ) );
+    if ( this->getSize()[0] == -1 )
+      this->setSize( SbVec2s(400, 400) );
+  }
+} // So@GUI@RenderArea()
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::constructor( // private
+  SbBool mouseInput,
+  SbBool keyboardInput )
+{
+  this->normalManager = new SoSceneManager;
+  this->normalManager->setRenderCallback( So@GUI@RenderArea::renderCB, this );
+  this->normalManager->activate();
+
+  this->overlayManager = new SoSceneManager;
+  this->overlayManager->activate();
+
+  this->normalColormap = NULL;
+  this->normalColormapSize = 0;
+  this->overlayColormap = NULL;
+  this->overlayColormapSize = 0;
+
+  this->clear = TRUE;
+  this->clearOverlay = TRUE;
+  this->autoRedraw = TRUE;
+
+  this->normalSelection = NULL;
+  this->overlaySelection = NULL;
+
+  this->devices.mouse = mouseInput ? new So@GUI@Mouse : NULL;
+  this->devices.keyboard = keyboardInput ? new So@GUI@Keyboard : NULL;
+  this->devices.extra = NULL;
+
+  this->appEventHandler = NULL;
+} // constructor()
+  
+/*!
+*/
+
+So@GUI@RenderArea::~So@GUI@RenderArea(
+  void )
+{
+  delete this->normalManager;
+  delete this->overlayManager;
+  delete [] this->normalColormap;
+  delete [] this->overlayColormap;
+  delete this->devices.mouse;
+  delete this->devices.keyboard;
+  delete this->devices.extra;
+} // ~So@GUI@RenderArea()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::setSceneGraph( // virtual
+  SoNode * scene )
+{
+  this->normalManager->setSceneGraph( scene );
+} // setSceneGraph()
+
+/*!
+*/
+
+SoNode *
+So@GUI@RenderArea::getSceneGraph( // virtual
+  void )
+{
+  return this->normalManager->getSceneGraph();
+} // getSceneGraph()
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::setOverlaySceneGraph(
+  SoNode * scene )
+{
+  this->overlayManager->setSceneGraph( scene );
+} // setOverlaySceneGraph()
+
+/*!
+*/
+
+SoNode *
+So@GUI@RenderArea::getOverlaySceneGraph(
+  void )
+{
+  return this->overlayManager->getSceneGraph();
+} // getOverlaySceneGraph()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::registerDevice(
+  So@GUI@Device * device )
+{
+  if ( ! this->devices.extra )
+    this->devices.extra = new SbPList;
+  this->devices.extra->append( device );
+  device->setWindowSize( this->getGLSize() );
+} // registerDevice()
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::unregisterDevice(
+  So@GUI@Device * device )
+{
+  assert( this->devices.extra != NULL );
+  int idx = this->devices.extra->find( device );
+#if SO@uGUI@_DEBUG
+  if ( idx == -1 ) {
+    SoDebugError::post( "So@GUI@RenderArea::unregisterDevice",
+        "tried to remove nonexisting device" );
+    return;
+  }
+#endif // SO@uGUI@_DEBUG
+} // unregisterDevice()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::setBackgroundColor(
+  const SbColor & color )
+{
+  assert( this->normalManager != NULL );
+  this->normalManager->setBackgroundColor( color );
+} // setBackgroundColor()
+
+/*!
+*/
+
+const SbColor &
+So@GUI@RenderArea::getBackgroundColor(
+  void ) const
+{
+  assert( this->normalManager != NULL );
+  return this->normalManager->getBackgroundColor();
+} // getBackgroundColor()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::setBackgroundIndex(
+  int idx )
+{
+  assert( this->normalManager != NULL );
+  this->normalManager->setBackgroundIndex( idx );
+} // setBackgroundIndex()
+
+/*!
+*/
+
+int
+So@GUI@RenderArea::getBackgroundIndex(
+  void ) const
+{
+  assert( this->normalManager != NULL );
+  return this->normalManager->getBackgroundIndex();
+} // getBackgroundIndex()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@GUI@RenderArea::setOverlayBackgroundIndex(
+  int idx )
+{
+  assert( this->overlayManager != NULL );
+  this->overlayManager->setBackgroundIndex( idx );
+} // setOverlayBackgroundIndex()
+
+/*!
+*/
+
+int
+So@GUI@RenderArea::getOverlayBackgroundIndex(
+  void ) const
+{
+  assert( this->overlayManager != NULL );
+  return this->overlayManager->getBackgroundIndex();
+} // getOverlayBackgroundIndex()
+
+// *************************************************************************
+
+void
+So@GUI@RenderArea::setColorMap(
+  int start,
+  int num,
+  const SbColor * colors )
+{
+  delete [] this->normalColormap;
+  this->normalColormapStart = start;
+  this->normalColormapSize = num;
+  this->normalColormap = new SbColor [ num ];
+  for ( int i = 0; i < num; i++ )
+    this->normalColormap[i] = colors[i];
+}
+
+void
+So@GUI@RenderArea::setOverlayColorMap(
+  int start,
+  int num,
+  const SbColor * colors )
+{
+  delete [] this->overlayColormap;
+  this->overlayColormapStart = start;
+  this->overlayColormapSize = num;
+  this->overlayColormap = new SbColor [ num ];
+  for ( int i = 0; i < num; i++ ) 
+    this->overlayColormap[i] = colors[i];
+}
+
+void
+So@GUI@RenderArea::setViewportRegion(
+  const SbViewportRegion & region )
+{
+  this->normalManager->getGLRenderAction()->setViewportRegion( region );
+}
+
+const SbViewportRegion &
+So@GUI@RenderArea::getViewportRegion(
+  void ) const
+{
+  return this->normalManager->getGLRenderAction()->getViewportRegion();
+}
+
+void
+So@GUI@RenderArea::setTransparencyType(
+  SoGLRenderAction::TransparencyType type )
+{
+  this->normalManager->getGLRenderAction()->setTransparencyType( type );
+}
+
+SoGLRenderAction::TransparencyType
+So@GUI@RenderArea::getTransparencyType(
+  void ) const
+{
+  return this->normalManager->getGLRenderAction()->getTransparencyType();
+}
+
+void
+So@GUI@RenderArea::setAntialiasing(
+  SbBool smoothing,
+  int numPasses )
+{
+  this->normalManager->setAntialiasing( smoothing, numPasses );
+}
+
+void
+So@GUI@RenderArea::getAntialiasing(
+  SbBool & smoothing,
+  int & numPasses) const
+{
+  this->normalManager->getAntialiasing(smoothing, numPasses);
+}
+
+void
+So@GUI@RenderArea::setClearBeforeRender(
+  SbBool enable,
+  SbBool zbEnable )
+{
+  this->clear = enable;
+  this->clearZBuffer = enable;
+}
+
+SbBool
+So@GUI@RenderArea::isClearBeforeRender(
+  void ) const
+{
+  return this->clear;
+}
+
+SbBool
+So@GUI@RenderArea::isClearZBufferBeforeRender(
+  void ) const
+{
+  return this->clearZBuffer;
+}
+
+void
+So@GUI@RenderArea::setClearBeforeOverlayRender(
+  SbBool enable )
+{
+  this->clearOverlay = enable;
+}
+
+SbBool
+So@GUI@RenderArea::isClearBeforeOverlayRender(
+  void ) const
+{
+  return this->clearOverlay;
+}
+
+void
+So@GUI@RenderArea::setAutoRedraw(
+  SbBool enable )
+{
+  this->autoRedraw = enable;
+}
+
+SbBool
+So@GUI@RenderArea::isAutoRedraw(
+  void ) const
+{
+  return this->autoRedraw;
+}
+
+void
+So@GUI@RenderArea::setRedrawPriority(
+  uint32_t priority )
+{
+  this->normalManager->setRedrawPriority( priority );
+  this->overlayManager->setRedrawPriority( priority );
+}
+
+uint32_t
+So@GUI@RenderArea::getRedrawPriority(
+  void ) const
+{
+  return this->normalManager->getRedrawPriority();
+}
+
+uint32_t
+So@GUI@RenderArea::getDefaultRedrawPriority( // static
+  void )
+{
+  return SoSceneManager::getDefaultRedrawPriority();
+}
+
+void
+So@GUI@RenderArea::render(
+  void )
+{
+  this->glLock();
+  this->redraw();
+  if ( this->isDoubleBuffer() )
+    this->glSwapBuffers();
+  else
+    this->glFlushBuffer();
+  this->glUnlock();
+}
+
+void
+So@GUI@RenderArea::renderOverlay(
+  void )
+{
+  this->overlayManager->render( this->clearOverlay, this->clearOverlay );
+}
+
+void
+So@GUI@RenderArea::scheduleRedraw(
+  void )
+{
+  this->normalManager->scheduleRedraw();
+}
+
+void
+So@GUI@RenderArea::scheduleOverlayRedraw(
+  void )
+{
+  this->overlayManager->scheduleRedraw();
+}
+
+void
+So@GUI@RenderArea::redrawOnSelectionChange(
+  SoSelection * selection )
+{
+  this->normalSelection = selection;
+}
+
+void
+So@GUI@RenderArea::redrawOverlayOnSelectionChange(
+  SoSelection * selection )
+{
+  this->overlaySelection = selection;
+}
+
+void
+So@GUI@RenderArea::setEventCallback(
+  So@GUI@RenderAreaEventCB * func,
+  void * user )
+{
+  this->appEventHandler = func;
+  this->appEventHandlerData = user;
+}
+
+void
+So@GUI@RenderArea::setSceneManager(
+  SoSceneManager * manager )
+{
+  this->normalManager = manager;
+}
+
+SoSceneManager *
+So@GUI@RenderArea::getSceneManager(
+  void ) const
+{
+  return this->normalManager;
+}
+
+void
+So@GUI@RenderArea::setOverlaySceneManager(
+  SoSceneManager * manager )
+{
+  this->overlayManager = manager;
+}
+
+SoSceneManager *
+So@GUI@RenderArea::getOverlaySceneManager(
+  void ) const
+{
+  return this->overlayManager;
+}
+
+void
+So@GUI@RenderArea::setGLRenderAction(
+  SoGLRenderAction * action )
+{
+  this->normalManager->setGLRenderAction( action );
+}
+
+SoGLRenderAction *
+So@GUI@RenderArea::getGLRenderAction(
+  void ) const
+{
+  return this->normalManager->getGLRenderAction();
+}
+
+void
+So@GUI@RenderArea::setOverlayGLRenderAction(
+  SoGLRenderAction * action )
+{
+  this->overlayManager->setGLRenderAction( action );
+}
+
+SoGLRenderAction *
+So@GUI@RenderArea::getOverlayGLRenderAction(
+  void ) const
+{
+  return this->overlayManager->getGLRenderAction();
+}
+
+void
+So@GUI@RenderArea::redraw( // virtual, protected
+  void )
+{
+  this->actualRedraw();
+}
+
+void
+So@GUI@RenderArea::actualRedraw( // virtual, protected
+  void )
+{
+  this->normalManager->render( this->clear, this->clear );
+}
+
+void
+So@GUI@RenderArea::redrawOverlay( // virtual, protected
+  void )
+{
+  this->actualOverlayRedraw();
+}
+
+void
+So@GUI@RenderArea::actualOverlayRedraw( // virtual, protected
+  void )
+{
+  this->overlayManager->render( this->clearOverlay,
+                                this->clearOverlay );
+}
+
+void
+So@GUI@RenderArea::initGraphic( // virtual, protected
+  void )
+{
+  COIN_STUB();
+}
+
+void
+So@GUI@RenderArea::initOverlayGraphic( // virtual, protected
+  void )
+{
+  COIN_STUB();
+}
+
+void
+So@GUI@RenderArea::sizeChanged( // virtual, protected
+  const SbVec2s size )
+{
+  assert( this->normalManager != NULL );
+  assert( this->overlayManager != NULL );
+
+  this->normalManager->setWindowSize( size );
+  this->normalManager->setSize( size );
+
+  this->overlayManager->setWindowSize( size );
+  this->overlayManager->setSize( size );
+
+  if ( this->devices.mouse != NULL )
+    this->devices.mouse->setWindowSize( size );
+  if ( this->devices.keyboard != NULL )
+    this->devices.keyboard->setWindowSize( size );
+  if ( this->devices.extra != NULL ) {
+    for ( int i = 0; i < this->devices.extra->getLength(); i++ )
+      ((So@GUI@Device *)((*(this->devices.extra))[i]))->setWindowSize( size );
+  }
+}
+
+void
+So@GUI@RenderArea::widgetChanged( // virtual, protected
+  @WIDGET@ widget )
+{
+  COIN_STUB();
+}
+
+@WIDGET@
+So@GUI@RenderArea::buildWidget( // protected
+  @WIDGET@ parent )
+{
+  @WIDGET@ widget = inherited::buildWidget( parent );
+  // setBaseWidget here?
+  return widget;
+} // buildWidget()
+
+const char *
+So@GUI@RenderArea::getDefaultWidgetName( // virtual, protected
+  void ) const
+{
+  static const char defaultWidgetName[] = "So@GUI@WidgetName";
+  return defaultWidgetName;
+}
+
+const char *
+So@GUI@RenderArea::getDefaultTitle( // virtual, protected
+  void ) const
+{
+  static const char defaultTitle[] = "@GUI@ RenderArea";
+  return defaultTitle;
+}
+
+const char *
+So@GUI@RenderArea::getDefaultIconTitle( // virtual, protected
+  void ) const
+{
+  static const char defaultIconTitle[] = "@GUI@ RenderArea";
+  return defaultIconTitle;
+}
+
+SbBool
+So@GUI@RenderArea::invokeAppCB( // protected
+  @EVENT@ event )
+{
+  if ( this->appEventHandler == NULL )
+    return FALSE;
+  return this->appEventHandler( this->appEventHandlerData, event );
+}
+
+// *************************************************************************
+
+void
+So@GUI@RenderArea::renderCB( // static
+  void * user,
+  SoSceneManager * manager )
+{
+  ((So@GUI@RenderArea *)user)->render();
+} // renderCB()
+
+// *************************************************************************
