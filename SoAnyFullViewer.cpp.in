@@ -370,9 +370,12 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
   //// Stereo viewing. ////////////////////////////////////////////////
   SbBool stereo = this->viewer->isStereoViewing();
   SbBool quadbuffer = this->viewer->isQuadBufferStereo();
-  menu->setMenuItemMarked( STEREO_OFF_ITEM, !stereo );
-  menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, stereo && !quadbuffer);
-  menu->setMenuItemMarked( STEREO_QUADBUFFER_ITEM, stereo && quadbuffer);
+	if ( !stereo )
+		menu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+	if ( stereo && !quadbuffer )
+		menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
+	if ( stereo && quadbuffer )
+		menu->setMenuItemMarked( STEREO_QUADBUFFER_ITEM, TRUE );
 
   //// GL canvas settings. ////////////////////////////////////////////
   switch ( this->viewer->getBufferingType() ) {
