@@ -32,7 +32,7 @@
 
 typedef void So@Gui@MenuSelectionCallback(int itemid, void * user);
 
-class So@Gui@PopupMenu { // abstract interface class
+class SO@GUI@_DLL_API So@Gui@PopupMenu { // abstract interface class
 public:
   static So@Gui@PopupMenu * createInstance(void);
   virtual ~So@Gui@PopupMenu();
