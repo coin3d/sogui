@@ -296,8 +296,17 @@ do
       $extralibs $libs $LIBS
     retval=$?
     test $retval -ne 0 && exit $retval
+    exit 0
+    ;;
+  --build-app)
     case $host in
     *-darwin*)
+      shift
+      progname=$1
+      shift
+      if test $@; then
+        $program --alternate="$alternate" --build $progname $@ || exit $?
+      fi
       echo "$me: making Mac OS X application"
       mkdir $progname.app 2>/dev/null
       mkdir $progname.app/Contents 2>/dev/null
