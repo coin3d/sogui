@@ -60,6 +60,7 @@ class So@Gui@Mouse;
 typedef SbBool So@Gui@RenderAreaEventCB( void * user, @EVENT@ event );
 
 class SO@GUI@_DLL_EXPORT So@Gui@RenderArea : public So@Gui@GLWidget {
+  SO@GUI@_TYPED_OBJECT_HEADER(So@Gui@RenderArea);
   typedef So@Gui@GLWidget inherited;
   @COMPONENTHEADER@
 
@@ -70,14 +71,6 @@ public:
     SbBool embed = TRUE,
     SbBool mouseInput = TRUE,
     SbBool keyboardInput = TRUE );
-#if SO@GUI@_HAVE_WINWIDGET
-  So@Gui@RenderArea(
-    @WINWIDGET@ parent = NULL,
-    const char * name = NULL,
-    SbBool embed = TRUE,
-    SbBool mouseInput = TRUE,
-    SbBool keyboardInput = TRUE );
-#endif // SO@GUI@_HAVE_WINWIDGET
   ~So@Gui@RenderArea(void);
 
   virtual void setSceneGraph( SoNode * scene );
@@ -134,15 +127,6 @@ protected:
     SbBool mouseInput,
     SbBool keyboardInput,
     SbBool build );
-#if SO@GUI@_HAVE_WINWIDGET
-  So@Gui@RenderArea(
-    @WINWIDGET@ parent,
-    const char * name,
-    SbBool embed,
-    SbBool mouseInput,
-    SbBool keyboardInput,
-    SbBool build );
-#endif // SO@GUI@_HAVE_WINWIDGET
 
   virtual void redraw(void);
   virtual void actualRedraw(void);
@@ -157,9 +141,6 @@ protected:
   virtual void widgetChanged( @WIDGET@ widget );
 
   @WIDGET@ buildWidget( @WIDGET@ parent );
-#if SO@GUI@_HAVE_WINWIDGET
-  @WIDGET@ buildWidget( @WINWIDGET@ parent );
-#endif // SO@GUI@_HAVE_WINWIDGET
 
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
