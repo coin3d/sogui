@@ -103,7 +103,7 @@ So@Gui@ExaminerViewer::genericConstructor(void)
   this->pointer.now = SbVec2s(0, 0);
   this->pointer.then = SbVec2s(0, 0);
   this->motion3OnCamera = TRUE;
-} // So@Gui@ExaminerViewer()
+}
 
 /*!
 */
@@ -114,7 +114,7 @@ So@Gui@ExaminerViewer::genericDestructor(void)
   delete this->spinprojector;
   delete[] this->log.position;
   delete[] this->log.time;
-} // ~So@Gui@ExaminerViewer()
+}
 
 // ************************************************************************
 
@@ -125,9 +125,8 @@ So@Gui@ExaminerViewer::genericDestructor(void)
 */
 
 float
-So@Gui@ExaminerViewer::rotXWheelMotion(
-  float value,
-  float oldvalue)
+So@Gui@ExaminerViewer::rotXWheelMotion(float value,
+                                       float oldvalue)
 {
   SoCamera * camera = this->getCamera();
   if (camera == NULL) return 0.0f; // can happen for empty scenegraph
@@ -145,7 +144,7 @@ So@Gui@ExaminerViewer::rotXWheelMotion(
   camera->position = focalpoint - camera->focalDistance.getValue() * dir;
 
   return value;
-} // rotXWheelMotion()
+}
 
 /*!
   The "rotY" wheel is the wheel on the bottom decoration on the examiner
@@ -154,9 +153,8 @@ So@Gui@ExaminerViewer::rotXWheelMotion(
 */
 
 float
-So@Gui@ExaminerViewer::rotYWheelMotion(
-  float value,
-  float oldvalue)
+So@Gui@ExaminerViewer::rotYWheelMotion(float value,
+                                       float oldvalue)
 {
   SoCamera * camera = this->getCamera();
   if (camera == NULL) return 0.0f; // can happen for empty scenegraph
@@ -174,7 +172,7 @@ So@Gui@ExaminerViewer::rotYWheelMotion(
   camera->position = focalpoint - camera->focalDistance.getValue() * dir;
 
   return value;
-} // rotYWheelMotion()
+}
 
 // ************************************************************************
 
@@ -204,11 +202,10 @@ So@Gui@ExaminerViewer::setGenericAnimationEnabled(const SbBool enable)
 */
 
 SbBool
-So@Gui@ExaminerViewer::isAnimationEnabled(
-  void) const
+So@Gui@ExaminerViewer::isAnimationEnabled(void) const
 {
   return this->spinanimatingallowed;
-} // isAnimationEnabled()
+}
 
 // *************************************************************************
 
@@ -217,8 +214,7 @@ So@Gui@ExaminerViewer::isAnimationEnabled(
 */
 
 void
-So@Gui@ExaminerViewer::stopAnimating(
-  void)
+So@Gui@ExaminerViewer::stopAnimating(void)
 {
   if (this->spinanimating) {
     this->spinanimating = FALSE;
@@ -229,7 +225,7 @@ So@Gui@ExaminerViewer::stopAnimating(
     SoDebugError::postWarning("So@Gui@ExaminerViewer::stopAnimating",
       "not animating");
 #endif // SO@GUI@_DEBUG
-} // stopAnimating()
+}
 
 // *************************************************************************
 
@@ -239,11 +235,10 @@ So@Gui@ExaminerViewer::stopAnimating(
 */
 
 SbBool
-So@Gui@ExaminerViewer::isAnimating(
-  void) const
+So@Gui@ExaminerViewer::isAnimating(void) const
 {
   return this->spinanimating;
-} // isAnimating()
+}
 
 // ************************************************************************
 
@@ -295,7 +290,7 @@ So@Gui@ExaminerViewer::setMode(const ViewerMode mode)
   }
 
   this->currentmode = mode;
-} // setMode()
+}
 
 // ************************************************************************
 
@@ -306,8 +301,7 @@ So@Gui@ExaminerViewer::setMode(const ViewerMode mode)
 */
 
 void
-So@Gui@ExaminerViewer::setFeedbackVisibility(
-  const SbBool enable)
+So@Gui@ExaminerViewer::setFeedbackVisibility(const SbBool enable)
 {
   if (enable == this->axiscrossEnabled) {
 #if SO@GUI@_DEBUG
@@ -319,7 +313,7 @@ So@Gui@ExaminerViewer::setFeedbackVisibility(
   this->axiscrossEnabled = enable;
 
   if (this->isViewing()) { this->scheduleRedraw(); }
-} // setFeedbackVisibility()
+}
 
 /*!
   Check if the feedback axis cross is visible.
@@ -328,11 +322,10 @@ So@Gui@ExaminerViewer::setFeedbackVisibility(
 */
 
 SbBool
-So@Gui@ExaminerViewer::isFeedbackVisible(
-  void) const
+So@Gui@ExaminerViewer::isFeedbackVisible(void) const
 {
   return this->axiscrossEnabled;
-} // isFeedbackVisibility()
+}
 
 // ************************************************************************
 
@@ -344,8 +337,7 @@ So@Gui@ExaminerViewer::isFeedbackVisible(
 */
 
 void
-So@Gui@ExaminerViewer::setGenericFeedbackSize(
-  const int size)
+So@Gui@ExaminerViewer::setGenericFeedbackSize(const int size)
 {
 #if SO@GUI@_DEBUG
   if (size < 1) {
@@ -359,7 +351,7 @@ So@Gui@ExaminerViewer::setGenericFeedbackSize(
 
   if (this->isFeedbackVisible() && this->isViewing())
     this->scheduleRedraw();
-} // setFeedbackSize()
+}
 
 /*!
   Return the size of the feedback axis cross. Default is 25.
@@ -368,11 +360,10 @@ So@Gui@ExaminerViewer::setGenericFeedbackSize(
 */
 
 int
-So@Gui@ExaminerViewer::getFeedbackSize(
-  void) const
+So@Gui@ExaminerViewer::getFeedbackSize(void) const
 {
   return this->axiscrossSize;
-} // getFeedbackSize()
+}
 
 // ************************************************************************
 
@@ -380,8 +371,7 @@ So@Gui@ExaminerViewer::getFeedbackSize(
 */
 
 void
-So@Gui@ExaminerViewer::drawAxisCross(
-  void)
+So@Gui@ExaminerViewer::drawAxisCross(void)
 {
   // Store GL state.
   glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -521,7 +511,7 @@ So@Gui@ExaminerViewer::drawAxisCross(
   glLoadMatrixd(projectionmatrix);
 
   glPopAttrib();
-} // drawAxisCross()
+}
 
 /*!
   \internal
@@ -530,8 +520,7 @@ So@Gui@ExaminerViewer::drawAxisCross(
 */
 
 void
-So@Gui@ExaminerViewer::drawArrow(// static
-  void)
+So@Gui@ExaminerViewer::drawArrow(void)
 {
   glBegin(GL_LINES);
   glVertex3f(0, 0, 0);
@@ -552,7 +541,7 @@ So@Gui@ExaminerViewer::drawArrow(// static
   glVertex3f(1.0-1.0/3, -0.5/4, 0);
   glVertex3f(1.0-1.0/3, 0, -0.5/4);
   glEnd();
-} // drawArrow()
+}
 
 // ************************************************************************
 
@@ -564,8 +553,7 @@ So@Gui@ExaminerViewer::drawArrow(// static
 */
 
 void
-So@Gui@ExaminerViewer::reorientCamera(
-  const SbRotation & rot)
+So@Gui@ExaminerViewer::reorientCamera(const SbRotation & rot)
 {
   SoCamera * cam = this->getCamera();
   if (cam == NULL) return;
@@ -582,7 +570,7 @@ So@Gui@ExaminerViewer::reorientCamera(
   // Reposition camera so we are still pointing at the same old focal point.
   cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
   cam->position = focalpoint - cam->focalDistance.getValue() * direction;
-} // reorientCamera()
+}
 
 // ************************************************************************
 
@@ -594,8 +582,7 @@ So@Gui@ExaminerViewer::reorientCamera(
 */
 
 void
-So@Gui@ExaminerViewer::spin(
-  const SbVec2f & pointerpos)
+So@Gui@ExaminerViewer::spin(const SbVec2f & pointerpos)
 {
   if (this->log.historysize < 2) return;
   assert(this->spinprojector != NULL);
@@ -630,7 +617,7 @@ So@Gui@ExaminerViewer::spin(
   // when the user quickly trigger (as in "click-drag-release") a spin
   // animation.
   if (this->spinsamplecounter > 3) this->spinsamplecounter = 3;
-} // spin()
+}
 
 // ************************************************************************
 
@@ -642,9 +629,8 @@ So@Gui@ExaminerViewer::spin(
 */
 
 void
-So@Gui@ExaminerViewer::pan(
-  const SbVec2f & thispos,
-  const SbVec2f & prevpos)
+So@Gui@ExaminerViewer::pan(const SbVec2f & thispos,
+                           const SbVec2f & prevpos)
 {
   SoCamera * cam = this->getCamera();
   if (cam == NULL) return; // can happen for empty scenegraph
@@ -657,8 +643,8 @@ So@Gui@ExaminerViewer::pan(
 
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("So@Gui@ExaminerViewer::pan",
-     "was(%.3g, %.3g) -> now(%.3g, %.3g)",
-     prevpos[0], prevpos[1], thispos[0], thispos[1]);
+                         "was(%.3g, %.3g) -> now(%.3g, %.3g)",
+                         prevpos[0], prevpos[1], thispos[0], thispos[1]);
 #endif // SO@GUI@_DEBUG
 
   // Find projection points for the last and current mouse coordinates.
@@ -674,7 +660,7 @@ So@Gui@ExaminerViewer::pan(
   // Reposition camera according to the vector difference between the
   // projected points.
   cam->position = cam->position.getValue() - (current_planept - old_planept);
-} // pan()
+}
 
 // ************************************************************************
 
@@ -737,14 +723,13 @@ So@Gui@ExaminerViewer::zoom(const float diffvalue)
 */
 
 void
-So@Gui@ExaminerViewer::zoomByCursor(
-  const SbVec2f & thispos,
-  const SbVec2f & prevpos)
+So@Gui@ExaminerViewer::zoomByCursor(const SbVec2f & thispos,
+                                    const SbVec2f & prevpos)
 {
   // There is no "geometrically correct" value, 20 just seems to give
   // about the right "feel".
   this->zoom((thispos[1] - prevpos[1]) * 20.0f);
-} // zoomByCursor()
+}
 
 // *************************************************************************
 
@@ -766,7 +751,7 @@ So@Gui@ExaminerViewer::actualGenericRedraw(void)
     deltaRotation.scaleAngle(secs * 5.0);
     this->reorientCamera(deltaRotation);
   }
-} // actualRedraw()
+}
 
 // *************************************************************************
 
@@ -839,7 +824,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
       break;
     default:
       break;
-    } // switch (button)
+    }
 
     if (press) {
       switch (button) {
@@ -882,7 +867,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
 
       default:
         break;
-      } // switch (button)
+      }
 
     } else { // ! press
       switch (button) {
@@ -950,7 +935,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
 
       default:
         break;
-      } // switch (button)
+      }
     }
   }
 
@@ -1097,11 +1082,10 @@ So@Gui@ExaminerViewer::setSeekMode(SbBool on)
 */
 
 void
-So@Gui@ExaminerViewer::clearLog(
-  void)
+So@Gui@ExaminerViewer::clearLog(void)
 {
   this->log.historysize = 0;
-} // clearLog()
+}
 
 /*!
   This method adds another point to the mouse location log, used for spin
@@ -1109,9 +1093,8 @@ So@Gui@ExaminerViewer::clearLog(
 */
 
 void
-So@Gui@ExaminerViewer::addToLog(
-  const SbVec2s pos,
-  const SbTime time)
+So@Gui@ExaminerViewer::addToLog(const SbVec2s pos,
+                                const SbTime time)
 {
   // In case someone changes the const size setting at the top of this
   // file too small.
@@ -1133,7 +1116,7 @@ So@Gui@ExaminerViewer::addToLog(
   this->log.time[0] = time;
   if (this->log.historysize < this->log.size)
     this->log.historysize += 1;
-} // addToLog()
+}
 
 // *************************************************************************
 
@@ -1143,11 +1126,10 @@ So@Gui@ExaminerViewer::addToLog(
 */
 
 void
-So@Gui@ExaminerViewer::setMotion3OnCamera(
-  SbBool enable)
+So@Gui@ExaminerViewer::setMotion3OnCamera(SbBool enable)
 {
   this->motion3OnCamera = enable;
-} // setMotion3OnCamera()
+}
 
 /*!
   This method returns whether Motion3 events affects the camera or the
@@ -1155,11 +1137,10 @@ So@Gui@ExaminerViewer::setMotion3OnCamera(
 */
 
 SbBool
-So@Gui@ExaminerViewer::getMotion3OnCamera(
-  void) const
+So@Gui@ExaminerViewer::getMotion3OnCamera(void) const
 {
   return this->motion3OnCamera;
-} // getMotion3OnCamera()
+}
 
 // *************************************************************************
 
