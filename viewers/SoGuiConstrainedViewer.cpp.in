@@ -30,11 +30,6 @@
 */
 // FIXME: document class properly. 20010905 mortene.
 
-#ifdef SOQT_INTERNAL
-#include <qmetaobject.h>
-#include <moc_SoQtConstrainedViewer.cpp>
-#endif // SOQT_INTERNAL
-
 #include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
 #include <Inventor/actions/SoRayPickAction.h>
 #include <Inventor/errors/SoDebugError.h>
@@ -55,10 +50,20 @@
 
 class So@Gui@ConstrainedViewerP {
 public:
+  So@Gui@ConstrainedViewerP(So@Gui@ConstrainedViewer * owner) {
+    this->publ = owner;
+  }
+
+  void rotateCamera(const float delta) const;
+
   SbVec3f upvechome;
+
+private:
+  So@Gui@ConstrainedViewer * publ;
 };
 
 #define PRIVATE(o) (o->pimpl)
+#define PUBLIC(o) (o->publ)
 
 // ************************************************************************
 
@@ -69,16 +74,15 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@ConstrainedViewer);
 /*!
   Constructor.
 */
-So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer(// protected
-  @WIDGET@ parent,
-  const char * const name,
-  SbBool embed,
-  So@Gui@FullViewer::BuildFlag flag,
-  So@Gui@Viewer::Type type,
-  SbBool build)
-: inherited(parent, name, embed, flag, type, FALSE)
+So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer(@WIDGET@ parent,
+                                                   const char * const name,
+                                                   SbBool embed,
+                                                   So@Gui@FullViewer::BuildFlag flag,
+                                                   So@Gui@Viewer::Type type,
+                                                   SbBool build)
+  : inherited(parent, name, embed, flag, type, FALSE)
 {
-  PRIVATE(this) = new So@Gui@ConstrainedViewerP;
+  PRIVATE(this) = new So@Gui@ConstrainedViewerP(this);
 
   this->setClassName("So@Gui@ConstrainedViewer");
   this->setLeftWheelString("Tilt");
@@ -111,8 +115,7 @@ So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer()
   Set up-direction vector for the camera viewpoint.
 */
 void
-So@Gui@ConstrainedViewer::setUpDirection(
-  const SbVec3f & dir)
+So@Gui@ConstrainedViewer::setUpDirection(const SbVec3f & dir)
 {
   SbRotation change(this->upVector, dir);
   this->upVector = dir;
@@ -139,8 +142,7 @@ So@Gui@ConstrainedViewer::getUpDirection(void) const
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::setCamera(// virtual
-  SoCamera * newcam)
+So@Gui@ConstrainedViewer::setCamera(SoCamera * newcam)
 {
   inherited::setCamera(newcam);
   this->checkForCameraUpConstrain();
@@ -150,8 +152,7 @@ So@Gui@ConstrainedViewer::setCamera(// virtual
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::saveHomePosition(// virtual
-  void)
+So@Gui@ConstrainedViewer::saveHomePosition(void)
 {
   inherited::saveHomePosition();
   PRIVATE(this)->upvechome = this->upVector;
@@ -161,8 +162,7 @@ So@Gui@ConstrainedViewer::saveHomePosition(// virtual
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::resetToHomePosition(// virtual
-  void)
+So@Gui@ConstrainedViewer::resetToHomePosition(void)
 {
   inherited::resetToHomePosition();
   this->upVector = PRIVATE(this)->upvechome;
@@ -177,8 +177,7 @@ So@Gui@ConstrainedViewer::resetToHomePosition(// virtual
   FIXME: doc
 */
 void
-So@Gui@ConstrainedViewer::recomputeSceneSize(// virtual
-  void)
+So@Gui@ConstrainedViewer::recomputeSceneSize(void)
 {
   SO@GUI@_STUB();  // FIXME: re-calculate sceneHeight value. 20010907 mortene.
   inherited::recomputeSceneSize();
@@ -191,8 +190,7 @@ So@Gui@ConstrainedViewer::recomputeSceneSize(// virtual
   direction.
 */
 void
-So@Gui@ConstrainedViewer::tiltCamera(// virtual, protected
-  float delta)
+So@Gui@ConstrainedViewer::tiltCamera(float delta)
 {
   SoCamera * const camera = this->getCamera();
   if (camera == NULL) { return; } // if there's no scenegraph, for instance
@@ -207,10 +205,9 @@ So@Gui@ConstrainedViewer::tiltCamera(// virtual, protected
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::bottomWheelMotion(// virtual, protected
-  float value)
+So@Gui@ConstrainedViewer::bottomWheelMotion(float value)
 {
-  this->rotateCamera(value - this->getBottomWheelValue());
+  PRIVATE(this)->rotateCamera(value - this->getBottomWheelValue());
   inherited::bottomWheelMotion(value);
 }
 
@@ -218,8 +215,7 @@ So@Gui@ConstrainedViewer::bottomWheelMotion(// virtual, protected
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::leftWheelMotion(// virtual, protected
-  float value)
+So@Gui@ConstrainedViewer::leftWheelMotion(float value)
 {
   this->tiltCamera(value - this->getLeftWheelValue());
   inherited::leftWheelMotion(value);
@@ -229,8 +225,7 @@ So@Gui@ConstrainedViewer::leftWheelMotion(// virtual, protected
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::changeCameraValues(// virtual, protected
-  SoCamera * camera)
+So@Gui@ConstrainedViewer::changeCameraValues(SoCamera * camera)
 {
   inherited::changeCameraValues(camera);
   this->checkForCameraUpConstrain();
@@ -244,8 +239,7 @@ So@Gui@ConstrainedViewer::changeCameraValues(// virtual, protected
   picked geometry.
 */
 void
-So@Gui@ConstrainedViewer::findUpDirection(// protected
-  SbVec2s mouselocation)
+So@Gui@ConstrainedViewer::findUpDirection(SbVec2s mouselocation)
 {
   SoRayPickAction rp(this->getViewportRegion());
   rp.setPoint(mouselocation);
@@ -271,8 +265,7 @@ So@Gui@ConstrainedViewer::findUpDirection(// protected
   heeded.
 */
 void
-So@Gui@ConstrainedViewer::checkForCameraUpConstrain(// protected
-  void)
+So@Gui@ConstrainedViewer::checkForCameraUpConstrain(void)
 {
   SoCamera * cam = this->getCamera();
   assert(cam);
@@ -296,13 +289,13 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain(// protected
 
 // private
 void
-So@Gui@ConstrainedViewer::rotateCamera(const float delta) const
+So@Gui@ConstrainedViewerP::rotateCamera(const float delta) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   camera->orientation = camera->orientation.getValue() *
-    SbRotation(this->getUpDirection(), -delta);
+    SbRotation(PUBLIC(this)->getUpDirection(), -delta);
 }
 
 // ************************************************************************

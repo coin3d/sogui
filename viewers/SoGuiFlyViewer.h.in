@@ -32,15 +32,13 @@
 
 class SO@GUI@_DLL_API So@Gui@FlyViewer : public So@Gui@ConstrainedViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@FlyViewer, So@Gui@ConstrainedViewer);
-  @COMPONENTHEADER@
 
 public:
-  So@Gui@FlyViewer(
-    @WIDGET@ parent = NULL,
-    const char * name = NULL, 
-    SbBool embed = TRUE, 
-    So@Gui@FullViewer::BuildFlag flag = BUILD_ALL,
-    So@Gui@Viewer::Type type = BROWSER);
+  So@Gui@FlyViewer(@WIDGET@ parent = NULL,
+                   const char * name = NULL, 
+                   SbBool embed = TRUE, 
+                   So@Gui@FullViewer::BuildFlag flag = BUILD_ALL,
+                   So@Gui@Viewer::Type type = BROWSER);
   ~So@Gui@FlyViewer();
 
   virtual void setViewing(SbBool enable);
@@ -51,13 +49,12 @@ public:
   virtual void setCameraType(SoType type);
 
 protected:
-  So@Gui@FlyViewer(
-    @WIDGET@ parent,
-    const char * const name, 
-    SbBool embed, 
-    So@Gui@FullViewer::BuildFlag flag, 
-    So@Gui@Viewer::Type type, 
-    SbBool build);
+  So@Gui@FlyViewer(@WIDGET@ parent,
+                   const char * const name, 
+                   SbBool embed, 
+                   So@Gui@FullViewer::BuildFlag flag, 
+                   So@Gui@Viewer::Type type, 
+                   SbBool build);
 
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
@@ -75,10 +72,9 @@ protected:
   virtual void afterRealizeHook(void);
 
 private:
-  void constructor(SbBool build);
   class So@Gui@FlyViewerP * pimpl;
-
-}; // class So@Gui@FlyViewer
+  friend class So@Gui@FlyViewerP;
+};
 
 // ************************************************************************
 

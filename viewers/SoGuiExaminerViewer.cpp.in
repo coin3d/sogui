@@ -33,7 +33,7 @@
   \brief The So@Gui@ExaminerViewer class is a 3D-model examination viewer.
   \ingroup so@gui@viewers
 
-  TODO: more doc
+  FIXME: more doc
   ...functionality for rotation, pan, zoom, etc...
   ...overview of what this class provides over parent class...
   ...keyboard combinations...mousebutton combinations...explain pan,

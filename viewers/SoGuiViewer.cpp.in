@@ -49,11 +49,6 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#ifdef SOQT_INTERNAL
-#include <qmetaobject.h>
-#include <moc_SoQtViewer.cpp>
-#endif // SOQT_INTERNAL
-
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>

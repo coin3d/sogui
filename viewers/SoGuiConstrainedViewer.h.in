@@ -32,7 +32,6 @@
 
 class SO@GUI@_DLL_API So@Gui@ConstrainedViewer : public So@Gui@FullViewer {
   SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@ConstrainedViewer, So@Gui@FullViewer);
-  @COMPONENTHEADER@
 
 public:
   void setUpDirection(const SbVec3f & dir);
@@ -44,13 +43,12 @@ public:
   virtual void recomputeSceneSize(void);
 
 protected:
-  So@Gui@ConstrainedViewer(
-    @WIDGET@ parent,
-    const char * const name,
-    SbBool embed,
-    So@Gui@FullViewer::BuildFlag flag, 
-    So@Gui@Viewer::Type type, 
-    SbBool build);
+  So@Gui@ConstrainedViewer(@WIDGET@ parent,
+                           const char * const name,
+                           SbBool embed,
+                           So@Gui@FullViewer::BuildFlag flag, 
+                           So@Gui@Viewer::Type type, 
+                           SbBool build);
 
   ~So@Gui@ConstrainedViewer();
 
@@ -67,10 +65,7 @@ protected:
 
 private:
   class So@Gui@ConstrainedViewerP * pimpl;
-
-  void rotateCamera(const float delta) const;
-
-}; // class So@Gui@ConstrainedViewer
+};
 
 // ************************************************************************
 
