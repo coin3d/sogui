@@ -40,46 +40,46 @@ public:
   SoAnyPopupMenu(void);
   virtual ~SoAnyPopupMenu(void);
 
-  virtual int NewMenu( char * name, int menuid = -1 ) = 0;
-  virtual int GetMenu( char * name ) = 0;
-  virtual void SetMenuTitle( int id, char * title ) = 0;
-  virtual char * GetMenuTitle( int id ) = 0;
+  virtual int newMenu( char * name, int menuid = -1 ) = 0;
+  virtual int getMenu( char * name ) = 0;
+  virtual void setMenuTitle( int id, char * title ) = 0;
+  virtual char * getMenuTitle( int id ) = 0;
 
-  virtual int NewMenuItem( char * name, int itemid = -1 ) = 0;
-  virtual int GetMenuItem( char * name ) = 0;
-  virtual void SetMenuItemTitle( int itemid, char * title ) = 0;
-  virtual char * GetMenuItemTitle( int itemid ) = 0;
-  virtual void SetMenuItemEnabled( int itemid, SbBool enabled ) = 0;
-  virtual SbBool GetMenuItemEnabled( int itemid ) = 0;
-  void SetMenuItemMarked( int itemid, SbBool marked );
-  virtual SbBool GetMenuItemMarked( int itemid ) = 0;
+  virtual int newMenuItem( char * name, int itemid = -1 ) = 0;
+  virtual int getMenuItem( char * name ) = 0;
+  virtual void setMenuItemTitle( int itemid, char * title ) = 0;
+  virtual char * getMenuItemTitle( int itemid ) = 0;
+  virtual void setMenuItemEnabled( int itemid, SbBool enabled ) = 0;
+  virtual SbBool getMenuItemEnabled( int itemid ) = 0;
+  void setMenuItemMarked( int itemid, SbBool marked );
+  virtual SbBool getMenuItemMarked( int itemid ) = 0;
 
-  virtual void AddMenu( int menuid, int submenuid, int pos = -1 ) = 0;
-  virtual void AddMenuItem( int menuid, int itemid, int pos = -1 ) = 0;
-  virtual void AddSeparator( int menuid, int pos = -1 ) = 0;
-  virtual void RemoveMenu( int menuid ) = 0;
-  virtual void RemoveMenuItem( int itemid ) = 0;
+  virtual void addMenu( int menuid, int submenuid, int pos = -1 ) = 0;
+  virtual void addMenuItem( int menuid, int itemid, int pos = -1 ) = 0;
+  virtual void addSeparator( int menuid, int pos = -1 ) = 0;
+  virtual void removeMenu( int menuid ) = 0;
+  virtual void removeMenuItem( int itemid ) = 0;
 
-  virtual void PopUp( @WIDGET@ inside, int x, int y ) = 0;
+  virtual void popUp( @WIDGET@ inside, int x, int y ) = 0;
 
-  int NewRadioGroup( int groupid = -1 );
-  int GetRadioGroup( int itemid );
-  int GetRadioGroupSize( int groupid );
-  void AddRadioGroupItem( int groupid, int itemid );
-  void RemoveRadioGroupItem( int itemid );
+  int newRadioGroup( int groupid = -1 );
+  int getRadioGroup( int itemid );
+  int getRadioGroupSize( int groupid );
+  void addRadioGroupItem( int groupid, int itemid );
+  void removeRadioGroupItem( int itemid );
 
-  void SetRadioGroupMarkedItem( int itemid );
-  int GetRadioGroupMarkedItem( int groupid );
+  void setRadioGroupMarkedItem( int itemid );
+  int getRadioGroupMarkedItem( int groupid );
 
-  void AddMenuSelectionCallback(
+  void addMenuSelectionCallback(
     SoAnyMenuSelectionCallback * callback, void * data );
-  void RemoveMenuSelectionCallback(
+  void removeMenuSelectionCallback(
     SoAnyMenuSelectionCallback * callback, void * data );
 
 protected:
   virtual void _setMenuItemMarked( int itemid, SbBool marked ) = 0;
 
-  void InvokeMenuSelection( int itemid );
+  void invokeMenuSelection( int itemid );
 
 private:
   SbIntList * menuitems;
