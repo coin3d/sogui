@@ -1075,12 +1075,14 @@ void
 So@Gui@Viewer::resetToHomePosition(void)
 {
   if (! this->camera) return; // probably a scene-less viewer
-
+  
   SoType t = this->camera->getTypeId();
-  if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()))
+  if (t == SoOrthographicCamera::getClassTypeId()) {
     this->camera->copyContents(PRIVATE(this)->storedortho, FALSE);
-  else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
+  }                                                                 
+  else if (t == SoPerspectiveCamera::getClassTypeId()) {
     this->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
+  }
 }
 
 // *************************************************************************
