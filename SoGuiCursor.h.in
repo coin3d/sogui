@@ -40,8 +40,8 @@ public:
     DEFAULT = 0,
     BUSY,
     BLANK,
-    NORMAL,
-    CROSSHAIR
+    CROSSHAIR,
+    UPARROW
   };
   
   So@Gui@Cursor(void);
