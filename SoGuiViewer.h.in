@@ -235,8 +235,11 @@ protected:
   virtual void toggleCameraType(void);
 
 protected:
-  // FIXME: more data than this should be protected
+  // FIXME: even more data than this should be protected
   SoCamera * camera;
+  So@GUI@Viewer::Type type;
+  SbBool viewingFlag;
+  SbBool altSwitchBack;
 
 private:
   // Seek functionality
@@ -279,9 +282,7 @@ private:
   SoGetBoundingBoxAction * autoclipbox;
 
   // Misc
-  Type viewertype;
   SoType cameratype;
-  SbBool viewmode;
   SbBool cursoron;
 
   SoCallbackList * interactionstartCallbacks, * interactionendCallbacks;

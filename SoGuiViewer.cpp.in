@@ -243,12 +243,16 @@ So@GUI@Viewer::So@GUI@Viewer(
   SbBool build )
 : inherited( parent, name, embed, TRUE, TRUE, FALSE )
 {
-  this->viewertype = t;
-  this->viewmode = TRUE;
+  // initialization of protected data
+  this->type = t;
+  this->viewingFlag = TRUE;
+  this->camera = NULL;
+  this->altSwitchBack = FALSE;
+
+  // initialization of internal data
   this->cursoron = TRUE;
 
   this->cameratype = SoPerspectiveCamera::getClassTypeId();
-  this->camera = NULL;
   this->deletecamera = FALSE;
   this->buffertype = this->isDoubleBuffer() ? BUFFER_DOUBLE : BUFFER_SINGLE;
 
@@ -819,23 +823,26 @@ So@GUI@Viewer::getBufferingType(void) const
 */
 
 void
-So@GUI@Viewer::setViewing(SbBool on)
+So@GUI@Viewer::setViewing(
+  SbBool enable )
 {
+  if ( this->viewingFlag == enable ) {
 #if SO@uGUI@_DEBUG
-  if (this->viewmode == on) {
-    SoDebugError::postWarning("So@GUI@Viewer::setViewing", "unnecessary called");
+    SoDebugError::postWarning( "So@GUI@Viewer::setViewing",
+      "unnecessary called" );
+#endif // SO@uGUI@_DEBUG
     return;
   }
-#endif // SO@uGUI@_DEBUG
 
   // Turn off the selection indicators when we go back from picking
   // mode into viewing mode.
-  if (on) {
+  if ( enable ) {
     SoGLRenderAction * action = this->getGLRenderAction();
-    if (action) SoLocateHighlight::turnOffCurrentHighlight(action);
+    if ( action != NULL )
+      SoLocateHighlight::turnOffCurrentHighlight( action );
   }
 
-  this->viewmode = on;
+  this->viewingFlag = enable;
 } // setViewing()
 
 // *************************************************************************
@@ -849,7 +856,7 @@ So@GUI@Viewer::setViewing(SbBool on)
 SbBool
 So@GUI@Viewer::isViewing(void) const
 {
-  return this->viewmode;
+  return this->viewingFlag;
 } // isViewing()
 
 // *************************************************************************
@@ -1478,7 +1485,7 @@ So@GUI@Viewer::setSceneGraph(SoNode * root)
     scenecamera = (SoCamera *)this->cameratype.createInstance();
     this->deletecamera = TRUE;
 
-    if (this->viewertype == So@GUI@Viewer::BROWSER) {
+    if ( this->type == So@GUI@Viewer::BROWSER ) {
       this->viewerroot->insertChild(scenecamera, 1);
     }
     else {
