@@ -1637,24 +1637,15 @@ void
 So@GUI@Viewer::interactiveCountDec(void)
 {
 #if SO@uGUI@_DEBUG
-  // Catch problems with missing interactiveCountInc() calls.
-  assert(this->interactionnesting > 0);
+  if (this->interactionnesting <= 0) {
+    SoDebugError::postWarning("SoQtViewer::interactiveCountDec",
+        "interaction count nesting went below zero" );
+#endif // SO@uGUI@_DEBUG
 
-  if (--(this->interactionnesting) == 0) {
-    this->interactionendCallbacks->invokeCallbacks(this);
-  }
-#else // no debug
   if (--(this->interactionnesting) <= 0) {
     this->interactionendCallbacks->invokeCallbacks(this);
     this->interactionnesting = 0;
   }
-#endif // nodebug
-
-#if 0 // debug
-  SoDebugError::postInfo("So@GUI@Viewer::interactiveCountDec", "%d -> %d",
-                         this->interactionnesting + 1,
-                         this->interactionnesting);
-#endif // debug
 } // interactiveCountDec()
 
 // *************************************************************************
