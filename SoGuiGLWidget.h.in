@@ -91,12 +91,12 @@ public:
   XVisualInfo * getOverlayVisual(void);
 #endif // __COIN_SOXT__
 #ifdef __COIN_SOWIN__
-  HWND getNormalWindow(void);
-  HWND getOverlayWindow(void);
-  HDC getNormalDC(void);
-  HDC getOverlayDC(void);
-  HGLRC getNormalContext(void);
-  HGLRC getOverlayContext(void);
+  HWND getNormalWindow(void) const;
+  HWND getOverlayWindow(void) const;
+  HDC getNormalDC(void) const;
+  HDC getOverlayDC(void) const;
+  HGLRC getNormalContext(void) const;
+  HGLRC getOverlayContext(void) const;
 
   void setStealFocus(SbBool doStealFocus);
 
