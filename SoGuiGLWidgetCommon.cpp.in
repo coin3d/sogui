@@ -491,6 +491,21 @@ So@Gui@GLWidget::getLineWidthLimits(SbVec2f & range, float & granularity)
   this->glUnlockNormal();
 }
 
+// FIXME: other implementation specifics to check are
+//
+//  * maximum stack depths (attribute, modelview matrix, name,
+//    projection matrix, texture matrix)
+//
+//  * max display list nesting
+//
+//  * max nr of clipplanes
+//
+//  * max nr of light sources
+//
+//  * max 3D texture size (needs specific extension?)
+//
+// 20020802 mortene.
+
 /*!
   Sets whether OpenGL stereo buffers (quad buffer stereo) should be
   used.
