@@ -44,8 +44,11 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->NewMenu( "drawstylesmenu", DRAWSTYLES_MENU );
   menu->SetMenuTitle( DRAWSTYLES_MENU, "Draw Styles" );
   menu->NewMenuItem( "examining", EXAMINING_ITEM );
+  menu->SetMenuItemTitle( EXAMINING_ITEM, "Viewing" );
   menu->NewMenuItem( "decoration", DECORATION_ITEM );
+  menu->SetMenuItemTitle( DECORATION_ITEM, "Decorations" );
   menu->NewMenuItem( "headlight", HEADLIGHT_ITEM );
+  menu->SetMenuItemTitle( HEADLIGHT_ITEM, "Headlight" );
   menu->NewMenuItem( "preferences", PREFERENCES_ITEM );
   menu->SetMenuItemTitle( PREFERENCES_ITEM, "Preferences..." );
 
@@ -54,31 +57,47 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->AddMenuItem( ROOT_MENU, EXAMINING_ITEM );
   menu->AddMenuItem( ROOT_MENU, DECORATION_ITEM );
   menu->AddMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
+  menu->AddSeparator( ROOT_MENU );
   menu->AddMenuItem( ROOT_MENU, PREFERENCES_ITEM );
 
   menu->NewMenuItem( "help", HELP_ITEM );
+  menu->SetMenuItemTitle( HELP_ITEM, "Help" );
   menu->NewMenuItem( "home", HOME_ITEM );
+  menu->SetMenuItemTitle( HOME_ITEM, "Home" );
   menu->NewMenuItem( "set_home", SET_HOME_ITEM );
+  menu->SetMenuItemTitle( SET_HOME_ITEM, "Set Home" );
   menu->NewMenuItem( "view_all", VIEW_ALL_ITEM );
+  menu->SetMenuItemTitle( VIEW_ALL_ITEM, "View All" );
   menu->NewMenuItem( "seek", SEEK_ITEM );
+  menu->SetMenuItemTitle( SEEK_ITEM, "Seek" );
   menu->NewMenuItem( "copy_view", COPY_VIEW_ITEM );
+  menu->SetMenuItemTitle( COPY_VIEW_ITEM, "Copy View" );
   menu->NewMenuItem( "paste_view", PASTE_VIEW_ITEM );
+  menu->SetMenuItemTitle( PASTE_VIEW_ITEM, "Paste View" );
 
   menu->AddMenuItem( FUNCTIONS_MENU, HELP_ITEM );
   menu->AddMenuItem( FUNCTIONS_MENU, HOME_ITEM );
   menu->AddMenuItem( FUNCTIONS_MENU, SET_HOME_ITEM );
   menu->AddMenuItem( FUNCTIONS_MENU, VIEW_ALL_ITEM );
   menu->AddMenuItem( FUNCTIONS_MENU, SEEK_ITEM );
+  menu->AddSeparator( FUNCTIONS_MENU );
   menu->AddMenuItem( FUNCTIONS_MENU, COPY_VIEW_ITEM );
   menu->AddMenuItem( FUNCTIONS_MENU, PASTE_VIEW_ITEM );
 
   menu->NewMenuItem( "as_is", AS_IS_ITEM );
+  menu->SetMenuItemTitle( AS_IS_ITEM, "as is" );
   menu->NewMenuItem( "hidden_line", HIDDEN_LINE_ITEM );
+  menu->SetMenuItemTitle( HIDDEN_LINE_ITEM, "hidden line" );
   menu->NewMenuItem( "no_textures", NO_TEXTURE_ITEM );
+  menu->SetMenuItemTitle( NO_TEXTURE_ITEM, "no texture" );
   menu->NewMenuItem( "low_resolution", LOW_RESOLUTION_ITEM );
+  menu->SetMenuItemTitle( LOW_RESOLUTION_ITEM, "low resolution" );
   menu->NewMenuItem( "wireframe", WIREFRAME_ITEM );
+  menu->SetMenuItemTitle( WIREFRAME_ITEM, "wireframe" );
   menu->NewMenuItem( "points", POINTS_ITEM );
+  menu->SetMenuItemTitle( POINTS_ITEM, "points" );
   menu->NewMenuItem( "bounding_box", BOUNDING_BOX_ITEM );
+  menu->SetMenuItemTitle( BOUNDING_BOX_ITEM, "bounding box (no depth)" );
 
   menu->NewRadioGroup( STILL_GROUP );
   menu->AddRadioGroupItem( STILL_GROUP, AS_IS_ITEM );
@@ -91,13 +110,23 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->SetMenuItemMarked( AS_IS_ITEM, TRUE );
 
   menu->NewMenuItem( "move_same_as_still", MOVE_SAME_AS_STILL_ITEM );
+  menu->SetMenuItemTitle( MOVE_SAME_AS_STILL_ITEM, "move same as still" );
   menu->NewMenuItem( "move_no_texture", MOVE_NO_TEXTURE_ITEM );
+  menu->SetMenuItemTitle( MOVE_NO_TEXTURE_ITEM, "move no texture" );
   menu->NewMenuItem( "move_low_res", MOVE_LOW_RES_ITEM );
+  menu->SetMenuItemTitle( MOVE_LOW_RES_ITEM, "move low resolution" );
   menu->NewMenuItem( "move_wireframe", MOVE_WIREFRAME_ITEM );
+  menu->SetMenuItemTitle( MOVE_WIREFRAME_ITEM, "move wireframe" );
   menu->NewMenuItem( "move_low_res_wireframe", MOVE_LOW_RES_WIREFRAME_ITEM );
+  menu->SetMenuItemTitle( MOVE_LOW_RES_WIREFRAME_ITEM,
+    "move low res wireframe (no depth)" );
   menu->NewMenuItem( "move_points", MOVE_POINTS_ITEM );
+  menu->SetMenuItemTitle( MOVE_POINTS_ITEM, "move points" );
   menu->NewMenuItem( "move_low_res_points", MOVE_LOW_RES_POINTS_ITEM );
+  menu->SetMenuItemTitle( MOVE_LOW_RES_POINTS_ITEM,
+    "move low res points (no depth)" );
   menu->NewMenuItem( "move_bounding_box", MOVE_BOUNDING_BOX_ITEM );
+  menu->SetMenuItemTitle( MOVE_BOUNDING_BOX_ITEM, "move bounding box (no depth)" );
 
   menu->NewRadioGroup( MOVE_GROUP );
   menu->AddRadioGroupItem( MOVE_GROUP, MOVE_SAME_AS_STILL_ITEM );
@@ -111,8 +140,11 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->SetMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
 
   menu->NewMenuItem( "single_buffer", SINGLE_BUFFER_ITEM );
+  menu->SetMenuItemTitle( SINGLE_BUFFER_ITEM, "single buffer" );
   menu->NewMenuItem( "double_buffer", DOUBLE_BUFFER_ITEM );
+  menu->SetMenuItemTitle( DOUBLE_BUFFER_ITEM, "double buffer" );
   menu->NewMenuItem( "interactive_buffer", INTERACTIVE_BUFFER_ITEM );
+  menu->SetMenuItemTitle( INTERACTIVE_BUFFER_ITEM, "interactive buffer" );
 
   menu->NewRadioGroup( BUFFER_GROUP );
   menu->AddRadioGroupItem( BUFFER_GROUP, SINGLE_BUFFER_ITEM );
@@ -127,7 +159,7 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->AddMenuItem( DRAWSTYLES_MENU, WIREFRAME_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, POINTS_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, BOUNDING_BOX_ITEM );
-//  menu->AddSeparatorItem( DRAWSTYLES_MENU );
+  menu->AddSeparator( DRAWSTYLES_MENU );
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_SAME_AS_STILL_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_NO_TEXTURE_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_LOW_RES_ITEM );
@@ -136,10 +168,18 @@ SoAnyFullViewer::buildStandardPopupMenu(
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_POINTS_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_LOW_RES_POINTS_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, MOVE_BOUNDING_BOX_ITEM );
-//  menu->AddSeparatorItem( DRAWSTYLES_MENU );
+  menu->AddSeparator( DRAWSTYLES_MENU );
   menu->AddMenuItem( DRAWSTYLES_MENU, SINGLE_BUFFER_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, DOUBLE_BUFFER_ITEM );
   menu->AddMenuItem( DRAWSTYLES_MENU, INTERACTIVE_BUFFER_ITEM );
+
+  int toggle;
+  toggle = menu->NewRadioGroup();
+  menu->AddRadioGroupItem( toggle, EXAMINING_ITEM );
+  toggle = menu->NewRadioGroup();
+  menu->AddRadioGroupItem( toggle, DECORATION_ITEM );
+  toggle = menu->NewRadioGroup();
+  menu->AddRadioGroupItem( toggle, HEADLIGHT_ITEM );
 
   return menu;
 } // buildPopupMenu()
