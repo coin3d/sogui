@@ -124,11 +124,6 @@ public:
   static BOOL dispatchEvent(MSG * msg);
   static SbBool nextEvent(int appContext, MSG * msg);
   static void doIdleTasks(void);
-
-protected:
-  static LRESULT CALLBACK eventHandler(HWND window, UINT message,
-                                       WPARAM wparam, LPARAM lparam);
-
 #endif // __COIN_SOWIN__
 
 
