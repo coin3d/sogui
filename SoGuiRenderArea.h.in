@@ -36,6 +36,10 @@ class SoNode;
 class SoSelection;
 
 class So@Gui@Device;
+// So@Gui@RenderAreaP is only used in the "friend class" statement in
+// the class definition, so this shouldn't really be necessary. But
+// the OSF1/cxx compiler complains if it's left out.
+class So@Gui@RenderAreaP;
 
 typedef SbBool So@Gui@RenderAreaEventCB(void * closure, @EVENT@ event);
 
@@ -46,13 +50,12 @@ class SO@GUI@_DLL_API So@Gui@RenderArea : public So@Gui@GLWidget {
   @COMPONENTHEADER@
 
 public:
-  So@Gui@RenderArea(
-    @WIDGET@ parent = NULL,
-    const char * name = NULL,
-    SbBool embed = TRUE,
-    SbBool mouseInput = TRUE,
-    SbBool keyboardInput = TRUE);
-  ~So@Gui@RenderArea(void);
+  So@Gui@RenderArea(@WIDGET@ parent = NULL,
+                    const char * name = NULL,
+                    SbBool embed = TRUE,
+                    SbBool mouseInput = TRUE,
+                    SbBool keyboardInput = TRUE);
+  ~So@Gui@RenderArea();
 
   virtual void setSceneGraph(SoNode * scene);
   virtual SoNode * getSceneGraph(void);
@@ -104,13 +107,12 @@ public:
   SbBool sendSoEvent(const SoEvent * event);
 
 protected:
-  So@Gui@RenderArea(
-    @WIDGET@ parent,
-    const char * name,
-    SbBool embed,
-    SbBool mouseInput,
-    SbBool keyboardInput,
-    SbBool build);
+  So@Gui@RenderArea(@WIDGET@ parent,
+                    const char * name,
+                    SbBool embed,
+                    SbBool mouseInput,
+                    SbBool keyboardInput,
+                    SbBool build);
 
   virtual void redraw(void);
   virtual void actualRedraw(void);
