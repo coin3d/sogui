@@ -2333,6 +2333,10 @@ So@Gui@Viewer::interactiveCountDec(void)
   // the viewer in INTERACT mode. When the seek is completed, the
   // count will become -1.  20010912 mortene.
 
+  // FIXME: and another one (tested with SoXt): click and hold LMB in
+  // the canvas while in INTERACT mode, then hit 'Esc' to switch to
+  // EXAMINE mode, then release LMB. 20020325 mortene.
+
   if (SO@GUI@_DEBUG) {
     if (PRIVATE(this)->interactionnesting <= 0) {
       SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
