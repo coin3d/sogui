@@ -1,0 +1,21 @@
+CURRENT
+
+  SoGuiViewportFix - fix origo to a corner of the viewport
+
+  SoGuiPane - group node for containing a 2D interface
+    - for enabling special translation/position nodes
+    - for enabling special scaling nodes
+
+  SoGuiPosition - set 2D position on pane
+
+  SoGuiTranslation - accumulate 2D translation on pane
+
+  SoGuiFrame - a 2d-rect emboss / frame renderer
+
+  SoGuiSlider1 - an interactive slider for a one-dimensional value space
+
+PLANNED
+
+  SoGuiSlider2 - an interative slider for a two-dimensional value space
+
+

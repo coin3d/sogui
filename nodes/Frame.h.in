@@ -1,0 +1,43 @@
+#ifndef COIN_GUIFRAME_H
+#define COIN_GUIFRAME_H
+
+#include <Inventor/nodes/SoSubNode.h>
+
+#include <Inventor/fields/SoSFColor.h>
+#include <Inventor/fields/SoSFEnum.h>
+#include <Inventor/fields/SoSFFloat.h>
+#include <Inventor/fields/SoSFVec3f.h>
+
+#include <Inventor/nodes/SoNode.h> // Shape?
+
+class SoGuiFrame : public SoNode {
+  typedef SoNode inherited;
+  SO_NODE_HEADER(SoGuiFrame);
+
+public:
+  static void initClass(void);
+
+  SoGuiFrame(void);
+  ~SoGuiFrame(void);
+
+  enum FrameDesign {
+    BLACK,
+    COLOR,
+    EMBOSS
+  };
+
+  SoSFEnum design;
+
+  SoSFVec3f areaSize;
+  SoSFFloat width;
+
+  virtual void GLRender(SoGLRenderAction * action);
+
+protected:
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUIFRAME_H

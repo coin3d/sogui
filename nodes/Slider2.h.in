@@ -1,0 +1,56 @@
+#ifndef COIN_GUISLIDER1_H
+#define COIN_GUISLIDER1_H
+
+#include <Inventor/fields/SoSFVec2f.h>
+#include <Inventor/fields/SoSFVec3f.h>
+
+#include <Inventor/nodekits/SoBaseKit.h>
+
+class SoGuiSlider2 : public SoBaseKit {
+  typedef SoBaseKit inherited;
+
+  SO_KIT_HEADER(SoGuiSlider2);
+
+  SO_KIT_CATALOG_ENTRY_HEADER(topSeparator);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceGeometry);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceTexture);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceTexCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceFaceSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobGeometry);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobFaceSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobShadeMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobShadeLineSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobLightMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobLightLineSet);
+
+public:
+  static void initClass(void);
+
+  SoGuiSlider2(void);
+  ~SoGuiSlider2(void);
+
+  SoSFVec3f size;
+
+  SoSFVec2f min;
+  SoSFVec2f max;
+  SoSFVec2f value;
+
+  virtual void handleEvent(SoHandleEventAction * action);
+
+  virtual void setDefaultOnNonWritingFields(void);
+
+  virtual void setSurfaceColor(const SbColor & value);
+
+  void sizeUpdate(void);
+  void valueUpdate(void);
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUISLIDER1_H

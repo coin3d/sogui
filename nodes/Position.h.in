@@ -1,0 +1,32 @@
+#ifndef COIN_GUIPOSITION_H
+#define COIN_GUIPOSITION_H
+
+#include <Inventor/fields/SoSFVec3f.h>
+#include <Inventor/nodes/SoTransformation.h>
+
+class SoGuiPosition : public SoTransformation {
+  typedef SoTransformation inherited;
+  SO_NODE_HEADER(SoGuiPosition);
+
+public:
+  static void initClass(void);
+
+  SoGuiPosition(void);
+
+  SoSFVec3f position;
+
+  virtual void doAction(SoAction * action);
+  virtual void GLRender(SoGLRenderAction * action);
+  virtual void pick(SoPickAction * action);
+  virtual void rayPick(SoRayPickAction * action);
+  virtual void getMatrix(SoGetMatrixAction * action);
+
+protected:
+  ~SoGuiPosition(void);
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUIPOSITION_H

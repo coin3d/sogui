@@ -1,0 +1,14 @@
+#include <Inventor/@Gui@/nodes/SoGuiNodes.h>
+
+void
+SoGuiNodes::initClasses(void)
+{
+  SoGuiViewportFix::initClass();
+  SoGuiPane::initClass();
+  SoGuiPosition::initClass();
+  SoGuiTranslation::initClass();
+  SoGuiFrame::initClass();
+  SoGuiSlider1::initClass();
+  // SoGuiSlider2::initClass();
+}
+

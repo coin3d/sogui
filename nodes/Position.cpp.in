@@ -1,0 +1,90 @@
+
+#include <assert.h>
+
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/actions/SoGLRenderAction.h>
+#include <Inventor/actions/SoPickAction.h>
+#include <Inventor/actions/SoRayPickAction.h>
+#include <Inventor/actions/SoGetMatrixAction.h>
+#include <Inventor/elements/SoModelMatrixElement.h>
+#include <Inventor/SoPath.h>
+
+#include <Inventor/@Gui@/nodes/SoGuiPane.h>
+#include <Inventor/@Gui@/nodes/SoGuiPosition.h>
+
+// *************************************************************************
+
+SO_NODE_SOURCE(SoGuiPosition);
+
+void
+SoGuiPosition::initClass(void)
+{
+  SO_NODE_INIT_CLASS(SoGuiPosition, SoTransformation, SoTransformation);
+}
+
+SoGuiPosition::SoGuiPosition(void)
+{
+  SO_NODE_CONSTRUCTOR(SoGuiPosition);
+  SO_NODE_ADD_FIELD(position, (SbVec3f(0.0f, 0.0f, 0.0f)));
+}
+
+SoGuiPosition::~SoGuiPosition(void)
+{
+}
+
+void
+SoGuiPosition::doAction(SoAction * action)
+{
+  int i;
+  // SoDebugError::postInfo("SoGuiPosition::doAction", "invoked by %s", action->getTypeId().getName().getString());
+  SoGuiPane * pane = NULL;
+  const SoPath * path = action->getCurPath();
+  for ( i = path->getLength() - 1; (i >= 0) && (pane == NULL); i-- ) {
+    SoNode * node = path->getNode(i);
+    assert(node);
+    if ( node->isOfType(SoGuiPane::getClassTypeId()) ) pane = (SoGuiPane *) node;
+  }
+  if ( pane == NULL ) {
+    SoDebugError::postInfo("SoGuiPosition::GLRender", "SoGuiPosition only works below an SoGuiPane node");
+    return;
+  }
+  pane->moveTo(action->getState(), this->position.getValue());
+}
+
+void
+SoGuiPosition::GLRender(SoGLRenderAction * action)
+{
+  this->doAction(action);
+}
+
+void
+SoGuiPosition::pick(SoPickAction * action)
+{
+  this->doAction(action);
+}
+
+void
+SoGuiPosition::rayPick(SoRayPickAction * action)
+{
+  this->doAction(action);
+}
+
+void
+SoGuiPosition::getMatrix(SoGetMatrixAction * action)
+{
+  SoDebugError::postInfo("SoGuiPosition::getMatrix", "invoked");
+  int i;
+  SoGuiPane * pane = NULL;
+  const SoPath * path = action->getCurPath();
+  for ( i = path->getLength() - 1; (i >= 0) && (pane == NULL); i-- ) {
+    SoNode * node = path->getNode(i);
+    assert(node);
+    if ( node->isOfType(SoGuiPane::getClassTypeId()) ) pane = (SoGuiPane *) node;
+  }
+  if ( pane == NULL ) {
+    SoDebugError::postInfo("SoGuiPosition::getMatrix", "SoGuiPosition only works below an SoGuiPane node");
+    return;
+  }
+  pane->applyMoveTo(action, this->position.getValue());
+}
+

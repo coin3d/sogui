@@ -1,0 +1,45 @@
+#ifndef COIN_GUIPANE_H
+#define COIN_GUIPANE_H
+
+#include <Inventor/fields/SoSFVec3f.h>
+#include <Inventor/nodes/SoSeparator.h>
+
+class SoGuiPane : public SoSeparator {
+  typedef SoSeparator inherited;
+  SO_NODE_HEADER(SoGuiPane);
+
+public:
+  static void initClass(void);
+
+  SoGuiPane(void);
+
+  SoSFVec3f worldSize;
+  SoSFVec3f objectSize;
+
+  virtual void doAction(SoAction * action);
+
+  virtual void GLRenderBelowPath(SoGLRenderAction * action);
+  virtual void GLRenderInPath(SoGLRenderAction * action);
+  virtual void GLRenderOffPath(SoGLRenderAction * action);
+  virtual void pick(SoPickAction * action);
+  virtual void rayPick(SoRayPickAction * action);
+  virtual void getMatrix(SoGetMatrixAction * action);
+  virtual void getBoundingBox(SoGetBoundingBoxAction * action);
+
+protected:
+  friend class SoGuiPosition;
+  friend class SoGuiTranslation;
+
+  ~SoGuiPane(void);
+
+  void moveTo(SoState * state, SbVec3f position);
+  void applyMoveTo(SoGetMatrixAction * action, SbVec3f position);
+  void moveBy(SoState * state, SbVec3f translation);
+  void applyMoveBy(SoGetMatrixAction * action, SbVec3f translation);
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUIPANE_H

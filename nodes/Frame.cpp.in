@@ -1,0 +1,132 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/elements/SoLazyElement.h>
+#include <Inventor/misc/SoState.h>
+#include <Inventor/actions/SoGLRenderAction.h>
+#include <Inventor/bundles/SoMaterialBundle.h>
+
+#include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/nodes/SoGuiFrame.h>
+
+SO_NODE_SOURCE(SoGuiFrame);
+
+void
+SoGuiFrame::initClass(void)
+{
+  SO_NODE_INIT_CLASS(SoGuiFrame, SoNode, SoNode);
+}
+
+SoGuiFrame::SoGuiFrame(void)
+{
+  this->internals = NULL;
+  SO_NODE_CONSTRUCTOR(SoGuiFrame);
+
+  SO_NODE_ADD_FIELD(design, (SoGuiFrame::BLACK));
+  // SO_NODE_ADD_FIELD(background, (SbColor(0.8f, 0.8f, 0.8f)));
+  SO_NODE_ADD_FIELD(width, (0.0f));
+  SO_NODE_ADD_FIELD(areaSize, (SbVec3f(0.0f, 0.0f, 0.0f)));
+
+  SO_NODE_DEFINE_ENUM_VALUE(FrameDesign, BLACK);
+  SO_NODE_DEFINE_ENUM_VALUE(FrameDesign, COLOR);
+  SO_NODE_DEFINE_ENUM_VALUE(FrameDesign, EMBOSS);
+
+  SO_NODE_SET_SF_ENUM_TYPE(design, FrameDesign);
+}
+
+SoGuiFrame::~SoGuiFrame(void)
+{
+}
+
+void
+SoGuiFrame::GLRender(SoGLRenderAction * action)
+{
+  SoState * state = action->getState();
+
+  state->push();
+  SoLazyElement::setLightModel(state, SoLazyElement::BASE_COLOR);
+
+  SbVec3f size = this->areaSize.getValue();
+
+  switch ( this->design.getValue() ) {
+  case SoGuiFrame::BLACK:
+    // SoDebugError::postInfo("SoGuiFrame::GLRender", "black border");
+    do {
+      glColor3f(0.0f, 0.0f, 0.0f);
+      glBegin(GL_LINES);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glEnd(); // GL_LINESET
+    } while ( FALSE );
+    break;
+  case SoGuiFrame::COLOR:
+    // SoDebugError::postInfo("SoGuiFrame::GLRender", "color border");
+    do {
+      SoMaterialBundle mb(action);
+      mb.sendFirst();
+      glBegin(GL_LINES);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glEnd(); // GL_LINESET
+    } while ( FALSE );
+    break;
+  case SoGuiFrame::EMBOSS:
+    do {
+      SoMaterialBundle mb(action);
+      mb.sendFirst();
+      SbColor light = SoLazyElement::getAmbient(state);
+      // the light intensity
+      light[0] *= 0.8;
+      light[1] *= 0.8;
+      light[2] *= 0.8;
+      // SbColor light = this->background.getValue();
+      SbColor shadow = light;
+      // SoDebugError::postInfo("SoGuiFrame::GLRender", "embossed border (%g %g %g)", light[0], light[1], light[2]);
+      light[0] = light[0] + 0.15f;
+      light[1] = light[1] + 0.15f;
+      light[2] = light[2] + 0.15f;
+      if ( light[0] > 1.0f ) light[0] = 1.0f;
+      if ( light[1] > 1.0f ) light[1] = 1.0f;
+      if ( light[2] > 1.0f ) light[2] = 1.0f;
+      shadow[0] = shadow[0] - 0.20f;
+      shadow[1] = shadow[1] - 0.20f;
+      shadow[2] = shadow[2] - 0.20f;
+      if ( shadow[0] < 0.0f ) shadow[0] = 0.0f;
+      if ( shadow[1] < 0.0f ) shadow[1] = 0.0f;
+      if ( shadow[2] < 0.0f ) shadow[2] = 0.0f;
+      // light on these
+      glColor3f(light[0], light[1], light[2]);
+      glBegin(GL_LINES);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, -1.0f, 0.0f);
+      glVertex3f(size[0]+0.0f, size[1]+0.0f, 0.0f);
+      glEnd(); // GL_LINESET
+      // shadow on these
+      glColor3f(shadow[0], shadow[1], shadow[2]);
+      glBegin(GL_LINES);
+      glVertex3f(-1.0f, -1.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(-1.0f, size[1]+0.0f, 0.0f);
+      glVertex3f(size[0]+1.0f, size[1]+0.0f, 0.0f);
+      glEnd(); // GL_LINESET
+    } while ( FALSE );
+    break;
+  }
+  state->pop();
+}
+

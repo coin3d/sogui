@@ -1,0 +1,68 @@
+#ifndef COIN_GUISLIDER1_H
+#define COIN_GUISLIDER1_H
+
+#include <Inventor/fields/SoSFFloat.h>
+#include <Inventor/fields/SoSFEnum.h>
+#include <Inventor/fields/SoSFVec3f.h>
+
+#include <Inventor/nodekits/SoBaseKit.h>
+
+class SoGuiSlider1 : public SoBaseKit {
+  typedef SoBaseKit inherited;
+
+  SO_KIT_HEADER(SoGuiSlider1);
+
+  SO_KIT_CATALOG_ENTRY_HEADER(topSeparator);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceGeometry);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceTexture);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceTexCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(surfaceFaceSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobGeometry);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobCoords);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobFaceSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobShadeMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobShadeLineSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobLightMaterial);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobLightLineSet);
+
+public:
+  static void initClass(void);
+
+  SoGuiSlider1(void);
+  ~SoGuiSlider1(void);
+
+  enum Orientation {
+    X, Y
+  };
+
+  SoSFVec3f size;
+  SoSFEnum orientation; // not implemented
+
+  SoSFFloat min;
+  SoSFFloat max;
+  SoSFFloat value;
+
+
+  virtual void handleEvent(SoHandleEventAction * action);
+
+  virtual void setDefaultOnNonWritingFields(void);
+
+  virtual void setSurfaceColor(const SbColor & value);
+  virtual void setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue);
+  virtual SbColor getValueAsColor(void) const;
+
+  // FIXME: move to something non-public
+  void sizeUpdate(void);
+  void valueUpdate(void);
+  void minUpdate(void);
+  void maxUpdate(void);
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUISLIDER1_H

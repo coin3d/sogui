@@ -1,0 +1,32 @@
+#ifndef COIN_GUITRANSLATION_H
+#define COIN_GUITRANSLATION_H
+
+#include <Inventor/fields/SoSFVec3f.h>
+#include <Inventor/nodes/SoTransformation.h>
+
+class SoGuiTranslation : public SoTransformation {
+  typedef SoTransformation inherited;
+  SO_NODE_HEADER(SoGuiTranslation);
+
+public:
+  static void initClass(void);
+
+  SoGuiTranslation(void);
+
+  SoSFVec3f translation;
+
+  virtual void doAction(SoAction * action);
+  virtual void GLRender(SoGLRenderAction * action);
+  virtual void pick(SoPickAction * action);
+  virtual void rayPick(SoRayPickAction * action);
+  virtual void getMatrix(SoGetMatrixAction * action);
+
+protected:
+  ~SoGuiTranslation(void);
+
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_GUITRANSLATION_H

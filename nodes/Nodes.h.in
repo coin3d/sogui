@@ -1,0 +1,18 @@
+#ifndef COIN_GUINODES_H
+#define COIN_GUINODES_H
+
+#include <Inventor/@Gui@/nodes/SoGuiViewportFix.h>
+#include <Inventor/@Gui@/nodes/SoGuiPane.h>
+#include <Inventor/@Gui@/nodes/SoGuiPosition.h>
+#include <Inventor/@Gui@/nodes/SoGuiTranslation.h>
+#include <Inventor/@Gui@/nodes/SoGuiFrame.h>
+#include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+// #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
+
+class SoGuiNodes {
+public:
+  static void initClasses(void);
+
+};
+
+#endif // !COIN_GUINODES_H
