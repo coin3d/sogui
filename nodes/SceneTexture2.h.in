@@ -43,6 +43,7 @@ public:
   SoSFNode scene;
 
   virtual void notify(SoNotList * list);
+  virtual void write(SoWriteAction * action);
 
 protected:
   virtual ~SoGuiSceneTexture2(void);

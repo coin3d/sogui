@@ -109,6 +109,18 @@ SoGuiSceneTexture2::notify(SoNotList * list)
   inherited::notify(list);
 }
 
+//
+// we don't want to write out the image and filename fields.
+//
+void
+SoGuiSceneTexture2::write(SoWriteAction * action)
+{
+  this->image.setDefault(TRUE);
+  this->filename.setDefault(TRUE);
+  inherited::write(action);
+}
+
+
 #undef PRIVATE
 
 // *************************************************************************
