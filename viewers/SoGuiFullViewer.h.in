@@ -166,7 +166,6 @@ protected:
   @WIDGET@ bottomWheel;
 
   virtual bool eventFilter(QObject * obj, QEvent * e);
-  virtual void afterRealizeHook(void);
   virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
 #endif // __COIN_SOQT__
 
