@@ -31,6 +31,9 @@
 /*! \defgroup viewers @Gui@ Viewer Components */
 
 
+// FIXME: the code example shouldn't be duplicated here -- it's
+// already part of the SoQt mainpage-doc. 20020806 mortene.
+
 /*!
   \class So@Gui@ So@Gui@.h Inventor/@Gui@/So@Gui@.h
   \brief The So@Gui@ class takes care of @Gui@ initialization and event dispatching.
