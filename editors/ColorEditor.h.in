@@ -35,7 +35,7 @@ class SoMFColor;
 class SoMFUInt32;
 
 class So@Gui@ColorEditor : public So@Gui@RenderArea {
-  typedef So@Gui@RenderArea inherited;
+  SO@GUI@_OBJECT_HEADER(So@Gui@ColorEditor, So@Gui@RenderArea);
 
 public:
   So@Gui@ColorEditor(@WIDGET@ parent = NULL, const char * name = NULL, SbBool embed = TRUE);
