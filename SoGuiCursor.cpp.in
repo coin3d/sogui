@@ -135,12 +135,6 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
   this->shape = shape;
   this->cc = NULL;
 
-  if (cc) {
-    assert(shape == CUSTOM_BITMAP);
-    this->cc = new CustomCursor;
-    *(this->cc) = *cc;
-  }
-
   if (first) {
     zoom.dim = SbVec2s(16, 16);
     zoom.hotspot = SbVec2s(5, 7);
@@ -158,6 +152,12 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
     rotate.mask = rotate_mask_bitmap;
 
     first = FALSE;
+  }
+
+  if (cc) {
+    assert(shape == CUSTOM_BITMAP);
+    this->cc = new CustomCursor;
+    *(this->cc) = *cc;
   }
 }
 
