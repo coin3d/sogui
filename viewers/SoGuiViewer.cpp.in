@@ -533,8 +533,17 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * cameraarg,
 
 // FIXME: this code is really not applying the correct solution,
 // trying to convert between SoOrthographic::height and
-// SoPerspectiveCamera::heightAngle. What we should really try to do
-// is:
+// SoPerspectiveCamera::heightAngle.
+//
+// Conversion from a perspective camera to an orthographic camera, and
+// vice versa, makes a "best guess" at how information from one or the
+// other can be represented.
+//
+// The current code which does this may accumulate small errors upon
+// each conversion from one type to the other, and eventually the
+// errors gets large enough that the camera starts acting weird.
+//
+// What we should really try to do is:
 //
 //       * when going from orthocam -> perspectivecam: set the
 //       heightAngle field to it's default value (45°), and move
@@ -1948,12 +1957,13 @@ So@Gui@Viewer::getCameraType(void) const
 /*!
   Reposition the current camera so we can see the complete scene.
 */
-
 void
 So@Gui@Viewer::viewAll(void)
 {
-  if (PRIVATE(this)->camera && PRIVATE(this)->scenegraph)
-    PRIVATE(this)->camera->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
+  SoCamera * cam = PRIVATE(this)->camera;
+  if (cam && PRIVATE(this)->scenegraph) {
+    cam->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
+  }
 }
 
 // *************************************************************************
