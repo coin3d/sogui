@@ -21,6 +21,15 @@
  *
 \**************************************************************************/
 
+/*
+ * TODO
+ * - field "SoSFFloat delay" for making node wait a certain time after
+ *   last scene change before re-rendering the texture
+ * - field "SoSFBool dirty" for making texture show itself as dirty
+ *   (stippled?) until it has been rerendered (in case it takes time to
+ *   rerender scene).
+ */
+
 #include <assert.h>
 #include <string.h>
 
