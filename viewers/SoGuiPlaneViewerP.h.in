@@ -59,6 +59,8 @@ public:
   void drawRotateGraphics(void) const;
 
   enum PlaneViewerMode {
+    SCENEGRAPH_INTERACT_MODE,
+
     IDLE_MODE,
 
     DOLLY_MODE,

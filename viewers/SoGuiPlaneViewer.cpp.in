@@ -337,7 +337,9 @@ So@Gui@PlaneViewer::setSeekMode(SbBool on)
 
   PRIVATE(this)->changeMode(on ?
                             SoGuiPlaneViewerP::SEEK_WAIT_MODE :
-                            SoGuiPlaneViewerP::IDLE_MODE);
+                            (this->isViewing() ?
+                             SoGuiPlaneViewerP::IDLE_MODE :
+                             SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE));
 }
 
 // ************************************************************************
@@ -348,6 +350,27 @@ So@Gui@PlaneViewer::setCursorEnabled(SbBool enable)
 {
   inherited::setCursorEnabled(enable);
   PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::setViewing(SbBool enable)
+{
+  if (!!enable == !!this->isViewing()) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("SoQtPlaneViewer::setViewing",
+                              "unnecessary invocation");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+  inherited::setViewing(enable);
+
+  if (!this->isViewing()) {
+    PRIVATE(this)->changeMode(SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE);
+  }
 }
 
 // ************************************************************************
@@ -710,6 +733,10 @@ SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
   }
 
   switch (mode) {
+  case SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
+    break;
+
   case SoGuiPlaneViewerP::IDLE_MODE:
   case SoGuiPlaneViewerP::DOLLY_MODE:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
