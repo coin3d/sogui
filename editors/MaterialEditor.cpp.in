@@ -15,9 +15,10 @@ public:
   MaterialEditorComponent(void);
   ~MaterialEditorComponent(void);
 
-  SoMaterial * material;
   SoNodeSensor * attachment;
   SoGuiMaterialEditor * editor;
+
+  SoMaterial * dummy;
 
   SbPList * callbacks;
 
@@ -37,7 +38,11 @@ So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * name,
 {
   this->internals = new MaterialEditorComponent;
   this->setSize(SbVec2s(550,300));
-  this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
+  SoNode * scene = MaterialEditorComponent::getSceneGraph();
+  this->setSceneGraph(scene);
+  assert(scene->isOfType(SoSeparator::getClassTypeId()));
+  PRIVATE(this)->editor = (SoGuiMaterialEditor *) ((SoSeparator *) scene)->getChild(((SoSeparator *) scene)->getNumChildren()-1);
+  assert(PRIVATE(this)->editor->isOfType(SoGuiMaterialEditor::getClassTypeId()));
 }
 
 So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * const name, SbBool embed, SbBool build)
@@ -45,12 +50,17 @@ So@Gui@MaterialEditor::So@Gui@MaterialEditor(@WIDGET@ parent, const char * const
 {
   this->internals = new MaterialEditorComponent;
   this->setSize(SbVec2s(550,300));
-  this->setSceneGraph(MaterialEditorComponent::getSceneGraph());
+  SoNode * scene = MaterialEditorComponent::getSceneGraph();
+  this->setSceneGraph(scene);
+  assert(scene->isOfType(SoSeparator::getClassTypeId()));
+  PRIVATE(this)->editor = (SoGuiMaterialEditor *) ((SoSeparator *) scene)->getChild(((SoSeparator *) scene)->getNumChildren()-1);
+  assert(PRIVATE(this)->editor->isOfType(SoGuiMaterialEditor::getClassTypeId()));
 }
 
 So@Gui@MaterialEditor::~So@Gui@MaterialEditor(void)
 {
-  PRIVATE(this)->material->unref();
+  assert(PRIVATE(this)->editor);
+  if ( PRIVATE(this)->dummy ) PRIVATE(this)->dummy->unref();
   MaterialEditorComponent * obj = PRIVATE(this);
   delete obj;
 }
@@ -58,24 +68,29 @@ So@Gui@MaterialEditor::~So@Gui@MaterialEditor(void)
 void
 So@Gui@MaterialEditor::attach(SoMaterial * material, int index)
 {
+  assert(PRIVATE(this)->editor);
+  PRIVATE(this)->editor->material.setValue(material);
+  PRIVATE(this)->editor->index.setValue(index);
 }
 
 void
 So@Gui@MaterialEditor::attach(SoVRMLMaterial * material)
 {
+  assert(PRIVATE(this)->editor);
+  PRIVATE(this)->editor->material.setValue(material);
 }
 
 void
 So@Gui@MaterialEditor::detach(void)
 {
-  delete PRIVATE(this)->attachment;
-  PRIVATE(this)->attachment = NULL;
+  PRIVATE(this)->editor->material.setValue(NULL);
 }
 
 SbBool
 So@Gui@MaterialEditor::isAttached(void)
 {
-  return (PRIVATE(this)->attachment != NULL) ? TRUE : FALSE;
+  assert(PRIVATE(this)->editor != NULL);
+  return (PRIVATE(this)->editor->material.getValue() != NULL) ? TRUE : FALSE;
 }
 
 void
@@ -114,14 +129,17 @@ So@Gui@MaterialEditor::setMaterial(const SoVRMLMaterial & material)
 const SoMaterial &
 So@Gui@MaterialEditor::getMaterial(void) const
 {
-  return *(PRIVATE(this)->material);
+  PRIVATE(this)->dummy = new SoMaterial;
+  PRIVATE(this)->dummy->ref();
+  // FIXME: update values
+  return *(PRIVATE(this)->dummy);
 }
 
 SbBool
 So@Gui@MaterialEditor::isAttachedVRML(void)
 {
-  // FIXME
-  return FALSE;
+  SoNode * material = PRIVATE(this)->editor->material.getValue();
+  return (material && material->isOfType(SoVRMLMaterial::getClassTypeId())) ? TRUE : FALSE;
 }
 
 const char *
@@ -171,16 +189,14 @@ MaterialEditorComponent::superscene[] =
 
 MaterialEditorComponent::MaterialEditorComponent(void)
 {
-  this->material = new SoMaterial;
-  this->material->ref();
   this->attachment = NULL;
   this->editor = NULL;
   this->callbacks = NULL;
+  this->dummy = NULL;
 }
 
 MaterialEditorComponent::~MaterialEditorComponent(void)
 {
-  this->material->unref();
   if ( this->attachment != NULL ) {
     delete this->attachment;
   }
