@@ -1998,7 +1998,8 @@ So@GUI@Viewer::setClippingPlanes(
 
   // Disallow negative near clipping plane distance, and make sure the
   // z-buffer depth utilization is kept below a certain threshold.
-  nearval = SbMax(SLACK * farval, nearval);
+  float farslack = SLACK * farval;
+  nearval = farslack > nearval ? farslack : nearval;
 
   // Give a bit of slack to avoid artifacts when scene fits exactly
   // inside bounding box.

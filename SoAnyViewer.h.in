@@ -38,7 +38,7 @@
 
 #include <Inventor/SbTime.h>
 #include <Inventor/SoType.h>
-#include <Inventor/SbRotation.h>
+#include <Inventor/SbLinear.h>
 
 #include <Inventor/@GUI@/So@GUI@RenderArea.h>
 
