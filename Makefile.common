@@ -62,6 +62,7 @@ SoGui_src_Inventor_Gui_viewers_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/SoGuiPlaneViewerP.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
+  $(top_builddir)/src/Inventor/@Gui@/viewers/SoGuiWalkViewerP.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.cpp
 
@@ -119,7 +120,6 @@ SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewer.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ConstrainedViewer.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@WalkViewer.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FlyViewer.cpp
 
 SoGui_src_Inventor_Gui_widgets_BuiltMetaFiles = \
@@ -205,6 +205,7 @@ SoGuiCommonDistFiles = \
   src/Inventor/@Gui@/common/viewers/SoGuiPlaneViewerP.h.in \
   src/Inventor/@Gui@/common/viewers/SoGuiWalkViewer.cpp.in \
   src/Inventor/@Gui@/common/viewers/SoGuiWalkViewer.h.in \
+  src/Inventor/@Gui@/common/viewers/SoGuiWalkViewerP.h.in \
   src/Inventor/@Gui@/common/viewers/SoGuiViewer.cpp.in \
   src/Inventor/@Gui@/common/viewers/SoGuiViewer.h.in \
   src/Inventor/@Gui@/common/pixmaps/help.xpm \
@@ -370,6 +371,9 @@ $(top_builddir)/src/Inventor/@Gui@/viewers/SoGuiPlaneViewerP.h: $(top_srcdir)/sr
 $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp: $(top_srcdir)/src/Inventor/@Gui@/common/viewers/SoGuiPlaneViewer.cpp.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp:src/Inventor/@Gui@/common/viewers/SoGuiPlaneViewer.cpp.in )
 
+$(top_builddir)/src/Inventor/@Gui@/viewers/SoGuiWalkViewerP.h: $(top_srcdir)/src/Inventor/@Gui@/common/viewers/SoGuiWalkViewerP.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/viewers/SoGuiWalkViewerP.h:src/Inventor/@Gui@/common/viewers/SoGuiWalkViewerP.h.in )
+
 $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h: $(top_srcdir)/src/Inventor/@Gui@/common/viewers/SoGuiWalkViewer.h.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h:src/Inventor/@Gui@/common/viewers/SoGuiWalkViewer.h.in )
 
@@ -489,11 +493,6 @@ $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ConstrainedViewer
 	@( cd $(top_builddir); \
 	echo "$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ConstrainedViewer.cpp src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h"; \
 	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ConstrainedViewer.cpp src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h )
-
-$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@WalkViewer.cpp: $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h $(top_builddir)/config.status
-	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@WalkViewer.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@WalkViewer.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h` )
 
 $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FlyViewer.cpp: $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \

@@ -34,26 +34,29 @@
 #endif // HAVE_CONFIG_H
 
 #include <Inventor/@Gui@/viewers/So@Gui@WalkViewer.h>
+#include <Inventor/@Gui@/viewers/SoGuiWalkViewerP.h>
 #include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 #include <assert.h>
 #include <so@gui@defs.h>
 
+#define PRIVATE(ptr) ptr->pimpl
+#define PUBLIC(ptr) ptr->pub
 
 // This method dollies the camera back and forth in the scene.
 void
-So@Gui@WalkViewer::dollyCamera(const float delta) const
+SoGuiWalkViewerP::dollyCamera(const float delta) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
-  SbPlane walkplane(this->getUpDirection(), camera->position.getValue());
+  SbPlane walkplane(PUBLIC(this)->getUpDirection(), camera->position.getValue());
   SbVec3f campos = camera->position.getValue();
   SbVec3f camvec;
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
   SbLine cross(campos + camvec,
-                campos + camvec + this->getUpDirection());
+                campos + camvec + PUBLIC(this)->getUpDirection());
   SbVec3f intersect;
   walkplane.intersect(cross, intersect);
   SbVec3f dir = intersect - campos;
@@ -64,12 +67,12 @@ So@Gui@WalkViewer::dollyCamera(const float delta) const
 
 // This method elevates the camera up and down.
 void
-So@Gui@WalkViewer::elevateCamera(const float delta) const
+SoGuiWalkViewerP::elevateCamera(const float delta) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
-  SbVec3f up = this->getUpDirection();
+  SbVec3f up = PUBLIC(this)->getUpDirection();
   up.normalize();
   camera->position = camera->position.getValue() - up * delta;
 }

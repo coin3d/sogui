@@ -28,7 +28,6 @@
 
 class SO@GUI@_DLL_API So@Gui@WalkViewer : public So@Gui@ConstrainedViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@WalkViewer, So@Gui@ConstrainedViewer);
-  @COMPONENTHEADER@
 
 public:
   So@Gui@WalkViewer(@WIDGET@ parent = NULL,
@@ -69,8 +68,9 @@ protected:
   virtual void openViewerHelpCard(void);
 
 private:
-  void dollyCamera(const float change) const;
-  void elevateCamera(const float change) const;
+  class So@Gui@WalkViewerP * pimpl;
+  friend class SoGuiWalkViewerP;
+  friend class So@Gui@WalkViewerP;
 
 /// FIXME!: merge the So*WalkViewer.h parts in properly. 20020109 mortene. ////
 
