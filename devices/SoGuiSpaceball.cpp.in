@@ -122,15 +122,21 @@ So@Gui@Spaceball::getTranslationScaleFactor(void) const
 
 /*!
   \fn void So@Gui@Spaceball::setFocusToWindow(SbBool flag)
-  FIXME: write function documentation
+
+  Set to \c TRUE if you want spaceball events to be received even when
+  the component does not have focus.
 */
 
 /*!
   \fn SbBool So@Gui@Spaceball::isFocusToWindow(void) const
-  FIXME: write function documentation
+
+  Returns whether or not spaceball events are caught even when the
+  component does not have focus.
 */
 
 // *************************************************************************
+
+#ifndef DOXYGEN_SKIP_THIS
 
 SoGuiSpaceballP::SoGuiSpaceballP(So@Gui@Spaceball * p)
 {
@@ -140,5 +146,7 @@ SoGuiSpaceballP::SoGuiSpaceballP(So@Gui@Spaceball * p)
 SoGuiSpaceballP::~SoGuiSpaceballP()
 {
 }
+
+#endif // !DOXYGEN_SKIP_THIS
 
 // *************************************************************************

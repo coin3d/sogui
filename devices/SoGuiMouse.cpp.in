@@ -118,6 +118,8 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Mouse);
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 SoGuiMouseP::SoGuiMouseP(So@Gui@Mouse * p)
 {
   this->pub = p;
@@ -132,5 +134,7 @@ SoGuiMouseP::~SoGuiMouseP()
   delete this->buttonevent;
   delete this->locationevent;
 }
+
+#endif // !DOXYGEN_SKIP_THIS
 
 // *************************************************************************

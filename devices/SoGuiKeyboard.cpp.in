@@ -84,6 +84,8 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Keyboard);
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 SoGuiKeyboardP::SoGuiKeyboardP(void)
 {
   this->kbdevent = new SoKeyboardEvent;
@@ -93,5 +95,7 @@ SoGuiKeyboardP::~SoGuiKeyboardP()
 {
   delete this->kbdevent;
 }
+
+#endif // !DOXYGEN_SKIP_THIS
 
 // *************************************************************************
