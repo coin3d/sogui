@@ -73,15 +73,15 @@ SoGuiLabel::SoGuiLabel(void)
 
   SO_KIT_INIT_INSTANCE();
 
-  SoNode * scene = SoAny::loadSceneGraph(Label::scene);
-  assert(scene);
-  scene->ref();
+  SoNode * thescene = SoAny::loadSceneGraph(Label::scene);
+  assert(thescene);
+  thescene->ref();
 
-  PRIVATE(this)->text = (SoAsciiText *) SoAny::scanSceneForName(scene, "text");
+  PRIVATE(this)->text = (SoAsciiText *) SoAny::scanSceneForName(thescene, "text");
   assert(PRIVATE(this)->text);
 
-  scene->unrefNoDelete();
-  SbBool ok = this->setAnyPart("scene", scene);
+  thescene->unrefNoDelete();
+  SbBool ok = this->setAnyPart("scene", thescene);
   assert(ok);
 
   PRIVATE(this)->text_sensor = new SoFieldSensor(Label::text_updated_cb, PRIVATE(this));

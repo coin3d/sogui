@@ -896,7 +896,7 @@ SoGuiPlaneViewerP::updateAnchorScenegraph(void) const
 
 // Set cursor graphics according to mode.
 void
-SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
+SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode modearg)
 {
 #if SO@GUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@Gui@PlaneViewer::setCursorRepresentation",
@@ -910,7 +910,7 @@ SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
     return;
   }
 
-  switch (mode) {
+  switch (modearg) {
   case SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
     break;

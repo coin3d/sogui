@@ -85,8 +85,8 @@ public:
     : display(display), screen(screen), cacheid(-1) { } 
   ~soany_cache_context() { }
 
-  SbBool isSameCacheContext(void * display, void * screen) const {
-    return (this->display == display && this->screen == screen);
+  SbBool isSameCacheContext(void * displayarg, void * screenarg) const {
+    return (this->display == displayarg && this->screen == screenarg);
   }
   SbBool findContext(void * context) const {
     for (int i = 0; i < this->contextlist.getLength(); i++) {
@@ -291,11 +291,11 @@ SoAny::getSharedCacheContextId(void * context)
   \sa So@Gui@::setFatalErrorHandler()
  */
 So@Gui@::FatalErrorCB *
-SoAny::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
+SoAny::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdataarg)
 {
   So@Gui@::FatalErrorCB * oldcb = this->fatalcb;
   this->fatalcb = cb;
-  this->userdata = userdata;
+  this->userdata = userdataarg;
   return oldcb;
 }
 
@@ -353,10 +353,10 @@ SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
 */
 void
 SoAny::addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
-                                    void * userdata)
+                                    void * userdataarg)
 {
   this->internalfehandlers.append((void *)cb);
-  this->internalfedata.append(userdata);
+  this->internalfedata.append(userdataarg);
 }
 
 

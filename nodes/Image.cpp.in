@@ -77,16 +77,16 @@ SoGuiImage::SoGuiImage(void)
   assert(geometryroot);
   geometryroot->ref();
   geometryroot->isOfType(SoSeparator::getClassTypeId());
-  SoNode * geometry = ((SoSeparator *) geometryroot)->getChild(0);
-  assert(geometry);
-  geometry->ref();
+  SoNode * realgeometry = ((SoSeparator *) geometryroot)->getChild(0);
+  assert(realgeometry);
+  realgeometry->ref();
 
-  PRIVATE(this)->coords = (SoCoordinate3 *) SoAny::scanSceneForName(geometry, "coords");
+  PRIVATE(this)->coords = (SoCoordinate3 *) SoAny::scanSceneForName(realgeometry, "coords");
   assert(PRIVATE(this)->coords);
   assert(PRIVATE(this)->coords->isOfType(SoCoordinate3::getClassTypeId()));
 
-  geometry->unrefNoDelete();
-  SbBool ok = this->setAnyPart("geometry", geometry);
+  realgeometry->unrefNoDelete();
+  SbBool ok = this->setAnyPart("geometry", realgeometry);
   assert(ok);
   geometryroot->unref();
 

@@ -532,7 +532,7 @@ So@Gui@ViewerP::createFPSSuperimposition(void)
 // camera fields, only the transformations traversed before the camera
 // in the scene graph.
 void
-So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * camera,
+So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * cameraarg,
                                           SoNode * root,
                                           SbMatrix & matrix,
                                           SbMatrix & inverse)
@@ -540,7 +540,7 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * camera,
   this->searchaction->reset();
   this->searchaction->setSearchingAll(TRUE);
   this->searchaction->setInterest(SoSearchAction::FIRST);
-  this->searchaction->setNode(camera);
+  this->searchaction->setNode(cameraarg);
   this->searchaction->apply(root);
 
   matrix = inverse = SbMatrix::identity();

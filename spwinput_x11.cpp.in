@@ -450,7 +450,8 @@ void SPW_InputResetGlobalVars (void)
 void SPW_InputResetSpaceball (Display *display)
 {
   SPW_strLength = 0;
-  SendString (display, "RESET");
+  static char RESET[] = "RESET";
+  SendString (display, RESET);
 } /* end of SPW_InputResetSpaceball */
 
 /*-----------------------------------------------------------------------------
@@ -639,11 +640,13 @@ int SPW_GrabDevice(Display *display, Window window,
 
   if (exclusive == 1)
     {
-      SendString (display, "~hard");
+      static char hard[] = "~hard";
+      SendString (display, hard);
     }
   else
     {
-      SendString (display, "~soft");
+      static char soft[] = "~soft";
+      SendString (display, soft);
     }
 
   return 1;
@@ -678,7 +681,8 @@ int SPW_ReleaseDevice(Display *display)
     }
 
   SPW_strLength = 0;
-  SendString (display, "~relgrab"); 
+  static char relgrab[] = "~relgrab";
+  SendString (display, relgrab); 
   return 1;
 } /* end of SPW_ReleaseDevice */
 
@@ -1415,7 +1419,8 @@ void SPW_InputRezero (Display *display)
   if (SpaceballInputExtension == 0) {
     /* setup the rezero string and send it */
     SPW_strLength = 0;
-    SendString (display, "Z\r");
+    static char Z[] = "Z\r";
+    SendString (display, Z);
   }
 } /* end of SPW_InputRezero */
 

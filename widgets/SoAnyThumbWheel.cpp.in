@@ -117,19 +117,19 @@ SoAnyThumbWheel::~SoAnyThumbWheel(
 
 void
 SoAnyThumbWheel::setSize(
-  const int diameter,
-  const int width)
+  const int diameterarg,
+  const int widtharg)
 {
-  if (this->diameter != diameter) {
+  if (this->diameter != diameterarg) {
     this->dirtyTables = 1;
     this->dirtyVariables = 1;
-  } else if (this->width != width) {
+  } else if (this->width != widtharg) {
     this->dirtyVariables = 1; // embossed squares grows...
   } else {
     return;
   }
-  this->diameter = diameter;
-  this->width = width;
+  this->diameter = diameterarg;
+  this->width = widtharg;
 } // setSize()
 
 /*!
@@ -137,11 +137,11 @@ SoAnyThumbWheel::setSize(
 
 void
 SoAnyThumbWheel::getSize(
-  int & diameter,
-  int & width) const
+  int & diameterref,
+  int & widthref) const
 {
-  diameter = this->diameter;
-  width = this->width;
+  diameterref = this->diameter;
+  widthref = this->width;
 } // getSize()
 
 // ************************************************************************
@@ -151,13 +151,13 @@ SoAnyThumbWheel::getSize(
 
 void
 SoAnyThumbWheel::setColor(
-  const float red,
-  const float green,
-  const float blue)
+  const float redval,
+  const float greenval,
+  const float blueval)
 {
-  this->red = red;
-  this->green = green;
-  this->blue = blue;
+  this->red = redval;
+  this->green = greenval;
+  this->blue = blueval;
 } // setColor()
 
 /*!
@@ -165,13 +165,13 @@ SoAnyThumbWheel::setColor(
 
 void
 SoAnyThumbWheel::getColor(
-  float & red,
-  float & green,
-  float & blue) const
+  float & redref,
+  float & greenref,
+  float & blueref) const
 {
-  red = this->red;
-  green = this->green;
-  blue = this->blue;
+  redref = this->red;
+  greenref = this->green;
+  blueref = this->blue;
 } // GetColor()
 
 // ************************************************************************
@@ -181,15 +181,15 @@ SoAnyThumbWheel::getColor(
 
 void
 SoAnyThumbWheel::setColorFactors(
-  const float light,
-  const float front,
-  const float normal,
-  const float shade)
+  const float lightval,
+  const float frontval,
+  const float normalval,
+  const float shadeval)
 {
-  this->light = light;
-  this->front = front;
-  this->normal = normal;
-  this->shade = shade;
+  this->light = lightval;
+  this->front = frontval;
+  this->normal = normalval;
+  this->shade = shadeval;
 } // setColorFactors()
 
 /*!
@@ -197,15 +197,15 @@ SoAnyThumbWheel::setColorFactors(
 
 void
 SoAnyThumbWheel::getColorFactors(
-  float & light,
-  float & front,
-  float & normal,
-  float & shade) const
+  float & lightref,
+  float & frontref,
+  float & normalref,
+  float & shaderef) const
 {
-  light = this->light;
-  front = this->front;
-  normal = this->normal;
-  shade = this->shade;
+  lightref = this->light;
+  frontref = this->front;
+  normalref = this->normal;
+  shaderef = this->shade;
 } // getColorFactors()
 
 // ************************************************************************
@@ -331,9 +331,9 @@ SoAnyThumbWheel::getBitmapForValue(
 
 void
 SoAnyThumbWheel::setGraphicsByteOrder(
-  const GraphicsByteOrder byteorder)
+  const GraphicsByteOrder byteorderval)
 {
-  this->byteorder = byteorder;
+  this->byteorder = byteorderval;
 } // setGraphicsByteOrder()
 
 /*!
@@ -353,9 +353,9 @@ SoAnyThumbWheel::getGraphicsByteOrder(
 
 void
 SoAnyThumbWheel::setMovement(
-  const Movement movement)
+  const Movement movementval)
 {
-  this->movement = movement;
+  this->movement = movementval;
 } // setMovement()
 
 /*!
@@ -490,35 +490,35 @@ SoAnyThumbWheel::drawDisabledWheel(// private
   unsigned int * buffer = (unsigned int *) bitmap;
 
   for (int j = 0; j < this->diameter; j++) {
-    unsigned int light, front, normal, shade;
-    light  = int8clamp(255.0f * this->tables[SIN][j] * 1.15f);
-    front = 0;
-    normal = int8clamp(255.0f * this->tables[SIN][j]);
-    shade  = int8clamp(255.0f * this->tables[SIN][j] * 0.85f);
+    unsigned int lightval, frontval, normalval, shadeval;
+    lightval = int8clamp(255.0f * this->tables[SIN][j] * 1.15f);
+    frontval = 0;
+    normalval = int8clamp(255.0f * this->tables[SIN][j]);
+    shadeval = int8clamp(255.0f * this->tables[SIN][j] * 0.85f);
 
     // rgbx
-    light  =  (light << 24) |  (light << 16) |  (light << 8);
-    front  =  (front << 24) |  (front << 16) |  (front << 8);
-    normal = (normal << 24) | (normal << 16) | (normal << 8);
-    shade  =  (shade << 24) |  (shade << 16) |  (shade << 8);
+    lightval = (lightval << 24) | (lightval << 16) | (lightval << 8);
+    frontval = (frontval << 24) | (frontval << 16) | (frontval << 8);
+    normalval = (normalval << 24) | (normalval << 16) | (normalval << 8);
+    shadeval = (shadeval << 24) | (shadeval << 16) | (shadeval << 8);
 
     if (this->byteorder != RGBA) {
-      light  = this->swapWord( light);
-      front  = this->swapWord( front);
-      normal = this->swapWord(normal);
-      shade  = this->swapWord( shade);
+      lightval = this->swapWord(lightval);
+      frontval = this->swapWord(frontval);
+      normalval = this->swapWord(normalval);
+      shadeval = this->swapWord(shadeval);
     }
 
     if (alignment == VERTICAL) {
-      buffer[j*this->width] = light;
+      buffer[j*this->width] = lightval;
       for (int i = 1; i < (width - 1); i++)
-        buffer[(j*this->width)+i] = normal;
-      buffer[(j*this->width)+(this->width-1)] = shade;
+        buffer[(j*this->width)+i] = normalval;
+      buffer[(j*this->width)+(this->width-1)] = shadeval;
     } else {
-      buffer[j] = light;
+      buffer[j] = lightval;
       for (int i = 1; i < (this->width-1); i++)
-        buffer[j+(i*this->diameter)] = normal;
-      buffer[j+((this->width-1)*this->diameter)] = shade;
+        buffer[j+(i*this->diameter)] = normalval;
+      buffer[j+((this->width-1)*this->diameter)] = shadeval;
     }
   }
 } // drawDisabledWheel()
@@ -548,72 +548,72 @@ SoAnyThumbWheel::drawEnabledWheel(
   int newsquare = 1;
   unsigned int * buffer = (unsigned int *) bitmap;
   for (int j = 0; j < this->diameter; j++) {
-    unsigned int light, front, normal, shade, color;
+    unsigned int lightval, frontval, normalval, shadeval, color;
 
-    light  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->light) << 24) +
+    lightval  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->light) << 24) +
              (int8clamp(255.0f * this->green * this->tables[SIN][j] * this->light) << 16) +
              (int8clamp(255.0f * this->blue * this->tables[SIN][j] * this->light) << 8);
-    front  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->front) << 24) +
+    frontval  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->front) << 24) +
              (int8clamp(255.0f * this->green * this->tables[SIN][j] * this->front) << 16) +
              (int8clamp(255.0f * this->blue * this->tables[SIN][j] * this->front) << 8);
-    normal = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->normal) << 24) +
+    normalval = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->normal) << 24) +
              (int8clamp(255.0f * this->green * this->tables[SIN][j] * this->normal) << 16) +
              (int8clamp(255.0f * this->blue * this->tables[SIN][j] * this->normal) << 8);
-    shade  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->shade) << 24) +
+    shadeval  = (int8clamp(255.0f * this->red * this->tables[SIN][j] * this->shade) << 24) +
              (int8clamp(255.0f * this->green * this->tables[SIN][j] * this->shade) << 16) +
              (int8clamp(255.0f * this->blue * this->tables[SIN][j] * this->shade) << 8);
 
     if (this->byteorder != RGBA) {
-      light   = this->swapWord(light);
-      normal  = this->swapWord(normal);
-      front   = this->swapWord(front);
-      shade   = this->swapWord(shade);
+      lightval = this->swapWord(lightval);
+      normalval = this->swapWord(normalval);
+      frontval = this->swapWord(frontval);
+      shadeval = this->swapWord(shadeval);
     }
 
     static int flag = 0;
     if (newsquare) {
-      color=front;
+      color=frontval;
       newsquare = 0;
       flag = 1;
     } else {
       if (flag == 1) {
         if (j < (this->diameter * 2 / 3))
-          color = shade;
+          color = shadeval;
         else
-          color = normal;
+          color = normalval;
         flag = 0;
       } else {
-        color = normal;
+        color = normalval;
       }
     }
 
     if (alignment == VERTICAL) {
-      buffer[(this->width*j)] = front;
-      buffer[(this->width*j)+1] = front;
-      if (flag == 1) buffer[(this->width*j)+2] = front;
-      else                buffer[(this->width*j)+2] = shade;
+      buffer[(this->width*j)] = frontval;
+      buffer[(this->width*j)+1] = frontval;
+      if (flag == 1) buffer[(this->width*j)+2] = frontval;
+      else           buffer[(this->width*j)+2] = shadeval;
 
       for (int i = 3; i < (this->width-2); i++)
         buffer[(j*this->width)+i] = color;
 
-      if (flag == 1) buffer[(this->width*j)+this->width-3] = front;
-      else                buffer[(this->width*j)+this->width-3] = normal;
-      buffer[(this->width*j)+this->width-2] = front;
-      buffer[(this->width*j)+this->width-1] = front;
+      if (flag == 1) buffer[(this->width*j)+this->width-3] = frontval;
+      else           buffer[(this->width*j)+this->width-3] = normalval;
+      buffer[(this->width*j)+this->width-2] = frontval;
+      buffer[(this->width*j)+this->width-1] = frontval;
     } else {
 
-      buffer[j] = front;
-      buffer[j+this->diameter] = front;
-      if (flag == 1) buffer[j+(this->diameter*2)] = front;
-      else                buffer[j+(this->diameter*2)] = shade;
+      buffer[j] = frontval;
+      buffer[j+this->diameter] = frontval;
+      if (flag == 1) buffer[j+(this->diameter*2)] = frontval;
+      else           buffer[j+(this->diameter*2)] = shadeval;
 
       for (int i = 2; i < (this->width-2); i++)
         buffer[j+(i*this->diameter)] = color;
 
-      if (flag == 1) buffer[j+(this->diameter*(this->width-3))] = front;
-      else                buffer[j+(this->diameter*(this->width-3))] = normal;
-      buffer[j+(this->diameter*(this->width-2))] = front;
-      buffer[j+(this->diameter*(this->width-1))] = front;
+      if (flag == 1) buffer[j+(this->diameter*(this->width-3))] = frontval;
+      else           buffer[j+(this->diameter*(this->width-3))] = normalval;
+      buffer[j+(this->diameter*(this->width-2))] = frontval;
+      buffer[j+(this->diameter*(this->width-1))] = frontval;
     }
 
     if (j < (this->diameter - 1)) {
@@ -622,18 +622,18 @@ SoAnyThumbWheel::drawEnabledWheel(
         if (alignment == VERTICAL) {
           int color = 0;
           if (j > (this->diameter * 2 / 3))
-            color = light;
+            color = lightval;
           else if (j > (this->diameter / 3))
-            color = front;
+            color = frontval;
           if (color != 0)
             for (int i = 3; i < (this->width-2); i++)
               buffer[(j*this->width)+i] = color;
         } else {
           int color = 0;
           if (j > (this->diameter * 2 / 3))
-            color = light;
+            color = lightval;
           else if (j > (this->diameter / 3))
-            color = front;
+            color = frontval;
           if (color != 0)
             for (int i = 3; i < (this->width-2); i++)
               buffer[j+(this->diameter*i)] = color;

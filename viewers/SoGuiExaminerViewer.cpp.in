@@ -1259,14 +1259,14 @@ SoGuiExaminerViewerP::getMotion3OnCamera(void) const
 
 // Set cursor graphics according to mode.
 void
-SoGuiExaminerViewerP::setCursorRepresentation(int mode)
+SoGuiExaminerViewerP::setCursorRepresentation(int modearg)
 {
   if (!PUBLIC(this)->isCursorEnabled()) {
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getBlankCursor());
     return;
   }
 
-  switch (mode) {
+  switch (modearg) {
   case SoGuiExaminerViewerP::INTERACT:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
     break;

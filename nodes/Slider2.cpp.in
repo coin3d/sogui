@@ -298,9 +298,9 @@ SoGuiSlider2::~SoGuiSlider2(void)
 void
 SoGuiSlider2::sizeUpdate(void)
 {
-  SbVec3f size = this->size.getValue();
-  if ( size[0] != 0.0f && size[1] != 0.0f ) {
-    float coordinates[][3] = { {0.0f, 0.0f, 0.0f}, {size[0], 0.0f, 0.0f}, {size[0], size[1], 0.0f}, {0.0f, size[1], 0.0f} };
+  SbVec3f sizeval = this->size.getValue();
+  if ( sizeval[0] != 0.0f && sizeval[1] != 0.0f ) {
+    float coordinates[][3] = { {0.0f, 0.0f, 0.0f}, {sizeval[0], 0.0f, 0.0f}, {sizeval[0], sizeval[1], 0.0f}, {0.0f, sizeval[1], 0.0f} };
     SoCoordinate3 * coords = SO_GET_ANY_PART(this, "surfaceCoords", SoCoordinate3);
     assert(coords);
     coords->point.setValues(0, sizeof(coordinates) / sizeof(coordinates[0]), coordinates);
@@ -312,18 +312,18 @@ void
 SoGuiSlider2::valueUpdate(void)
 {
   assert(PRIVATE(this)->knobtranslation != NULL);
-  SbVec2f value = this->value.getValue();
-  SbVec2f min = this->min.getValue();
-  SbVec2f max = this->max.getValue();
-  SbVec3f size = this->size.getValue();
+  SbVec2f val = this->value.getValue();
+  SbVec2f minval = this->min.getValue();
+  SbVec2f maxval = this->max.getValue();
+  SbVec3f sizeval = this->size.getValue();
 
   SbVec2f nval;
-  nval[0] = (value[0] - min[0]) / (max[0] - min[0]);
-  nval[1] = (value[1] - min[1]) / (max[1] - min[1]);
+  nval[0] = (val[0] - minval[0]) / (maxval[0] - minval[0]);
+  nval[1] = (val[1] - minval[1]) / (maxval[1] - minval[1]);
 
   SbVec3f translation;
-  translation[0] = nval[0] * size[0];
-  translation[1] = nval[1] * size[1];
+  translation[0] = nval[0] * sizeval[0];
+  translation[1] = nval[1] * sizeval[1];
   translation[2] = 0.0f;
 
   PRIVATE(this)->knobtranslation->translation.setValue(translation);
@@ -348,12 +348,12 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
       SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
       if ( raypos[0] != -1.0f ) {
         SbVec2f imagpos = SbVec2f(raypos[0], raypos[1]) + PRIVATE(this)->graboffset;
-        SbVec2f min = this->min.getValue();
-        SbVec2f max = this->max.getValue();
-        SbVec3f size = this->size.getValue();
+        SbVec2f minval = this->min.getValue();
+        SbVec2f maxval = this->max.getValue();
+        SbVec3f sizeval = this->size.getValue();
         SbVec2f imagval;
-        imagval[0] = min[0] + (max[0] - min[0]) * So@Gui@Clamp(imagpos[0] / size[0], 0.0f, 1.0f);
-        imagval[1] = min[1] + (max[1] - min[1]) * So@Gui@Clamp(imagpos[1] / size[1], 0.0f, 1.0f);
+        imagval[0] = minval[0] + (maxval[0] - minval[0]) * So@Gui@Clamp(imagpos[0] / sizeval[0], 0.0f, 1.0f);
+        imagval[1] = minval[1] + (maxval[1] - minval[1]) * So@Gui@Clamp(imagpos[1] / sizeval[1], 0.0f, 1.0f);
         this->value.setValue(imagval);
       }
       action->setHandled();
@@ -381,11 +381,11 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
           const SoPickedPoint * pp = pplist[i];
           const SoFullPath * path = (const SoFullPath *) pp->getPath();
           SoNode * node = NULL;
-          SoNode * knobGeometry = SO_GET_ANY_PART(this, "knobGeometry", SoSeparator);
+          SoNode * knob = SO_GET_ANY_PART(this, "knobGeometry", SoSeparator);
           int j = path->getLength() - 1;
           for ( ; j >= 0; j-- ) {
             SoNode * node = path->getNode(j);
-            if ( node == knobGeometry ) break;
+            if ( node == knob ) break;
             node = NULL;
           }
 
@@ -394,7 +394,7 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
             action->setHandled();
 
             SbVec3f point = pp->getObjectPoint();
-            SbVec2f size =  SbVec2f(this->size.getValue()[0], this->size.getValue()[1]);
+            SbVec2f sizeval = SbVec2f(this->size.getValue()[0], this->size.getValue()[1]);
 
             const SoFullPath * path = (const SoFullPath *) action->getCurPath();
             int i = path->getLength() - 1;
@@ -415,8 +415,8 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
             SbVec2f lower = this->max.getValue() - this->min.getValue();
 
             SbVec2f realval;
-            realval[0] = (upper[0] / lower[0]) * size[0];
-            realval[1] = (upper[1] / lower[1]) * size[1];
+            realval[0] = (upper[0] / lower[0]) * sizeval[0];
+            realval[1] = (upper[1] / lower[1]) * sizeval[1];
             PRIVATE(this)->graboffset = realval - raypos;
           }
         }
@@ -427,13 +427,13 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
           SoNode * node = ((SoFullPath *) path)->getTail();
           if ( node == ((SoNode *) SO_GET_ANY_PART(this, "surfaceFaceSet", SoIndexedFaceSet)) ) {
             SbVec3f point = pp->getObjectPoint();
-            SbVec3f size = this->size.getValue();
-            SbVec2f min = this->min.getValue();
-            SbVec2f max = this->max.getValue();
-            SbVec2f value;
-            value[0] = min[0] + (point[0] / size[0]) * (max[0] - min[0]);
-            value[1] = min[1] + (point[1] / size[1]) * (max[1] - min[1]);
-            this->value.setValue(value);
+            SbVec3f sizeval = this->size.getValue();
+            SbVec2f minval = this->min.getValue();
+            SbVec2f maxval = this->max.getValue();
+            SbVec2f val;
+            val[0] = minval[0] + (point[0] / sizeval[0]) * (maxval[0] - minval[0]);
+            val[1] = minval[1] + (point[1] / sizeval[1]) * (maxval[1] - minval[1]);
+            this->value.setValue(val);
             action->setHandled();
             if ( this->alwaysHook.getValue() ) {
               PRIVATE(this)->grabbing = TRUE;
@@ -454,11 +454,11 @@ SoGuiSlider2::handleEvent(SoHandleEventAction * action)
               PRIVATE(this)->grabpos = raypos;
               SbVec2f upper = this->value.getValue() - this->min.getValue();
               SbVec2f lower = this->max.getValue() - this->min.getValue();
-              SbVec2f size =  SbVec2f(this->size.getValue()[0], this->size.getValue()[1]);
+              SbVec2f sizeval = SbVec2f(this->size.getValue()[0], this->size.getValue()[1]);
 
               SbVec2f realval;
-              realval[0] = (upper[0] / lower[0]) * size[0];
-              realval[1] = (upper[1] / lower[1]) * size[1];
+              realval[0] = (upper[0] / lower[0]) * sizeval[0];
+              realval[1] = (upper[1] / lower[1]) * sizeval[1];
               PRIVATE(this)->graboffset = realval - raypos;
             }
           }

@@ -148,16 +148,16 @@ SoGuiClickCounter::handleEvent(SoHandleEventAction * action)
         if ( node == (SoNode *) target ) hit = TRUE;
       }
       if ( hit ) {
-        int32_t first = this->first.getValue();
-        int32_t last = this->last.getValue();
-        if ( first < last ) {
-          int32_t value = this->value.getValue() + 1;
-          if ( value > last ) value = first;
-          this->value.setValue(value);
-        } else if ( first > last ) {
-          int32_t value = this->value.getValue() - 1;
-          if ( value < last ) value = first;
-          this->value.setValue(value);
+        int32_t firstval = this->first.getValue();
+        int32_t lastval = this->last.getValue();
+        if ( firstval < lastval ) {
+          int32_t val = this->value.getValue() + 1;
+          if ( val > lastval ) val = firstval;
+          this->value.setValue(val);
+        } else if ( firstval > lastval ) {
+          int32_t val = this->value.getValue() - 1;
+          if ( val < lastval ) val = firstval;
+          this->value.setValue(val);
         }
         this->click.touch();
       }
@@ -166,16 +166,16 @@ SoGuiClickCounter::handleEvent(SoHandleEventAction * action)
 }
 
 void
-SoGuiClickCounter::setSurfaceColor(const SbColor & value)
+SoGuiClickCounter::setSurfaceColor(const SbColor & valuearg)
 {
 }
 
 void
 SoGuiClickCounter::sizeUpdate(void)
 {
-  SbVec3f size = this->size.getValue();
-  if ( size[0] != 0.0f && size[1] != 0.0f ) {
-    float coordinates[][3] = { {0.0f, 0.0f, 0.0f}, {size[0], 0.0f, 0.0f}, {size[0], size[1], 0.0f}, {0.0f, size[1], 0.0f} };
+  SbVec3f sizeval = this->size.getValue();
+  if ( sizeval[0] != 0.0f && sizeval[1] != 0.0f ) {
+    float coordinates[][3] = { {0.0f, 0.0f, 0.0f}, {sizeval[0], 0.0f, 0.0f}, {sizeval[0], sizeval[1], 0.0f}, {0.0f, sizeval[1], 0.0f} };
     SoCoordinate3 * coords = SO_GET_ANY_PART(this, "surfaceCoords", SoCoordinate3);
     assert(coords);
     coords->point.setValues(0, sizeof(coordinates) / sizeof(coordinates[0]), coordinates);

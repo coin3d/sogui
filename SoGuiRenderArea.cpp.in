@@ -578,9 +578,9 @@ So@Gui@RenderAreaP::selection_redraw_cb(void * closure, SoSelection * sel)
 }
 
 // Private class constructor.
-So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * pub)
+So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * api)
 {
-  PUBLIC(this) = pub;
+  PUBLIC(this) = api;
 
   this->normalManager = new SoSceneManager;
   this->overlayManager = new SoSceneManager;

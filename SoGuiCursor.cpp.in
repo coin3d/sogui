@@ -237,16 +237,16 @@ So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
   As for the format of the cursor bitmap data, see documentation of
   So@Gui@Cursor::CustomCursor.
 */
-So@Gui@Cursor::So@Gui@Cursor(const CustomCursor * cc)
+So@Gui@Cursor::So@Gui@Cursor(const CustomCursor * ccarg)
 { 
-  this->commonConstructor(CUSTOM_BITMAP, cc);
+  this->commonConstructor(CUSTOM_BITMAP, ccarg);
 }
 
 // Private common constructor.
 void
-So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
+So@Gui@Cursor::commonConstructor(const Shape shapearg, const CustomCursor * ccarg)
 { 
-  this->shape = shape;
+  this->shape = shapearg;
   this->cc = NULL;
 
   if (first) {
@@ -273,10 +273,10 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
     first = FALSE;
   }
 
-  if (cc) {
+  if (ccarg) {
     assert(shape == CUSTOM_BITMAP);
     this->cc = new CustomCursor;
-    *(this->cc) = *cc;
+    *(this->cc) = *ccarg;
   }
 }
 
@@ -324,9 +324,9 @@ So@Gui@Cursor::getShape(void) const
   Sets the cursor to a predefined shape.
 */
 void 
-So@Gui@Cursor::setShape(const Shape shape)
+So@Gui@Cursor::setShape(const Shape shapearg)
 {
-  this->shape = shape;
+  this->shape = shapearg;
 }
 
 /*!
