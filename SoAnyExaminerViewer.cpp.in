@@ -823,8 +823,13 @@ SoAnyExaminerViewer::processSoEvent(
         SbVec3f to = this->spinprojector->project( normalized );
         SbRotation rot = this->spinprojector->getRotation( from, to );
 
-        float deltatime = this->log.time[0].getMsecValue() -
-                          this->log.time[2].getMsecValue();
+        SbTime delta = (this->log.time[0] - this->log.time[2]);
+        float deltatime = (float) delta.getMsecValue();
+        if ( deltatime == 1.0f ) {
+          SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
+            this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue() );
+          return TRUE;
+        }
         rot.scaleAngle( 200.0f / deltatime );
         rot.invert();
 
@@ -863,7 +868,7 @@ SoAnyExaminerViewer::processSoEvent(
       return TRUE;
     }
     if ( this->button1Down ) {
-      this->addToLog( event->getPosition() );
+      this->addToLog( event->getPosition(), event->getTime() );
       this->spin( normalized );
       return TRUE;
     }
@@ -940,7 +945,8 @@ SoAnyExaminerViewer::clearLog(
 
 void
 SoAnyExaminerViewer::addToLog(
-  const SbVec2s pos )
+  const SbVec2s pos,
+  const SbTime time )
 {
   if ( this->log.size <= 0 ) {
 #if SO@GUI@_DEBUG
@@ -948,10 +954,21 @@ SoAnyExaminerViewer::addToLog(
 #endif // SO@GUI@_DEBUG
     return;
   }
-  memmove( &(this->log.position[1]), &(this->log.position[0]), sizeof(SbVec2s)*(this->log.size-1) );
-  memmove( &(this->log.time[1]), &(this->log.time[0]), sizeof(SbTime)*(this->log.size-1) );
+  if ( this->log.historysize > 0 && pos == this->log.position[0] ) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo( "SoAnyExaminerViewer::addToLog", "got position already!" );
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+//  memmove( &(this->log.position[1]), &(this->log.position[0]), sizeof(SbVec2s)*(this->log.size-1) );
+//  memmove( &(this->log.time[1]), &(this->log.time[0]), sizeof(SbTime)*(this->log.size-1) );
+  for ( int i = this->log.size - 1; i > 0; i-- ) {
+    this->log.position[i] = this->log.position[i-1];
+    this->log.time[i] = this->log.time[i-1];
+  }
   this->log.position[0] = pos;
-  this->log.time[0] = SbTime::getTimeOfDay();
+  this->log.time[0] = time;
   if ( this->log.historysize < this->log.size )
     this->log.historysize += 1;
 } // addToLog()
