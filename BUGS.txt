@@ -71,3 +71,28 @@ NOTE: see also So@Gui@/BUGS.txt.
     20021118 mortene, reported by Michael Wimmer on coin-discuss.
 
 =====================================================================
+
+002 Should search for and pick up VRML97 Viewpoint nodes.
+
+    As of now, the SoGuiViewer only scans a newly set scene graph for
+    SoCamera nodes. (If found, it will "attach" the viewer controls to
+    the first one.) If none is found, the viewer sets up it's own in
+    it's private "control graph".
+
+    This doesn't work with VRML97 scene graphs, obviously, so
+    SoGuiViewer should also scan for Viewpoint nodes to be set up as
+    the viewer's camera.
+
+    Note that matters are complicated a bit by the fact that we can't
+    be sure that an implementation of any VRML97 nodes is actually
+    present in the Coin / Inventor library (it could be SGI Inventor,
+    or it could be Coin configured to exclude VRML97 support). So we
+    need to search for them by using the SoType::fromName("Viewpoint")
+    type (check that this is != SoType::badType() to see whether
+    VRML97 is supported), and connect up it's position, orientation
+    and fieldOfViewer fields by using the introspection features of
+    SoFieldContainer.
+
+    20030107 mortene.
+
+=====================================================================
