@@ -2323,7 +2323,8 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
 }
 
 /*!
-  Set the auto clipping strategy used for auto clipping.
+  Set the strategy used for automatic updates of the distances to the
+  near and far clipping planes.
 
   When auto clipping is enabled, the near plane distance is calculated
   so that it is just in front of the scene bounding box. If this near
