@@ -42,6 +42,8 @@ public:
   SoSFVec2s size;
   SoSFNode scene;
 
+  virtual void notify(SoNotList * list);
+
 protected:
   virtual ~SoGuiSceneTexture2(void);
 

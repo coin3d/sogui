@@ -26,8 +26,10 @@
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/sensors/SoFieldSensor.h>
-#include <Inventor/SoOffscreenRenderer.h>
+#include <Inventor/sensors/SoOneShotSensor.h>
 #include <Inventor/actions/SoGLRenderAction.h>
+#include <Inventor/SoOffscreenRenderer.h>
+#include <Inventor/misc/SoNotification.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
 
@@ -43,8 +45,10 @@ public:
   SoOffscreenRenderer * renderer;
 
   SoFieldSensor * size_sensor;
-  SoFieldSensor * scene_sensor;
-  static void scene_updated_cb(void * closure, SoSensor * sensor);
+  static void size_updated_cb(void * closure, SoSensor * sensor);
+
+  SoOneShotSensor * render_sensor;
+  static void render_cb(void * closure, SoSensor * sensor);
 };
 
 // *************************************************************************
@@ -68,19 +72,32 @@ SoGuiSceneTexture2::SoGuiSceneTexture2(void)
   SO_NODE_ADD_FIELD(size, (SbVec2s(256, 256)));
   SO_NODE_ADD_FIELD(scene, (NULL));
 
-  PRIVATE(this)->size_sensor = new SoFieldSensor(SceneTexture2::scene_updated_cb, PRIVATE(this));
+  PRIVATE(this)->size_sensor = new SoFieldSensor(SceneTexture2::size_updated_cb, PRIVATE(this));
   PRIVATE(this)->size_sensor->attach(&(this->size));
-  PRIVATE(this)->scene_sensor = new SoFieldSensor(SceneTexture2::scene_updated_cb, PRIVATE(this));
-  PRIVATE(this)->scene_sensor->attach(&(this->scene));
+  PRIVATE(this)->render_sensor = new SoOneShotSensor(SceneTexture2::render_cb, PRIVATE(this));
 }
 
 SoGuiSceneTexture2::~SoGuiSceneTexture2(void)
 {
   delete PRIVATE(this)->size_sensor;
-  delete PRIVATE(this)->scene_sensor;
+  delete PRIVATE(this)->render_sensor;
   if ( PRIVATE(this)->renderer != NULL ) {
     delete PRIVATE(this)->renderer;
   }
+}
+
+// We overload notify() because we need to know when the scene graph has
+// been updated, but want to stop that notification from propagating
+// through the external scene graph.  We only want the texture update to
+// trigger re-rendering.
+void
+SoGuiSceneTexture2::notify(SoNotList * list)
+{
+  if ( list->getLastField() == &(this->scene) ) {
+    PRIVATE(this)->render_sensor->schedule();
+    return;
+  }
+  inherited::notify(list);
 }
 
 #undef PRIVATE
@@ -92,23 +109,35 @@ SoGuiSceneTexture2::~SoGuiSceneTexture2(void)
 SceneTexture2::SceneTexture2(void)
 {
   this->api = NULL;
-  this->size_sensor = NULL;
-  this->scene_sensor = NULL;
-  this->renderer = NULL;
   this->prevsize = SbVec2s(-1, -1);
+  this->renderer = NULL;
+  this->size_sensor = NULL;
+  this->render_sensor = NULL;
 }
 
-// This rendering is terribly slow.  Some 
-
-
 void
-SceneTexture2::scene_updated_cb(void * closure, SoSensor * sensor)
+SceneTexture2::size_updated_cb(void * closure, SoSensor * sensor)
 {
-  // SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "");
   assert(closure);
   SceneTexture2 * me = (SceneTexture2 *) closure;
-  SbVec2s size = PUBLIC(me)->size.getValue(), dummy;
-  int dummync;
+  SbVec2s size = PUBLIC(me)->size.getValue();
+  if ( size != me->prevsize ) {
+    if ( me->renderer != NULL ) {
+      me->renderer->setViewportRegion(SbViewportRegion(size));
+      PUBLIC(me)->image.setValue(size, 3, NULL);
+      me->render_sensor->schedule();
+    }
+    me->prevsize = size;
+  }
+}
+
+void
+SceneTexture2::render_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  SceneTexture2 * me = (SceneTexture2 *) closure;
+  SbVec2s size = PUBLIC(me)->size.getValue();
+  int nc = 3;
   SoNode * scene = PUBLIC(me)->scene.getValue();
   SbBool save = PUBLIC(me)->image.enableNotify(FALSE);
   if ( scene != NULL ) {
@@ -117,21 +146,16 @@ SceneTexture2::scene_updated_cb(void * closure, SoSensor * sensor)
       me->renderer->setComponents(SoOffscreenRenderer::RGB);
       me->renderer->getGLRenderAction()->setTransparencyType(SoGLRenderAction::BLEND);
       me->prevsize = size;
-      PUBLIC(me)->image.setValue(size, 3, NULL);
-    }
-    if ( size != me->prevsize ) {
-      me->renderer->setViewportRegion(SbViewportRegion(size));
-      me->prevsize = size;
-      PUBLIC(me)->image.setValue(size, 3, NULL);
+      PUBLIC(me)->image.setValue(size, nc, NULL);
     }
     me->renderer->render(scene);
     unsigned char * renderbuffer = me->renderer->getBuffer();
-    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
-    memcpy(imagebytes, renderbuffer, size[0] * size[1] * 3);
+    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(size, nc);
+    memcpy(imagebytes, renderbuffer, size[0] * size[1] * nc);
     PUBLIC(me)->image.finishEditing();
   } else {
-    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
-    memset(imagebytes, 0, size[0] * size[1] * 3);
+    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(size, nc);
+    memset(imagebytes, 0, size[0] * size[1] * nc);
     PUBLIC(me)->image.finishEditing();
   }
   PUBLIC(me)->image.enableNotify(save);
