@@ -48,10 +48,10 @@ static const char rcsid[] =
 */
 
 SoAnyFlyViewer::SoAnyFlyViewer(
-  So@Gui@FlyViewer * const _viewer )
-: viewer( _viewer )
+  So@Gui@FlyViewer * const v )
+: viewer( v )
 {
-  assert( _viewer != NULL );
+  assert( v != NULL );
 } // SoAnyFlyViewer()
 
 /*!
@@ -72,14 +72,15 @@ void
 SoAnyFlyViewer::dolly(
   const float delta ) const
 {
-  SoCamera * const camera = viewer->getCamera();
-  assert( camera != NULL );
-  SbPlane walkplane( viewer->getUpDirection(), camera->position.getValue() );
+  SoCamera * const camera = this->viewer->getCamera();
+  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+
+  SbPlane walkplane( this->viewer->getUpDirection(), camera->position.getValue() );
   SbVec3f campos = camera->position.getValue();
   SbVec3f camvec;
   camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
   SbLine cross( campos + camvec,
-                campos + camvec + viewer->getUpDirection() );
+                campos + camvec + this->viewer->getUpDirection() );
   SbVec3f intersect;
   walkplane.intersect( cross, intersect );
   SbVec3f dir = intersect - campos;
