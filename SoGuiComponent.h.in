@@ -32,6 +32,10 @@ class QWidget;
 #ifdef __COIN_SOXT__
 #include <X11/Intrinsic.h>
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOXT__
+#include <gtk/gtk.h>
+#endif // __COIN_SOXT__
+
 
 class So@Gui@Component;
 
@@ -132,6 +136,12 @@ protected:
   virtual bool eventFilter(QObject * obj, QEvent * e);
 #endif // __COIN_SOQT__
 
+#ifdef __COIN_SOGTK__
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
+#endif // __COIN_SOGTK__
+
+
 #ifdef __COIN_SOQT__
 private slots:
   void widgetClosed(void);
@@ -139,6 +149,8 @@ private slots:
 
 private:
   class So@Gui@ComponentP * pimpl;
+  // FIXME: get rid of this? Possibly used by SoGtkComponent. 20011012 mortene.
+  friend class So@Gui@ComponentP;
 
 #ifdef __COIN_SOXT__
   // FIXME: get rid of this? 20011012 mortene.
