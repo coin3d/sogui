@@ -46,14 +46,16 @@ static const char rcsid[] =
 #include <GL/gl.h> // glDrawBuffer()
 
 #include <Inventor/SoSceneManager.h>
+#include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/nodes/SoSelection.h>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Basic.h>
-#include <Inventor/@Gui@/devices/So@Gui@Mouse.h>
+#include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/devices/So@Gui@Keyboard.h>
+#include <Inventor/@Gui@/devices/So@Gui@Mouse.h>
 #include <Inventor/@Gui@/devices/So@Gui@Spaceball.h>
 #ifdef HAVE_JOYSTICK_LINUX
 #include <Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h>
@@ -165,8 +167,8 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation( void )
   if (exts.getLength() > 0) { info += "\n   "; info += exts; }
   info += "\"\n";
 
-  SoWin::createSimpleErrorDialog( NULL, "OpenGL driver information",
-                                  info.getString() );
+  So@Gui@::createSimpleErrorDialog( NULL, "OpenGL driver information",
+                                    info.getString() );
 #endif // SO@GUI@_DEBUG
 }
 
@@ -1389,6 +1391,8 @@ So@Gui@RenderArea::processEvent( // virtual, protected
       SoKeyboardEvent * ke = ( SoKeyboardEvent * )soevent;
       if ( ke->getState( ) == SoButtonEvent::UP ) {
         char c = ke->getPrintableCharacter();
+        // XXX debug
+        // SoDebugError::postInfo("hepp", "new char=%c", c);
         if ( PRIVATE( this )->checkMagicSequence( c ) ) {
           this->glLockNormal();
           PRIVATE( this )->showOpenGLDriverInformation( );
