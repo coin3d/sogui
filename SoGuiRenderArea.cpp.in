@@ -202,6 +202,16 @@ So@Gui@RenderArea::constructor( // private
   PRIVATE(this)->normalManager->activate();
   PRIVATE(this)->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   PRIVATE(this)->overlayManager->activate();
+  // FIXME: what is this magic number doing here - shouldn't we use
+  // SoGLCacheContextElement::getUniqueCacheContext() for Coin, and
+  // magic numbers just for SGI / TGS Inventor?
+  //
+  // On a side note: won't this code fail if we construct several
+  // So@Gui@RenderArea instances with overlays? They will all use
+  // cachecontext==1 for their SoGLRenderAction instances -- is that
+  // kosher?
+  //
+  // 20010831 mortene.
   PRIVATE(this)->overlayManager->getGLRenderAction()->setCacheContext(1);
 
   this->deviceList = new SbPList ;
@@ -210,6 +220,13 @@ So@Gui@RenderArea::constructor( // private
 
   if ( mouseInput ) {
     PRIVATE(this)->devices.mouse = new So@Gui@Mouse;
+
+    // FIXME: somebody debug larsa's head so he learns to write proper
+    // FIXME comments (see below), which _at least_ actually contains
+    // a useful description of what doesn't work / is to be fixed. And
+    // why not throw in the ability to tag the FIXME with a datestamp
+    // and username aswell. Sheesh... 20010831 mortene.
+
     // FIXME: this does not work
     // this->registerDevice( PRIVATE(this)->devices.mouse );
     this->deviceList->append( PRIVATE(this)->devices.mouse );
@@ -295,6 +312,11 @@ void
 So@Gui@RenderArea::setOverlaySceneGraph(
   SoNode * scene )
 {
+  // FIXME: when an overlay scenegraph is attempted registered with
+  // the SoQtRenderArea -- try to make a QGLWidget with overlay
+  // planes, and if that's not possible, display a warning.
+  // 20010805 mortene.
+
   PRIVATE(this)->overlayManager->setSceneGraph( scene );
 } // setOverlaySceneGraph()
 
