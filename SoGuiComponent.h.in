@@ -118,13 +118,8 @@ private:
   friend class SoGuiComponentP;
   friend class So@Gui@ComponentP;
 
-  // FIXME: get rid of remaining toolkit specifics below. 20020611 mortene.
-
-#ifdef __COIN_SOWIN__
-public:
-  HWND setFocusProxy(HWND widget);
-  HWND getFocusProxy(void);
-#endif // __COIN_SOWIN__
+  // FIXME!: audit and remove as much as possible of the remaining
+  // toolkit specific parts below. 20020117 mortene.
 
 #ifdef __COIN_SOXT__
 public:
