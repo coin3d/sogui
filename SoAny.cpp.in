@@ -373,6 +373,10 @@ envlist_append(struct envvar_data * item)
   datastructures on different heaps. That's why we need this
   abstraction around the C-libs getenv() vs the Win32 API
   GetEnvironmentVariable() function.
+
+  Note: do not deallocate the returned string -- they are supposed to
+  be permanently available to all callers. Deallocating the resources
+  is the responsibility of the application exit cleanup code.
 */
 const char *
 SoAny::getenv(const char * envname)
