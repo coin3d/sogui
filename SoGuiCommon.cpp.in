@@ -21,6 +21,7 @@
 // @configure_input@
 
 #include <Inventor/@Gui@/So@Gui@.h>
+#include <Inventor/@Gui@/SoAny.h>
 
 /*!
   \typedef void So@Gui@::FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode, void * userdata)
