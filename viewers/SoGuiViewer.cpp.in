@@ -262,14 +262,26 @@ public:
   double lastgettimeofday;
   int framecount;
 
+  // Stereo-related
+  SbBool stereoviewing;
+  float stereooffset;
+  enum Eye { LEFT, RIGHT, RESTORE };
+  struct StereoData {
+    SbVec3f camerapos, cameradir, offsetvec, focalpoint;
+    SbRotation camerarot;
+    float offset;
+    SbBool nodenotify, positionnotify, orientationnotify;
+  };
+  void setStereoEye(SoCamera * camera,
+                    const So@Gui@ViewerP::Eye eye,
+                    So@Gui@ViewerP::StereoData & storage) const;
+
   // Misc
   SoType cameratype;
   SbBool cursoron, localsetbuffertype;
   SoCallbackList * interactionstartCallbacks, * interactionendCallbacks;
   int interactionnesting;
   So@Gui@Viewer::BufferType buffertype;
-  SbBool stereoviewing;
-  float stereooffset;
   SbColor wireframeoverlaycolor;
 
   void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
@@ -2896,6 +2908,77 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   return TRUE;
 }
 
+void
+So@Gui@ViewerP::setStereoEye(SoCamera * camera,
+                             const So@Gui@ViewerP::Eye eye,
+                             So@Gui@ViewerP::StereoData & s) const
+{
+#ifdef HAVE_SOCAMERA_SETSTEREOMODE
+
+  // SoCamera::setStereoMode() is a fairly recent addition to Coin and
+  // TGS Inventor. If available, camera eye setup is quite
+  // straightforward.
+
+  if (eye == So@Gui@ViewerP::LEFT) {
+    camera->setStereoAdjustment(PUBLIC(this)->getStereoOffset());
+    camera->setStereoMode(SoCamera::LEFT_VIEW);
+  }
+  else if (eye == So@Gui@ViewerP::RIGHT) {
+    camera->setStereoMode(SoCamera::RIGHT_VIEW);
+  }
+  else {
+    assert(eye == So@Gui@ViewerP::RESTORE);
+
+    camera->setStereoMode(SoCamera::MONOSCOPIC);
+  }
+
+#else // ! HAVE_SOCAMERA_SETSTEREOMODE
+
+  // To support older versions of Coin, and SGI/TGS Inventor, we also
+  // provide "manual" tuning of the camera left/right eye split.
+
+  if (eye == So@Gui@ViewerP::LEFT) {
+    s.camerapos = camera->position.getValue();
+    s.cameradir.setValue(0.0f, 0.0f, -1.0f);
+    s.offsetvec.setValue(1.0f, 0.0f, 0.0f);
+    s.offset = PUBLIC(this)->getStereoOffset() * 0.5f;
+    s.camerarot = camera->orientation.getValue();
+    s.camerarot.multVec(s.cameradir, s.cameradir);
+    s.camerarot.multVec(s.offsetvec, s.offsetvec);
+    s.focalpoint = s.camerapos + s.cameradir * camera->focalDistance.getValue();
+
+    s.nodenotify = camera->isNotifyEnabled();
+    s.positionnotify = camera->position.isNotifyEnabled();
+    s.orientationnotify = camera->orientation.isNotifyEnabled();
+    // turn off notification to avoid redraws
+    camera->enableNotify(FALSE);
+    camera->position.enableNotify(FALSE);
+    camera->orientation.enableNotify(FALSE);
+
+    camera->position = s.camerapos - s.offsetvec * s.offset;
+    SbVec3f dir = s.focalpoint - camera->position.getValue();
+    SbRotation rot(s.cameradir, dir);
+    camera->orientation = s.camerarot * rot;
+  }
+  else if (eye == So@Gui@ViewerP::RIGHT) {
+    camera->position = s.camerapos + s.offsetvec * s.offset;
+    SbVec3f dir = s.focalpoint - camera->position.getValue();
+    SbRotation rot(s.cameradir, dir);
+    camera->orientation = s.camerarot * rot;
+  }
+  else {
+    assert(eye == So@Gui@ViewerP::RESTORE);
+
+    camera->position = s.camerapos;
+    camera->orientation = s.camerarot;
+    camera->position.enableNotify(s.positionnotify);
+    camera->orientation.enableNotify(s.orientationnotify);
+    camera->enableNotify(s.nodenotify);
+  }
+
+#endif // ! HAVE_SOCAMERA_SETSTEREOMODE
+}
+
 // Documented in superclass. Overridden from parent class to be able
 // to do the necessary two-pass rendering e.g. if the drawing style is
 // hidden line.
@@ -2908,31 +2991,12 @@ So@Gui@Viewer::actualRedraw(void)
 
   if (this->isStereoViewing()) {
     SbColor bgcol = this->getSceneManager()->getBackgroundColor();
-
     SbBool quadstereo = this->isQuadBufferStereo();
-#ifndef HAVE_SOCAMERA_SETSTEREOMODE
     SoCamera * camera = this->getCamera();
-    SbVec3f camerapos = camera->position.getValue();
-    SbVec3f cameradir(0.0f, 0.0f, -1.0f);
-    SbVec3f offsetvec(1.0f, 0.0f, 0.0f);
-    float offset = this->getStereoOffset() * 0.5f;
-    SbRotation camerarot = camera->orientation.getValue();
-    camerarot.multVec(cameradir, cameradir);
-    camerarot.multVec(offsetvec, offsetvec);
-    SbVec3f focalpoint = camerapos + cameradir * camera->focalDistance.getValue();
+    So@Gui@ViewerP::StereoData tmpstorage;
 
-    SbBool notifystore = camera->isNotifyEnabled();
-    SbBool positionstore = camera->position.isNotifyEnabled();
-    SbBool orientationstore = camera->orientation.isNotifyEnabled();
-    // turn off notification to avoid redraws
-    camera->enableNotify(FALSE);
-    camera->position.enableNotify(FALSE);
-    camera->orientation.enableNotify(FALSE);
+    PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::LEFT, tmpstorage);
 
-    camera->position = camerapos - offsetvec * offset;
-    SbVec3f dir = focalpoint - camera->position.getValue();
-    SbRotation rot(cameradir, dir);
-    camera->orientation = camerarot * rot;
     if (quadstereo) {
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_LEFT : GL_FRONT_LEFT);
       PRIVATE(this)->reallyRedraw(clearcol);
@@ -2945,11 +3009,7 @@ So@Gui@Viewer::actualRedraw(void)
       PRIVATE(this)->reallyRedraw(FALSE, FALSE);
     }
 
-    // right eye
-    camera->position = camerapos + offsetvec * offset;
-    dir = focalpoint - camera->position.getValue();
-    rot.setValue(cameradir, dir);
-    camera->orientation = camerarot * rot;
+    PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::RIGHT, tmpstorage);
 
     if (quadstereo) {
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK_RIGHT : GL_FRONT_RIGHT);
@@ -2960,63 +3020,18 @@ So@Gui@Viewer::actualRedraw(void)
       PRIVATE(this)->reallyRedraw(FALSE, TRUE);
     }
 
-    // restore camera values and enable notification
-    camera->position = camerapos;
-    camera->orientation = camerarot;
-    camera->position.enableNotify(positionstore);
-    camera->orientation.enableNotify(orientationstore);
-    camera->enableNotify(notifystore);
+    PRIVATE(this)->setStereoEye(camera, So@Gui@ViewerP::RESTORE, tmpstorage);
+
     if (quadstereo) {
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
     }
     else {
       glColorMask(1,1,1,1); // restore GL color mask
     }
-#else // HAVE_SOCAMERA_SETSTEREOMODE
-
-    if (!quadstereo) {
-      SoCamera * camera = this->getCamera();
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK);
-      else
-        glDrawBuffer(GL_FRONT);
-      glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
-      glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-      glColorMask(1,0,0,1); // draw red-only
-      camera->setStereoAdjustment(this->getStereoOffset());
-      camera->setStereoMode(SoCamera::LEFT_VIEW);
-      PRIVATE(this)->reallyRedraw(FALSE, FALSE);
-
-      camera->setStereoMode(SoCamera::RIGHT_VIEW);
-      glColorMask(0,1,1,1); // draw green and blue
-      PRIVATE(this)->reallyRedraw(FALSE, TRUE);
-      camera->setStereoMode(SoCamera::MONOSCOPIC);
-      glColorMask(1,1,1,1); // restore GL color mask
-    }
-    else {
-      SoCamera * camera = this->getCamera();
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK_LEFT);
-      else
-        glDrawBuffer(GL_FRONT_LEFT);
-      camera->setStereoAdjustment(this->getStereoOffset());
-      camera->setStereoMode(SoCamera::LEFT_VIEW);
-      PRIVATE(this)->reallyRedraw(clearcol);
-      camera->setStereoMode(SoCamera::RIGHT_VIEW);
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK_RIGHT);
-      else
-        glDrawBuffer(GL_FRONT_RIGHT);
-      PRIVATE(this)->reallyRedraw(clearcol);
-      camera->setStereoMode(SoCamera::MONOSCOPIC);
-      if (this->isDoubleBuffer())
-        glDrawBuffer(GL_BACK);
-      else
-        glDrawBuffer(GL_FRONT);
-    }
-#endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
-  else PRIVATE(this)->reallyRedraw(clearcol);
+  else {
+    PRIVATE(this)->reallyRedraw(clearcol);
+  }
 
   if (PRIVATE(this)->superimpositions != NULL) {
     SoGLRenderAction * raaction = this->getSceneManager()->getGLRenderAction();
