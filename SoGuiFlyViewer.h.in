@@ -1,0 +1,76 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// @configure_input@
+// $Id$
+
+#ifndef SO@GUI@_FLYVIEWER_H
+#define SO@GUI@_FLYVIEWER_H
+
+#include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
+
+// ************************************************************************
+
+class SO@GUI@_DLL_API So@Gui@FlyViewer : public So@Gui@ConstrainedViewer {
+  SO@GUI@_OBJECT_HEADER(So@Gui@FlyViewer, So@Gui@ConstrainedViewer);
+  @COMPONENTHEADER@
+
+public:
+  So@Gui@FlyViewer(
+    @WIDGET@ parent = NULL,
+    const char * name = NULL, 
+    SbBool embed = TRUE, 
+    So@Gui@FullViewer::BuildFlag flag = BUILD_ALL,
+    So@Gui@Viewer::Type type = BROWSER );
+  ~So@Gui@FlyViewer();
+
+  virtual void setViewing( SbBool enable );
+  virtual void resetToHomePosition(void);
+  virtual void setCamera( SoCamera * camera );
+  virtual void setCursorEnabled( SbBool enable );
+  virtual void setCameraType( SoType type );
+
+protected:
+  So@Gui@FlyViewer(
+    @WIDGET@ parent,
+    const char * const name, 
+    SbBool embed, 
+    So@Gui@FullViewer::BuildFlag flag, 
+    So@Gui@Viewer::Type type, 
+    SbBool build );
+
+  virtual const char * getDefaultWidgetName(void) const;
+  virtual const char * getDefaultTitle(void) const;
+  virtual const char * getDefaultIconTitle(void) const;
+
+  virtual void processEvent( @EVENT@ event );
+  virtual void setSeekMode( SbBool enable );
+  virtual void actualRedraw(void);
+
+  virtual void rightWheelMotion( float value );
+
+  virtual void createPrefSheet(void);
+  virtual void openViewerHelpCard(void);
+
+}; // class So@Gui@FlyViewer
+
+// ************************************************************************
+
+#endif // ! SO@GUI@_FLYVIEWER_H

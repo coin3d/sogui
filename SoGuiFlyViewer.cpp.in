@@ -1,0 +1,245 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// @configure_input@
+
+#if SO@GUI@_DEBUG
+static const char rcsid[] =
+  "$Id$";
+#endif // SO@GUI@_DEBUG
+
+/*!
+  \class So@Gui@FlyViewer Inventor/@Gui@/viewers/So@Gui@FlyViewer.h
+  \brief The So@Gui@FlyViewer class implements controls for moving the camera in a "flying" motion.
+  \ingroup so@gui@viewers
+
+  FIXME: document (mouse controls, keyboard controls, ...)
+*/
+
+#include <so@gui@defs.h>
+#include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
+
+// ************************************************************************
+
+SO@GUI@_OBJECT_SOURCE(So@Gui@FlyViewer);
+
+// ************************************************************************
+
+/*!
+  Public constructor.
+*/
+So@Gui@FlyViewer::So@Gui@FlyViewer( // public
+  @WIDGET@ parent,
+  const char * name, 
+  SbBool embed, 
+  So@Gui@FullViewer::BuildFlag flag,
+  So@Gui@Viewer::Type type )
+: inherited( parent, name, embed, flag, type, TRUE )
+{
+} // So@Gui@FlyViewer()
+
+// ************************************************************************
+
+/*!
+  Protected constructor, used by viewer components derived from the
+  So@Gui@FlyViewer.
+*/
+So@Gui@FlyViewer::So@Gui@FlyViewer( // protected
+  @WIDGET@ parent,
+  const char * const name,
+  SbBool embed, 
+  So@Gui@FullViewer::BuildFlag flag, 
+  So@Gui@Viewer::Type type, 
+  SbBool build )
+: inherited( parent, name, embed, flag, type, FALSE )
+{
+} // So@Gui@FlyViewer()
+
+// ************************************************************************
+
+/*!
+  Virtual constructor.
+*/
+So@Gui@FlyViewer::~So@Gui@FlyViewer()
+{
+} // ~So@Gui@FlyViewer()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::setViewing( // virtual
+  SbBool enable )
+{
+} // setViewing()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::resetToHomePosition( // virtual
+  void )
+{
+} // resetToHomePosition()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::setCamera( // virtual
+  SoCamera * camera )
+{
+} // setCamera()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::setCursorEnabled( // virtual
+  SbBool enable )
+{
+} // setCursorEnabled()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::setCameraType( // virtual
+  SoType type )
+{
+} // setCameraType()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+const char *
+So@Gui@FlyViewer::getDefaultWidgetName( // virtual
+  void ) const
+{
+  static const char defaultWidgetName[] = "";
+  return defaultWidgetName;
+} // getDefaultWidgetName()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+const char *
+So@Gui@FlyViewer::getDefaultTitle( // virtual
+  void ) const
+{
+  static const char defaultTitle[] = "Fly Viewer";
+  return defaultTitle;
+} // getDefaultTitle()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+const char *
+So@Gui@FlyViewer::getDefaultIconTitle( // virtual
+  void ) const
+{
+  static const char defaultIconTitle[] = "";
+  return defaultIconTitle;
+} // getDefaultIconTitle()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::processEvent( // virtual
+  @EVENT@ event )
+{
+} // processEvent()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::setSeekMode( // virtual
+  SbBool enable )
+{
+} // setSeekMode()
+
+// ************************************************************************
+
+// doc in super
+void
+So@Gui@FlyViewer::actualRedraw( // virtual
+  void )
+{
+  inherited::actualRedraw();
+  // FIXME: render speed indicator on top. 20010907 mortene.
+} // actualRedraw()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::rightWheelMotion( // virtual
+  float value )
+{
+} // rightWheelMotion()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::createPrefSheet( // virtual
+  void )
+{
+} // createPrefSheet()
+
+// ************************************************************************
+
+/*!
+  FIXME: doc
+*/
+void
+So@Gui@FlyViewer::openViewerHelpCard( // virtual
+  void )
+{
+  // FIXME: mark obsoleted. 20010907 mortene.
+} // openViewerHelpCard()
+
+// ************************************************************************
