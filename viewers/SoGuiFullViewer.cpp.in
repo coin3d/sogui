@@ -379,7 +379,81 @@ So@Gui@FullViewer::setPopupMenuString(const char * name)
   if (this->prefmenu) { this->prefmenu->setMenuTitle(SoGuiFullViewerP::ROOT_MENU, name); }
 }
 
+
+// Documented in superclass.
+SbBool
+So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
+{
+  // We're in "interact" mode (ie *not* the camera modification mode),
+  // so don't handle the event here. It should either be forwarded to
+  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // it's an ESC press (to switch modes).
+  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
+
+  // Note: with the original SGI InventorXt, the popup menu is also
+  // activated by RMB clicks in non-viewing mode. We want to allow RMB
+  // clicks to pass through to the scenegraph in non-viewing mode, so
+  // we don't copy that behavior.
+
+  if (ev->getTypeId().isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
+    SoMouseButtonEvent * const e = (SoMouseButtonEvent *) ev;
+    if ((e->getButton() == SoMouseButtonEvent::BUTTON2)) {
+      if (this->isPopupMenuEnabled()) {
+        if (e->getState() == SoButtonEvent::DOWN) {
+          this->openPopupMenu(e->getPosition());
+        }
+        // Steal all RMB-events if the viewer uses the popup-menu.
+        return TRUE;
+      }
+    }
+  }
+
+  return inherited::processSoEvent(ev);
+}
+
+// *************************************************************************
+
+/*!
+  Override this method to provide functionality when the user clicks
+  the Help button. Default implementation does nothing.
+*/
+void
+So@Gui@FullViewer::openViewerHelpCard(void)
+{
+#if SO@GUI@_DEBUG
+  SoDebugError::postWarning("So@Gui@FullViewer::openViewerHelpCard",
+                            "should be overridden");
+#endif // SO@GUI@_DEBUG
+}
+
+// *************************************************************************
+
+// FIXME: get rid of this hack and make this file truly
+// "generic". 20020109 mortene.
+#ifndef __COIN_SOWIN__
+
+// *************************************************************************
+
+// Doc in superclass.
+void
+So@Gui@FullViewer::setComponentCursor(const So@Gui@Cursor & cursor)
+{
+  // Overridden to apply the new cursor only for the rendering canvas
+  // widget. Otherwise, the default So@Gui@Component
+  // setComponentCursor() method will set the cursor for the top-most
+  // parent widget, which makes it affect all sub-widgets, like the
+  // decorations stuff.
+
+  So@Gui@Component::setWidgetCursor(this->getGLWidget(), cursor);
+}
+
+// *************************************************************************
+
+#endif // ! __COIN_SOWIN__
+
 // ************************************************************************
+
+#ifndef DOXYGEN_SKIP_THIS
 
 SoGuiFullViewerP::SoGuiFullViewerP(So@Gui@FullViewer * owner)
 {
@@ -843,10 +917,6 @@ SoGuiFullViewerP::menuSelectionCallback(int menuitemid,
 
 // ************************************************************************
 
-/*!
- \internal
-*/
-
 void
 SoGuiFullViewerP::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
                                              So@Gui@Viewer::DrawStyle value)
@@ -935,10 +1005,6 @@ SoGuiFullViewerP::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
 }
 
 // ************************************************************************
-
-/*!
-  \internal
-*/
 
 void
 SoGuiFullViewerP::drawstyleActivated(int menuitemid)
@@ -1083,73 +1149,4 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
 
 // ************************************************************************
 
-// Documented in superclass.
-SbBool
-So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
-{
-  // We're in "interact" mode (ie *not* the camera modification mode),
-  // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
-  // it's an ESC press (to switch modes).
-  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
-
-  // Note: with the original SGI InventorXt, the popup menu is also
-  // activated by RMB clicks in non-viewing mode. We want to allow RMB
-  // clicks to pass through to the scenegraph in non-viewing mode, so
-  // we don't copy that behavior.
-
-  if (ev->getTypeId().isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
-    SoMouseButtonEvent * const e = (SoMouseButtonEvent *) ev;
-    if ((e->getButton() == SoMouseButtonEvent::BUTTON2)) {
-      if (this->isPopupMenuEnabled()) {
-        if (e->getState() == SoButtonEvent::DOWN) {
-          this->openPopupMenu(e->getPosition());
-        }
-        // Steal all RMB-events if the viewer uses the popup-menu.
-        return TRUE;
-      }
-    }
-  }
-
-  return inherited::processSoEvent(ev);
-}
-
-// *************************************************************************
-
-/*!
-  Override this method to provide functionality when the user clicks
-  the Help button. Default implementation does nothing.
-*/
-void
-So@Gui@FullViewer::openViewerHelpCard(void)
-{
-#if SO@GUI@_DEBUG
-  SoDebugError::postWarning("So@Gui@FullViewer::openViewerHelpCard",
-                            "should be overridden");
-#endif // SO@GUI@_DEBUG
-}
-
-// *************************************************************************
-
-// FIXME: get rid of this hack and make this file truly
-// "generic". 20020109 mortene.
-#ifndef __COIN_SOWIN__
-
-// *************************************************************************
-
-// Doc in superclass.
-void
-So@Gui@FullViewer::setComponentCursor(const So@Gui@Cursor & cursor)
-{
-  // Overridden to apply the new cursor only for the rendering canvas
-  // widget. Otherwise, the default So@Gui@Component
-  // setComponentCursor() method will set the cursor for the top-most
-  // parent widget, which makes it affect all sub-widgets, like the
-  // decorations stuff.
-
-  So@Gui@Component::setWidgetCursor(this->getGLWidget(), cursor);
-}
-
-// *************************************************************************
-
-#endif // ! __COIN_SOWIN__
+#endif // DOXYGEN_SKIP_THIS

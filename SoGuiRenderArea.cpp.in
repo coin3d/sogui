@@ -93,6 +93,8 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 class So@Gui@RenderAreaP {
 public:
 
@@ -401,35 +403,78 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   return So@Gui@RenderAreaP::NONE;
 }
 
-// *************************************************************************
-
-/*!
-  Public constructor.
-*/
-So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
-                                     const char * name,
-                                     SbBool embed,
-                                     SbBool mouseInput,
-                                     SbBool keyboardInput)
-  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+// This method sets the window size data in all the connected device
+// classes.
+void
+So@Gui@RenderAreaP::setDevicesWindowSize(const SbVec2s size)
 {
-  PRIVATE(this) = new So@Gui@RenderAreaP(this);
-  PRIVATE(this)->constructor(mouseInput, keyboardInput, TRUE);
+  if (!this->devicelist) return;
+  const int num = this->devicelist->getLength();
+  for (int i = 0; i < num; i++)
+    ((So@Gui@Device *)(*this->devicelist)[i])->setWindowSize(size);
 }
 
-/*!
-  Protected constructor used by derived classes.
-*/
-So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
-                                     const char * name,
-                                     SbBool embed,
-                                     SbBool mouseInput,
-                                     SbBool keyboardInput,
-                                     SbBool build)
-  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+// *************************************************************************
+
+void
+So@Gui@RenderAreaP::renderCB(void * closure, SoSceneManager * manager)
 {
-  PRIVATE(this) = new So@Gui@RenderAreaP(this);
-  PRIVATE(this)->constructor(mouseInput, keyboardInput, build);
+  So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
+  if (manager == PRIVATE(thisptr)->normalManager)
+    thisptr->render();
+  else if (manager == PRIVATE(thisptr)->overlayManager)
+    thisptr->renderOverlay();
+  else assert(0);
+
+  if (!thisptr->isAutoRedraw())
+    manager->setRenderCallback(NULL, NULL);
+}
+
+// Callback for automatic redraw on SoSelection changes.
+void
+So@Gui@RenderAreaP::selection_redraw_cb(void * closure, SoSelection * sel)
+{
+  So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
+  if (sel == PRIVATE(ra)->normalSelection)
+    ra->scheduleRedraw();
+  else if (sel == PRIVATE(ra)->overlaySelection)
+    ra->scheduleOverlayRedraw();
+  else
+    assert(0 && "callback on unknown SoSelection node");
+}
+
+// Private class constructor.
+So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * pub)
+{
+  PUBLIC(this) = pub;
+
+  this->normalManager = new SoSceneManager;
+  this->overlayManager = new SoSceneManager;
+
+  this->normalColormap = NULL;
+  this->normalColormapSize = 0;
+  this->overlayColormap = NULL;
+  this->overlayColormapSize = 0;
+
+  this->clear = TRUE;
+  this->clearZBuffer = TRUE;
+  this->clearOverlay = TRUE;
+  this->autoRedraw = TRUE;
+
+  this->normalSelection = NULL;
+  this->overlaySelection = NULL;
+
+  this->devices.mouse = NULL;
+  this->devices.keyboard = NULL;
+}
+
+// Private class destructor.
+So@Gui@RenderAreaP::~So@Gui@RenderAreaP()
+{
+  delete this->normalManager;
+  delete this->overlayManager;
+  delete [] this->normalColormap;
+  delete [] this->overlayColormap;
 }
 
 // Common code for all constructors.
@@ -484,6 +529,64 @@ So@Gui@RenderAreaP::constructor(SbBool mouseInput,
   @WIDGET@ glarea = PUBLIC(this)->buildWidget(PUBLIC(this)->getParentWidget());
   PUBLIC(this)->setBaseWidget(glarea);
   PUBLIC(this)->setSize(SbVec2s(400, 400));
+}
+
+// This method invokes the application event handler, if one is set.
+SbBool
+So@Gui@RenderAreaP::invokeAppCB(@EVENT@ event)
+{
+  if (this->appeventhandler != NULL)
+    return this->appeventhandler(this->appeventhandlerdata, event);
+  return FALSE;
+}
+
+// This method returns an SoEvent * corresponding to the given \a
+// event, or \c NULL if there are none.
+const SoEvent *
+So@Gui@RenderAreaP::getSoEvent(@EVENT@ event)
+{
+  if (!this->devicelist)
+    return (SoEvent *) NULL;
+
+  const SoEvent * soevent = NULL;
+  const int num = this->devicelist->getLength();
+  for (int i = 0; (i < num) && (soevent == NULL); i++)
+    soevent = ((So@Gui@Device *)(*this->devicelist)[i])->translateEvent(event);
+
+  return soevent;
+}
+
+#endif // DOXYGEN_SKIP_THIS
+
+// *************************************************************************
+
+/*!
+  Public constructor.
+*/
+So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
+                                     const char * name,
+                                     SbBool embed,
+                                     SbBool mouseInput,
+                                     SbBool keyboardInput)
+  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+{
+  PRIVATE(this) = new So@Gui@RenderAreaP(this);
+  PRIVATE(this)->constructor(mouseInput, keyboardInput, TRUE);
+}
+
+/*!
+  Protected constructor used by derived classes.
+*/
+So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
+                                     const char * name,
+                                     SbBool embed,
+                                     SbBool mouseInput,
+                                     SbBool keyboardInput,
+                                     SbBool build)
+  : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
+{
+  PRIVATE(this) = new So@Gui@RenderAreaP(this);
+  PRIVATE(this)->constructor(mouseInput, keyboardInput, build);
 }
 
 /*!
@@ -1583,17 +1686,6 @@ So@Gui@RenderArea::getDefaultIconTitle(void) const
   return defaultIconTitle;
 }
 
-/*!
-  This method invokes the application event handler, if one is set.
-*/
-SbBool
-So@Gui@RenderAreaP::invokeAppCB(@EVENT@ event)
-{
-  if (this->appeventhandler != NULL)
-    return this->appeventhandler(this->appeventhandlerdata, event);
-  return FALSE;
-}
-
 // *************************************************************************
 
 /*!
@@ -1692,111 +1784,6 @@ So@Gui@RenderArea::glScheduleRedraw(void)
     this->scheduleOverlayRedraw();
   }
   return TRUE;
-}
-
-
-/*!
-  This method returns an SoEvent * corresponding to the given \a
-  event, or \c NULL if there are none.
-*/
-const SoEvent *
-So@Gui@RenderAreaP::getSoEvent(@EVENT@ event)
-{
-  if (!this->devicelist)
-    return (SoEvent *) NULL;
-
-  const SoEvent * soevent = NULL;
-  const int num = this->devicelist->getLength();
-  for (int i = 0; (i < num) && (soevent == NULL); i++)
-    soevent = ((So@Gui@Device *)(*this->devicelist)[i])->translateEvent(event);
-
-  return soevent;
-}
-
-// *************************************************************************
-
-/*!
-  This method sets the window size data in all the connected device
-  classes.
-*/
-void
-So@Gui@RenderAreaP::setDevicesWindowSize(const SbVec2s size)
-{
-  if (!this->devicelist) return;
-  const int num = this->devicelist->getLength();
-  for (int i = 0; i < num; i++)
-    ((So@Gui@Device *)(*this->devicelist)[i])->setWindowSize(size);
-}
-
-// *************************************************************************
-
-void
-So@Gui@RenderAreaP::renderCB(void * closure, SoSceneManager * manager)
-{
-  So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
-  if (manager == PRIVATE(thisptr)->normalManager)
-    thisptr->render();
-  else if (manager == PRIVATE(thisptr)->overlayManager)
-    thisptr->renderOverlay();
-  else assert(0);
-
-  if (!thisptr->isAutoRedraw())
-    manager->setRenderCallback(NULL, NULL);
-}
-
-/*!
-  Callback for automatic redraw on SoSelection changes.
-*/
-void
-So@Gui@RenderAreaP::selection_redraw_cb(void * closure, SoSelection * sel)
-{
-  So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
-  if (sel == PRIVATE(ra)->normalSelection)
-    ra->scheduleRedraw();
-  else if (sel == PRIVATE(ra)->overlaySelection)
-    ra->scheduleOverlayRedraw();
-  else
-    assert(0 && "callback on unknown SoSelection node");
-}
-
-// *************************************************************************
-
-/*!
-  Private class constructor.
-*/
-So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * pub)
-{
-  PUBLIC(this) = pub;
-
-  this->normalManager = new SoSceneManager;
-  this->overlayManager = new SoSceneManager;
-
-  this->normalColormap = NULL;
-  this->normalColormapSize = 0;
-  this->overlayColormap = NULL;
-  this->overlayColormapSize = 0;
-
-  this->clear = TRUE;
-  this->clearZBuffer = TRUE;
-  this->clearOverlay = TRUE;
-  this->autoRedraw = TRUE;
-
-  this->normalSelection = NULL;
-  this->overlaySelection = NULL;
-
-  this->devices.mouse = NULL;
-  this->devices.keyboard = NULL;
-}
-
-/*!
-  Private class destructor.
-*/
-So@Gui@RenderAreaP::~So@Gui@RenderAreaP()
-{
-  delete this->normalManager;
-  delete this->overlayManager;
-  delete [] this->normalColormap;
-  delete [] this->overlayColormap;
 }
 
 // *************************************************************************

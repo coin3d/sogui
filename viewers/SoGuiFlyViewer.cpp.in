@@ -79,6 +79,8 @@
 
 // ************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 class So@Gui@FlyViewerP {
 public:
   So@Gui@FlyViewerP(So@Gui@FlyViewer * owner)
@@ -158,43 +160,6 @@ So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
 #define PRIVATE(o) (o->pimpl)
 #define PUBLIC(o) (o->publ)
 
-// ************************************************************************
-
-SO@GUI@_OBJECT_SOURCE(So@Gui@FlyViewer);
-
-// ************************************************************************
-
-/*!
-  Public constructor.
-*/
-So@Gui@FlyViewer::So@Gui@FlyViewer(@WIDGET@ parent,
-                                   const char * name, 
-                                   SbBool embed, 
-                                   So@Gui@FullViewer::BuildFlag flag,
-                                   So@Gui@Viewer::Type type)
-  : inherited(parent, name, embed, flag, type, FALSE)
-{
-  PRIVATE(this) = new So@Gui@FlyViewerP(this);
-  PRIVATE(this)->constructor(TRUE);
-}
-
-// ************************************************************************
-
-/*!
-  Protected constructor, used by viewer components derived from the
-  So@Gui@FlyViewer.
-*/
-So@Gui@FlyViewer::So@Gui@FlyViewer(@WIDGET@ parent,
-                                   const char * const name,
-                                   SbBool embed, 
-                                   So@Gui@FullViewer::BuildFlag flag, 
-                                   So@Gui@Viewer::Type type, 
-                                   SbBool build)
-  : inherited(parent, name, embed, flag, type, FALSE)
-{
-  PRIVATE(this) = new So@Gui@FlyViewerP(this);
-  PRIVATE(this)->constructor(build);
-}
 
 // Common constructor code.
 void
@@ -359,6 +324,194 @@ So@Gui@FlyViewerP::constructor(SbBool build)
     @WIDGET@ viewer = PUBLIC(this)->buildWidget(PUBLIC(this)->getParentWidget());
     PUBLIC(this)->setBaseWidget(viewer);
   }
+}
+
+// This method dollies the camera back and forth in the scene.
+void
+So@Gui@FlyViewerP::dolly(const float delta) const
+{
+  SoCamera * const camera = PUBLIC(this)->getCamera();
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+
+  SbPlane walkplane(PUBLIC(this)->getUpDirection(), camera->position.getValue());
+  SbVec3f campos = camera->position.getValue();
+  SbVec3f camvec;
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
+  SbLine cross(campos + camvec,
+                campos + camvec + PUBLIC(this)->getUpDirection());
+  SbVec3f intersect;
+  walkplane.intersect(cross, intersect);
+  SbVec3f dir = intersect - campos;
+  dir.normalize();
+
+  camera->position = campos - dir * delta;
+}
+
+// The viewer is a state machine, and all changes to the current state
+// are made through this call.
+void
+So@Gui@FlyViewerP::setMode(ViewerMode newmode)
+{
+  switch (newmode) {
+    // Assuming interesting things will happen here..
+  default:
+    break;
+  }
+
+  this->viewermode = newmode;
+  this->updateCursorRepresentation();
+}
+
+// This method locates a named node in the superimposed scene.
+SoNode *
+So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
+{
+  if (! this->searcher)
+    this->searcher = new SoSearchAction;
+  searcher->reset();
+  searcher->setName(SbName(name));
+  searcher->setInterest(SoSearchAction::FIRST);
+  searcher->setSearchingAll(TRUE);
+  searcher->apply(this->superimposition);
+  assert(searcher->getPath());
+  return searcher->getPath()->getTail();
+}
+
+void
+So@Gui@FlyViewerP::superimpositionevent(SoAction * action)
+{
+  if (!action->isOfType(SoGLRenderAction::getClassTypeId())) return;
+  SbViewportRegion vpRegion =
+    ((SoGLRenderAction *) action)->getViewportRegion();
+  SbVec2s viewport = vpRegion.getViewportSizePixels();
+  float aspect = float(viewport[0]) / float(viewport[1]);
+  float factorx = 1.0f/float(viewport[1]) * 220.0f;
+  float factory = factorx;
+  if (aspect > 1.0f) {
+    this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f, 0.0f));
+  } else {
+    this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f / aspect, 0.0f));
+    factorx /= aspect;
+    factory /= aspect;
+  }
+  if (viewport[0] > 500)
+    factorx *= 500.0f / 400.0f;
+  else
+    factorx *= float(viewport[0]) / 400.0f;
+  this->sscale->scaleFactor.setValue(SbVec3f(factorx, factory, 1.0f));
+
+  if (this->getMode() == TILTING) {
+    assert(this->crossposition != NULL);
+    assert(this->crossscale != NULL);
+    float tx = float(this->tiltpos[0]-float(viewport[0])/2.0f)/(float(viewport[0]));
+    float ty = float(this->tiltpos[1]-float(viewport[1])/2.0f)/(float(viewport[1]));
+    if (aspect > 1.0f) tx *= aspect;
+    else ty /= aspect;
+    this->crossposition->translation.setValue(SbVec3f(tx, ty, 0));
+
+    float sx = (1.0f/float(viewport[0])) * 15.0f;
+    float sy = (1.0f/float(viewport[1])) * 15.0f;
+    if (aspect > 1.0f) sx *= aspect;
+    else sy /= aspect;
+    this->crossscale->scaleFactor.setValue(SbVec3f(sx, sy, 0));
+  }
+}
+
+void
+So@Gui@FlyViewerP::superimposition_cb(void * closure, SoAction * action)
+{
+  assert(closure != NULL);
+  ((So@Gui@FlyViewerP *) closure)->superimpositionevent(action);
+}
+
+void
+So@Gui@FlyViewerP::updateSpeedIndicator(void)
+{
+  assert(this->sgeometry != NULL);
+  SbVec3f * points = this->sgeometry->point.startEditing();
+  if (points[10][0] == 0.0f)
+    this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
+  if (points[14][0] == 0.0f)
+    this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
+  points[10][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
+  points[11][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
+  points[14][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
+  points[15][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
+  this->sgeometry->point.finishEditing();
+  if (this->maxspeed == 0.0f)
+    this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
+  if (this->currentspeed == 0.0f)
+    this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
+}
+
+// Set cursor graphics according to mode.
+void
+So@Gui@FlyViewerP::updateCursorRepresentation(void)
+{
+  if (!PUBLIC(this)->isCursorEnabled()) {
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getBlankCursor());
+    return;
+  }
+
+  switch (this->viewermode) {
+  case So@Gui@FlyViewerP::FLYING:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
+    break;
+
+  case So@Gui@FlyViewerP::WAITING_FOR_SEEK:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
+    break;
+
+  case So@Gui@FlyViewerP::WAITING_FOR_UP_PICK:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
+    break;
+
+  default:
+    // FIXME: enable again when implementation completed. 20010910 mortene.
+//      assert(0);
+    SO@GUI@_STUB();
+    break;
+  }
+}
+
+#endif // DOXYGEN_SKIP_THIS
+
+// ************************************************************************
+
+SO@GUI@_OBJECT_SOURCE(So@Gui@FlyViewer);
+
+// ************************************************************************
+
+/*!
+  Public constructor.
+*/
+So@Gui@FlyViewer::So@Gui@FlyViewer(@WIDGET@ parent,
+                                   const char * name, 
+                                   SbBool embed, 
+                                   So@Gui@FullViewer::BuildFlag flag,
+                                   So@Gui@Viewer::Type type)
+  : inherited(parent, name, embed, flag, type, FALSE)
+{
+  PRIVATE(this) = new So@Gui@FlyViewerP(this);
+  PRIVATE(this)->constructor(TRUE);
+}
+
+// ************************************************************************
+
+/*!
+  Protected constructor, used by viewer components derived from the
+  So@Gui@FlyViewer.
+*/
+So@Gui@FlyViewer::So@Gui@FlyViewer(@WIDGET@ parent,
+                                   const char * const name,
+                                   SbBool embed, 
+                                   So@Gui@FullViewer::BuildFlag flag, 
+                                   So@Gui@Viewer::Type type, 
+                                   SbBool build)
+  : inherited(parent, name, embed, flag, type, FALSE)
+{
+  PRIVATE(this) = new So@Gui@FlyViewerP(this);
+  PRIVATE(this)->constructor(build);
 }
 
 // ************************************************************************
@@ -907,175 +1060,12 @@ So@Gui@FlyViewer::openViewerHelpCard(void)
 
 // ************************************************************************
 
-// This method dollies the camera back and forth in the scene.
-void
-So@Gui@FlyViewerP::dolly(const float delta) const
-{
-  SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
-
-  SbPlane walkplane(PUBLIC(this)->getUpDirection(), camera->position.getValue());
-  SbVec3f campos = camera->position.getValue();
-  SbVec3f camvec;
-  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
-  SbLine cross(campos + camvec,
-                campos + camvec + PUBLIC(this)->getUpDirection());
-  SbVec3f intersect;
-  walkplane.intersect(cross, intersect);
-  SbVec3f dir = intersect - campos;
-  dir.normalize();
-
-  camera->position = campos - dir * delta;
-}
-
-// ************************************************************************
-
 // doc in super
 void
 So@Gui@FlyViewer::afterRealizeHook(void)
 {
   PRIVATE(this)->updateCursorRepresentation();
   inherited::afterRealizeHook();
-}
-
-// ************************************************************************
-
-// The viewer is a state machine, and all changes to the current state
-// are made through this call.
-void
-So@Gui@FlyViewerP::setMode(ViewerMode newmode)
-{
-  switch (newmode) {
-    // Assuming interesting things will happen here..
-  default:
-    break;
-  }
-
-  this->viewermode = newmode;
-  this->updateCursorRepresentation();
-}
-
-// ************************************************************************
-
-// This method locates a named node in the superimposed scene.
-SoNode *
-So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
-{
-  if (! this->searcher)
-    this->searcher = new SoSearchAction;
-  searcher->reset();
-  searcher->setName(SbName(name));
-  searcher->setInterest(SoSearchAction::FIRST);
-  searcher->setSearchingAll(TRUE);
-  searcher->apply(this->superimposition);
-  assert(searcher->getPath());
-  return searcher->getPath()->getTail();
-}
-
-// ************************************************************************
-
-void
-So@Gui@FlyViewerP::superimpositionevent(SoAction * action)
-{
-  if (!action->isOfType(SoGLRenderAction::getClassTypeId())) return;
-  SbViewportRegion vpRegion =
-    ((SoGLRenderAction *) action)->getViewportRegion();
-  SbVec2s viewport = vpRegion.getViewportSizePixels();
-  float aspect = float(viewport[0]) / float(viewport[1]);
-  float factorx = 1.0f/float(viewport[1]) * 220.0f;
-  float factory = factorx;
-  if (aspect > 1.0f) {
-    this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f, 0.0f));
-  } else {
-    this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f / aspect, 0.0f));
-    factorx /= aspect;
-    factory /= aspect;
-  }
-  if (viewport[0] > 500)
-    factorx *= 500.0f / 400.0f;
-  else
-    factorx *= float(viewport[0]) / 400.0f;
-  this->sscale->scaleFactor.setValue(SbVec3f(factorx, factory, 1.0f));
-
-  if (this->getMode() == TILTING) {
-    assert(this->crossposition != NULL);
-    assert(this->crossscale != NULL);
-    float tx = float(this->tiltpos[0]-float(viewport[0])/2.0f)/(float(viewport[0]));
-    float ty = float(this->tiltpos[1]-float(viewport[1])/2.0f)/(float(viewport[1]));
-    if (aspect > 1.0f) tx *= aspect;
-    else ty /= aspect;
-    this->crossposition->translation.setValue(SbVec3f(tx, ty, 0));
-
-    float sx = (1.0f/float(viewport[0])) * 15.0f;
-    float sy = (1.0f/float(viewport[1])) * 15.0f;
-    if (aspect > 1.0f) sx *= aspect;
-    else sy /= aspect;
-    this->crossscale->scaleFactor.setValue(SbVec3f(sx, sy, 0));
-  }
-}
-
-void
-So@Gui@FlyViewerP::superimposition_cb(void * closure, SoAction * action)
-{
-  assert(closure != NULL);
-  ((So@Gui@FlyViewerP *) closure)->superimpositionevent(action);
-}
-
-// ************************************************************************
-
-void
-So@Gui@FlyViewerP::updateSpeedIndicator(void)
-{
-  assert(this->sgeometry != NULL);
-  SbVec3f * points = this->sgeometry->point.startEditing();
-  if (points[10][0] == 0.0f)
-    this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
-  if (points[14][0] == 0.0f)
-    this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
-  points[10][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
-  points[11][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
-  points[14][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
-  points[15][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
-  this->sgeometry->point.finishEditing();
-  if (this->maxspeed == 0.0f)
-    this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
-  if (this->currentspeed == 0.0f)
-    this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
-}
-
-// ************************************************************************
-
-/*!
-  \internal
-  Set cursor graphics according to mode.
-*/
-void
-So@Gui@FlyViewerP::updateCursorRepresentation(void)
-{
-  if (!PUBLIC(this)->isCursorEnabled()) {
-    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getBlankCursor());
-    return;
-  }
-
-  switch (this->viewermode) {
-  case So@Gui@FlyViewerP::FLYING:
-    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
-    break;
-
-  case So@Gui@FlyViewerP::WAITING_FOR_SEEK:
-    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
-    break;
-
-  case So@Gui@FlyViewerP::WAITING_FOR_UP_PICK:
-    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
-    break;
-
-  default:
-    // FIXME: enable again when implementation completed. 20010910 mortene.
-//      assert(0);
-    SO@GUI@_STUB();
-    break;
-  }
 }
 
 // ************************************************************************

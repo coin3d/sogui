@@ -26,6 +26,18 @@
 // This file contains the generic, "templatize-able" parts of the
 // So*WalkViewer sourcecode.
 
+// *************************************************************************
+
+/*!
+  \class So@Gui@WalkViewer Inventor/@Gui@/viewers/So@Gui@WalkViewer.h
+  \brief The So@Gui@WalkViewer class is a viewer for moving about in "walk"-like style.
+  \ingroup components viewers
+
+  This is a viewer suitable for architectural-type walk-throughs, for
+  instance.
+
+  FIXME: more class doc
+*/
 
 // *************************************************************************
 

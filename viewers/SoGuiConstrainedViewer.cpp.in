@@ -48,6 +48,8 @@
 
 // ************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 class So@Gui@ConstrainedViewerP {
 public:
   So@Gui@ConstrainedViewerP(So@Gui@ConstrainedViewer * owner) {
@@ -64,6 +66,18 @@ private:
 
 #define PRIVATE(o) (o->pimpl)
 #define PUBLIC(o) (o->publ)
+
+void
+So@Gui@ConstrainedViewerP::rotateCamera(const float delta) const
+{
+  SoCamera * const camera = PUBLIC(this)->getCamera();
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+
+  camera->orientation = camera->orientation.getValue() *
+    SbRotation(PUBLIC(this)->getUpDirection(), -delta);
+}
+
+#endif // DOXYGEN_SKIP_THIS
 
 // ************************************************************************
 
@@ -283,19 +297,6 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain(void)
   SbRotation r(camrightdir, correctrightdir);
   SbRotation newcamorient = camorient * r;
   cam->orientation = newcamorient;
-}
-
-// ************************************************************************
-
-// private
-void
-So@Gui@ConstrainedViewerP::rotateCamera(const float delta) const
-{
-  SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
-
-  camera->orientation = camera->orientation.getValue() *
-    SbRotation(PUBLIC(this)->getUpDirection(), -delta);
 }
 
 // ************************************************************************

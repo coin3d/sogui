@@ -106,6 +106,8 @@ static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
 // *************************************************************************
 
+#ifndef DOXYGEN_SKIP_THIS
+
 // The private data for the So@Gui@Viewer.
 class So@Gui@ViewerP {
 public:
@@ -501,6 +503,764 @@ So@Gui@ViewerP::convertPerspective2Ortho(const SoPerspectiveCamera * in,
 
   out->height = 2 * focaldist * tan(in->heightAngle.getValue() / 2.0f);
 }
+
+void
+So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
+{
+  // Recalculate near/far planes. Must be done in reallyRedraw() --
+  // not actualRedraw() -- so the clipping planes are correct even
+  // when rendering multiple times with different camera settings.
+  if (PUBLIC(this)->isAutoClipping()) { this->setClippingPlanes(); }
+
+  if (this->drawAsHiddenLine()) {
+
+    // First pass: render as filled, but with the background color.
+
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    // textureQuality field of socomplexity node is always 0.0
+
+    this->sobasecolor->rgb.setValue(PUBLIC(this)->getBackgroundColor());
+    this->sobasecolor->rgb.setIgnored(FALSE);
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
+    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+
+    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
+
+    // Second pass, render wireframe on top.
+
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
+    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
+    this->somaterialbinding->value.setIgnored(TRUE); // as-is
+    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+
+    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
+
+    return;
+  }
+  if (this->drawAsWireframeOverlay()) {
+    // First pass: render as-is, with polygon offset
+
+    this->solightmodel->model.setIgnored(TRUE);
+    this->somaterialbinding->value.setIgnored(TRUE);
+    this->sobasecolor->rgb.setIgnored(TRUE);
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    this->socomplexity->textureQuality.setIgnored(TRUE);
+
+    this->somaterialbinding->value.setIgnored(TRUE); // override with OVERALL
+    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+
+    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
+
+    // Second pass, render wireframe on top.
+    this->sobasecolor->rgb.setValue(this->wireframeoverlaycolor);
+    this->sobasecolor->rgb.setIgnored(FALSE);
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
+
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
+    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    this->socomplexity->textureQuality.setIgnored(FALSE);
+
+    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
+
+    SbBool oldnot;
+
+    // disable override nodes
+    (void) this->sobasecolor->rgb.enableNotify(FALSE);
+    this->sobasecolor->rgb.setIgnored(TRUE);
+    (void) this->sobasecolor->rgb.enableNotify(TRUE);
+
+    (void) this->somaterialbinding->value.enableNotify(FALSE);
+    this->somaterialbinding->value.setIgnored(TRUE);
+    (void) this->somaterialbinding->value.enableNotify(TRUE);
+
+    (void) this->solightmodel->model.enableNotify(FALSE);
+    this->solightmodel->model.setIgnored(TRUE);
+    (void) this->solightmodel->model.enableNotify(TRUE);
+
+    (void) this->socomplexity->textureQuality.enableNotify(FALSE);
+    this->socomplexity->textureQuality.setIgnored(TRUE);
+    (void) this->socomplexity->textureQuality.enableNotify(TRUE);
+
+    (void) this->sodrawstyle->style.enableNotify(FALSE);
+    this->sodrawstyle->style.setIgnored(TRUE);
+    (void) this->sodrawstyle->style.enableNotify(TRUE);
+    return;
+  }
+
+  SbBool clearzbuffer = TRUE;
+  So@Gui@Viewer::DrawStyle style = this->currentDrawStyle();
+  switch (style) {
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+    clearzbuffer = FALSE;
+  default:
+    break; // Include "default:" case to avoid compiler warning.
+  }
+
+  PUBLIC(this)->getSceneManager()->render(clearcol, clearzbuffer && clearz);
+}
+
+
+// *************************************************************************
+
+// Returns a boolean to indicate if the dynamic drawstyle equals
+// the static drawstyle.
+
+SbBool
+So@Gui@ViewerP::drawInteractiveAsStill(void) const
+{
+  SbBool moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_SAME_AS_STILL;
+  if (! moveasstill)
+    moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == this->drawstyles[So@Gui@Viewer::STILL];
+  if (! moveasstill)
+    moveasstill =
+      this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_NO_TEXTURE &&
+      this->drawstyles[So@Gui@Viewer::STILL] != So@Gui@Viewer::VIEW_AS_IS;
+  return moveasstill;
+}
+
+// Returns the current drawing style.
+So@Gui@Viewer::DrawStyle
+So@Gui@ViewerP::currentDrawStyle(void) const
+{
+  SbBool interactivemode = PUBLIC(this)->getInteractiveCount() > 0 ? TRUE : FALSE;
+
+  if (!interactivemode || this->drawInteractiveAsStill())
+    return this->drawstyles[So@Gui@Viewer::STILL];
+  else
+    return this->drawstyles[So@Gui@Viewer::INTERACTIVE];
+}
+
+// Returns a boolean to indicate if the current drawstyle settings implies
+// hidden line rendering.
+SbBool
+So@Gui@ViewerP::drawAsHiddenLine(void) const
+{
+  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_HIDDEN_LINE) ? TRUE : FALSE);
+}
+
+// Returns a boolean to indicate if the current drawstyle settings
+// implies wirefram overlay rendering.
+SbBool
+So@Gui@ViewerP::drawAsWireframeOverlay(void) const
+{
+  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY) ? TRUE : FALSE);
+}
+
+// Use the given style setting to set the correct states in the
+// rendering control nodes. This will affect the way the scene is
+// currently rendered.
+void
+So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
+{
+  // Turn on/off Z-buffering based on the style setting.
+  switch (style) {
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+    PUBLIC(this)->glLockNormal();
+    // FIXME: shouldn't this be done "lazy", i.e. before we do any
+    // actual rendering? 20001126 mortene.
+    glDisable(GL_DEPTH_TEST);
+    PUBLIC(this)->glUnlockNormal();
+    break;
+
+  default:
+    PUBLIC(this)->glLockNormal();
+    // FIXME: shouldn't this be done "lazy", i.e. before we do any
+    // actual rendering? 20001126 mortene.
+    glEnable(GL_DEPTH_TEST);
+    PUBLIC(this)->glUnlockNormal();
+    break;
+  }
+
+  // Render everything as its supposed to be done, don't override
+  // any of the settings in the ``real'' graph.
+  if (style == So@Gui@Viewer::VIEW_AS_IS) {
+    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
+    return;
+  }
+
+  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
+  if ((style == So@Gui@Viewer::VIEW_HIDDEN_LINE) ||
+      (style == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY)) {
+    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
+    return;
+  } else {
+    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
+  }
+
+  // Set or unset lightmodel override.
+  switch (style) {
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+    this->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
+    break;
+
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->solightmodel->model.setIgnored(FALSE); // force BASE lighting
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+
+  // Set or unset drawstyle override.
+  switch (style) {
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+    this->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
+    break;
+
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored(FALSE); // force line rendering
+    break;
+
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->sodrawstyle->style = SoDrawStyle::POINTS;
+    this->sodrawstyle->style.setIgnored(FALSE); // force point rendering
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+  // Set or unset complexity value override.
+  switch (style) {
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity
+    break;
+
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+  // Set or unset complexity textureQuality override (the value of the
+  // override-field is always 0.0, ie signalling "textures off").
+  switch (style) {
+  case So@Gui@Viewer::VIEW_HIDDEN_LINE:
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->textureQuality.setIgnored(FALSE); // textures off
+    break;
+
+  default:
+    this->socomplexity->textureQuality.setIgnored(TRUE); // don't override
+    break;
+  }
+
+  // Set or unset complexity type override.
+  switch (style) {
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->type.setIgnored(TRUE); // as-is
+    break;
+
+  case So@Gui@Viewer::VIEW_BBOX:
+    this->socomplexity->type = SoComplexity::BOUNDING_BOX;
+    this->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
+    break;
+
+  default:
+    assert(FALSE); break;
+  }
+
+#if 0 // debug
+  SoDebugError::postInfo("So@Gui@Viewer::changeDrawStyle",
+                         "\n"
+                         "\tdrawstyle style: 0x%02x (isIgnored() == %s)\n"
+                         "\tlightmodel model: 0x%02x, (isIgnored() == %s)\n"
+                         "\tcomplexity type: 0x%02x, (isIgnored() == %s)\n"
+                         "\tcomplexity value: %f, (isIgnored() == %s)\n"
+                         "",
+                         this->sodrawstyle->style.getValue(),
+                         this->sodrawstyle->style.isIgnored() ? "T" : "F",
+                         this->solightmodel->model.getValue(),
+                         this->solightmodel->model.isIgnored() ? "T" : "F",
+                         this->socomplexity->type.getValue(),
+                         this->socomplexity->type.isIgnored() ? "T" : "F",
+                         this->socomplexity->value.getValue(),
+                         this->socomplexity->value.isIgnored() ? "T" : "F");
+#endif // debug
+}
+
+// Position the near and far clipping planes just in front of and
+// behind the scene's bounding box. This will give us the optimal
+// utilization of the z buffer resolution by shrinking it to its
+// minimum depth.
+//
+// Near and far clipping planes are specified in the camera fields
+// nearDistance and farDistance.
+void
+So@Gui@ViewerP::setClippingPlanes(void)
+{
+  // This is necessary to avoid a crash in case there is no scene
+  // graph specified by the user.
+  if (this->camera == NULL) return;
+
+  if (this->autoclipbboxaction == NULL)
+    this->autoclipbboxaction =
+      new SoGetBoundingBoxAction(PUBLIC(this)->getViewportRegion());
+  else
+    this->autoclipbboxaction->setViewportRegion(PUBLIC(this)->getViewportRegion());
+
+  this->autoclipbboxaction->apply(this->sceneroot);
+
+  SbXfBox3f xbox = this->autoclipbboxaction->getXfBoundingBox();
+
+  SbMatrix cammat;
+  SbMatrix inverse;
+  this->getCameraCoordinateSystem(this->camera, this->sceneroot, cammat, inverse);
+  xbox.transform(inverse);
+
+  SbMatrix mat;
+  mat.setTranslate(- this->camera->position.getValue());
+  xbox.transform(mat);
+  mat = this->camera->orientation.getValue().inverse();
+  xbox.transform(mat);
+  SbBox3f box = xbox.project();
+
+  // Bounding box was calculated in camera space, so we need to "flip"
+  // the box (because camera is pointing in the (0,0,-1) direction
+  // from origo.
+  float nearval = -box.getMax()[2];
+  float farval = -box.getMin()[2];
+
+  // FIXME: what if we have a weird scale transform in the scenegraph?
+  // Could we end up with nearval > farval then? Investigate, then
+  // either use an assert() (if it can't happen) or an So@Gui@Swap()
+  // (to handle it). 20020116 mortene.
+
+  // Check if scene is completely behind us.
+  if (farval <= 0.0f) { return; }
+
+  if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+    // Disallow negative near clipping plane distance.
+    if (nearval <= 0.0f) {
+      // Set to a short distance, but make sure we're still well below
+      // the far clipping plane distance (in case that is also very
+      // short).
+      nearval = So@Gui@Min(0.1f, farval / 5000.0f);
+      // (The "5000" magic constant was found by fiddling around a bit
+      // on an OpenGL implementation with a 16-bit depth-buffer
+      // resolution, adjusting to find something that would work well
+      // with both a very "stretched" / deep scene and a more compact
+      // single-model one.)
+
+      // FIXME: we're seeing bugs here on some OpenGL drivers if there
+      // are SoPolygonOffset nodes in the scenegraph, pushing z-buffer
+      // values so they overflow. Don't know how to fix yet, or even
+      // if it's "fixable" here at all. 20020318 mortene.
+    }
+  }
+
+  // Some slack around the bounding box, in case the scene fits
+  // exactly inside it. This is done to minimize the chance of
+  // artifacts caused by the limitation of the z-buffer
+  // resolution. One common artifact if this is not done is that the
+  // near clipping plane cuts into the corners of the model as it's
+  // rotated.
+  const float SLACK = 0.001f;
+
+  this->camera->nearDistance = nearval * (1.0f - SLACK);
+  this->camera->farDistance = farval * (1.0f + SLACK);
+
+
+  // FIXME: there's a possible optimization to take advantage of here,
+  // since we are able to sometimes know for sure that all geometry is
+  // completely inside the view volume. I quote from the "OpenGL FAQ
+  // and Troubleshooting Guide":
+  //
+  //  "10.050 I know my geometry is inside the view volume. How can I
+  //  turn off OpenGL's view-volume clipping to maximize performance?
+  //
+  //   Standard OpenGL doesn't provide a mechanism to disable the
+  //   view-volume clipping test; thus, it will occur for every
+  //   primitive you send.
+  //
+  //   Some implementations of OpenGL support the
+  //   GL_EXT_clip_volume_hint extension. If the extension is
+  //   available, a call to
+  //   glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT,GL_FASTEST) will inform
+  //   OpenGL that the geometry is entirely within the view volume and
+  //   that view-volume clipping is unnecessary. Normal clipping can
+  //   be resumed by setting this hint to GL_DONT_CARE. When clipping
+  //   is disabled with this hint, results are undefined if geometry
+  //   actually falls outside the view volume."
+  //
+  // 20020117 mortene.
+
+
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
+                           "near, far: %f (%f), %f (%f)",
+                           nearval, this->camera->nearDistance.getValue(),
+                           farval, this->camera->farDistance.getValue());
+  }
+}
+
+// Translate camera a distance equal to the difference in projected,
+// normalized screen coordinates given by the argument.
+void
+So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
+{
+  SoCamera * cam = PUBLIC(this)->getCamera();
+  assert(cam);
+
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
+                           "screenpos: <%f, %f>, campos: <%f, %f, %f>",
+                           screenpos[0], screenpos[1],
+                           cam->position.getValue()[0],
+                           cam->position.getValue()[1],
+                           cam->position.getValue()[2]);
+  }
+
+  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
+  SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
+
+  SbLine line;
+  vv.projectPointToLine(screenpos + SbVec2f(0.5, 0.5f), line);
+  SbVec3f current_planept;
+  panplane.intersect(line, current_planept);
+  vv.projectPointToLine(SbVec2f(0.5f, 0.5f), line);
+  SbVec3f old_planept;
+  panplane.intersect(line, old_planept);
+
+  // Reposition camera according to the vector difference between the
+  // projected points.
+  cam->position = cam->position.getValue() - (current_planept - old_planept);
+
+  if (SO@GUI@_DEBUG && 0) { // debug
+    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
+                           "newcampos: <%f, %f, %f>",
+                           cam->position.getValue()[0],
+                           cam->position.getValue()[1],
+                           cam->position.getValue()[2]);
+  }
+}
+
+// Called when viewer enters interactive mode (animation, drag, ...).
+void
+So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
+{
+  // In interactive buffer mode, doublebuffering is used during interaction.
+  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
+    PRIVATE(thisp)->localsetbuffertype = TRUE;
+    thisp->So@Gui@RenderArea::setDoubleBuffer(TRUE);
+    PRIVATE(thisp)->localsetbuffertype = FALSE;
+  }
+
+  // Use the dynamic drawstyle.
+  if (!PRIVATE(thisp)->drawInteractiveAsStill())
+    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::INTERACTIVE]);
+}
+
+// Called when viewer goes out of interactive mode and into "frozen"
+// mode.
+void
+So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
+{
+  // In interactive buffer mode, doublebuffering is used during
+  // interaction, singelbuffering while the camera is static.
+  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
+    PRIVATE(thisp)->localsetbuffertype = TRUE;
+    thisp->So@Gui@RenderArea::setDoubleBuffer(FALSE);
+    PRIVATE(thisp)->localsetbuffertype = FALSE;
+  }
+
+  // Back to static drawstyle.
+  if (!PRIVATE(thisp)->drawInteractiveAsStill())
+    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::STILL]);
+}
+
+// Called repeatedly during the seek animation.
+void
+So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
+{
+  SbTime currenttime = SbTime::getTimeOfDay();
+
+  So@Gui@Viewer * thisp = (So@Gui@Viewer *)data;
+  SoTimerSensor * sensor = (SoTimerSensor *)s;
+
+  float t =
+    (currenttime - sensor->getBaseTime()).getValue() / PRIVATE(thisp)->seekperiod;
+  if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
+  SbBool end = (t == 1.0f);
+  
+  t = (float) ((1.0 - cos(M_PI*t)) * 0.5);
+  
+  PRIVATE(thisp)->camera->position = PRIVATE(thisp)->camerastartposition +
+    (PRIVATE(thisp)->cameraendposition - PRIVATE(thisp)->camerastartposition) * t;
+  PRIVATE(thisp)->camera->orientation = 
+    SbRotation::slerp(PRIVATE(thisp)->camerastartorient,
+                      PRIVATE(thisp)->cameraendorient, 
+                      t);
+
+  if (end) thisp->setSeekMode(FALSE);
+}
+
+// Reset the frames-per-second counter upon window resize events,
+// abnormal delays, etc.
+//
+// The methods for recording FPS values are Coin extensions, not
+// available in the original Open Inventor API.
+//
+// \sa addFrametime(), recordFPS()
+void
+So@Gui@ViewerP::resetFrameCounter(void)
+{
+  this->framecount = 0;
+  for (int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++)
+    this->frames[i] = 0.0;
+  this->totalval = 0.0;
+  this->currentframetime = 0.0;
+}
+
+// Adds the time spent drawing the last frame to the array of past
+// frame times.
+//
+// The methods for recording FPS values are Coin extensions, not
+// available in the original Open Inventor API.
+//
+// \sa resetFrameCounter(), recordFPS()
+void
+So@Gui@ViewerP::addFrametime(const double ft)
+{
+  this->framecount++;
+
+  int arrayptr = (this->framecount - 1) % FRAMESARRAY_SIZE;
+  double oldval = this->frames[arrayptr];
+  this->frames[arrayptr] = ft;
+  this->totalval += (ft - oldval);
+  this->currentframetime =
+    this->totalval / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
+}
+
+static unsigned char fps2dfont[][12] = {
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, //
+  {  0,  0, 12, 12,  0,  8, 12, 12, 12, 12, 12,  0 }, // !
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 20, 20, 20 }, // \"
+  {  0,  0, 18, 18, 18, 63, 18, 18, 63, 18, 18,  0 }, // #
+  {  0,  8, 28, 42, 10, 10, 12, 24, 40, 42, 28,  8 }, // $
+  {  0,  0,  6, 73, 41, 22,  8, 52, 74, 73, 48,  0 }, // %
+  {  0, 12, 18, 18, 12, 25, 37, 34, 34, 29,  0,  0 }, // &
+  { 12, 12, 24,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // '
+  {  0,  6,  8,  8, 16, 16, 16, 16, 16,  8,  8,  6 }, // (
+  {  0, 48,  8,  8,  4,  4,  4,  4,  4,  8,  8, 48 }, //)
+  {  0,  0,  0,  0,  0,  0,  8, 42, 20, 42,  8,  0 }, // *
+  {  0,  0,  0,  8,  8,  8,127,  8,  8,  8,  0,  0 }, // +
+  {  0, 24, 12, 12,  0,  0,  0,  0,  0,  0,  0,  0 }, // ,
+  {  0,  0,  0,  0,  0,  0,127,  0,  0,  0,  0,  0 }, // -
+  {  0,  0, 24, 24,  0,  0,  0,  0,  0,  0,  0,  0 }, // .
+  {  0, 32, 32, 16, 16,  8,  8,  8,  4,  4,  2,  2 }, // /
+  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 28,  0 }, // 0
+  {  0,  0,  8,  8,  8,  8,  8,  8, 40, 24,  8,  0 }, // 1
+  {  0,  0, 62, 32, 16,  8,  4,  2,  2, 34, 28,  0 }, // 2
+  {  0,  0, 28, 34,  2,  2, 12,  2,  2, 34, 28,  0 }, // 3
+  {  0,  0,  4,  4,  4,126, 68, 36, 20, 12,  4,  0 }, // 4
+  {  0,  0, 28, 34,  2,  2,  2, 60, 32, 32, 62,  0 }, // 5
+  {  0,  0, 28, 34, 34, 34, 60, 32, 32, 34, 28,  0 }, // 6
+  {  0,  0, 16, 16, 16,  8,  8,  4,  2,  2, 62,  0 }, // 7
+  {  0,  0, 28, 34, 34, 34, 28, 34, 34, 34, 28,  0 }, // 8
+  {  0,  0, 28, 34,  2,  2, 30, 34, 34, 34, 28,  0 }, // 9
+  {  0,  0, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // :
+  {  0, 48, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // ;
+  {  0,  0,  0,  2,  4,  8, 16,  8,  4,  2,  0,  0 }, // <
+  {  0,  0,  0,  0,  0,127,  0,127,  0,  0,  0,  0 }, // =
+  {  0,  0,  0, 16,  8,  4,  2,  4,  8, 16,  0,  0 }, // >
+  {  0,  0, 16, 16,  0, 16, 28,  2,  2,  2, 60,  0 }, // ?
+  {  0,  0, 28, 32, 73, 86, 82, 82, 78, 34, 28,  0 }, // @
+  {  0,  0, 33, 33, 33, 63, 18, 18, 18, 12, 12,  0 }, // A
+  {  0,  0, 60, 34, 34, 34, 60, 34, 34, 34, 60,  0 }, // B
+  {  0,  0, 14, 16, 32, 32, 32, 32, 32, 18, 14,  0 }, // C
+  {  0,  0, 56, 36, 34, 34, 34, 34, 34, 36, 56,  0 }, // D
+  {  0,  0, 62, 32, 32, 32, 60, 32, 32, 32, 62,  0 }, // E
+  {  0,  0, 16, 16, 16, 16, 30, 16, 16, 16, 30,  0 }, // F
+  {  0,  0, 14, 18, 34, 34, 32, 32, 32, 18, 14,  0 }, // G
+  {  0,  0, 34, 34, 34, 34, 62, 34, 34, 34, 34,  0 }, // H
+  {  0,  0, 62,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // I
+  {  0,  0,112,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // J
+  {  0,  0, 33, 33, 34, 36, 56, 40, 36, 34, 33,  0 }, // K
+  {  0,  0, 30, 16, 16, 16, 16, 16, 16, 16, 16,  0 }, // L
+  {  0,  0, 33, 33, 33, 45, 45, 45, 51, 51, 33,  0 }, // M
+  {  0,  0, 34, 34, 38, 38, 42, 42, 50, 50, 34,  0 }, // N
+  {  0,  0, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // O
+  {  0,  0, 32, 32, 32, 60, 34, 34, 34, 34, 60,  0 }, // P
+  {  3,  6, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // Q
+  {  0,  0, 34, 34, 34, 36, 60, 34, 34, 34, 60,  0 }, // R
+  {  0,  0, 60,  2,  2,  6, 28, 48, 32, 32, 30,  0 }, // S
+  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,127,  0 }, // T
+  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 34,  0 }, // U
+  {  0,  0, 12, 12, 18, 18, 18, 33, 33, 33, 33,  0 }, // V
+  {  0,  0, 34, 34, 34, 54, 85, 73, 73, 73, 65,  0 }, // W
+  {  0,  0, 34, 34, 20, 20,  8, 20, 20, 34, 34,  0 }, // X
+  {  0,  0,  8,  8,  8,  8, 20, 20, 34, 34, 34,  0 }, // Y
+  {  0,  0, 62, 32, 16, 16,  8,  4,  4,  2, 62,  0 }, // Z
+  {  0, 14,  8,  8,  8,  8,  8,  8,  8,  8,  8, 14 }, // [
+  {  0,  2,  2,  4,  4,  8,  8,  8, 16, 16, 32, 32 }, // [backslash]
+  {  0, 56,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // ]
+  {  0,  0,  0,  0,  0, 34, 34, 20, 20,  8,  8,  0 }, // ^
+  {  0,127,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // _
+  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 24, 24, 12 }, // `
+  {  0,  0, 29, 34, 34, 30,  2, 34, 28,  0,  0,  0 }, // a
+  {  0,  0, 60, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // b
+  {  0,  0, 14, 16, 32, 32, 32, 16, 14,  0,  0,  0 }, // c
+  {  0,  0, 26, 38, 34, 34, 34, 34, 30,  2,  2,  2 }, // d
+  {  0,  0, 28, 34, 32, 62, 34, 34, 28,  0,  0,  0 }, // e
+  {  0,  0, 16, 16, 16, 16, 16, 16, 62, 16, 16, 14 }, // f
+  { 28,  2,  2, 26, 38, 34, 34, 34, 30,  0,  0,  0 }, // g
+  {  0,  0, 34, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // h
+  {  0,  0,  8,  8,  8,  8,  8,  8, 56,  0,  8,  8 }, // i
+  { 56,  4,  4,  4,  4,  4,  4,  4, 60,  0,  4,  4 }, // j
+  {  0,  0, 33, 34, 36, 56, 40, 36, 34, 32, 32, 32 }, // k
+  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // l
+  {  0,  0, 73, 73, 73, 73, 73,109, 82,  0,  0,  0 }, // m
+  {  0,  0, 34, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // n
+  {  0,  0, 28, 34, 34, 34, 34, 34, 28,  0,  0,  0 }, // o
+  { 32, 32, 60, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // p
+  {  2,  2, 26, 38, 34, 34, 34, 34, 30,  0,  0,  0 }, // q
+  {  0,  0, 16, 16, 16, 16, 16, 24, 22,  0,  0,  0 }, // r
+  {  0,  0, 60,  2,  2, 28, 32, 32, 30,  0,  0,  0 }, // s
+  {  0,  0, 14, 16, 16, 16, 16, 16, 62, 16, 16,  0 }, // t
+  {  0,  0, 26, 38, 34, 34, 34, 34, 34,  0,  0,  0 }, // u
+  {  0,  0,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // v
+  {  0,  0, 34, 34, 34, 85, 73, 73, 65,  0,  0,  0 }, // w
+  {  0,  0, 34, 34, 20,  8, 20, 34, 34,  0,  0,  0 }, // x
+  { 48, 16,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // y
+  {  0,  0, 62, 32, 16,  8,  4,  2, 62,  0,  0,  0 }, // z
+  {  0,  6,  8,  8,  8,  4, 24,  4,  8,  8,  8,  6 }, // {
+  {  0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 }, // |
+  {  0, 48,  8,  8,  8, 16, 12, 16,  8,  8,  8, 48 }, // }
+  {  0,  0,  0,  0,  0,  0, 78, 57,  0,  0,  0,  0 }  // ~
+};
+
+static void
+printString(const char * s)
+{
+#if defined(__COIN__)
+  int i,n;
+  n = strlen(s);
+  for (i = 0; i < n; i++)
+    glBitmap(8, 12, 0.0, 2.0, 10.0, 0.0, fps2dfont[s[i] - 32]);
+#endif
+}
+
+static void
+Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
+{
+  // Store GL state.
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_TEXTURE_2D);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0.0, glsize[0], 0.0, glsize[1], -1, 1);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glColor3f(0.0, 0.0, 0.0);
+  glRasterPos2f(position[0] + 1, position[1]);
+  printString(str);
+  glRasterPos2f(position[0] - 1, position[1]);
+  printString(str);
+  glRasterPos2f(position[0], position[1] + 1);
+  printString(str);
+  glRasterPos2f(position[0], position[1] - 1);
+  printString(str);
+
+  glColor3f(1.0, 1.0, 0.0);
+  glRasterPos2f(position[0], position[1]);
+  printString(str);
+
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+
+  glPopAttrib();
+}
+
+
+// FIXME: the following is just a temporary hack to enable the FPS
+// counter. We should really write a proper interface against it, so
+// applications can set up feedback loops to control scene complexity
+// and get a nice and steady maximum framerate, for instance.
+//
+// For anyone who want to execute that task, check what TGS has done
+// first. If their API is fine, use the same approach.
+//
+// 20001124 mortene.
+
+// Draw a text string showing the current frame-per-seconds value in
+// the lower left corner of the OpenGL canvas (after recording
+// information needed to calculate the fps).
+//
+// The methods for recording FPS values are Coin extensions, not
+// available in the original Open Inventor API.
+//
+// \sa resetFrameCounter(), addFrametime()
+void
+So@Gui@ViewerP::recordFPS(const double rendertime)
+{
+  if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
+    const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
+    COIN_SHOW_FPS_COUNTER = env ? atoi(env) : 0;
+  }
+
+  if (COIN_SHOW_FPS_COUNTER) {
+    this->addFrametime(rendertime);
+
+    char buffer[64];
+    int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
+    assert(nr < 64);
+    Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
+  }
+}
+
+#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 
@@ -2114,115 +2874,6 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   return TRUE;
 }
 
-// *************************************************************************
-
-
-void
-So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
-{
-  // Recalculate near/far planes. Must be done in reallyRedraw() --
-  // not actualRedraw() -- so the clipping planes are correct even
-  // when rendering multiple times with different camera settings.
-  if (PUBLIC(this)->isAutoClipping()) { this->setClippingPlanes(); }
-
-  if (this->drawAsHiddenLine()) {
-
-    // First pass: render as filled, but with the background color.
-
-    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
-    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
-    // textureQuality field of socomplexity node is always 0.0
-
-    this->sobasecolor->rgb.setValue(PUBLIC(this)->getBackgroundColor());
-    this->sobasecolor->rgb.setIgnored(FALSE);
-    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
-    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
-
-    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
-
-    // Second pass, render wireframe on top.
-
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force lines
-    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
-    this->somaterialbinding->value.setIgnored(TRUE); // as-is
-    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
-
-    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
-
-    return;
-  }
-  if (this->drawAsWireframeOverlay()) {
-    // First pass: render as-is, with polygon offset
-
-    this->solightmodel->model.setIgnored(TRUE);
-    this->somaterialbinding->value.setIgnored(TRUE);
-    this->sobasecolor->rgb.setIgnored(TRUE);
-    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
-    this->socomplexity->textureQuality.setIgnored(TRUE);
-
-    this->somaterialbinding->value.setIgnored(TRUE); // override with OVERALL
-    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
-
-    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
-
-    // Second pass, render wireframe on top.
-    this->sobasecolor->rgb.setValue(this->wireframeoverlaycolor);
-    this->sobasecolor->rgb.setIgnored(FALSE);
-    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
-
-    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force lines
-    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
-    this->socomplexity->textureQuality.setIgnored(FALSE);
-
-    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
-
-    SbBool oldnot;
-
-    // disable override nodes
-    (void) this->sobasecolor->rgb.enableNotify(FALSE);
-    this->sobasecolor->rgb.setIgnored(TRUE);
-    (void) this->sobasecolor->rgb.enableNotify(TRUE);
-
-    (void) this->somaterialbinding->value.enableNotify(FALSE);
-    this->somaterialbinding->value.setIgnored(TRUE);
-    (void) this->somaterialbinding->value.enableNotify(TRUE);
-
-    (void) this->solightmodel->model.enableNotify(FALSE);
-    this->solightmodel->model.setIgnored(TRUE);
-    (void) this->solightmodel->model.enableNotify(TRUE);
-
-    (void) this->socomplexity->textureQuality.enableNotify(FALSE);
-    this->socomplexity->textureQuality.setIgnored(TRUE);
-    (void) this->socomplexity->textureQuality.enableNotify(TRUE);
-
-    (void) this->sodrawstyle->style.enableNotify(FALSE);
-    this->sodrawstyle->style.setIgnored(TRUE);
-    (void) this->sodrawstyle->style.enableNotify(TRUE);
-    return;
-  }
-
-  SbBool clearzbuffer = TRUE;
-  So@Gui@Viewer::DrawStyle style = this->currentDrawStyle();
-  switch (style) {
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-  case So@Gui@Viewer::VIEW_BBOX:
-    clearzbuffer = FALSE;
-  default:
-    break; // Include "default:" case to avoid compiler warning.
-  }
-
-  PUBLIC(this)->getSceneManager()->render(clearcol, clearzbuffer && clearz);
-}
-
-
 // Documented in superclass. Overridden from parent class to be able
 // to do the necessary two-pass rendering e.g. if the drawing style is
 // hidden line.
@@ -2626,730 +3277,11 @@ So@Gui@Viewer::changeCameraValues(// virtual, protected
 
 // *************************************************************************
 
-/*!
-  \internal
-
-  Returns a boolean to indicate if the dynamic drawstyle equals
-  the static drawstyle.
-*/
-
-SbBool
-So@Gui@ViewerP::drawInteractiveAsStill(void) const
-{
-  SbBool moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_SAME_AS_STILL;
-  if (! moveasstill)
-    moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == this->drawstyles[So@Gui@Viewer::STILL];
-  if (! moveasstill)
-    moveasstill =
-      this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_NO_TEXTURE &&
-      this->drawstyles[So@Gui@Viewer::STILL] != So@Gui@Viewer::VIEW_AS_IS;
-  return moveasstill;
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Returns the current drawing style.
-*/
-
-So@Gui@Viewer::DrawStyle
-So@Gui@ViewerP::currentDrawStyle(
-  void) const
-{
-  SbBool interactivemode = PUBLIC(this)->getInteractiveCount() > 0 ? TRUE : FALSE;
-
-  if (!interactivemode || this->drawInteractiveAsStill())
-    return this->drawstyles[So@Gui@Viewer::STILL];
-  else
-    return this->drawstyles[So@Gui@Viewer::INTERACTIVE];
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Returns a boolean to indicate if the current drawstyle settings implies
-  hidden line rendering.
-*/
-
-SbBool
-So@Gui@ViewerP::drawAsHiddenLine(void) const
-{
-  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_HIDDEN_LINE) ? TRUE : FALSE);
-}
-
-/*!
-  \internal
-
-  Returns a boolean to indicate if the current drawstyle settings implies
-  wirefram overlay rendering.
-*/
-
-SbBool
-So@Gui@ViewerP::drawAsWireframeOverlay(void) const
-{
-  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY) ? TRUE : FALSE);
-}
-
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Use the given style setting to set the correct states in the
-  rendering control nodes. This will affect the way the scene is
-  currently rendered.
-*/
-
-void
-So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
-{
-  // Turn on/off Z-buffering based on the style setting.
-  switch (style) {
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-  case So@Gui@Viewer::VIEW_BBOX:
-    PUBLIC(this)->glLockNormal();
-    // FIXME: shouldn't this be done "lazy", i.e. before we do any
-    // actual rendering? 20001126 mortene.
-    glDisable(GL_DEPTH_TEST);
-    PUBLIC(this)->glUnlockNormal();
-    break;
-
-  default:
-    PUBLIC(this)->glLockNormal();
-    // FIXME: shouldn't this be done "lazy", i.e. before we do any
-    // actual rendering? 20001126 mortene.
-    glEnable(GL_DEPTH_TEST);
-    PUBLIC(this)->glUnlockNormal();
-    break;
-  }
-
-  // Render everything as its supposed to be done, don't override
-  // any of the settings in the ``real'' graph.
-  if (style == So@Gui@Viewer::VIEW_AS_IS) {
-    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
-    return;
-  }
-
-  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
-  if ((style == So@Gui@Viewer::VIEW_HIDDEN_LINE) ||
-      (style == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY)) {
-    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
-    return;
-  } else {
-    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
-  }
-
-  // Set or unset lightmodel override.
-  switch (style) {
-  case So@Gui@Viewer::VIEW_NO_TEXTURE:
-  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-    this->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
-    break;
-
-  case So@Gui@Viewer::VIEW_LINE:
-  case So@Gui@Viewer::VIEW_POINT:
-  case So@Gui@Viewer::VIEW_BBOX:
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-    this->solightmodel->model.setIgnored(FALSE); // force BASE lighting
-    break;
-
-  default:
-    assert(FALSE); break;
-  }
-
-
-  // Set or unset drawstyle override.
-  switch (style) {
-  case So@Gui@Viewer::VIEW_NO_TEXTURE:
-  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-    this->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
-    break;
-
-  case So@Gui@Viewer::VIEW_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_BBOX:
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force line rendering
-    break;
-
-  case So@Gui@Viewer::VIEW_POINT:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-    this->sodrawstyle->style = SoDrawStyle::POINTS;
-    this->sodrawstyle->style.setIgnored(FALSE); // force point rendering
-    break;
-
-  default:
-    assert(FALSE); break;
-  }
-
-  // Set or unset complexity value override.
-  switch (style) {
-  case So@Gui@Viewer::VIEW_NO_TEXTURE:
-  case So@Gui@Viewer::VIEW_LINE:
-  case So@Gui@Viewer::VIEW_POINT:
-  case So@Gui@Viewer::VIEW_BBOX:
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity
-    break;
-
-  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-    this->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
-    break;
-
-  default:
-    assert(FALSE); break;
-  }
-
-  // Set or unset complexity textureQuality override (the value of the
-  // override-field is always 0.0, ie signalling "textures off").
-  switch (style) {
-  case So@Gui@Viewer::VIEW_HIDDEN_LINE:
-  case So@Gui@Viewer::VIEW_NO_TEXTURE:
-  case So@Gui@Viewer::VIEW_LINE:
-  case So@Gui@Viewer::VIEW_POINT:
-  case So@Gui@Viewer::VIEW_BBOX:
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-    this->socomplexity->textureQuality.setIgnored(FALSE); // textures off
-    break;
-
-  default:
-    this->socomplexity->textureQuality.setIgnored(TRUE); // don't override
-    break;
-  }
-
-  // Set or unset complexity type override.
-  switch (style) {
-  case So@Gui@Viewer::VIEW_NO_TEXTURE:
-  case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-  case So@Gui@Viewer::VIEW_LINE:
-  case So@Gui@Viewer::VIEW_POINT:
-  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-    this->socomplexity->type.setIgnored(TRUE); // as-is
-    break;
-
-  case So@Gui@Viewer::VIEW_BBOX:
-    this->socomplexity->type = SoComplexity::BOUNDING_BOX;
-    this->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
-    break;
-
-  default:
-    assert(FALSE); break;
-  }
-
-#if 0 // debug
-  SoDebugError::postInfo("So@Gui@Viewer::changeDrawStyle",
-                         "\n"
-                         "\tdrawstyle style: 0x%02x (isIgnored() == %s)\n"
-                         "\tlightmodel model: 0x%02x, (isIgnored() == %s)\n"
-                         "\tcomplexity type: 0x%02x, (isIgnored() == %s)\n"
-                         "\tcomplexity value: %f, (isIgnored() == %s)\n"
-                         "",
-                         this->sodrawstyle->style.getValue(),
-                         this->sodrawstyle->style.isIgnored() ? "T" : "F",
-                         this->solightmodel->model.getValue(),
-                         this->solightmodel->model.isIgnored() ? "T" : "F",
-                         this->socomplexity->type.getValue(),
-                         this->socomplexity->type.isIgnored() ? "T" : "F",
-                         this->socomplexity->value.getValue(),
-                         this->socomplexity->value.isIgnored() ? "T" : "F");
-#endif // debug
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Position the near and far clipping planes just in front of and behind
-  the scene's bounding box. This will give us the optimal utilization of
-  the z buffer resolution by shrinking it to its minimum depth.
-
-  Near and far clipping planes are specified in the camera fields
-  nearDistance and farDistance.
-*/
-void
-So@Gui@ViewerP::setClippingPlanes(void)
-{
-  // This is necessary to avoid a crash in case there is no scene
-  // graph specified by the user.
-  if (this->camera == NULL) return;
-
-  if (this->autoclipbboxaction == NULL)
-    this->autoclipbboxaction =
-      new SoGetBoundingBoxAction(PUBLIC(this)->getViewportRegion());
-  else
-    this->autoclipbboxaction->setViewportRegion(PUBLIC(this)->getViewportRegion());
-
-  this->autoclipbboxaction->apply(this->sceneroot);
-
-  SbXfBox3f xbox = this->autoclipbboxaction->getXfBoundingBox();
-
-  SbMatrix cammat;
-  SbMatrix inverse;
-  this->getCameraCoordinateSystem(this->camera, this->sceneroot, cammat, inverse);
-  xbox.transform(inverse);
-
-  SbMatrix mat;
-  mat.setTranslate(- this->camera->position.getValue());
-  xbox.transform(mat);
-  mat = this->camera->orientation.getValue().inverse();
-  xbox.transform(mat);
-  SbBox3f box = xbox.project();
-
-  // Bounding box was calculated in camera space, so we need to "flip"
-  // the box (because camera is pointing in the (0,0,-1) direction
-  // from origo.
-  float nearval = -box.getMax()[2];
-  float farval = -box.getMin()[2];
-
-  // FIXME: what if we have a weird scale transform in the scenegraph?
-  // Could we end up with nearval > farval then? Investigate, then
-  // either use an assert() (if it can't happen) or an So@Gui@Swap()
-  // (to handle it). 20020116 mortene.
-
-  // Check if scene is completely behind us.
-  if (farval <= 0.0f) { return; }
-
-  if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
-    // Disallow negative near clipping plane distance.
-    if (nearval <= 0.0f) {
-      // Set to a short distance, but make sure we're still well below
-      // the far clipping plane distance (in case that is also very
-      // short).
-      nearval = So@Gui@Min(0.1f, farval / 5000.0f);
-      // (The "5000" magic constant was found by fiddling around a bit
-      // on an OpenGL implementation with a 16-bit depth-buffer
-      // resolution, adjusting to find something that would work well
-      // with both a very "stretched" / deep scene and a more compact
-      // single-model one.)
-
-      // FIXME: we're seeing bugs here on some OpenGL drivers if there
-      // are SoPolygonOffset nodes in the scenegraph, pushing z-buffer
-      // values so they overflow. Don't know how to fix yet, or even
-      // if it's "fixable" here at all. 20020318 mortene.
-    }
-  }
-
-  // Some slack around the bounding box, in case the scene fits
-  // exactly inside it. This is done to minimize the chance of
-  // artifacts caused by the limitation of the z-buffer
-  // resolution. One common artifact if this is not done is that the
-  // near clipping plane cuts into the corners of the model as it's
-  // rotated.
-  const float SLACK = 0.001f;
-
-  this->camera->nearDistance = nearval * (1.0f - SLACK);
-  this->camera->farDistance = farval * (1.0f + SLACK);
-
-
-  // FIXME: there's a possible optimization to take advantage of here,
-  // since we are able to sometimes know for sure that all geometry is
-  // completely inside the view volume. I quote from the "OpenGL FAQ
-  // and Troubleshooting Guide":
-  //
-  //  "10.050 I know my geometry is inside the view volume. How can I
-  //  turn off OpenGL's view-volume clipping to maximize performance?
-  //
-  //   Standard OpenGL doesn't provide a mechanism to disable the
-  //   view-volume clipping test; thus, it will occur for every
-  //   primitive you send.
-  //
-  //   Some implementations of OpenGL support the
-  //   GL_EXT_clip_volume_hint extension. If the extension is
-  //   available, a call to
-  //   glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT,GL_FASTEST) will inform
-  //   OpenGL that the geometry is entirely within the view volume and
-  //   that view-volume clipping is unnecessary. Normal clipping can
-  //   be resumed by setting this hint to GL_DONT_CARE. When clipping
-  //   is disabled with this hint, results are undefined if geometry
-  //   actually falls outside the view volume."
-  //
-  // 20020117 mortene.
-
-
-  if (SO@GUI@_DEBUG && 0) { // debug
-    SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
-                           "near, far: %f (%f), %f (%f)",
-                           nearval, this->camera->nearDistance.getValue(),
-                           farval, this->camera->farDistance.getValue());
-  }
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Translate camera a distance equal to the difference in projected,
-  normalized screen coordinates given by the argument.
-*/
-
-void
-So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
-{
-  SoCamera * cam = PUBLIC(this)->getCamera();
-  assert(cam);
-
-  if (SO@GUI@_DEBUG && 0) { // debug
-    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
-                           "screenpos: <%f, %f>, campos: <%f, %f, %f>",
-                           screenpos[0], screenpos[1],
-                           cam->position.getValue()[0],
-                           cam->position.getValue()[1],
-                           cam->position.getValue()[2]);
-  }
-
-  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
-  SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
-
-  SbLine line;
-  vv.projectPointToLine(screenpos + SbVec2f(0.5, 0.5f), line);
-  SbVec3f current_planept;
-  panplane.intersect(line, current_planept);
-  vv.projectPointToLine(SbVec2f(0.5f, 0.5f), line);
-  SbVec3f old_planept;
-  panplane.intersect(line, old_planept);
-
-  // Reposition camera according to the vector difference between the
-  // projected points.
-  cam->position = cam->position.getValue() - (current_planept - old_planept);
-
-  if (SO@GUI@_DEBUG && 0) { // debug
-    SoDebugError::postInfo("So@Gui@Viewer::moveCameraScreen",
-                           "newcampos: <%f, %f, %f>",
-                           cam->position.getValue()[0],
-                           cam->position.getValue()[1],
-                           cam->position.getValue()[2]);
-  }
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Called when viewer enters interactive mode (animation, drag, ...).
-*/
-void
-So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
-{
-  // In interactive buffer mode, doublebuffering is used during interaction.
-  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
-    PRIVATE(thisp)->localsetbuffertype = TRUE;
-    thisp->So@Gui@RenderArea::setDoubleBuffer(TRUE);
-    PRIVATE(thisp)->localsetbuffertype = FALSE;
-  }
-
-  // Use the dynamic drawstyle.
-  if (!PRIVATE(thisp)->drawInteractiveAsStill())
-    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::INTERACTIVE]);
-}
-
-/*!
-  \internal
-
-  Called when viewer goes out of interactive mode and into
-  "frozen" mode.
-*/
-void
-So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
-{
-  // In interactive buffer mode, doublebuffering is used during
-  // interaction, singelbuffering while the camera is static.
-  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
-    PRIVATE(thisp)->localsetbuffertype = TRUE;
-    thisp->So@Gui@RenderArea::setDoubleBuffer(FALSE);
-    PRIVATE(thisp)->localsetbuffertype = FALSE;
-  }
-
-  // Back to static drawstyle.
-  if (!PRIVATE(thisp)->drawInteractiveAsStill())
-    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::STILL]);
-}
-
-// *************************************************************************
-
-/*!
-  \internal
-
-  Called repeatedly during the seek animation.
-*/
-void
-So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
-{
-  SbTime currenttime = SbTime::getTimeOfDay();
-
-  So@Gui@Viewer * thisp = (So@Gui@Viewer *)data;
-  SoTimerSensor * sensor = (SoTimerSensor *)s;
-
-  float t =
-    (currenttime - sensor->getBaseTime()).getValue() / PRIVATE(thisp)->seekperiod;
-  if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
-  SbBool end = (t == 1.0f);
-  
-  t = (float) ((1.0 - cos(M_PI*t)) * 0.5);
-  
-  PRIVATE(thisp)->camera->position = PRIVATE(thisp)->camerastartposition +
-    (PRIVATE(thisp)->cameraendposition - PRIVATE(thisp)->camerastartposition) * t;
-  PRIVATE(thisp)->camera->orientation = 
-    SbRotation::slerp(PRIVATE(thisp)->camerastartorient,
-                      PRIVATE(thisp)->cameraendorient, 
-                      t);
-
-  if (end) thisp->setSeekMode(FALSE);
-}
-
-// *************************************************************************
-
 // doc in super
 void
 So@Gui@Viewer::sizeChanged(const SbVec2s & size)
 {
   inherited::sizeChanged(size);
-}
-
-// *************************************************************************
-
-/*!
-  Reset the frames-per-second counter upon window resize events,
-  abnormal delays, etc.
-
-  The methods for recording FPS values are Coin extensions, not
-  available in the original Open Inventor API.
-
-  \sa addFrametime(), recordFPS()
-*/
-void
-So@Gui@ViewerP::resetFrameCounter(void)
-{
-  this->framecount = 0;
-  for (int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++)
-    this->frames[i] = 0.0;
-  this->totalval = 0.0;
-  this->currentframetime = 0.0;
-}
-
-/*!
-  Adds the time spent drawing the last frame to the array of past
-  frame times.
-
-  The methods for recording FPS values are Coin extensions, not
-  available in the original Open Inventor API.
-
-  \sa resetFrameCounter(), recordFPS()
-*/
-
-void
-So@Gui@ViewerP::addFrametime(const double ft)
-{
-  this->framecount++;
-
-  int arrayptr = (this->framecount - 1) % FRAMESARRAY_SIZE;
-  double oldval = this->frames[arrayptr];
-  this->frames[arrayptr] = ft;
-  this->totalval += (ft - oldval);
-  this->currentframetime =
-    this->totalval / So@Gui@Min(this->framecount, (int) FRAMESARRAY_SIZE);
-}
-
-static unsigned char fps2dfont[][12] = {
-  {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, //
-  {  0,  0, 12, 12,  0,  8, 12, 12, 12, 12, 12,  0 }, // !
-  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 20, 20, 20 }, // \"
-  {  0,  0, 18, 18, 18, 63, 18, 18, 63, 18, 18,  0 }, // #
-  {  0,  8, 28, 42, 10, 10, 12, 24, 40, 42, 28,  8 }, // $
-  {  0,  0,  6, 73, 41, 22,  8, 52, 74, 73, 48,  0 }, // %
-  {  0, 12, 18, 18, 12, 25, 37, 34, 34, 29,  0,  0 }, // &
-  { 12, 12, 24,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // '
-  {  0,  6,  8,  8, 16, 16, 16, 16, 16,  8,  8,  6 }, // (
-  {  0, 48,  8,  8,  4,  4,  4,  4,  4,  8,  8, 48 }, //)
-  {  0,  0,  0,  0,  0,  0,  8, 42, 20, 42,  8,  0 }, // *
-  {  0,  0,  0,  8,  8,  8,127,  8,  8,  8,  0,  0 }, // +
-  {  0, 24, 12, 12,  0,  0,  0,  0,  0,  0,  0,  0 }, // ,
-  {  0,  0,  0,  0,  0,  0,127,  0,  0,  0,  0,  0 }, // -
-  {  0,  0, 24, 24,  0,  0,  0,  0,  0,  0,  0,  0 }, // .
-  {  0, 32, 32, 16, 16,  8,  8,  8,  4,  4,  2,  2 }, // /
-  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 28,  0 }, // 0
-  {  0,  0,  8,  8,  8,  8,  8,  8, 40, 24,  8,  0 }, // 1
-  {  0,  0, 62, 32, 16,  8,  4,  2,  2, 34, 28,  0 }, // 2
-  {  0,  0, 28, 34,  2,  2, 12,  2,  2, 34, 28,  0 }, // 3
-  {  0,  0,  4,  4,  4,126, 68, 36, 20, 12,  4,  0 }, // 4
-  {  0,  0, 28, 34,  2,  2,  2, 60, 32, 32, 62,  0 }, // 5
-  {  0,  0, 28, 34, 34, 34, 60, 32, 32, 34, 28,  0 }, // 6
-  {  0,  0, 16, 16, 16,  8,  8,  4,  2,  2, 62,  0 }, // 7
-  {  0,  0, 28, 34, 34, 34, 28, 34, 34, 34, 28,  0 }, // 8
-  {  0,  0, 28, 34,  2,  2, 30, 34, 34, 34, 28,  0 }, // 9
-  {  0,  0, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // :
-  {  0, 48, 24, 24,  0,  0,  0, 24, 24,  0,  0,  0 }, // ;
-  {  0,  0,  0,  2,  4,  8, 16,  8,  4,  2,  0,  0 }, // <
-  {  0,  0,  0,  0,  0,127,  0,127,  0,  0,  0,  0 }, // =
-  {  0,  0,  0, 16,  8,  4,  2,  4,  8, 16,  0,  0 }, // >
-  {  0,  0, 16, 16,  0, 16, 28,  2,  2,  2, 60,  0 }, // ?
-  {  0,  0, 28, 32, 73, 86, 82, 82, 78, 34, 28,  0 }, // @
-  {  0,  0, 33, 33, 33, 63, 18, 18, 18, 12, 12,  0 }, // A
-  {  0,  0, 60, 34, 34, 34, 60, 34, 34, 34, 60,  0 }, // B
-  {  0,  0, 14, 16, 32, 32, 32, 32, 32, 18, 14,  0 }, // C
-  {  0,  0, 56, 36, 34, 34, 34, 34, 34, 36, 56,  0 }, // D
-  {  0,  0, 62, 32, 32, 32, 60, 32, 32, 32, 62,  0 }, // E
-  {  0,  0, 16, 16, 16, 16, 30, 16, 16, 16, 30,  0 }, // F
-  {  0,  0, 14, 18, 34, 34, 32, 32, 32, 18, 14,  0 }, // G
-  {  0,  0, 34, 34, 34, 34, 62, 34, 34, 34, 34,  0 }, // H
-  {  0,  0, 62,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // I
-  {  0,  0,112,  8,  8,  8,  8,  8,  8,  8, 62,  0 }, // J
-  {  0,  0, 33, 33, 34, 36, 56, 40, 36, 34, 33,  0 }, // K
-  {  0,  0, 30, 16, 16, 16, 16, 16, 16, 16, 16,  0 }, // L
-  {  0,  0, 33, 33, 33, 45, 45, 45, 51, 51, 33,  0 }, // M
-  {  0,  0, 34, 34, 38, 38, 42, 42, 50, 50, 34,  0 }, // N
-  {  0,  0, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // O
-  {  0,  0, 32, 32, 32, 60, 34, 34, 34, 34, 60,  0 }, // P
-  {  3,  6, 12, 18, 33, 33, 33, 33, 33, 18, 12,  0 }, // Q
-  {  0,  0, 34, 34, 34, 36, 60, 34, 34, 34, 60,  0 }, // R
-  {  0,  0, 60,  2,  2,  6, 28, 48, 32, 32, 30,  0 }, // S
-  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,127,  0 }, // T
-  {  0,  0, 28, 34, 34, 34, 34, 34, 34, 34, 34,  0 }, // U
-  {  0,  0, 12, 12, 18, 18, 18, 33, 33, 33, 33,  0 }, // V
-  {  0,  0, 34, 34, 34, 54, 85, 73, 73, 73, 65,  0 }, // W
-  {  0,  0, 34, 34, 20, 20,  8, 20, 20, 34, 34,  0 }, // X
-  {  0,  0,  8,  8,  8,  8, 20, 20, 34, 34, 34,  0 }, // Y
-  {  0,  0, 62, 32, 16, 16,  8,  4,  4,  2, 62,  0 }, // Z
-  {  0, 14,  8,  8,  8,  8,  8,  8,  8,  8,  8, 14 }, // [
-  {  0,  2,  2,  4,  4,  8,  8,  8, 16, 16, 32, 32 }, // [backslash]
-  {  0, 56,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // ]
-  {  0,  0,  0,  0,  0, 34, 34, 20, 20,  8,  8,  0 }, // ^
-  {  0,127,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // _
-  {  0,  0,  0,  0,  0,  0,  0,  0,  0, 24, 24, 12 }, // `
-  {  0,  0, 29, 34, 34, 30,  2, 34, 28,  0,  0,  0 }, // a
-  {  0,  0, 60, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // b
-  {  0,  0, 14, 16, 32, 32, 32, 16, 14,  0,  0,  0 }, // c
-  {  0,  0, 26, 38, 34, 34, 34, 34, 30,  2,  2,  2 }, // d
-  {  0,  0, 28, 34, 32, 62, 34, 34, 28,  0,  0,  0 }, // e
-  {  0,  0, 16, 16, 16, 16, 16, 16, 62, 16, 16, 14 }, // f
-  { 28,  2,  2, 26, 38, 34, 34, 34, 30,  0,  0,  0 }, // g
-  {  0,  0, 34, 34, 34, 34, 34, 50, 44, 32, 32, 32 }, // h
-  {  0,  0,  8,  8,  8,  8,  8,  8, 56,  0,  8,  8 }, // i
-  { 56,  4,  4,  4,  4,  4,  4,  4, 60,  0,  4,  4 }, // j
-  {  0,  0, 33, 34, 36, 56, 40, 36, 34, 32, 32, 32 }, // k
-  {  0,  0,  8,  8,  8,  8,  8,  8,  8,  8,  8, 56 }, // l
-  {  0,  0, 73, 73, 73, 73, 73,109, 82,  0,  0,  0 }, // m
-  {  0,  0, 34, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // n
-  {  0,  0, 28, 34, 34, 34, 34, 34, 28,  0,  0,  0 }, // o
-  { 32, 32, 60, 34, 34, 34, 34, 50, 44,  0,  0,  0 }, // p
-  {  2,  2, 26, 38, 34, 34, 34, 34, 30,  0,  0,  0 }, // q
-  {  0,  0, 16, 16, 16, 16, 16, 24, 22,  0,  0,  0 }, // r
-  {  0,  0, 60,  2,  2, 28, 32, 32, 30,  0,  0,  0 }, // s
-  {  0,  0, 14, 16, 16, 16, 16, 16, 62, 16, 16,  0 }, // t
-  {  0,  0, 26, 38, 34, 34, 34, 34, 34,  0,  0,  0 }, // u
-  {  0,  0,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // v
-  {  0,  0, 34, 34, 34, 85, 73, 73, 65,  0,  0,  0 }, // w
-  {  0,  0, 34, 34, 20,  8, 20, 34, 34,  0,  0,  0 }, // x
-  { 48, 16,  8,  8, 20, 20, 34, 34, 34,  0,  0,  0 }, // y
-  {  0,  0, 62, 32, 16,  8,  4,  2, 62,  0,  0,  0 }, // z
-  {  0,  6,  8,  8,  8,  4, 24,  4,  8,  8,  8,  6 }, // {
-  {  0,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8 }, // |
-  {  0, 48,  8,  8,  8, 16, 12, 16,  8,  8,  8, 48 }, // }
-  {  0,  0,  0,  0,  0,  0, 78, 57,  0,  0,  0,  0 }  // ~
-};
-
-static void
-printString(const char * s)
-{
-#if defined(__COIN__)
-  int i,n;
-  n = strlen(s);
-  for (i = 0; i < n; i++)
-    glBitmap(8, 12, 0.0, 2.0, 10.0, 0.0, fps2dfont[s[i] - 32]);
-#endif
-}
-
-static void
-Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
-{
-  // Store GL state.
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-  glDisable(GL_LIGHTING);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_TEXTURE_2D);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0.0, glsize[0], 0.0, glsize[1], -1, 1);
-
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-  glColor3f(0.0, 0.0, 0.0);
-  glRasterPos2f(position[0] + 1, position[1]);
-  printString(str);
-  glRasterPos2f(position[0] - 1, position[1]);
-  printString(str);
-  glRasterPos2f(position[0], position[1] + 1);
-  printString(str);
-  glRasterPos2f(position[0], position[1] - 1);
-  printString(str);
-
-  glColor3f(1.0, 1.0, 0.0);
-  glRasterPos2f(position[0], position[1]);
-  printString(str);
-
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-
-  glPopAttrib();
-}
-
-
-// FIXME: the following is just a temporary hack to enable the FPS
-// counter. We should really write a proper interface against it, so
-// applications can set up feedback loops to control scene complexity
-// and get a nice and steady maximum framerate, for instance.
-//
-// For anyone who want to execute that task, check what TGS has done
-// first. If their API is fine, use the same approach.
-//
-// 20001124 mortene.
-
-/*!
-  Draw a text string showing the current frame-per-seconds value in
-  the lower left corner of the OpenGL canvas (after recording
-  information needed to calculate the fps).
-
-  The methods for recording FPS values are Coin extensions, not
-  available in the original Open Inventor API.
-
-  \sa resetFrameCounter(), addFrametime()
-*/
-void
-So@Gui@ViewerP::recordFPS(const double rendertime)
-{
-  if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
-    const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
-    COIN_SHOW_FPS_COUNTER = env ? atoi(env) : 0;
-  }
-
-  if (COIN_SHOW_FPS_COUNTER) {
-    this->addFrametime(rendertime);
-
-    char buffer[64];
-    int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
-    assert(nr < 64);
-    Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
-  }
 }
 
 // *************************************************************************
