@@ -282,10 +282,8 @@ SoGuiSlider2::SoGuiSlider2(void)
   
   // set up sensors
   PRIVATE(this)->sizeSensor = new SoFieldSensor(Slider2::sizeChangeCB, PRIVATE(this));
-  PRIVATE(this)->sizeSensor->setPriority(0);
   PRIVATE(this)->sizeSensor->attach(&(this->size));
   PRIVATE(this)->valueSensor = new SoFieldSensor(Slider2::valueChangeCB, PRIVATE(this));
-  // this sensor can't have priority 0 for constraints feedback to work
   PRIVATE(this)->valueSensor->attach(&(this->value));
 }
 

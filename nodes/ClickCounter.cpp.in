@@ -116,10 +116,8 @@ SoGuiClickCounter::SoGuiClickCounter(void)
   this->sizeUpdate();
 
   PRIVATE(this)->sizesensor = new SoFieldSensor(ClickCounter::sizeCB, PRIVATE(this));
-  PRIVATE(this)->sizesensor->setPriority(0);
   PRIVATE(this)->sizesensor->attach(&(this->size));
   PRIVATE(this)->firstsensor = new SoFieldSensor(ClickCounter::firstCB, PRIVATE(this));
-  PRIVATE(this)->firstsensor->setPriority(0);
   PRIVATE(this)->firstsensor->attach(&(this->first));
 }
 
