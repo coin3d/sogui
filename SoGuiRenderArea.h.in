@@ -119,7 +119,7 @@ protected:
   virtual void processEvent(@EVENT@ event);
   virtual void initGraphic(void);
   virtual void initOverlayGraphic(void);
-  virtual void sizeChanged(const SbVec2s size);
+  virtual void sizeChanged(const SbVec2s & size);
   virtual void widgetChanged(@WIDGET@ widget);
   virtual void afterRealizeHook(void);
 

@@ -141,7 +141,7 @@ protected:
   virtual const char * getDefaultTitle(void) const;
   virtual const char * getDefaultIconTitle(void) const;
 
-  virtual void sizeChanged(const SbVec2s size);
+  virtual void sizeChanged(const SbVec2s & size);
 
   void addVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
                                    void * const user = NULL);

@@ -1231,13 +1231,9 @@ So@Gui@RenderArea::initOverlayGraphic(// virtual, protected
 
 } // initOverlayGraphic()
 
-/*!
-  This method is
-*/
-
-void
-So@Gui@RenderArea::sizeChanged(// virtual, protected
-  const SbVec2s size)
+// doc in super
+void             // virtual, protected
+So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
 {
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("So@Gui@RenderArea::sizeChanged",

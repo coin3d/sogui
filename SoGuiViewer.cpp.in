@@ -2869,8 +2869,7 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
 
 // doc in super
 void
-So@Gui@Viewer::sizeChanged(
-  const SbVec2s size)
+So@Gui@Viewer::sizeChanged(const SbVec2s & size)
 {
   inherited::sizeChanged(size);
 } // sizeChanged()
