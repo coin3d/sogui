@@ -150,7 +150,7 @@ private:
 
 const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
                                                  SO_GL_ZBUFFER |
-                                                 SO_GL_DOUBLE);
+                                                 SO_GL_DOUBLE );
 
 // Note: assumes a valid current OpenGL context.
 void
@@ -470,10 +470,10 @@ So@Gui@RenderArea::afterRealizeHook(void)
   \sa getSceneGraph(), setOverlaySceneGraph()
 */
 void
-So@Gui@RenderArea::setSceneGraph(SoNode * scene)  // virtual
+So@Gui@RenderArea::setSceneGraph(SoNode * scene)
 {
   PRIVATE(this)->normalManager->setSceneGraph(scene);
-} // setSceneGraph()
+}
 
 /*!
   This method returns a reference to the scene graph root node as set
@@ -482,14 +482,17 @@ So@Gui@RenderArea::setSceneGraph(SoNode * scene)  // virtual
   \sa So@Gui@RenderArea::getSceneManager()
 */
 SoNode *
-So@Gui@RenderArea::getSceneGraph(void) // virtual
+So@Gui@RenderArea::getSceneGraph(void)
 {
   return PRIVATE(this)->normalManager->getSceneGraph();
-} // getSceneGraph()
+}
 
 /*!
   This method sets the scene graph to render for the overlay bitmap
   planes.
+
+  It will automatically take care of setting up overplay planes in the
+  OpenGL canvas if the OpenGL hardware and driver supports it.
 
   Important note: not all graphics hardware and / or drivers for
   graphics hardware support overlay planes, so application programmers
@@ -503,13 +506,12 @@ So@Gui@RenderArea::getSceneGraph(void) // virtual
 void
 So@Gui@RenderArea::setOverlaySceneGraph(SoNode * scene)
 {
-  // FIXME: when an overlay scenegraph is attempted registered with
-  // the SoQtRenderArea -- try to make a QGLWidget with overlay
-  // planes, and if that's not possible, display a warning.
-  // 20010805 mortene.
-
+  SoNode * oldroot = this->getOverlaySceneGraph();
   PRIVATE(this)->overlayManager->setSceneGraph(scene);
-} // setOverlaySceneGraph()
+
+  if (!oldroot && scene) { this->setOverlayPlanes(TRUE); }
+  else if (oldroot && !scene) { this->setOverlayPlanes(FALSE); }
+}
 
 /*!
   This method returns the scene graph for the overlay scene.
@@ -518,7 +520,7 @@ SoNode *
 So@Gui@RenderArea::getOverlaySceneGraph(void)
 {
   return PRIVATE(this)->overlayManager->getSceneGraph();
-} // getOverlaySceneGraph()
+}
 
 // *************************************************************************
 
@@ -613,7 +615,7 @@ So@Gui@RenderArea::setOverlayBackgroundIndex(int idx)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   PRIVATE(this)->overlayManager->setBackgroundIndex(idx);
-} // setOverlayBackgroundIndex()
+}
 
 /*!
   This method returns the index of the background for the overlay scene.
@@ -623,7 +625,7 @@ So@Gui@RenderArea::getOverlayBackgroundIndex(void) const
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   return PRIVATE(this)->overlayManager->getBackgroundIndex();
-} // getOverlayBackgroundIndex()
+}
 
 // *************************************************************************
 
@@ -652,9 +654,10 @@ So@Gui@RenderArea::setOverlayColorMap(int start, int num,
   PRIVATE(this)->overlayColormapStart = start;
   PRIVATE(this)->overlayColormapSize = num;
   PRIVATE(this)->overlayColormap = new SbColor [ num ];
-  for (int i = 0; i < num; i++)
+  for (int i = 0; i < num; i++) {
     PRIVATE(this)->overlayColormap[i] = colors[i];
-} // setOverlayColorMap()
+  }
+}
 
 // *************************************************************************
 
@@ -675,7 +678,7 @@ So@Gui@RenderArea::setViewportRegion(const SbViewportRegion & region)
 
   PRIVATE(this)->normalManager->setViewportRegion(region);
   PRIVATE(this)->overlayManager->setViewportRegion(region);
-} // setViewportRegion()
+}
 
 /*!
   This method returns the viewport region.
@@ -697,7 +700,7 @@ So@Gui@RenderArea::setTransparencyType(SoGLRenderAction::TransparencyType type)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->getGLRenderAction()->setTransparencyType(type);
-//  PRIVATE(this)->overlayManager->getGLRenderAction()->setTransparencyType(type);
+  PRIVATE(this)->overlayManager->getGLRenderAction()->setTransparencyType(type);
 } // setTransparencyType()
 
 /*!
@@ -811,7 +814,7 @@ void
 So@Gui@RenderArea::setClearBeforeOverlayRender(SbBool enable)
 {
   PRIVATE(this)->clearOverlay = enable;
-} // setClearBeforeOverlayRender()
+}
 
 /*!
   This method returns whether the overlay render buffer is cleared
@@ -821,7 +824,7 @@ SbBool
 So@Gui@RenderArea::isClearBeforeOverlayRender(void) const
 {
   return PRIVATE(this)->clearOverlay;
-} // isClearBeforeOverlayRender()
+}
 
 /*!
   This method sets whether redrawing should be handled automatically
@@ -847,7 +850,7 @@ So@Gui@RenderArea::setAutoRedraw(SbBool enable)
   // redraws -- and autoRedraw is then used to remember that the
   // pointer should be set back to NULL again after redraw.
   PRIVATE(this)->autoRedraw = enable;
-} // setAutoRedraw()
+}
 
 /*!
   This method returns whether redrawing is handled automatically 
@@ -857,7 +860,7 @@ SbBool
 So@Gui@RenderArea::isAutoRedraw(void) const
 {
   return PRIVATE(this)->autoRedraw;
-} // isAutoRedraw()
+}
 
 /*!
   This method sets the redraw priority.
@@ -867,7 +870,7 @@ So@Gui@RenderArea::setRedrawPriority(uint32_t priority)
 {
   PRIVATE(this)->normalManager->setRedrawPriority(priority);
   PRIVATE(this)->overlayManager->setRedrawPriority(priority);
-} // setRedrawPriority()
+}
 
 /*!
   This method returns the redraw priority.
@@ -904,7 +907,7 @@ void
 So@Gui@RenderArea::renderOverlay(void)
 {
   this->redrawOverlay();
-} // renderOverlay()
+}
 
 /*!
   This method schedules a redraw to happen at a later time (when the
@@ -936,7 +939,7 @@ So@Gui@RenderArea::scheduleOverlayRedraw(void)
   // NULL in renderCB() if autoRedraw is OFF.
   PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
   PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
-} // scheduleOverlayRedraw()
+}
 
 /*!
   Do automatic redraw of the scenegraph when a selection under the
@@ -1042,27 +1045,24 @@ So@Gui@RenderArea::getSceneManager(void) const
 /*!
   This method sets the overlay scene SoSceneManager object.
 */
-
 void
 So@Gui@RenderArea::setOverlaySceneManager(SoSceneManager * manager)
 {
   PRIVATE(this)->overlayManager = manager;
-} // setOverlaySceneManager()
+}
 
 /*!
   This method returns the overlay scene SoSceneManager object.
 */
-
 SoSceneManager *
 So@Gui@RenderArea::getOverlaySceneManager(void) const
 {
   return PRIVATE(this)->overlayManager;
-} // getOverlaySceneManager()
+}
 
 /*!
   This method sets the SoGLRenderAction object for the normal scene.
 */
-
 void
 So@Gui@RenderArea::setGLRenderAction(SoGLRenderAction * action)
 {
@@ -1071,7 +1071,7 @@ So@Gui@RenderArea::setGLRenderAction(SoGLRenderAction * action)
   // Force an update of the SoGLRenderAction to the correct
   // updatearea, aspectratio, etc.
   this->sizeChanged(this->getSize());
-} // setGLRenderAction()
+}
 
 /*!
   This method returns the SoGLRenderAction object for the normal scene.
@@ -1084,15 +1084,15 @@ So@Gui@RenderArea::getGLRenderAction(void) const
 } // getGLRenderAction()
 
 /*!
-  This method sets the SoGLRenderAction object for rendering the overlay
-  scen graph.
+  This method sets the SoGLRenderAction object for rendering the
+  overlay scenegraph.
 */
 void
 So@Gui@RenderArea::setOverlayGLRenderAction(SoGLRenderAction * action)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   PRIVATE(this)->overlayManager->setGLRenderAction(action);
-} // setOverlayGLRenderAction()
+}
 
 /*!
   This method returns the SoGLRenderAction object for the overlay scene
@@ -1103,7 +1103,7 @@ So@Gui@RenderArea::getOverlayGLRenderAction(void) const
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   return PRIVATE(this)->overlayManager->getGLRenderAction();
-} // getOverlayGLRenderAction()
+}
 
 /*!
   This method redraws the normal scene graph.
@@ -1156,24 +1156,27 @@ So@Gui@RenderArea::actualRedraw(void) // virtual, protected
 void
 So@Gui@RenderArea::redrawOverlay(void) // virtual, protected
 {
-  if (!this->isVisible() || this->waitForExpose || !this->hasOverlayGLArea()) return;
+  if (!this->isVisible() || this->waitForExpose || !this->hasOverlayGLArea()) {
+    return;
+  }
   
-  glLockOverlay();
+  this->glLockOverlay();
   this->actualOverlayRedraw();
   this->glFlushBuffer();
-  glUnlockOverlay();
+  this->glUnlockOverlay();
 } // redrawOverlay()
 
 /*!
   This method renders the overlay scene.
 */
 void
-So@Gui@RenderArea::actualOverlayRedraw(void) // virtual, protected
+So@Gui@RenderArea::actualOverlayRedraw(void)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   if (! this->isVisible()) return;
-  PRIVATE(this)->overlayManager->render(PRIVATE(this)->clearOverlay, PRIVATE(this)->clearZBuffer);
-} // actualOverlayRedraw()
+  PRIVATE(this)->overlayManager->render(PRIVATE(this)->clearOverlay,
+                                        PRIVATE(this)->clearZBuffer);
+}
 
 /*!
   This method is invoked to initialize the normal graphics.
@@ -1191,7 +1194,7 @@ So@Gui@RenderArea::initGraphic(void) // virtual, protected
   // FIXME: if not RGB mode, load colormap
 
   inherited::initGraphic();
-} // initGraphic()
+}
 
 /*!
   This method is invoked to initialize the overlay graphics.
@@ -1207,12 +1210,11 @@ So@Gui@RenderArea::initOverlayGraphic(void) // virtual, protected
   // FIXME: load colormap
 
   // FIXME: shouldn't we do inherited::initOverlayGraphic() ? 20010831 mortene.
-
-} // initOverlayGraphic()
+}
 
 // doc in super
 void
-So@Gui@RenderArea::sizeChanged(const SbVec2s & size) // virtual, protected
+So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
 {
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("So@Gui@RenderArea::sizeChanged",
@@ -1366,14 +1368,12 @@ So@Gui@RenderArea::invokeAppCB(@EVENT@ event) // protected
   \c TRUE is returned if the event was handled, otherwise \c FALSE.
 */
 SbBool
-So@Gui@RenderArea::processSoEvent(const SoEvent * const event) // virtual
+So@Gui@RenderArea::processSoEvent(const SoEvent * const event)
 {
-  if (PRIVATE(this)->overlayManager->processEvent(event))
-    return TRUE;
-  if (PRIVATE(this)->normalManager->processEvent(event))
-    return TRUE;
+  if (PRIVATE(this)->overlayManager->processEvent(event)) { return TRUE; }
+  if (PRIVATE(this)->normalManager->processEvent(event)) { return TRUE; }
   return FALSE;
-} // processSoEvent()
+}
 
 // *************************************************************************
 
@@ -1383,10 +1383,9 @@ So@Gui@RenderArea::processSoEvent(const SoEvent * const event) // virtual
   generic SoEvent is forwarded to So@Gui@RenderArea::processSoEvent().
  */
 void
-So@Gui@RenderArea::processEvent(@EVENT@ event) // virtual, protected
+So@Gui@RenderArea::processEvent(@EVENT@ event)
 {
-  if (this->invokeAppCB(event))
-    return;
+  if (this->invokeAppCB(event)) { return; }
 
   const SoEvent * soevent = this->getSoEvent(event);
 
@@ -1430,7 +1429,7 @@ So@Gui@RenderArea::processEvent(@EVENT@ event) // virtual, protected
   }
 
   inherited::processEvent(event);
-} // processEvent()
+}
 
 // *************************************************************************
 
