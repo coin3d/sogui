@@ -219,6 +219,11 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
     s.sprintf("GL_[RED|GREEN|BLUE|ALPHA]_BITS==[%d, %d, %d, %d]\n",
               colbits[0], colbits[1], colbits[2], colbits[3]);
     info += s;
+
+    GLint maxdims[2];
+    glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxdims);
+    s.sprintf("GL_MAX_VIEWPORT_DIMS==<%d, %d>\n", maxdims[0], maxdims[1]);
+    info += s;
   }
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
