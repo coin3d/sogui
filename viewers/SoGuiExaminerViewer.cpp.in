@@ -685,10 +685,8 @@ So@Gui@ExaminerViewer::pan(
   the height of the viewport (orthogonal camera) or move the
   camera closer or further away from the focal point in the scene.
 */
-
 void
-So@Gui@ExaminerViewer::zoom(
-  const float diffvalue)
+So@Gui@ExaminerViewer::zoom(const float diffvalue)
 {
   SoCamera * cam = this->getCamera();
   if (cam == NULL) return; // can happen for empty scenegraph
@@ -698,9 +696,17 @@ So@Gui@ExaminerViewer::zoom(
   float multiplicator = exp(diffvalue);
 
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
+
+    // Since there's no perspective, "zooming" in the original sense
+    // of the word won't have any visible effect. So we just increase
+    // or decrease the field-of-view values of the camera instead, to
+    // "shrink" the projection size of the model / scene.
     SoOrthographicCamera * oc = (SoOrthographicCamera *)cam;
     oc->height = oc->height.getValue() * multiplicator;
-  } else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
+
+  }
+  else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
+
     float oldfocaldist = cam->focalDistance.getValue();
     cam->focalDistance = oldfocaldist * multiplicator;
 
@@ -708,10 +714,18 @@ So@Gui@ExaminerViewer::zoom(
     cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
     cam->position = cam->position.getValue() +
       (cam->focalDistance.getValue() - oldfocaldist) * -direction;
-  } else {
-    assert(0 && "impossible");
+
   }
-} // zoom()
+  else {
+    static SbBool first = TRUE;
+    if (first) {
+      SoDebugError::postWarning("So@Gui@ExaminerViewer::zoom",
+                                "unknown camera type, "
+                                "attempts to zoom will have no effect");
+      first = FALSE;
+    }
+  }
+}
 
 // *************************************************************************
 
