@@ -485,7 +485,13 @@ void
 So@GUI@RenderArea::render(
   void )
 {
+  this->glLock();
   this->redraw();
+  if ( this->isDoubleBuffer() )
+    this->glSwapBuffers();
+  else
+    this->glFlushBuffer();
+  this->glUnlock();
 } // render()
 
 /*!
@@ -658,7 +664,7 @@ So@GUI@RenderArea::actualRedraw( // virtual, protected
   void )
 {
   assert( this->normalManager != NULL );
-  this->normalManager->render( this->clear, this->clear /* ZBuffer */ );
+  this->normalManager->render( this->clear, this->clear /* ZBuffer ?? */ );
 } // actualRedraw()
 
 /*!
@@ -717,11 +723,11 @@ So@GUI@RenderArea::sizeChanged( // virtual, protected
 
   this->normalManager->setWindowSize( size );
   this->normalManager->setSize( size );
-  this->normalManager->setViewportRegion( SbViewportRegion( size ) );
+//  this->normalManager->setViewportRegion( SbViewportRegion( size ) );
 
   this->overlayManager->setWindowSize( size );
   this->overlayManager->setSize( size );
-  this->overlayManager->setViewportRegion( SbViewportRegion( size ) );
+//  this->overlayManager->setViewportRegion( SbViewportRegion( size ) );
 
   if ( this->devices.mouse != NULL )
     this->devices.mouse->setWindowSize( size );
@@ -827,9 +833,9 @@ So@GUI@RenderArea::glReshape( // virtual, derived
 {
   inherited::glReshape( width, height );
 
-  glLock();
+  this->glLock();
   this->setViewportRegion( SbViewportRegion( width, height ) );
-  glUnlock();
+  this->glUnlock();
   // call widgetChanged() or something?
 } // glReshape()
 
@@ -842,13 +848,13 @@ So@GUI@RenderArea::glRender( // virtual, derived
 {
   inherited::glRender();
 
-  glLock();
+  this->glLock();
   this->redraw();
   if ( this->isDoubleBuffer() )
-    glSwapBuffers();
+    this->glSwapBuffers();
   else
-    glFlushBuffer();
-  glUnlock();
+    this->glFlushBuffer();
+  this->glUnlock();
 } // glRender()
 
 /*!
