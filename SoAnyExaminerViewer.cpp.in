@@ -67,11 +67,6 @@ static GLubyte zbmp[] = { 0x1f,0x10,0x08,0x04,0x02,0x01,0x1f };
 #define M_PI 3.1415926535f
 #endif // ! M_PI
 
-#define MOUSEBUTTON_EVENT  SoMouseButtonEvent::getClassTypeId()
-#define LOCATION2_EVENT    SoLocation2Event::getClassTypeId()
-#define MOTION3_EVENT      SoMotion3Event::getClassTypeId()
-#define KEYBOARD_EVENT     SoKeyboardEvent::getClassTypeId()
-
 // ************************************************************************
 
 /*!
@@ -106,9 +101,12 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   this->log.position = new SbVec2s [ 16 ];
   this->log.time = new SbTime [ 16 ];
   this->log.historysize = 0;
-  this->button1Down = FALSE;
-  this->button3Down = FALSE;
-  this->controlDown = FALSE;
+  this->button1down = FALSE;
+  this->button2down = FALSE;
+  this->button3down = FALSE;
+  this->controldown = FALSE;
+  this->pointer.now = SbVec2s( 0, 0 );
+  this->pointer.then = SbVec2s( 0, 0 );
   this->motion3OnCamera = TRUE;
 } // SoAnyExaminerViewer()
 
@@ -749,6 +747,11 @@ SoAnyExaminerViewer::actualRedraw(
 
 // *************************************************************************
 
+#define MOUSEBUTTON_EVENT_TYPE  (SoMouseButtonEvent::getClassTypeId())
+#define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
+#define MOTION3_EVENT_TYPE      (SoMotion3Event::getClassTypeId())
+#define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
+
 /*!
   This method processes SoEvents instead of native GUI toolkit events, so
   the code can be shared between all the SoGUI libraries.
@@ -758,62 +761,88 @@ SbBool
 SoAnyExaminerViewer::processSoEvent(
   const SoEvent * const ev )
 {
+  // SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "[invoked]" );
   if ( ! viewer->isViewing() ) // event is for scene graph
     return FALSE;
+
+  this->canvas = viewer->getGLSize();
 
   const SoType type( ev->getTypeId() );
 
   const SbVec2f prevnormalized = this->lastmouseposition;
-  const SbVec2f normalized(
-    float(ev->getPosition()[0]) / float(viewer->getGLSize()[0]-1),
-    float(ev->getPosition()[1]) / float(viewer->getGLSize()[1]-1) );
-  this->lastmouseposition = normalized;
+
+  const SbVec2s pos( ev->getPosition() );
+  const SbVec2f posn( (float) pos[0] / (float) canvas[0],
+                      (float) pos[1] / (float) canvas[1] );
+
+  this->lastmouseposition = posn;
 
   // Mouse Button / Spaceball Button handling
-  if ( type.isDerivedFrom( MOUSEBUTTON_EVENT ) ) {
-    SoMouseButtonEvent * const event = (SoMouseButtonEvent *) ev;
 
+  if ( type.isDerivedFrom( MOUSEBUTTON_EVENT_TYPE ) ) {
+    const SoMouseButtonEvent * const event = (const SoMouseButtonEvent *) ev;
     const int button = event->getButton();
-    if ( event->getState() == SoButtonEvent::DOWN ) {
-      if ( button == SoMouseButtonEvent::BUTTON1 ) {
+    const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
+
+    // SoDebugError::postInfo( "processSoEvent", "button = %d", button );
+    switch ( button ) {
+    case SoMouseButtonEvent::BUTTON1:
+      this->button1down = press;
+      break;
+    case SoMouseButtonEvent::BUTTON2:
+      this->button2down = press;
+      break;
+    case SoMouseButtonEvent::BUTTON3:
+      this->button3down = press;
+      break;
+    default:
+      break;
+    } // shitch ( button )
+
+    if ( press ) {
+      switch ( button ) {
+      case SoMouseButtonEvent::BUTTON1:
         if ( viewer->isSeekMode() )
           return FALSE;
         if ( this->isAnimating() )
           this->stopAnimating();
         viewer->interactiveCountInc();
         this->clearLog();
-        this->button1Down = TRUE;
         return TRUE; 
-      }
-      if ( button == SoMouseButtonEvent::BUTTON3 ) {
-        if ( this->isAnimating() )
-          this->stopAnimating();
-        viewer->interactiveCountInc();
-        this->button3Down = TRUE;
-        SoCamera * const camera = viewer->getCamera();
-        SbViewVolume volume = camera->getViewVolume( viewer->getGLAspectRatio() );
-        this->panningplane = volume.getPlane( camera->focalDistance.getValue() );
-        return TRUE; 
-      }
- #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
-      if ( button == SoMouseButtonEvent::BUTTON4 ) {
+
+      case SoMouseButtonEvent::BUTTON3:
+        do {
+          if ( this->isAnimating() )
+            this->stopAnimating();
+          viewer->interactiveCountInc();
+          SoCamera * const camera = viewer->getCamera();
+          SbViewVolume volume = camera->getViewVolume( viewer->getGLAspectRatio() );
+          this->panningplane = volume.getPlane( camera->focalDistance.getValue() );
+          return TRUE; 
+        } while ( FALSE );
+
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+      case SoMouseButtonEvent::BUTTON4:
         this->zoom( -0.1f );
         return TRUE;
-      }
-      if ( button == SoMouseButtonEvent::BUTTON5 ) {
+
+      case SoMouseButtonEvent::BUTTON5:
         this->zoom( 0.1f );
         return TRUE; 
-      }
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
-      return FALSE;
-    }
 
-    if ( event->getState() == SoButtonEvent::UP ) {
-      if ( button == SoMouseButtonEvent::BUTTON1 ) {
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+      default:
+        break;
+      } // switch ( button )
+      return FALSE;
+
+    } else { // ! press
+      switch ( button ) {
+      case SoMouseButtonEvent::BUTTON1:
+        do {
         this->spinanimating = FALSE;
         if ( viewer->isSeekMode() )
           return FALSE;
-        this->button1Down = FALSE;
         if ( ! this->isAnimationEnabled() || this->log.historysize < 3 ) {
           viewer->interactiveCountDec();
           return TRUE;
@@ -822,7 +851,7 @@ SoAnyExaminerViewer::processSoEvent(
         SbVec3f from = this->spinprojector->project(
           SbVec2f( float(this->log.position[2][0]) / float(glsize[0]-1),
                    float(this->log.position[2][1]) / float(glsize[1]-1) ) );
-        SbVec3f to = this->spinprojector->project( normalized );
+        SbVec3f to = this->spinprojector->project( posn );
         SbRotation rot = this->spinprojector->getRotation( from, to );
 
         SbTime stoptime = (event->getTime() - this->log.time[0]);
@@ -852,63 +881,69 @@ SoAnyExaminerViewer::processSoEvent(
         this->spinRotation = rot;
         this->spinanimating = TRUE;
         viewer->scheduleRedraw();
+        } while ( FALSE );
         return TRUE; 
-      }
-      if ( button == SoMouseButtonEvent::BUTTON3 ) {
-        this->button3Down = FALSE;
+
+      case SoMouseButtonEvent::BUTTON3:
         viewer->interactiveCountDec();
         return TRUE;
-      }
+
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
-      if ( button == SoMouseButtonEvent::BUTTON4 )
-        return TRUE; // correlates with zoom events
-      if ( button == SoMouseButtonEvent::BUTTON5 )
-        return TRUE; // correlates with zoom events
+      case SoMouseButtonEvent::BUTTON4:
+        return TRUE; // don't pass on
+
+      case SoMouseButtonEvent::BUTTON5:
+        return TRUE; // don't pass on
+
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
+      default:
+        break;
+      } // switch ( button )
       return FALSE;
     }
     return FALSE;
   }
 
   // Mouse Movement handling
-  if ( type.isDerivedFrom( LOCATION2_EVENT ) ) {
-    SoLocation2Event * const event = (SoLocation2Event *) ev;
-    if ( this->button1Down && this->button3Down ) {
-      this->zoomByCursor( normalized, prevnormalized );
+  if ( type.isDerivedFrom( LOCATION2_EVENT_TYPE ) ) {
+    const SoLocation2Event * const event = (const SoLocation2Event *) ev;
+
+    if ( this->button1down && this->button3down ) {
+      this->zoomByCursor( posn, prevnormalized );
       return TRUE;
     }
-    if ( this->button1Down ) {
+    if ( this->button1down ) {
       this->addToLog( event->getPosition(), event->getTime() );
-      this->spin( normalized );
+      this->spin( posn );
       return TRUE;
     }
-    if ( this->button3Down ) {
-      this->pan( normalized, prevnormalized );
+    if ( this->button3down ) {
+      this->pan( posn, prevnormalized );
       return TRUE;
     }
     return FALSE;
   }
 
   // Keyboard handling
-  if ( type.isDerivedFrom( KEYBOARD_EVENT ) ) {
-    SoKeyboardEvent * const event = (SoKeyboardEvent *) ev;
-    if ( event->getState() == SoButtonEvent::DOWN ) {
+  if ( type.isDerivedFrom( KEYBOARD_EVENT_TYPE ) ) {
+    const SoKeyboardEvent * const event = (const SoKeyboardEvent *) ev;
+    const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
+    if ( press ) {
       if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
         || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
-        this->controlDown = TRUE;
+        this->controldown = TRUE;
       }
-    }
-    if ( event->getState() == SoButtonEvent::UP ) {
+    } else {
       if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
         || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
-        this->controlDown = FALSE;
+        this->controldown = FALSE;
       }
     }
     return FALSE;
   }
 
   // Spaceball & Joystick handling
-  if ( type.isDerivedFrom( MOTION3_EVENT ) ) {
+  if ( type.isDerivedFrom( MOTION3_EVENT_TYPE ) ) {
     SoMotion3Event * const event = (SoMotion3Event *) ev;
     SoCamera * const camera = viewer->getCamera();
     if ( camera ) {

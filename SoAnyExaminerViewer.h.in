@@ -97,9 +97,14 @@ protected:
     SbTime * time;
   } log;
 
-  SbBool button1Down;
-  SbBool button3Down;
-  SbBool controlDown;
+  struct {
+    SbVec2s now, then;
+  } pointer;
+
+  SbBool button1down;
+  SbBool button2down;
+  SbBool button3down;
+  SbBool controldown;
 
   void clearLog(void);
   void addToLog( const SbVec2s pos, const SbTime time );
@@ -107,6 +112,8 @@ protected:
   SbTime prevRedrawTime;
 
   SbBool motion3OnCamera;
+
+  SbVec2s canvas;
 
 private:
   enum ViewerMode {
