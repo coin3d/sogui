@@ -38,7 +38,8 @@ public:
   enum Shape {
     CUSTOM_BITMAP = -1,
     DEFAULT = 0,
-    BUSY = 1
+    BUSY,
+    BLANK
   };
   
   So@Gui@Cursor(void);
