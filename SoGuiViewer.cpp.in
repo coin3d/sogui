@@ -36,25 +36,6 @@ static const char rcsid[] =
  *
 \**************************************************************************/
 
-/*!
-  \class So@Gui@Viewer Inventor/@Gui@/viewers/So@Gui@Viewer.h
-  \brief The So@Gui@Viewer class is the top level base viewer class.
-  \ingroup components viewers common
-
-  TODO: more doc
-  ...overview of what this class provides over parent class...
-  ...keyboard combinations: Home, s, arrow keys (but only during
-  viewing), Esc...
-  ...explain pan, rotate, zoom, dolly, seek...
-  ..explain the fact that we're moving the camera, not the scene...
-  ...viewer modes (examine vs interact) w/ explanation of what they are
-  useful for...
-
-  \sa So@Gui@FullViewer
-*/
-
-// *************************************************************************
-
 #if HAVE_CONFIG_H
 #include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
 #endif // HAVE_CONFIG_H
@@ -103,6 +84,27 @@ static const char rcsid[] =
 #ifndef M_PI
 #define M_PI 3.1415926535f
 #endif // ! M_PI
+
+/*!
+  \class So@Gui@Viewer Inventor/@Gui@/viewers/So@Gui@Viewer.h
+  \brief The So@Gui@Viewer class is the top level base viewer class.
+  \ingroup components viewers common
+
+  TODO: more doc
+  ...overview of what this class provides over parent class...
+  ...keyboard combinations: Home, s, arrow keys (but only during
+  viewing), Esc...
+  ...explain pan, rotate, zoom, dolly, seek...
+  ..explain the fact that we're moving the camera, not the scene...
+  ...viewer modes (examine vs interact) w/ explanation of what they are
+  useful for...
+
+  \sa So@Gui@FullViewer
+*/
+
+// *************************************************************************
+
+SO@GUI@_TYPED_ABSTRACT_OBJECT_SOURCE(So@Gui@Viewer,So@Gui@RenderArea);
 
 // *************************************************************************
 
