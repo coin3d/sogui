@@ -744,7 +744,7 @@ SoGuiPlaneViewerP::viewPlaneX(void) const
     camera->focalDistance.getValue() * dir;
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(1, 0, 0);
-  camera->orientation = SbRotation(SbVec3f(0, 1, 0), M_PI / 2.0);
+  camera->orientation = SbRotation(SbVec3f(0, 1, 0), float(M_PI) / 2.0f);
 }
 
 void
@@ -759,7 +759,7 @@ SoGuiPlaneViewerP::viewPlaneY(void) const
     camera->focalDistance.getValue() * dir;
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(0, 1, 0);
-  camera->orientation = SbRotation(SbVec3f(1, 0, 0), -M_PI / 2.0);
+  camera->orientation = SbRotation(SbVec3f(1, 0, 0), -float(M_PI) / 2.0f);
 }
 
 void
