@@ -125,7 +125,7 @@ do
         esac
       else
         for arg in $@; do
-          $program --ac-subst $arg
+          $program --alternate="$alternate" --ac-subst $arg
           retval=$?
           test $retval -ne 0 && exit $retval
         done
@@ -149,7 +149,7 @@ do
         case $1 in
           *\.in)
             outfile=`echo $1 | sed -e 's/\.in$//'`
-            $program --ac-subst $1
+            $program --alternate="$alternate" --ac-subst $1
             $program --alternate="$alternate" --compile $outfile
             retval=$?
             test $retval -ne 0 && exit $retval
@@ -215,12 +215,12 @@ do
       for arg in $@; do
         case $arg in
           *.h.in)
-            $program --ac-subst $arg
+            $program --alternate="$alternate" --ac-subst $arg
             ;;
           *.c.in | *.cpp.in | *.cxx.in | *.cc.in)
             outfile=`echo "$arg" | sed -e 's/\.in$//'`
             basename=`echo "$outfile" | sed -e 's/\.[^\.]*$//'`
-            $program --ac-subst $arg
+            $program --alternate="$alternate" --ac-subst $arg
             $program --alternate="$alternate" --compile $outfile
             retval=$?
             test $retval -ne 0 && exit $retval
