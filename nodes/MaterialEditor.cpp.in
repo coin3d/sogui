@@ -881,6 +881,7 @@ MaterialEditor::coloreditorclose_cb(void * closure, SoGuiColorEditor * editor)
   SoDebugError::postInfo("MaterialEditor::coloreditorclose_cb", "default callback invoked - not implemented yet");
 }
 
+#undef PRIVATE
 #undef PUBLIC
 
 // *************************************************************************

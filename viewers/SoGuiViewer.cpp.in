@@ -3150,7 +3150,7 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 }
 
 void
-So@Gui@ViewerP::setStereoEye(SoCamera * camera,
+So@Gui@ViewerP::setStereoEye(SoCamera * thecamera,
                              const So@Gui@ViewerP::Eye eye,
                              So@Gui@ViewerP::StereoData & s) const
 {
@@ -3161,16 +3161,16 @@ So@Gui@ViewerP::setStereoEye(SoCamera * camera,
   // straightforward.
 
   if (eye == So@Gui@ViewerP::LEFT) {
-    camera->setStereoAdjustment(PUBLIC(this)->getStereoOffset());
-    camera->setStereoMode(SoCamera::LEFT_VIEW);
+    thecamera->setStereoAdjustment(PUBLIC(this)->getStereoOffset());
+    thecamera->setStereoMode(SoCamera::LEFT_VIEW);
   }
   else if (eye == So@Gui@ViewerP::RIGHT) {
-    camera->setStereoMode(SoCamera::RIGHT_VIEW);
+    thecamera->setStereoMode(SoCamera::RIGHT_VIEW);
   }
   else {
     assert(eye == So@Gui@ViewerP::RESTORE);
 
-    camera->setStereoMode(SoCamera::MONOSCOPIC);
+    thecamera->setStereoMode(SoCamera::MONOSCOPIC);
   }
 
 #else // ! HAVE_SOCAMERA_SETSTEREOMODE
@@ -3179,42 +3179,42 @@ So@Gui@ViewerP::setStereoEye(SoCamera * camera,
   // provide "manual" tuning of the camera left/right eye split.
 
   if (eye == So@Gui@ViewerP::LEFT) {
-    s.camerapos = camera->position.getValue();
+    s.camerapos = thecamera->position.getValue();
     s.cameradir.setValue(0.0f, 0.0f, -1.0f);
     s.offsetvec.setValue(1.0f, 0.0f, 0.0f);
     s.offset = PUBLIC(this)->getStereoOffset() * 0.5f;
-    s.camerarot = camera->orientation.getValue();
+    s.camerarot = thecamera->orientation.getValue();
     s.camerarot.multVec(s.cameradir, s.cameradir);
     s.camerarot.multVec(s.offsetvec, s.offsetvec);
-    s.focalpoint = s.camerapos + s.cameradir * camera->focalDistance.getValue();
+    s.focalpoint = s.camerapos + s.cameradir * thecamera->focalDistance.getValue();
 
-    s.nodenotify = camera->isNotifyEnabled();
-    s.positionnotify = camera->position.isNotifyEnabled();
-    s.orientationnotify = camera->orientation.isNotifyEnabled();
+    s.nodenotify = thecamera->isNotifyEnabled();
+    s.positionnotify = thecamera->position.isNotifyEnabled();
+    s.orientationnotify = thecamera->orientation.isNotifyEnabled();
     // turn off notification to avoid redraws
-    camera->enableNotify(FALSE);
-    camera->position.enableNotify(FALSE);
-    camera->orientation.enableNotify(FALSE);
+    thecamera->enableNotify(FALSE);
+    thecamera->position.enableNotify(FALSE);
+    thecamera->orientation.enableNotify(FALSE);
 
-    camera->position = s.camerapos - s.offsetvec * s.offset;
-    SbVec3f dir = s.focalpoint - camera->position.getValue();
+    thecamera->position = s.camerapos - s.offsetvec * s.offset;
+    SbVec3f dir = s.focalpoint - thecamera->position.getValue();
     SbRotation rot(s.cameradir, dir);
-    camera->orientation = s.camerarot * rot;
+    thecamera->orientation = s.camerarot * rot;
   }
   else if (eye == So@Gui@ViewerP::RIGHT) {
-    camera->position = s.camerapos + s.offsetvec * s.offset;
-    SbVec3f dir = s.focalpoint - camera->position.getValue();
+    thecamera->position = s.camerapos + s.offsetvec * s.offset;
+    SbVec3f dir = s.focalpoint - thecamera->position.getValue();
     SbRotation rot(s.cameradir, dir);
-    camera->orientation = s.camerarot * rot;
+    thecamera->orientation = s.camerarot * rot;
   }
   else {
     assert(eye == So@Gui@ViewerP::RESTORE);
 
-    camera->position = s.camerapos;
-    camera->orientation = s.camerarot;
-    camera->position.enableNotify(s.positionnotify);
-    camera->orientation.enableNotify(s.orientationnotify);
-    camera->enableNotify(s.nodenotify);
+    thecamera->position = s.camerapos;
+    thecamera->orientation = s.camerarot;
+    thecamera->position.enableNotify(s.positionnotify);
+    thecamera->orientation.enableNotify(s.orientationnotify);
+    thecamera->enableNotify(s.nodenotify);
   }
 
 #endif // ! HAVE_SOCAMERA_SETSTEREOMODE

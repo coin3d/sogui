@@ -630,3 +630,7 @@ ColorEditorComponent::editor_update_cb(void * closure, SoSensor * sensor)
 }
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+

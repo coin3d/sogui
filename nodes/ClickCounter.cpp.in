@@ -230,3 +230,6 @@ ClickCounter::firstCB(void * closure, SoSensor * sensor)
 }
 
 // *************************************************************************
+
+#undef PRIVATE
+

@@ -356,4 +356,5 @@ SoGuiPane::applyMoveBy(SoGetMatrixAction * action, SbVec3f offset)
 }
 
 #undef ZSCALE
+#undef PRIVATE
 

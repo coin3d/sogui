@@ -873,3 +873,7 @@ ColorEditor::generateSliderTextureHSV(const SbColor & current, SbBool wysiwyg)
 }
 
 // *************************************************************************
+
+#undef PUBLIC
+#undef PRIVATE
+
