@@ -82,7 +82,11 @@ void
 So@Gui@MaterialEditor::attach(SoVRMLMaterial * material)
 {
   assert(PRIVATE(this)->editor);
+#ifdef HAVE_SOVRMLMATERIAL
   PRIVATE(this)->editor->material.setValue(material);
+#else // !HAVE_SOVRMLMATERIAL
+  PRIVATE(this)->editor->material.setValue((SoNode *) material);
+#endif // !HAVE_SOVRMLMATERIAL
 }
 
 void
