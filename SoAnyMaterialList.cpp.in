@@ -169,11 +169,11 @@ SoAnyMaterialList::freeMaterialDirectory(
     // all data is allocated
     for ( i = 0; i < this->directory->numGroups; i++ ) {
       for ( j = 0; j < this->directory->groups[i]->numMaterials; j++ ) {
-        delete [] this->directory->groups[i]->materials[j]->data;
-        delete [] this->directory->groups[i]->materials[j]->name;
+        delete [] (char *) this->directory->groups[i]->materials[j]->data;
+        delete [] (char *) this->directory->groups[i]->materials[j]->name;
         delete this->directory->groups[i]->materials[j];
       }
-      delete [] this->directory->groups[i]->name;
+      delete [] (char *) this->directory->groups[i]->name;
       delete [] this->directory->groups[i]->materials;
       delete this->directory->groups[i];
     }
