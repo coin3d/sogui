@@ -54,7 +54,7 @@ struct So@Gui@MaterialDirectory {
 
 // *************************************************************************
 
-class SoAnyMaterialList {
+class SO@GUI@_DLL_API SoAnyMaterialList {
 public:
   SoAnyMaterialList(const char * const dir);
   ~SoAnyMaterialList(void);
