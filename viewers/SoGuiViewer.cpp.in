@@ -101,10 +101,6 @@
 #include <Inventor/nodes/SoPolygonOffset.h>
 #endif // HAVE_SOPOLYGONOFFSET
 
-#ifndef M_PI
-#define M_PI 3.1415926535f
-#endif // ! M_PI
-
 // (note: this *must* be a #define, not a static variable -- to avoid
 // initialization race conditions with the static variables being set
 // to the value of this)
@@ -124,6 +120,11 @@ public:
   SoSeparator * createSuperScene(void);
   SoSeparator * createFPSSuperimposition(void);
 
+  static void convertOrtho2Perspective(const SoOrthographicCamera * in,
+                                       SoPerspectiveCamera * out);
+  static void convertPerspective2Ortho(const SoPerspectiveCamera * in,
+                                       SoOrthographicCamera * out);
+
   // Seek functionality
   SoTimerSensor * seeksensor;
   float seekperiod;
@@ -136,9 +137,10 @@ public:
 
   // Camera handling
   SbBool deletecamera;
-  SbVec3f storedposition;
-  SbRotation storedorientation;
-  float storedheightval;
+
+  // Home position storage.
+  SoOrthographicCamera * storedortho;
+  SoPerspectiveCamera * storedperspective;
 
   SoDirectionalLight * headlight;
 
@@ -222,9 +224,14 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->matrixaction = new SoGetMatrixAction(SbViewportRegion(100,100));
   this->superimpositions = NULL;
   this->superimpositionsenabled = NULL;
+
+  this->storedortho = new SoOrthographicCamera;
+  this->storedortho->ref();
+  this->storedperspective = new SoPerspectiveCamera;
+  this->storedperspective->ref();
 }
 
-So@Gui@ViewerP::~So@Gui@ViewerP(void)
+So@Gui@ViewerP::~So@Gui@ViewerP()
 {
   if (this->superimpositions) {
     delete this->superimpositions;
@@ -233,6 +240,9 @@ So@Gui@ViewerP::~So@Gui@ViewerP(void)
   }
   delete this->searchaction;
   delete this->matrixaction;
+
+  this->storedortho->unref();
+  this->storedperspective->unref();
 }
 
 SoSeparator *
@@ -361,6 +371,8 @@ So@Gui@ViewerP::createSuperScene(void)
   return (SoSeparator *) root;
 }
 
+// FIXME: this method is unnecessary robust, and generally
+// weird. 20020522 mortene.
 SoSeparator *
 So@Gui@ViewerP::createFPSSuperimposition(void)
 {
@@ -429,6 +441,58 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * camera,
   this->searchaction->reset();
 }
 
+// FIXME: this code is really not applying the correct solution,
+// trying to convert between SoOrthographic::height and
+// SoPerspectiveCamera::heightAngle. What we should really try to do
+// is:
+//
+//       * when going from orthocam -> perspectivecam: set the
+//       heightAngle field to it's default value (45°), and move
+//       camera to a position where the scene/model would fill about
+//       the same screenspace as it did in the orthocam
+//
+//       * when going from perspectivecam -> orthocam: keep the
+//       current position, but tune the view-volume height so the
+//       scene/model takes up about the same screenspace
+//
+// 20020522 mortene.
+
+void
+So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
+                                         SoPerspectiveCamera * out)
+{
+  out->aspectRatio.setValue(in->aspectRatio.getValue());
+  out->focalDistance.setValue(in->focalDistance.getValue());
+  out->orientation.setValue(in->orientation.getValue());
+  out->position.setValue(in->position.getValue());
+  out->viewportMapping.setValue(in->viewportMapping.getValue());
+  
+  float focaldist = in->focalDistance.getValue();
+
+  // focalDistance==0.0f happens for empty scenes.
+  if (focaldist != 0.0f) {
+    out->heightAngle = 2.0f * atan(in->height.getValue() / 2.0f / focaldist);
+  }
+  else {
+    // 45° is the default value of this field in SoPerspectiveCamera.
+    out->heightAngle = M_PI / 4.0f;
+  }
+}
+
+void
+So@Gui@ViewerP::convertPerspective2Ortho(const SoPerspectiveCamera * in,
+                                         SoOrthographicCamera * out)
+{
+  out->aspectRatio.setValue(in->aspectRatio.getValue());
+  out->focalDistance.setValue(in->focalDistance.getValue());
+  out->orientation.setValue(in->orientation.getValue());
+  out->position.setValue(in->position.getValue());
+  out->viewportMapping.setValue(in->viewportMapping.getValue());
+
+  float focaldist = in->focalDistance.getValue();
+
+  out->height = 2 * focaldist * tan(in->heightAngle.getValue() / 2.0f);
+}
 
 // *************************************************************************
 
@@ -745,8 +809,7 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
   Destructor.
 */
 
-So@Gui@Viewer::~So@Gui@Viewer(
-  void)
+So@Gui@Viewer::~So@Gui@Viewer()
 {
   delete this->autoClipBboxAction;
 
@@ -856,7 +919,7 @@ So@Gui@Viewer::setCameraType(SoType t)
   SbBool newisperspective = t.isDerivedFrom(perspectivetype);
 
   if ((oldisperspective && newisperspective) ||
-       (!oldisperspective && !newisperspective)) // Same old, same old..
+      (!oldisperspective && !newisperspective)) // Same old, same old..
     return;
 
   if (SO@GUI@_DEBUG) {
@@ -879,54 +942,15 @@ So@Gui@Viewer::setCameraType(SoType t)
 
   if (this->camera != NULL) {
     SoCamera * newcamera = (SoCamera *)t.createInstance();
-    newcamera->aspectRatio.setValue(this->camera->aspectRatio.getValue());
-    newcamera->focalDistance.setValue(this->camera->focalDistance.getValue());
-    newcamera->orientation.setValue(this->camera->orientation.getValue());
-    newcamera->position.setValue(this->camera->position.getValue());
-    newcamera->viewportMapping.setValue(this->camera->viewportMapping.getValue());
 
-    SoPerspectiveCamera * newpcam = NULL, * oldpcam = NULL;
-    SoOrthographicCamera * newocam = NULL, * oldocam = NULL;
-
-    float focaldist = this->camera->focalDistance.getValue();
-
-    // Try to transfer values from one camera type to the
-    // other.
-    //
-    // FIXME: this code is really not applying the correct solution,
-    // trying to convert between SoOrthographic::height and
-    // SoPerspectiveCamera::heightAngle. What we should really try to
-    // do is:
-    //
-    //       * when going from orthocam -> perspectivecam: set the
-    //       heightAngle field to it's default value (45°), and move
-    //       camera to a position where the scene/model would fill
-    //       about the same screenspace as it did in the orthocam
-    //
-    //       * when going from perspectivecam -> orthocam: keep the
-    //       current position, but tune the view-volume height so the
-    //       scene/model takes up about the same screenspace
-    //
-    // 20020522 mortene.
+    // Transfer and convert values from one camera type to the other.
     if (newisperspective) {
-      newpcam = (SoPerspectiveCamera *)newcamera;
-      oldocam = (SoOrthographicCamera *)this->camera;
-
-      // focalDistance==0.0f happens for empty scenes.
-      if (focaldist != 0.0f) {
-        newpcam->heightAngle =
-          2.0f * atan(oldocam->height.getValue() / 2.0f / focaldist);
-      }
-      else {
-        // 45° is the default value of this field in SoPerspectiveCamera.
-        newpcam->heightAngle = M_PI / 4.0f;
-      }
+      So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
+                                               (SoPerspectiveCamera *)newcamera);
     }
     else {
-      newocam = (SoOrthographicCamera *)newcamera;
-      oldpcam = (SoPerspectiveCamera *)this->camera;
-      newocam->height =
-        2 * focaldist * tan(oldpcam->heightAngle.getValue() / 2.0f);
+      So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
+                                               (SoOrthographicCamera *)newcamera);
     }
 
     SoGroup * cameraparent =
@@ -990,17 +1014,16 @@ So@Gui@Viewer::saveHomePosition(void)
 {
   if (! this->camera) return; // probably a scene-less viewer
 
-  PRIVATE(this)->storedorientation = this->camera->orientation.getValue();
-  PRIVATE(this)->storedposition = this->camera->position.getValue();
-
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
-    PRIVATE(this)->storedheightval =
-      ((SoOrthographicCamera *)this->camera)->height.getValue();
+    *(PRIVATE(this)->storedortho) = *((SoOrthographicCamera *)this->camera);
+    So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
+                                             PRIVATE(this)->storedperspective);
   }
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-    PRIVATE(this)->storedheightval =
-      ((SoPerspectiveCamera *)this->camera)->heightAngle.getValue();
+    *(PRIVATE(this)->storedperspective) = *((SoPerspectiveCamera *)this->camera);
+    So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
+                                             PRIVATE(this)->storedortho);
   }
 }
 
@@ -1017,18 +1040,11 @@ So@Gui@Viewer::resetToHomePosition(void)
 {
   if (! this->camera) return; // probably a scene-less viewer
 
-  this->camera->orientation = PRIVATE(this)->storedorientation;
-  this->camera->position = PRIVATE(this)->storedposition;
-
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()))
-    ((SoOrthographicCamera *)this->camera)->height = PRIVATE(this)->storedheightval;
+    *((SoOrthographicCamera *)this->camera) = *(PRIVATE(this)->storedortho);
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
-    ((SoPerspectiveCamera *)this->camera)->heightAngle = PRIVATE(this)->storedheightval;
-
-  this->camera->focalDistance =
-    (this->camera->farDistance.getValue() +
-     this->camera->nearDistance.getValue())/2;
+    *((SoPerspectiveCamera *)this->camera) = *(PRIVATE(this)->storedperspective);
 }
 
 // *************************************************************************
