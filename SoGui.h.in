@@ -84,9 +84,9 @@ public:
   static SbVec2s getWidgetSize(const @WIDGET@ widget);
 
   static void createSimpleErrorDialog(@WIDGET@ widget,
-                                      const char * dialogTitle,
-                                      const char * errorStr1,
-                                      const char * errorStr2 = NULL);
+                                      const char * title,
+                                      const char * string1,
+                                      const char * string2 = NULL);
 
   static void getVersionInfo(int * major = NULL,
                              int * minor = NULL,

@@ -323,3 +323,20 @@ So@Gui@::abort(So@Gui@ABIError error)
 }
 
 // *************************************************************************
+
+/*!
+  This is a convenient way for the application programmer to throw up
+  an obtrusive application-global error dialog.
+
+  If \a widget is \c NULL, the dialog will be modal for the whole
+  application (all windows will be blocked for input). If not,
+  only the window for the given \a widget will be blocked.
+
+  \a title is the title of the dialog box. \a string1 and \a string2
+  contains the text which will be shown in the dialog box.
+
+  There will only be a single "Ok" button for the user to press and
+  continue with the application.
+*/
+
+// *************************************************************************
