@@ -1227,7 +1227,7 @@ SoGuiExaminerViewerP::addToLog(const SbVec2s pos, const SbTime time)
     return;
   }
 
-  for (int i = this->log.size - 1; i > 0; i--) {
+  for (int i = this->log.historysize; i > 0; i--) {
     this->log.position[i] = this->log.position[i-1];
     this->log.time[i] = this->log.time[i-1];
   }
