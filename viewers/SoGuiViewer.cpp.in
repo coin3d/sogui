@@ -251,6 +251,7 @@ So@Gui@ViewerP::createSuperScene(void)
     "  DEF so@gui@->headlight DirectionalLight {",
     "    direction 1 -1 -10",
     "  }",
+
     "  DEF so@gui@->drawstyleroot Switch {",
     "    whichChild -1",
     "    DEF so@gui@->lightmodel LightModel {",
@@ -346,10 +347,10 @@ So@Gui@ViewerP::createSuperScene(void)
   if (this->sodrawstyle) this->sodrawstyle->setOverride(TRUE);
   if (this->solightmodel) this->solightmodel->setOverride(TRUE);
   if (this->somaterialbinding) this->somaterialbinding->setOverride(TRUE);
-#ifdef HAVE_POLYGONOFFSET
+#ifdef HAVE_SOPOLYGONOFFSET
   LOCATE_NODE(this->sopolygonoffset, SoPolygonOffset, "so@gui@->polygonoffset");
   if (this->sopolygonoffset) this->sopolygonoffset->setOverride(TRUE);
-#endif
+#endif // HAVE_SOPOLYGONOFFSET
 
 #undef LOCATE_NODE
   this->searchaction->reset();
