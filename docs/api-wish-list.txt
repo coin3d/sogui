@@ -1,0 +1,24 @@
+WHAT'S THIS?
+============
+
+This document describes API extension ideas where we think the So*
+libraries lacks necessary functionality.
+
+The listing of an API change or API extension in this file does not
+mean that it will be implemented, only that it will be considered for
+implementation.
+
+Ideas for this wish list can be submitted by anyone.
+
+
+THE WISH LIST
+=============
+
+* Mouse control configuration API
+  2001-12-17  write-up by <mortene@sim.no>
+  [upwards compatible extension]
+
+  A request from coin-discuss: it should be possible for application
+  programmers to change the default mousebutton combination
+  configurations for dragging / zooming / panning for the
+  So*ExaminerViewer, and likewise for the other viewer classes.
