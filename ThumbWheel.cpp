@@ -26,6 +26,11 @@ static const char rcsid[] =
 
 #include "ThumbWheel.h"
 
+#ifndef FALSE
+#define FALSE 0
+#define TRUE (!FALSE)
+#endif
+
 /*!
   \class ThumbWheel ThumbWheel.h
   \brief The ThumbWheel class is a helper class for managing thumb wheel
@@ -66,8 +71,8 @@ ThumbWheel::ThumbWheel(
 , byteorder( ABGR )
 , handling( MODULATE )
 , method( AUTHENTIC )
-, dirtyTables( true )
-, dirtyVariables( true )
+, dirtyTables( TRUE )
+, dirtyVariables( TRUE )
 {
   assert( sizeof(int) == 4 && "FIXME: use int32 datatype instead" );
 
@@ -230,12 +235,12 @@ void
 ThumbWheel::DrawBitmap(
   int number,
   void * bitmap,
-  bool vertical )
+  unsigned int flags )
 {
   if ( number == 0 ) {
-    DrawDisabledWheel( number, bitmap, vertical );
+    DrawDisabledWheel( number, bitmap, flags );
   } else {
-    DrawEnabledWheel( number, bitmap, vertical );
+    DrawEnabledWheel( number, bitmap, flags );
   }
 }
 
@@ -305,20 +310,17 @@ ThumbWheel::CalculateValue(
 int
 ThumbWheel::GetBitmapForValue(
   float value,
-  bool enabled )
+  unsigned int flags )
 {
   this->Validate();
-//  float svalue = value; // store for debug message
 
-  if ( enabled == false )
+  if ( ! (flags & THUMBWHEEL_ENABLED) )
     return 0; // only one disabled bitmap in this implementation
 
   float squarerange = (2.0f * M_PI) / (float) numsquares;
   float normalizedmodval = fmod( value, squarerange ) / squarerange;
-  // fmod doesn't wrap negative values to positive ones
   if ( normalizedmodval < 0.0f ) normalizedmodval += 1.0f;
   int bitmap = 1 + (int) (normalizedmodval * (float) (this->width - 4 + 2));
-//  fprintf( stderr, "value %8.4f gives bitmap %d\n", svalue, bitmap );
   return bitmap;
 } // GetBitmapForValue()
 
@@ -473,7 +475,7 @@ void
 ThumbWheel::DrawDisabledWheel( // private
   int number,
   void * bitmap,
-  bool vertical )
+  unsigned int flags )
 {
   assert( number == 0 );
 
@@ -501,7 +503,7 @@ ThumbWheel::DrawDisabledWheel( // private
       shade  = swapWord(  shade );
     }
 
-    if ( vertical == true ) {
+    if ( flags & THUMBWHEEL_VERTICAL ) {
       buffer[j*this->width] = light;
       for ( int i = 1; i < (width - 1); i++ )
         buffer[(j*this->width)+i] = normal;
@@ -527,7 +529,7 @@ void
 ThumbWheel::DrawEnabledWheel(
   int number,
   void * bitmap,
-  bool vertical )
+  unsigned int flags )
 {
   this->Validate();
 
@@ -581,7 +583,7 @@ ThumbWheel::DrawEnabledWheel(
       }
     }
 
-    if ( vertical == true ) {
+    if ( flags & THUMBWHEEL_VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
       if ( flag == true ) buffer[(this->width*j)+2] = front;
@@ -613,7 +615,7 @@ ThumbWheel::DrawEnabledWheel(
     if ( j < (this->diameter - 1) ) {
       radian += this->tables[RAD][j+1] - this->tables[RAD][j];
       if ( radian > modulo ) {
-        if ( vertical == true ) {
+        if ( flags & THUMBWHEEL_VERTICAL ) {
           int color = 0;
           if ( j > (this->diameter * 2 / 3) )
             color = light;
@@ -640,4 +642,3 @@ ThumbWheel::DrawEnabledWheel(
 } // DrawEnabledWheel()
 
 // ************************************************************************
-

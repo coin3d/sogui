@@ -24,6 +24,9 @@
 
 // ************************************************************************
 
+#define THUMBWHEEL_ENABLED   0x01
+#define THUMBWHEEL_VERTICAL  0x02
+
 class ThumbWheel {
 public:
   ThumbWheel(void);
@@ -38,9 +41,9 @@ public:
   void GetColorFactors( float & light, float & front, float & normal, float & shade );
 
   int BitmapsRequired(void) const;
-  void DrawBitmap( int number, void * bitmap, bool vertical );
+  void DrawBitmap( int number, void * bitmap, unsigned int flags );
   float CalculateValue( float origValue, int origPosition, int deltaPosition );
-  int GetBitmapForValue( float value, bool enabled );
+  int GetBitmapForValue( float value, unsigned int flags );
 
   enum GraphicsByteOrder {
     ABGR,
@@ -87,12 +90,13 @@ private:
   };
 
   float * tables[NUMTABLES];
-  bool dirtyTables;
-  bool dirtyVariables;
+  int dirtyTables;
+  int dirtyVariables;
   float squarelength, squarespacing, shadelength, unistep, numsquares;
 
-  void DrawDisabledWheel( int number, void * bitmap, bool vertical );
-  void DrawEnabledWheel( int number, void * bitmap, bool vertical );
+  void DrawDisabledWheel( int number, void * bitmap, unsigned int flags );
+  void DrawEnabledWheel( int number, void * bitmap, unsigned int flags );
+
 }; // class ThumbWheel
 
 // ************************************************************************
