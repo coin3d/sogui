@@ -52,6 +52,7 @@ static const char rcsid[] =
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
+#include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoSceneManager.h>
 
 #if HAVE_CONFIG_H
@@ -690,28 +691,74 @@ So@Gui@RenderArea::scheduleOverlayRedraw(
   this->overlayManager->scheduleRedraw();
 } // scheduleOverlayRedraw()
 
+
+// Callback for automatic redraw on SoSelection changes.
+void
+So@Gui@RenderArea::selection_redraw_cb( void * data, SoSelection * sel )
+{
+  So@Gui@RenderArea * ra = ( So@Gui@RenderArea * ) data;
+  if ( sel == ra->normalSelection )
+    ra->scheduleRedraw();
+  else if ( sel == ra->overlaySelection )
+    ra->scheduleOverlayRedraw();
+  else
+    assert(0 && "callback on unknown SoSelection node");
+}
+
+
 /*!
-  This method sets which selection a selection change on should schedule
-  a redraw.
+  Do automatic redraw of the scenegraph when a selection under the
+  SoSelection node is changed.
+
+  Pass \c NULL to deactivate.
+
+  (Only one SoSelection node can be monitored at any given time. This
+  is obviously a rather silly design flaw. We choose to match the
+  original Inventor API here, but this will probably change in the
+  next major revision of the library.)
 */
 
 void
 So@Gui@RenderArea::redrawOnSelectionChange(
   SoSelection * selection )
 {
+  // FIXME: this interface is badly designed, see the comment above in
+  // the function documentation. 20001002 mortene.
+
+  if ( this->normalSelection )
+    this->normalSelection->removeChangeCallback( selection_redraw_cb, this );
+
   this->normalSelection = selection;
+
+  if ( selection )
+    selection->addChangeCallback( selection_redraw_cb, this );
+
 } // redrawOnSelectionChange()
 
 /*!
-  This method sets which selection a selection change on should schedule
-  a redraw of the overlay scene.
+  Do automatic redraw of the scenegraph in the overlay planes when a
+  selection under the SoSelection node is changed.
+
+  Pass \c NULL to deactivate.
+
+  \sa So@Gui@RenderArea::redrawOnSelectionChange()
 */
 
 void
 So@Gui@RenderArea::redrawOverlayOnSelectionChange(
   SoSelection * selection )
 {
+  // FIXME: this interface is badly designed, see the comment above in
+  // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
+
+  if ( this->overlaySelection )
+    this->overlaySelection->removeChangeCallback( selection_redraw_cb, this );
+
   this->overlaySelection = selection;
+
+  if ( selection )
+    selection->addChangeCallback( selection_redraw_cb, this );
+
 } // redrawOverlayOnSelectionChange()
 
 /*!

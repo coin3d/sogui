@@ -206,6 +206,7 @@ private:
 
   SoSelection * normalSelection;
   SoSelection * overlaySelection;
+  static void selection_redraw_cb( void * data, SoSelection * sel );
 
 }; // class So@Gui@RenderArea
 
