@@ -69,7 +69,6 @@ class So@Gui@Viewer;
 
 typedef void So@Gui@ViewerCB(void * data, So@Gui@Viewer * viewer);
 typedef void So@Gui@ViewerFPSCB(float fps, void * data, So@Gui@Viewer * viewer);
-typedef void So@Gui@ViewerDecimationPercentageCB(float percentage, void * data, So@Gui@Viewer * viewer);
 
 // *************************************************************************
 
@@ -80,13 +79,6 @@ public:
   enum Type {
     BROWSER,
     EDITOR
-  };
-
-  enum DecimationStrategy {
-    NORMAL,
-    FIXED_NUM_TRIANGLES,
-    FRAMES_PER_SECOND,
-    FIXED_PERCENTAGE
   };
 
   enum DrawStyle {
@@ -164,31 +156,6 @@ public:
   void removeFinishCallback(So@Gui@ViewerCB * func, void * data = NULL);
 
   virtual void recomputeSceneSize(void);
-
-  void setDecimationStrategy(const DecimationStrategy strategy);
-  DecimationStrategy getDecimationStrategy(void) const;
-
-  void setGoalNumberOfTriangles(const int32_t goal);
-  int32_t getGoalNumberOfTriangles(void) const;
-
-  void setGoalFramesPerSecond(const float goal);
-  float getGoalFramesPerSecond(void) const;
-
-  void setFixedPercentage(const float percent);
-  float getFixedPercentage(void) const;
-
-  void enableFullRenderingWhenStill(const SbBool enable);
-  SbBool isFullRenderingWhenStill(void) const;
-  SbBool isStillNow(void) const;
-
-  void setFramesPerSecondCallback(So@Gui@ViewerFPSCB * callback, void * data);
-
-  void setNumSamples(const int numFrames);
-  int getNumSamples(void) const;
-
-  void setDecimationPercentageCallback(
-      So@Gui@ViewerDecimationPercentageCB * cb, void * data = NULL);
-  float getCurrentDecimationPercentage(void) const;
 
   void setWireframeOverlayColor(const SbColor & color);
   const SbColor & getWireframeOverlayColor(void) const;
