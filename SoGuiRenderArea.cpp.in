@@ -287,6 +287,9 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
   if (exts.getLength() > 0) { info += "\n   "; info += exts; }
   info += "\"\n";
 
+  // FIXME: should also show available GLX / WGL / AGL
+  // extensions. 20020802 mortene.
+
   // Misc implementation info
   {
     SbVec2f range;
@@ -328,6 +331,27 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texdim);
     s.sprintf("GL_MAX_TEXTURE_SIZE==%d\n", texdim);
     info += s;
+
+    GLint maxlights;
+    glGetIntegerv(GL_MAX_LIGHTS, &maxlights);
+    s.sprintf("GL_MAX_LIGHTS==%d\n", maxlights);
+    info += s;
+
+    GLint maxplanes;
+    glGetIntegerv(GL_MAX_CLIP_PLANES, &maxplanes);
+    s.sprintf("GL_MAX_CLIP_PLANES==%d\n", maxplanes);
+    info += s;
+
+    // FIXME: other implementation specifics to print are
+    //
+    //  * maximum stack depths (attribute, modelview matrix, name,
+    //    projection matrix, texture matrix)
+    //
+    //  * max display list nesting
+    //
+    //  * max 3D texture size (needs specific extension?)
+    //
+    // 20020802 mortene.
   }
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
