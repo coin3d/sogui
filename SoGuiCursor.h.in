@@ -22,9 +22,9 @@
 #define SO@GUI@_CURSOR_H
 
 #include <Inventor/SbLinear.h>
+#include <Inventor/@Gui@/So@Gui@Basic.h>
 
-
-class So@Gui@Cursor {
+class SO@GUI@_DLL_API So@Gui@Cursor {
 public:
   struct CustomCursor {
     SbVec2s dim;
