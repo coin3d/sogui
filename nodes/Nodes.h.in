@@ -34,6 +34,8 @@
 #include <Inventor/@Gui@/nodes/SoGuiPosition.h>
 #include <Inventor/@Gui@/nodes/SoGuiTranslation.h>
 #include <Inventor/@Gui@/nodes/SoGuiFrame.h>
+#include <Inventor/@Gui@/nodes/SoGuiImage.h>
+#include <Inventor/@Gui@/nodes/SoGuiLabel.h>
 #include <Inventor/@Gui@/nodes/SoGuiToggleButton.h>
 #include <Inventor/@Gui@/nodes/SoGuiRadioButton.h>
 #include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
