@@ -42,6 +42,15 @@ public:
   void viewPlaneY(void) const;
   void viewPlaneZ(void) const;
 
+  void setCanvasSize( const SbVec2s size );
+  void setPointerLocation( const SbVec2s location );
+  int getPointerXMotion(void) const;
+  int getPointerYMotion(void) const;
+  float getPointerOrigoAngle(void) const;
+  float getPointerOrigoMotionAngle(void) const;
+
+  void drawRotateGraphics(void) const;
+
   // old interface
   float transYWheelMotion( const float value, const float oldvalue,
     SoCamera * const camera );
@@ -56,6 +65,12 @@ public:
 
 private:
   So@GUI@PlaneViewer * const viewer;
+
+  struct {
+    SbVec2s now;
+    SbVec2s then;
+  } pointer;
+  SbVec2s canvas;
 
 }; // class SoAnyPlaneViewer
 

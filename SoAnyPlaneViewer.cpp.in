@@ -28,6 +28,11 @@ static const char rcsid[] =
 
 #include <assert.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif // _WIN32
+#include <GL/gl.h>
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 
@@ -43,6 +48,10 @@ SoAnyPlaneViewer::SoAnyPlaneViewer(
   So@GUI@PlaneViewer * const _viewer )
 : viewer( _viewer )
 {
+  assert( viewer != NULL );
+  this->canvas = SbVec2s( 0, 0 );
+  this->pointer.now = SbVec2s( 0, 0 );
+  this->pointer.then = SbVec2s( 0, 0 );
 } // SoAnyPlaneViewer()
 
 /*!
@@ -94,8 +103,10 @@ SoAnyPlaneViewer::rotateZ(
 {
   SoCamera * const camera = viewer->getCamera();
   assert( camera != NULL );
-  SoDebugError::postInfo( "SoAnyPlaneViewer::rotateZ",
-    "not implemented yet" );
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+  camera->orientation =
+    camera->orientation.getValue() * SbRotation( dir, angle );
 } // rotateZ()
 
 // *************************************************************************
@@ -264,5 +275,128 @@ SoAnyPlaneViewer::viewPlaneZ(
     camera->focalDistance.getValue() * SbVec3f( 0, 0, 1 );
   camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), 0 );
 } // viewPlaneZ()
+
+// ************************************************************************
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::setCanvasSize(
+  const SbVec2s size )
+{
+  this->canvas = size;
+} // setCanvasSize()
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::setPointerLocation(
+  const SbVec2s position )
+{
+  this->pointer.then = this->pointer.now;
+  this->pointer.now = position;
+} // setPointerLocation()
+
+/*!
+*/
+
+int
+SoAnyPlaneViewer::getPointerXMotion(
+  void ) const
+{
+  return this->pointer.now[0] - this->pointer.then[0];
+} // getPointerXMotion()
+
+/*!
+*/
+
+int
+SoAnyPlaneViewer::getPointerYMotion(
+  void ) const
+{
+  return this->pointer.now[1] - this->pointer.then[1];
+} // getPointerYMotion()
+
+/*!
+*/
+
+float
+SoAnyPlaneViewer::getPointerOrigoAngle(
+  void ) const
+{
+  SbVec2s now = this->pointer.now;
+  now[0] -= this->canvas[0] / 2;
+  now[1] -= this->canvas[1] / 2;
+
+  float nowradval = atan( fabs( (float) now[1] / (float) now[0] ) );
+  if ( now[0] < 0 ) nowradval = M_PI - nowradval;
+  if ( now[1] < 0 ) nowradval = 2 * M_PI - nowradval;
+
+  return nowradval;
+} // getPointerOrigoAngle()
+
+/*!
+*/
+
+float
+SoAnyPlaneViewer::getPointerOrigoMotionAngle(
+  void ) const
+{
+  if ( this->pointer.then == this->pointer.now )
+    return 0.0f;
+
+  SbVec2s now = this->pointer.now;
+  now[0] -= this->canvas[0] / 2;
+  now[1] -= this->canvas[1] / 2;
+
+  SbVec2s then = this->pointer.then;
+  then[0] -= this->canvas[0] / 2;
+  then[1] -= this->canvas[1] / 2;
+
+  float nowradval = atan( fabs( (float) now[1] / (float) now[0] ) );
+  if ( now[0] < 0 ) nowradval = M_PI - nowradval;
+  if ( now[1] < 0 ) nowradval = 2 * M_PI - nowradval;
+
+  float thenradval = atan( fabs( (float) then[1] / (float) then[0] ) );
+  if ( then[0] < 0 ) thenradval = M_PI - thenradval;
+  if ( then[1] < 0 ) thenradval = 2 * M_PI - thenradval;
+
+  return nowradval - thenradval;
+} // getPointerMotionAngle()
+
+// ************************************************************************
+
+/*!
+  This method draws the rotate mode graphics...
+*/
+
+void
+SoAnyPlaneViewer::drawRotateGraphics(
+  void ) const
+{
+  glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
+               GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
+  GLfloat depthrange[2];
+  glGetFloatv(GL_DEPTH_RANGE, depthrange);
+  GLdouble projectionmatrix[16];
+  glGetDoublev(GL_PROJECTION_MATRIX, projectionmatrix);
+
+  glDepthFunc(GL_ALWAYS);
+  glDepthMask(GL_TRUE);
+  glDepthRange(0, 0);
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
+
+  // draw gfx
+
+  // Reset original state.
+  glDepthRange(depthrange[0], depthrange[1]);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(projectionmatrix);
+  glPopAttrib();
+} // drawRotateGraphics()
 
 // ************************************************************************
