@@ -27,12 +27,6 @@
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 #include <Inventor/SbLinear.h>
 
-// FIXME: these includes only needed because of SoWin-specific private
-// functions -- get rid of it after fixing up the header file to be a
-// 100% "pure" template. 20011210 mortene.
-#include <Inventor/events/SoMotion3Event.h>
-#include <Inventor/events/SoSpaceballButtonEvent.h>
-
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@Spaceball : public So@Gui@Device {
@@ -53,15 +47,10 @@ public:
   };
 
   So@Gui@Spaceball(int events = ALL_EVENTS);
-#ifdef __COIN_SOXT__ // FIXME: get rid of this abominable #ifdef. 20011229 mortene.
-  SoXtSpaceball(Display * display, int events = SoXtSpaceball::ALL_EVENTS);
-#endif // __COIN_SOXT__
   virtual ~So@Gui@Spaceball();
 
-  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                      void * closure);
-  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                       void * closure);
+  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
+  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
 
   virtual const SoEvent * translateEvent(@EVENT@ event);
 
@@ -70,39 +59,13 @@ public:
   void setTranslationScaleFactor(float f);
   float getTranslationScaleFactor(void) const;
 
-#ifdef __COIN_SOXT__ // FIXME: make a "pure" template. 20011210 mortene.
-  static SbBool exists(Display * display = NULL);
-#else
   static SbBool exists(void);
-#endif
 
   void setFocusToWindow(SbBool flag);
   SbBool isFocusToWindow(void) const;
 
 private:
   class So@Gui@SpaceballP * pimpl;
-
-#ifdef __COIN_SOWIN__ // FIXME: make a "pure" template. 20011210 mortene.
-  UINT eventMask;
-  SoMotion3Event * motionEvent;
-  SoSpaceballButtonEvent * buttonEvent;
-  HWND parentWidget;
-  float rotScale, transScale;
-  SoMotion3Event * translateMotionEvent(MSG * motionEvent);
-  SoSpaceballButtonEvent * translateButtonEvent(MSG * buttonEvent, SoButtonEvent::State whichState);
-  SoMotion3Event * translateMotionEventMagellan(MSG * motionEvent);
-#endif // __COIN_SOWIN__
-#ifdef __COIN_SOXT__ // FIXME: make a "pure" template. 20011210 mortene.
-  int events;
-  float rotationFactor;
-  float translationFactor;
-#endif // __COIN_SOXT__
-#ifdef __COIN_SOGTK__ // FIXME: make a "pure" template. 20011210 mortene.
-  int events;
-  float rotationscale;
-  float translationscale;
-  SbBool focustowindow;
-#endif // __COIN_SOGTK__
 };
 
 // *************************************************************************

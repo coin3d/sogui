@@ -46,6 +46,7 @@
 #include <Inventor/@Gui@/devices/So@Gui@DeviceP.h>
 #include <Inventor/SbPList.h>
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/events/SoEvent.h>
 
 #include <Inventor/@Gui@/devices/So@Gui@InputFocus.h>
 #include <Inventor/@Gui@/devices/So@Gui@Keyboard.h>
