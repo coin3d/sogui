@@ -39,12 +39,12 @@ static const char rcsid[] =
 */
 
 /*!
-  \var bool ThumbWheel::dirtyTables
+  \var int ThumbWheel::dirtyTables
   If this flag is set, the internal tables needs to be recalculated.
 */
 
 /*!
-  \var bool ThumbWheel::dirtyVariables
+  \var int ThumbWheel::dirtyVariables
   If this flag is set, the internal variables that are calculated from the
   tables and wheel settings need to be recalculated.
 */
@@ -118,10 +118,10 @@ ThumbWheel::SetWheelSize(
   int width )
 {
   if ( this->diameter != diameter ) {
-    this->dirtyTables = true;
-    this->dirtyVariables = true;
+    this->dirtyTables = TRUE;
+    this->dirtyVariables = TRUE;
   } else if ( this->width != width ) {
-    this->dirtyVariables = true; // embossed squares grows...
+    this->dirtyVariables = TRUE; // embossed squares grows...
   } else {
     return;
   }
@@ -407,8 +407,8 @@ void
 ThumbWheel::Validate( // private
   void )
 {
-  if ( this->dirtyTables != false ) {
-    assert( this->dirtyVariables != false );
+  if ( this->dirtyTables != FALSE ) {
+    assert( this->dirtyVariables != FALSE );
     for ( int i = 0; i < NUMTABLES; i++ ) {
       if ( this->tables[i] ) delete [] this->tables[i];
       this->tables[i] = new float [ this->diameter ];
@@ -429,11 +429,11 @@ ThumbWheel::Validate( // private
       this->tables[SIN][i] = sqrt( 1.0f - this->tables[COS][i] * this->tables[COS][i] );
     }
 
-    this->dirtyTables = false;
+    this->dirtyTables = FALSE;
   }
 
-  if ( this->dirtyVariables != false ) {
-    assert( this->dirtyTables == false );
+  if ( this->dirtyVariables != FALSE ) {
+    assert( this->dirtyTables == FALSE );
     if ( (this->diameter % 2) == 0)
       this->unistep = this->tables[RAD][this->diameter/2] -
                       this->tables[RAD][(this->diameter/2)-1];
@@ -449,7 +449,7 @@ ThumbWheel::Validate( // private
     this->numsquares = squares;
     this->squarelength = ((2.0f * M_PI) / (float) squares) - this->squarespacing;
 
-    this->dirtyVariables = false;
+    this->dirtyVariables = FALSE;
   }
 } // Validate()
 
@@ -541,7 +541,7 @@ ThumbWheel::DrawEnabledWheel(
 //  fprintf( stderr, "radoffset = %8.4f\n", radoffset );
 //  DrawDisabledWheel( 0, bitmap, vertical );
 
-  bool newsquare = true;
+  int newsquare = TRUE;
   unsigned int * buffer = (unsigned int *) bitmap;
   for ( int j = 0; j < this->diameter; j++ ) {
     unsigned int light, front, normal, shade, color;
@@ -566,18 +566,18 @@ ThumbWheel::DrawEnabledWheel(
       shade   = swapWord( shade );
     }
 
-    static bool flag = false;
+    static int flag = FALSE;
     if ( newsquare ) {
       color=front;
-      newsquare = false;
-      flag = true;
+      newsquare = FALSE;
+      flag = TRUE;
     } else {
-      if ( flag == true ) {
+      if ( flag == TRUE ) {
         if ( j < (this->diameter * 2 / 3) )
           color = shade;
         else
           color = normal;
-        flag = false;
+        flag = FALSE;
       } else {
         color = normal;
       }
@@ -586,13 +586,13 @@ ThumbWheel::DrawEnabledWheel(
     if ( flags & THUMBWHEEL_VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
-      if ( flag == true ) buffer[(this->width*j)+2] = front;
+      if ( flag == TRUE ) buffer[(this->width*j)+2] = front;
       else                buffer[(this->width*j)+2] = shade;
 
       for ( int i = 3; i < (this->width-2); i++ )
         buffer[(j*this->width)+i] = color;
 
-      if ( flag == true ) buffer[(this->width*j)+this->width-3] = front;
+      if ( flag == TRUE ) buffer[(this->width*j)+this->width-3] = front;
       else                buffer[(this->width*j)+this->width-3] = normal;
       buffer[(this->width*j)+this->width-2] = front;
       buffer[(this->width*j)+this->width-1] = front;
@@ -600,13 +600,13 @@ ThumbWheel::DrawEnabledWheel(
 
       buffer[j] = front;
       buffer[j+this->diameter] = front;
-      if ( flag == true ) buffer[j+(this->diameter*2)] = front;
+      if ( flag == TRUE ) buffer[j+(this->diameter*2)] = front;
       else                buffer[j+(this->diameter*2)] = shade;
 
       for ( int i = 2; i < (this->width-2); i++ )
         buffer[j+(i*this->diameter)] = color;
 
-      if ( flag == true ) buffer[j+(this->diameter*(this->width-3))] = front;
+      if ( flag == TRUE ) buffer[j+(this->diameter*(this->width-3))] = front;
       else                buffer[j+(this->diameter*(this->width-3))] = normal;
       buffer[j+(this->diameter*(this->width-2))] = front;
       buffer[j+(this->diameter*(this->width-1))] = front;
@@ -635,7 +635,7 @@ ThumbWheel::DrawEnabledWheel(
               buffer[j+(this->diameter*i)] = color;
         }
         radian = fmod( radian, modulo );
-        newsquare = true;
+        newsquare = TRUE;
       }
     }
   }
