@@ -323,6 +323,12 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
 {
 #if DEBUGGING_EGGS
   this->currentinput += c;
+
+  if (0) { // handy for debugging keyboard handling
+    SoDebugError::postInfo("So@Gui@RenderAreaP::checkMagicSequences",
+                           "'%s'", this->currentinput.getString());
+  }
+
   int cl = this->currentinput.getLength();
 
   static const char glinfoseq[] = "glinfo";
