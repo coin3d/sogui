@@ -2556,7 +2556,7 @@ So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
   // In interactive buffer mode, doublebuffering is used during interaction.
   if ( thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
     thisp->pimpl->localsetbuffertype = TRUE;
-    thisp->inherited::setDoubleBuffer( TRUE );
+    thisp->So@Gui@RenderArea::setDoubleBuffer( TRUE );
     thisp->pimpl->localsetbuffertype = FALSE;
   }
 
@@ -2579,7 +2579,7 @@ So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
   // interaction, singelbuffering while the camera is static.
   if (thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
     thisp->pimpl->localsetbuffertype = TRUE;
-    thisp->inherited::setDoubleBuffer(FALSE);
+    thisp->So@Gui@RenderArea::setDoubleBuffer(FALSE);
     thisp->pimpl->localsetbuffertype = FALSE;
   }
 
