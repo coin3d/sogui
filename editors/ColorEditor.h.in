@@ -75,6 +75,9 @@ public:
   void setUpdateFrequency(UpdateFrequency freq);
   UpdateFrequency getUpdateFrequency(void) const;
   
+  virtual void setSceneGraph(SoNode * scene);
+  virtual SoNode * getSceneGraph(void);
+
 private:
   void * internals;
 
