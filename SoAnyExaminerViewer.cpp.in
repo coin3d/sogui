@@ -1032,8 +1032,8 @@ SoAnyExaminerViewer::processSoEvent(
   if (processed) {
     enum { STATE_LMB = 0x01, STATE_MMB = 0x02, STATE_CTRL = 0x04 };
     unsigned short stateflags =
-      (this->button1down ? STATE_LMB : 0) |
-      (this->button3down ? STATE_MMB : 0) |
+      (this->button1down ? STATE_LMB : 0) +
+      (this->button3down ? STATE_MMB : 0) +
       (this->controldown ? STATE_CTRL : 0);
 
     SoAnyExaminerViewer::ViewerMode mode;
