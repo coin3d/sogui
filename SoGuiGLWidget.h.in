@@ -108,6 +108,9 @@ public:
   void setOverlayRender(const SbBool onoff);
   SbBool isOverlayRender(void) const;
 
+  void setStealFocus(SbBool enable);
+  SbBool isStealFocus(void) const;
+
   @WIDGET@ getGLWidget(void) const;
   @WIDGET@ getNormalWidget(void) const;
   @WIDGET@ getOverlayWidget(void) const;
@@ -204,6 +207,7 @@ protected:
 protected:
   virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
 #endif // __COIN_SOGTK__
+
 };
 
 // *************************************************************************
