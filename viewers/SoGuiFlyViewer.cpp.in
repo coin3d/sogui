@@ -81,6 +81,11 @@
 
 #ifndef DOXYGEN_SKIP_THIS
 
+// FIXME: We should probably move this class out of this
+// impl-file. There is code here that could be factored out and reused
+// in other modules, for example camera handling. Now there is a
+// duplication with some of the code in So@Gui@ConstrainedViewerP, for
+// example. 20021017 rolvs
 class So@Gui@FlyViewerP {
 public:
   So@Gui@FlyViewerP(So@Gui@FlyViewer * owner);
@@ -145,19 +150,26 @@ public:
   void superimpositionevent(SoAction * action);
   static void superimposition_cb(void * closure, SoAction * action);
 
-  SbVec2s mouseloc, tiltpos;
+  float tilt_increment; // Angle-adjustment between View-up and direction 
+  float pan_increment;  // Rotation-adjustment around View-up
+
+  SbVec2s mouseloc;
+  SbVec2s tiltpos;
   SbRotation tiltrotation;
   SbVec3f tiltup;
 
   SoNode * getSuperimpositionNode(const char * name);
 
+  // FIXME: Refactor event handlers and PUBLIC(this)->processSoEvent
+  // in a way similar to that in SoGuiExaminerViewer, where only
+  // internal state is red/set. 20021017 rolvs
   SbBool processKeyboardEvent( const SoKeyboardEvent * const kevt );
   SbBool processMouseButtonEvent( const SoMouseButtonEvent * const mevt );
   SbBool processLocation2Event( const SoLocation2Event * const levt );
 private:
   So@Gui@FlyViewer * publ;
   ViewerMode viewermode;
-}; // So@Gui@FlyViewerP
+};
 
 So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
 {
@@ -166,8 +178,15 @@ So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
   this->viewermode = FLYING;
   this->currentspeed = 0.0f;
   this->maxspeed = 0.0f;
+
   // the speed factor ought to be adjusted according to the scene
-  // graph bounding box in case of enormous models
+  // graph bounding box in case of enormous models 
+  // 
+  // FIXME: This scaling factor is not used (and as far as I can se,
+  // it haven't been used, either). But it is definetly necessary to
+  // scale the speed according to BBox size. Just try the FlyViwer
+  // with models with different scales, and you'll see what I
+  // mean. 20021017 rolvs.
   this->speedfactor = 1.0f;
   this->stranslation = NULL;
   this->sscale = NULL;
@@ -178,6 +197,8 @@ So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
   this->lshiftdown = FALSE;
   this->rshiftdown = FALSE;
   this->lastrender = new SbTime;
+  this->tilt_increment = 0;
+  this->pan_increment = 0;
 }
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
@@ -666,6 +687,13 @@ So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
   }
 
   this->mouseloc = lev->getPosition();
+  SbVec2s glsize( PUBLIC(this)->getGLSize() );
+
+  SbVec2s mid( glsize[0]/2, glsize[1]/2 );  
+  this->pan_increment = 0.002f *
+    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
+  this->tilt_increment =
+    (float(mid[1] - this->mouseloc[1]) / float(mid[1])) * 0.002f;
   return TRUE;
 }
 
@@ -759,15 +787,8 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
 
 void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
 {
-  SbVec2s glsize( PUBLIC(this)->getGLSize() );
-  SbVec2s mid( glsize[0]/2, glsize[1]/2 );
-
-  float xfrac =
-    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
-  float yfrac =
-    float(mid[1] - this->mouseloc[1]) / float(mid[1]);
-
-  float factor = xfrac * xfrac + yfrac * yfrac;
+  float factor = this->pan_increment * this->pan_increment 
+    + this->tilt_increment * this->tilt_increment;
   
   if (factor > 0.99f) {
     factor = 0.01f;
@@ -789,48 +810,39 @@ void
 So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
 {
   assert( camera != NULL );
-
+  // FIXME: Camera position movement and changes in orientation is
+  // general behaviour that could be factored out for re-use. 
+  // 20021017 rolvs
+  
   SbRotation orientation = camera->orientation.getValue();
-
   SbVec3f dir;
-  orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
+  camera->orientation.getValue().multVec( SbVec3f(0,0,-1), dir );
   dir.normalize();
   camera->position.setValue(camera->position.getValue() +
                             dir * (this->currentspeed 
                                    * dt
                                    * this->speedfactor));
 
-  SbVec2s glsize( PUBLIC(this)->getGLSize() );
-  SbVec2s mid( glsize[0]/2, glsize[1]/2 );  
-  float xfrac =
-    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
-  float yfrac =
-    float(mid[1] - this->mouseloc[1]) / float(mid[1]);
-  float xfactor = xfrac * xfrac / 2.0f;
-  if (xfrac < 0.0f) 
-    xfactor = -xfactor;
+  // FIXME: Make sure that the angle between direction and up-vector
+  // stays larger than zero, or else it gets 'locked' in an undefined
+  // state and starts to act weird. 20021017 rolvs
+  PUBLIC( this )->tiltCamera( this->tilt_increment );
 
-  SbVec3f up = PUBLIC(this)->getUpDirection();
-  up.normalize();
-  SbVec3f horizon = dir.cross(up);
-  horizon.normalize();
-            
-  orientation *= SbRotation(up, xfactor * dt);
-            
-  // set tilt
-  SbRotation tilt = SbRotation(horizon, yfrac * yfrac * 0.002f);
-  if (yfrac >= 0.0f) 
-    tilt.invert();
-
-  orientation *= tilt;
-  camera->orientation.setValue(orientation);
+  camera->orientation = camera->orientation.getValue() *
+    SbRotation( PUBLIC(this)->getUpDirection(), this->pan_increment );
 }
 
 void
 So@Gui@FlyViewerP::incrementMaxSpeed()
 {
-  // FIXME: Use an integer factor to update the speed, 
-  // and multiply the max speed factor. 20021016 rolvs
+  // FIXME: Use an integer factor that get's incremented with this
+  // function to calculate the maxSpeed instead. Needs a refactoring
+  // that encapsulates the enquiery of the maxspeed member variable.
+  // The maxspeed could then be calculated with something like this:
+  // maxspeed = factor * pow(some_base, abs(factor)). This will
+  // obsolete tests where maxvelocity is compared to a epsilon for
+  // Zero size, for example. It will still behave in the same manner
+  // as before (and the InventorXT fly-viewer). 20021017 rolvs.
 
   if (this->maxspeed == 0)
     this->maxspeed = SO@GUI@_MIN_STEP;
@@ -855,8 +867,8 @@ So@Gui@FlyViewerP::incrementMaxSpeed()
 void
 So@Gui@FlyViewerP::decrementMaxSpeed()
 {	
-  // FIXME: Use an integer factor to update the speed, 
-  // and multiply the max speed factor. 20021016 rolvs.
+  // FIXME: See fixme-comment on incrementMaxSpeed.
+  // 20021017 rolvs
 
   if ((this->maxspeed > 0.0f) &&
       (this->maxspeed <= SO@GUI@_MIN_STEP))
@@ -1114,7 +1126,8 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
   
   // FIXME: There is more parts of the kode in
   // So@Gui@*FlyViewer::processEvent that should go in to the
-  // processKeyboardEvent function; to be fixed later.
+  // processKeyboardEvent function; to be fixed later. 
+  // 20021015 rolvs
 
   // Keyboard handling
   if (event->isOfType(SoKeyboardEvent::getClassTypeId())) {
