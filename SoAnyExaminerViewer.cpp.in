@@ -92,7 +92,7 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
 
   // FIXME: use a smaller sphere than the default one to have a larger
   // area close to the borders that gives us "z-axis rotation"?
-  // 990425 mortene.
+  // 19990425 mortene.
   this->spinprojector = new SbSphereSheetProjector;
   SbViewVolume volume;
   volume.ortho( -1, 1, -1, 1, -1, 1 );
@@ -465,7 +465,7 @@ SoAnyExaminerViewer::drawAxisCross(
     // FIXME: the code which makes sure we render in the correct order
     // (which we have to do, as Z-buffering is dysfunctional at this
     // stage) is _really_ lousy. A virtual beer to the first hacker
-    // who improves this code. 990424 mortene.
+    // who improves this code. 19990424 mortene.
 
     // Bubble sort.. :-}
     float minval = xpos[2];
@@ -599,7 +599,7 @@ SoAnyExaminerViewer::reorientCamera(
 
 //  SoDebugError::postWarning("SoAnyExaminerViewer::reorientCamera", "A" );
   // Set new orientation value by accumulating the new rotation.
-  
+
 //  fprintf( stdout, "\nrotation : " );
 //  rot.print( stdout );
 //  fprintf( stdout, "\ncamera   : " );
@@ -640,7 +640,7 @@ SoAnyExaminerViewer::spin(
   this->spinprojector->projectAndGetRotation( pointerpos, r );
 #if 0 // debug
   // FIXME: Trying to track down an annoying (non-critical) bug.
-  // 990501 mortene.
+  // 19990501 mortene.
   if (r == SbRotation::identity()) {
     SoDebugError::postWarning("So@Gui@ExaminerViewer::spin",
                               "rotation equals identity");
@@ -662,7 +662,7 @@ SoAnyExaminerViewer::spin(
 
   this->spinsamplecounter++;
   acc_angle /= this->spinsamplecounter;
-  // FIXME: accumulate and average axis vectors aswell? 990501 mortene.
+  // FIXME: accumulate and average axis vectors aswell? 19990501 mortene.
   this->spinincrement.setValue(newaxis, acc_angle);
 
   // Don't carry too much baggage, as that'll give unwanted results
@@ -802,8 +802,11 @@ SoAnyExaminerViewer::actualRedraw(
 #define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
 
 /*!
-  This method processes SoEvents instead of native GUI toolkit events, so
-  the code can be shared between all the SoGUI libraries.
+  This method processes SoEvents instead of native GUI toolkit events,
+  so the code can be shared between all the SoGUI libraries.
+
+  Returns \c TRUE iff the event was processed, if not it should be
+  passed on further up in the inheritance hierarchy by the caller.
 */
 
 SbBool
@@ -825,6 +828,8 @@ SoAnyExaminerViewer::processSoEvent(
                       (float) pos[1] / (float) canvas[1] );
 
   this->lastmouseposition = posn;
+
+  SbBool processed = FALSE;
 
   // Mouse Button / Spaceball Button handling
 
@@ -851,126 +856,131 @@ SoAnyExaminerViewer::processSoEvent(
     if ( press ) {
       switch ( button ) {
       case SoMouseButtonEvent::BUTTON1:
-        if ( viewer->isSeekMode() )
-          return FALSE;
-        if ( this->isAnimating() )
-          this->stopAnimating();
-        viewer->interactiveCountInc();
-        this->clearLog();
-        return TRUE; 
+        if ( ! viewer->isSeekMode() ) {
+          if ( this->isAnimating() ) this->stopAnimating();
+          viewer->interactiveCountInc();
+          this->clearLog();
+          processed = TRUE;
+        }
+        break;
 
       case SoMouseButtonEvent::BUTTON3:
-        do {
-          if ( this->isAnimating() )
-            this->stopAnimating();
+        {
+          if ( this->isAnimating() ) this->stopAnimating();
           viewer->interactiveCountInc();
           SoCamera * const camera = viewer->getCamera();
           SbViewVolume volume = camera->getViewVolume( viewer->getGLAspectRatio() );
           this->panningplane = volume.getPlane( camera->focalDistance.getValue() );
-          return TRUE; 
-        } while ( FALSE );
+          processed = TRUE;
+        }
+        break;
 
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
       case SoMouseButtonEvent::BUTTON4:
         this->zoom( -0.1f );
-        return TRUE;
+        processed = TRUE;
+        break;
 
       case SoMouseButtonEvent::BUTTON5:
         this->zoom( 0.1f );
-        return TRUE; 
+        processed = TRUE;
+        break;
 
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
       default:
         break;
       } // switch ( button )
-      return FALSE;
 
     } else { // ! press
       switch ( button ) {
       case SoMouseButtonEvent::BUTTON1:
-        do {
-        this->spinanimating = FALSE;
-        if ( viewer->isSeekMode() )
-          return FALSE;
-        if ( ! this->isAnimationEnabled() || this->log.historysize < 3 ) {
-          viewer->interactiveCountDec();
-          return TRUE;
-        }
-        const SbVec2s glsize( viewer->getGLSize() );
-        SbVec3f from = this->spinprojector->project(
-          SbVec2f( float(this->log.position[2][0]) / float(glsize[0]-1),
-                   float(this->log.position[2][1]) / float(glsize[1]-1) ) );
-        SbVec3f to = this->spinprojector->project( posn );
-        SbRotation rot = this->spinprojector->getRotation( from, to );
+        {
+          this->spinanimating = FALSE;
+          if ( ! viewer->isSeekMode() ) {
+            if ( ! this->isAnimationEnabled() || this->log.historysize < 3 ) {
+              viewer->interactiveCountDec();
+            }
+            else {
+              const SbVec2s glsize( viewer->getGLSize() );
+              SbVec3f from = this->spinprojector->project(
+                                                          SbVec2f( float(this->log.position[2][0]) / float(glsize[0]-1),
+                                                                   float(this->log.position[2][1]) / float(glsize[1]-1) ) );
+              SbVec3f to = this->spinprojector->project( posn );
+              SbRotation rot = this->spinprojector->getRotation( from, to );
 
-        SbTime stoptime = (event->getTime() - this->log.time[0]);
-        if ( stoptime.getMsecValue() > 100 ) {
-          viewer->interactiveCountDec();
-          return TRUE;
-        }
+              SbTime stoptime = (event->getTime() - this->log.time[0]);
+              if ( stoptime.getMsecValue() > 100 ) {
+                viewer->interactiveCountDec();
+              }
+              else {
+                SbTime delta = (this->log.time[0] - this->log.time[2]);
+                float deltatime = (float) delta.getMsecValue();
+                if ( deltatime == 1.0f ) {
+                  SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
+                                          this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue() );
+                  viewer->interactiveCountDec();
+                }
+                else {
+                  rot.invert();
+                  rot.scaleAngle( 200.0f / deltatime );
 
-        SbTime delta = (this->log.time[0] - this->log.time[2]);
-        float deltatime = (float) delta.getMsecValue();
-        if ( deltatime == 1.0f ) {
-          SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
-            this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue() );
-          viewer->interactiveCountDec();
-          return TRUE;
+                  SbVec3f axis;
+                  float radians;
+                  rot.getValue( axis, radians );
+                  if ( radians < 0.01f || deltatime > 300.0f ) {
+                    viewer->interactiveCountDec();
+                  }
+                  else {
+                    this->spinRotation = rot;
+                    this->spinanimating = TRUE;
+                    viewer->scheduleRedraw();
+                  }
+                }
+              }
+            }
+          }
         }
-        rot.invert();
-        rot.scaleAngle( 200.0f / deltatime );
-
-        SbVec3f axis;
-        float radians;
-        rot.getValue( axis, radians );
-        if ( radians < 0.01f || deltatime > 300.0f ) {
-          viewer->interactiveCountDec();
-          return TRUE;
-        }
-        this->spinRotation = rot;
-        this->spinanimating = TRUE;
-        viewer->scheduleRedraw();
-        } while ( FALSE );
-        return TRUE; 
+        processed = TRUE;
+        break;
 
       case SoMouseButtonEvent::BUTTON3:
         viewer->interactiveCountDec();
-        return TRUE;
+        processed = TRUE;
+        break;
 
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTONS
       case SoMouseButtonEvent::BUTTON4:
-        return TRUE; // don't pass on
+        processed = TRUE; // don't pass on
+        break;
 
       case SoMouseButtonEvent::BUTTON5:
-        return TRUE; // don't pass on
+        processed = TRUE; // don't pass on
+        break;
 
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTONS
       default:
         break;
       } // switch ( button )
-      return FALSE;
     }
-    return FALSE;
   }
 
   // Mouse Movement handling
   if ( type.isDerivedFrom( LOCATION2_EVENT_TYPE ) ) {
     const SoLocation2Event * const event = (const SoLocation2Event *) ev;
 
+    if ( this->button1down || this->button3down ) processed = TRUE;
+
     if ( this->button1down && this->button3down ) {
       this->zoomByCursor( posn, prevnormalized );
-      return TRUE;
     }
-    if ( this->button1down ) {
+    else if ( this->button1down ) {
       this->addToLog( event->getPosition(), event->getTime() );
       this->spin( posn );
-      return TRUE;
     }
-    if ( this->button3down ) {
+    else if ( this->button3down ) {
       this->pan( posn, prevnormalized );
-      return TRUE;
     }
-    return FALSE;
+
   }
 
   // Keyboard handling
@@ -981,14 +991,15 @@ SoAnyExaminerViewer::processSoEvent(
       if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
         || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
         this->controldown = TRUE;
+        processed = TRUE;
       }
     } else {
       if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
         || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
         this->controldown = FALSE;
+        processed = TRUE;
       }
     }
-    return FALSE;
   }
 
   // Spaceball & Joystick handling
@@ -1001,20 +1012,60 @@ SoAnyExaminerViewer::processSoEvent(
           camera->position.getValue() + event->getTranslation();
         camera->orientation =
           camera->orientation.getValue() * event->getRotation();
-        return TRUE;
+        processed = TRUE;
       } else {
         // FIXME: move/rotate model
 #if SO@GUI@_DEBUG
         SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent",
           "SoMotion3Event for model movement is not implemented yet" );
 #endif // SO@GUI@_DEBUG
-        return TRUE;
+        processed = TRUE;
       }
     }
-    return FALSE;
   }
 
-  return FALSE;
+  if (processed) {
+    enum { STATE_LMB = 0x01, STATE_MMB = 0x02, STATE_CTRL = 0x04 };
+    unsigned short stateflags =
+      (this->button1down ? STATE_LMB : 0) |
+      (this->button3down ? STATE_MMB : 0) |
+      (this->controldown ? STATE_CTRL : 0);
+
+    SoAnyExaminerViewer::ViewerMode mode;
+
+    switch (stateflags) {
+    case 0:
+      mode = SoAnyExaminerViewer::EXAMINE;
+      break;
+
+    case STATE_LMB:
+      mode = SoAnyExaminerViewer::DRAGGING;
+      break;
+
+    case STATE_MMB:
+    case (STATE_LMB | STATE_CTRL):
+      mode = SoAnyExaminerViewer::PANNING;
+      break;
+
+    case STATE_CTRL:
+      mode = SoAnyExaminerViewer::WAITING_FOR_PAN;
+      break;
+
+    case (STATE_MMB | STATE_CTRL):
+    case (STATE_LMB | STATE_MMB):
+    case (STATE_LMB | STATE_MMB | STATE_CTRL):
+      mode = SoAnyExaminerViewer::ZOOMING;
+      break;
+
+    default:
+      assert(FALSE && "unhandled input state");
+      break;
+    }
+
+    this->setMode(mode);
+  }
+
+  return processed;
 } // processSoEvent()
 
 // *************************************************************************
@@ -1098,4 +1149,3 @@ SoAnyExaminerViewer::getMotion3OnCamera(
 #if SO@GUI@_DEBUG
 static const char * getSoAnyExaminerViewerRCSId(void) { return rcsid; }
 #endif // SO@GUI@_DEBUG
-
