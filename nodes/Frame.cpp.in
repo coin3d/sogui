@@ -113,9 +113,9 @@ SoGuiFrame::GLRender(SoGLRenderAction * action)
       mb.sendFirst();
       SbColor light = SoLazyElement::getAmbient(state);
       // the light intensity
-      light[0] *= 0.8;
-      light[1] *= 0.8;
-      light[2] *= 0.8;
+      light[0] *= 0.8f;
+      light[1] *= 0.8f;
+      light[2] *= 0.8f;
       // SbColor light = this->background.getValue();
       SbColor shadow = light;
       // SoDebugError::postInfo("SoGuiFrame::GLRender", "embossed border (%g %g %g)", light[0], light[1], light[2]);

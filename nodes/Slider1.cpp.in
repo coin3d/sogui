@@ -263,9 +263,9 @@ SoGuiSlider1::SoGuiSlider1(void)
 
   SoMaterial * knobshadowmaterial = SO_GET_ANY_PART(this, "knobShadeMaterial", SoMaterial);
   assert(knobshadowmaterial);
-  knobshadowmaterial->ambientColor.setValue(0.4, 0.4, 0.4);
-  knobshadowmaterial->diffuseColor.setValue(0.4, 0.4, 0.4);
-  knobshadowmaterial->emissiveColor.setValue(0.4, 0.4, 0.4);
+  knobshadowmaterial->ambientColor.setValue(0.4f, 0.4f, 0.4f);
+  knobshadowmaterial->diffuseColor.setValue(0.4f, 0.4f, 0.4f);
+  knobshadowmaterial->emissiveColor.setValue(0.4f, 0.4f, 0.4f);
 
   // FIXME: move these to correct coordinates
   SoIndexedLineSet * lightlineset = SO_GET_ANY_PART(this, "knobLightLineSet", SoIndexedLineSet);
@@ -404,17 +404,17 @@ SoGuiSlider1::valueUpdate(void)
     }
   }
   // store previous height & value to avoid redundant updates
-  float voff = floor(((value - min) / (max - min)) * size[0]);
+  float voff = (float) floor(((value - min) / (max - min)) * size[0]);
   float knobcoordinates[][3] = {
     // faces
-    {-7.0+voff, -4.0, 0.0}, {8.0+voff, -4.0, 0.0}, {8.0+voff, -1.0, 0.0}, {-7.0+voff, -1.0, 0.0}, 
-    {-7.0+voff, size[1]+1.0, 0.0}, {8.0+voff, size[1]+1.0, 0.0}, {8.0+voff, size[1]+4.0, 0.0}, {-7.0+voff, size[1]+4.0, 0.0}, 
-    {3.0+voff, -1.0, 0.0}, {3.0+voff, size[1]+1.0, 0.0}, {-2.0+voff, size[1]+1.0, 0.0}, {-2.0+voff, -1.0, 0.0},
+    {-7.0f+voff, -4.0f, 0.0f}, {8.0f+voff, -4.0f, 0.0f}, {8.0f+voff, -1.0f, 0.0f}, {-7.0f+voff, -1.0f, 0.0f}, 
+    {-7.0f+voff, size[1]+1.0f, 0.0f}, {8.0f+voff, size[1]+1.0f, 0.0f}, {8.0f+voff, size[1]+4.0f, 0.0f}, {-7.0f+voff, size[1]+4.0f, 0.0f}, 
+    {3.0f+voff, -1.0f, 0.0f}, {3.0f+voff, size[1]+1.0f, 0.0f}, {-2.0f+voff, size[1]+1.0f, 0.0f}, {-2.0f+voff, -1.0f, 0.0f},
     // outside lines
     // also used in handleEvent() so don't change their significance based on index
-    {-8.0+voff, -5.0, 0.0}, {8.0+voff, -5.0, 0.0}, {8.0+voff, size[1]+4.0, 0.0}, {-8.0+voff, size[1]+4.0, 0.0},
+    {-8.0f+voff, -5.0f, 0.0f}, {8.0f+voff, -5.0f, 0.0f}, {8.0f+voff, size[1]+4.0f, 0.0f}, {-8.0f+voff, size[1]+4.0f, 0.0f},
     // inside lines
-    {-2.0+voff, -1.0, 0.0}, {2.0+voff, -1.0, 0.0}, {2.0+voff, size[1], 0.0}, {-2.0+voff, size[1], 0.0}
+    {-2.0f+voff, -1.0f, 0.0f}, {2.0f+voff, -1.0f, 0.0f}, {2.0f+voff, size[1], 0.0f}, {-2.0f+voff, size[1], 0.0f}
   };
   SoCoordinate3 * knobcoords = SO_GET_ANY_PART(this, "knobCoords", SoCoordinate3);
   assert(knobcoords);
