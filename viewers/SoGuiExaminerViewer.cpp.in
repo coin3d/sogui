@@ -915,15 +915,6 @@ SoGuiExaminerViewerP::setMode(const ViewerMode newmode)
     break;
   }
 
-#if SO@GUI@_DEBUG && 1 // debug
-  if (oldmode == ZOOMING) {
-    SbVec3f v = PUBLIC(this)->getCamera()->position.getValue();
-    SoDebugError::postInfo("So@Gui@ExaminerViewerP::setMode",
-                           "new camera position after zoom: <%e, %e, %e>\n",
-                           v[0], v[1], v[2]);
-  }
-#endif // debug
-
 #if SO@GUI@_DEBUG && 0 // debug
   if (oldmode == ZOOMING) {
     SbVec3f v = PUBLIC(this)->getCamera()->position.getValue();
