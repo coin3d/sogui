@@ -31,6 +31,8 @@ public:
   SoAnyFlyViewer( So@GUI@FlyViewer * const viewer );
   ~SoAnyFlyViewer(void);
 
+  void dolly( const float delta ) const;
+
 private:
   So@GUI@FlyViewer * const viewer;
 

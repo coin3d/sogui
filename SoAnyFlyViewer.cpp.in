@@ -43,6 +43,7 @@ SoAnyFlyViewer::SoAnyFlyViewer(
   So@GUI@FlyViewer * const _viewer )
 : viewer( _viewer )
 {
+  assert( _viewer != NULL );
 } // SoAnyFlyViewer()
 
 /*!
@@ -52,5 +53,31 @@ SoAnyFlyViewer::~SoAnyFlyViewer(
   void )
 {
 } // ~SoAnyFlyViewer()
+
+// *************************************************************************
+
+/*!
+  This method dollies the camera back and forth in the scene.
+*/
+
+void
+SoAnyFlyViewer::dolly(
+  const float delta ) const
+{
+  SoCamera * const camera = viewer->getCamera();
+  assert( camera != NULL );
+  SbPlane walkplane( viewer->getUpDirection(), camera->position.getValue() );
+  SbVec3f campos = camera->position.getValue();
+  SbVec3f camvec;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
+  SbLine cross( campos + camvec,
+                campos + camvec + viewer->getUpDirection() );
+  SbVec3f intersect;
+  walkplane.intersect( cross, intersect );
+  SbVec3f dir = intersect - campos;
+  dir.normalize();
+
+  camera->position = campos - dir * delta;
+} // dolly()
 
 // *************************************************************************
