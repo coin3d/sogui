@@ -202,7 +202,6 @@ protected:
 #ifdef __COIN_SOGTK__
 protected:
   virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
-  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
 #endif // __COIN_SOGTK__
 };
 
