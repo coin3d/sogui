@@ -423,6 +423,7 @@ static inline SoGroup *
 GETPARENTOFNODE(SoNode * root, SoNode * node)
 {
   SoSearchAction search;
+  search.setSearchingAll(TRUE);
   assert(node);
   search.setNode(node);
   assert(root);
