@@ -24,7 +24,7 @@
 
 // FIXME: just a tmp thing to get hold of __COIN_SO*__
 // defines. 20020109 mortene.
-#include <Inventor/Win/SoWinBasic.h>
+#include <Inventor/@Gui@/So@Gui@Basic.h>
 
 // FIXME!: merge the So*ExaminerViewer.h in properly. 20020109 mortene.
 

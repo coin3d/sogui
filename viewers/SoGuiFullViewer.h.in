@@ -22,8 +22,9 @@
 #ifndef SO@GUI@_FULLVIEWER_H
 #define SO@GUI@_FULLVIEWER_H
 
-// FIXME: just a tmp thing to get hold of __COIN_SO*__ define. 20020109 mortene.
-#include <Inventor/Win/SoWinBasic.h>
+// FIXME: just a tmp thing to get hold of __COIN_SO*__
+// define. 20020109 mortene.
+#include <Inventor/@Gui@/So@Gui@Basic.h>
 
 // FIXME!: merge SoWinFullViewer.h in properly with the other
 // toolkits' So*FullViewer.h. 20020109 mortene.
