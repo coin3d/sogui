@@ -213,10 +213,30 @@ void
 So@Gui@RenderAreaP::showInventorInformation(void)
 {
 #if SO@GUI@_DEBUG
-  SbString info = SoDB::getVersion();
+  SbString info;
+  info.sprintf("%s\n", SoDB::getVersion());
+
+  // Display calculated maximum resolution of SbTime::getTimeOfDay().
+  {
+    const double DURATION = 0.1;  // run check for 1 sec
+    SbTime current = SbTime::getTimeOfDay();
+    SbTime end(current + DURATION);
+    SbTime last = current;
+    unsigned int ticks = 0;
+    do {
+      current = SbTime::getTimeOfDay();
+      if (current.getValue() != last.getValue()) { ticks++; last = current; }
+    } while (current < end);
+    SbString s;
+    s.sprintf("\nSbTime::getTimeOfDay() resolution: ~ %d Hz\n",
+              (int)(((double)ticks) / DURATION));
+    info += s;
+  }
+
   // FIXME: dump list of available node classes? 20010927 mortene.
   So@Gui@::createSimpleErrorDialog(NULL, "Inventor implementation info",
                                     info.getString());
+
 #endif // SO@GUI@_DEBUG
 }
 
@@ -234,11 +254,12 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
   // implementation, MSWindows version, ...).  20010927 mortene.
 
 #ifdef SOQT_INTERNAL
-  info += "\nQt version: ";
-  info += qVersion();
-  info += "\nQGL version: ";
-  info += qGLVersion();
-  info += "\n";
+  // Qt implementation info.
+  {
+    SbString s;
+    s.sprintf("\nQt version: %s\nQGL version: %s\n", qVersion(), qGLVersion());
+    info += s;
+  }
 #endif // SOQT_INTERNAL
 
   // FIXME: information about DLL path(s) (both for the So@Gui@ and
@@ -262,8 +283,13 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
   // with the generic format flags (SO_GL_DOUBLE etc), could be
   // useful.  20010927 mortene.
 
-  info += "\n";
-  info += "Inventor implementation: "; info += SoDB::getVersion();
+  // Underlying Inventor implementation.
+  {
+    SbString s;
+    s.sprintf("\nInventor implementation: %s\n", SoDB::getVersion());
+    info += s;
+  }
+
   So@Gui@::createSimpleErrorDialog(NULL, "So@Gui@ implementation info",
                                     info.getString());
 #endif // SO@GUI@_DEBUG
