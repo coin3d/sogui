@@ -45,7 +45,9 @@
 #include <Inventor/nodes/SoIndexedLineSet.h>
 
 #include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/So@Gui@Basic.h>
 
+#include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
 
 // *************************************************************************
@@ -92,10 +94,16 @@ public:
   SoFieldSensor * maxSensor;
 
   SbBool grabbing;
-  SbVec3f grabpos;
+  float grabpos;
+  float grabval;
+  float graboffset;
+  float pickpos;
+  SoGuiPane * pane;
 
   Slider1(void);
   ~Slider1(void);
+
+  SbColor mincolor, maxcolor;
 
   // sensors callbacks
   static void sizeChangeCB(void * closure, SoSensor * sensor);
@@ -112,6 +120,7 @@ Slider1::Slider1(void)
   this->minSensor = NULL;
   this->maxSensor = NULL;
   this->grabbing = FALSE;
+  this->pane = NULL;
 }
 
 #define DELETE_SENSOR(sensor) \
@@ -129,6 +138,7 @@ Slider1::~Slider1(void)
   DELETE_SENSOR(this->maxSensor);
   this->kit = NULL;
 }
+
 #undef DELETE_SENSOR
 
 void
@@ -297,18 +307,22 @@ SoGuiSlider1::setDefaultOnNonWritingFields(void)
 void
 SoGuiSlider1::setSurfaceColor(const SbColor & value)
 {
-  // FIXME:
+  // FIXME: use Material or basecolor instead of texture
+  this->setSurfaceColor(value, value);
+#if 0
+  PRIVATE(this)->mincolor = value;
+  PRIVATE(this)->maxcolor = value;
+  this->setPart("surfaceTexture", NULL);
+#endif
 }
 
 void
 SoGuiSlider1::setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue)
 {
-  // FIXME:
-  // - store values in private
+  PRIVATE(this)->mincolor = minvalue;
+  PRIVATE(this)->maxcolor = maxvalue;
 
-  // 
   this->setPart("surfaceMaterial", NULL);
-
   SoTexture2 * texturenode = SO_GET_ANY_PART(this, "surfaceTexture", SoTexture2);
   assert(texturenode);
 
@@ -340,8 +354,15 @@ SoGuiSlider1::setSurfaceColor(const SbColor & minvalue, const SbColor & maxvalue
 SbColor
 SoGuiSlider1::getValueAsColor(void) const
 {
-  // FIXME:
-  return SbColor(0, 0, 0);
+  // FIXME: support custom textures
+  float value = this->value.getValue();
+  float min = this->min.getValue();
+  float max = this->max.getValue();
+  float factor = (max - min) / (value - min);
+  float r = So@Gui@Clamp(PRIVATE(this)->mincolor[0] + (PRIVATE(this)->maxcolor[0] - PRIVATE(this)->mincolor[0]) * factor, 0.0f, 1.0f);
+  float g = So@Gui@Clamp(PRIVATE(this)->mincolor[1] + (PRIVATE(this)->maxcolor[1] - PRIVATE(this)->mincolor[1]) * factor, 0.0f, 1.0f);
+  float b = So@Gui@Clamp(PRIVATE(this)->mincolor[2] + (PRIVATE(this)->maxcolor[2] - PRIVATE(this)->mincolor[2]) * factor, 0.0f, 1.0f);
+  return SbColor(r, g, b);
 }
 
 void
@@ -435,11 +456,24 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
   }
 
   if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
-    if ( PRIVATE(this)->grabbing ) {
-      // we're dragging on the knob
-      // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "what a drag");
-      action->setPickRadius(0);
-      const SoPickedPointList & pplist = action->getPickedPointList();
+    if ( PRIVATE(this)->grabbing ) { // click-and-drag
+      assert(PRIVATE(this)->pane != NULL);
+
+      // although the return value is discarded, we need to make this call to make
+      // sure the raypick action is run over the scene graph so the pane can return
+      // a useful value...
+      action->getPickedPoint();
+
+      SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
+      if ( raypos[0] != -1.0f ) {
+        float imagpos = raypos[0] + PRIVATE(this)->graboffset;
+        float min = this->min.getValue();
+        float max = this->max.getValue();
+        float imagval;
+        if ( min < max ) imagval = So@Gui@Clamp(imagpos / this->size.getValue()[0], min, max);
+        else imagval = So@Gui@Clamp(imagpos / this->size.getValue()[0], max, min);
+        this->value.setValue(imagval);
+      }
     }
   }
   else if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
@@ -450,6 +484,7 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
       if ( action->getGrabber() == (SoNode *) this ) {
         action->releaseGrabber();
         PRIVATE(this)->grabbing = FALSE;
+        PRIVATE(this)->pane = NULL;
       }
     }
     else if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
@@ -472,11 +507,28 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
             SbVec3f knobmax = knobcoords->point[14];
             if ( point[0] >= knobmin[0] && point[0] <= knobmax[0] &&
                  point[1] >= knobmin[1] && point[1] <= knobmax[1] ) {
-              // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "locator is on knob (%g %g)  [%g %g] [%g %g]", point[0], point[1], knobmin[0], knobmin[1], knobmax[0], knobmax[1]);
               PRIVATE(this)->grabbing = TRUE;
-              PRIVATE(this)->grabpos = point;
               action->setGrabber(this);
               action->setHandled();
+
+              const SoFullPath * path = (const SoFullPath *) action->getCurPath();
+              int i = path->getLength() - 1;
+              SoNode * node = NULL;
+              for ( ; i >= 0; i-- ) {
+                node = path->getNode(i);
+                if ( node->isOfType(SoGuiPane::getClassTypeId()) ) break;
+                node = NULL;
+              }
+              assert(node != NULL);
+              PRIVATE(this)->pane = (SoGuiPane *) node;
+              PRIVATE(this)->grabval = this->value.getValue();
+              PRIVATE(this)->pickpos = point[0];
+
+              SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
+              PRIVATE(this)->grabpos = raypos[0];
+              float realval = ((this->value.getValue() - this->min.getValue()) /
+                (this->max.getValue() - this->min.getValue())) * this->size.getValue()[0];
+              PRIVATE(this)->graboffset = realval - raypos[0];
             }
           }
         }
@@ -486,7 +538,6 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
           const SoPath * path = pp->getPath();
           SoNode * node = ((SoFullPath *) path)->getTail();
           if ( node == ((SoNode *) SO_GET_ANY_PART(this, "surfaceFaceSet", SoIndexedFaceSet)) ) {
-            // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "locator is on slider surface");
             SbVec3f point = pp->getObjectPoint();
             SbVec3f size = this->size.getValue();
             this->value = this->min.getValue() + ((point[0] / size[0]) * (this->max.getValue() - this->min.getValue()));
@@ -497,4 +548,6 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
     }
   }
 }
+
+#undef PRIVATE
 

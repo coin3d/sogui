@@ -59,7 +59,6 @@ public:
   static void initClass(void);
 
   SoGuiSlider1(void);
-  ~SoGuiSlider1(void);
 
   enum Orientation {
     X, Y
@@ -86,6 +85,9 @@ public:
   void valueUpdate(void);
   void minUpdate(void);
   void maxUpdate(void);
+
+protected:
+  virtual ~SoGuiSlider1(void);
 
 private:
   void * internals;
