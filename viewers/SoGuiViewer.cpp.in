@@ -2968,8 +2968,10 @@ So@Gui@Viewer::interactiveCountInc(void)
   // Catch problems with missing interactiveCountDec() calls.
   assert(PRIVATE(this)->interactionnesting < 100);
 
-  if (++(PRIVATE(this)->interactionnesting) == 1)
+  if (++(PRIVATE(this)->interactionnesting) == 1) {
     PRIVATE(this)->interactionstartCallbacks->invokeCallbacks(this);
+    PRIVATE(this)->resetFrameCounter();
+  }
 
 #if 0 // debug
   SoDebugError::postInfo("So@Gui@Viewer::interactiveCountInc", "%d -> %d",
@@ -3030,7 +3032,6 @@ So@Gui@Viewer::interactiveCountDec(void)
   if (--(PRIVATE(this)->interactionnesting) <= 0) {
     PRIVATE(this)->interactionendCallbacks->invokeCallbacks(this);
     PRIVATE(this)->interactionnesting = 0;
-    PRIVATE(this)->resetFrameCounter();
   }
 }
 
