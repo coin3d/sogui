@@ -40,12 +40,11 @@ public:
 
   static SbDict * widget2compdict;
 
+  static int nrofcomponents;
+
 protected:
   SoGuiComponentP(So@Gui@Component * publ);
   So@Gui@Component * pub;
-
-private:
-  static int nrofcomponents;
 };
 
 // ************************************************************************
