@@ -64,8 +64,9 @@
 #include <Inventor/@Gui@/common/gl.h> // glDrawBuffer()
 
 #include <Inventor/SoSceneManager.h>
-#include <Inventor/events/SoKeyboardEvent.h>
+#include <Inventor/actions/SoWriteAction.h>
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/nodes/SoSelection.h>
 
@@ -132,11 +133,12 @@ public:
   static const int GL_DEFAULT_MODE;
 
   // OpenGL info-window hack.
-  enum { NONE, OPENGL, INVENTOR, TOOLKIT };
+  enum { NONE, OPENGL, INVENTOR, TOOLKIT, DUMPSCENEGRAPH };
   int checkMagicSequences(const char c);
   void showOpenGLDriverInformation(void);
   void showInventorInformation(void);
   void showToolkitInformation(void);
+  void dumpScenegraph(void);
 
 private:
   So@Gui@RenderArea * pub; // public interface class
@@ -333,6 +335,26 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
 #endif // DEBUGGING_EGGS
 }
 
+void
+So@Gui@RenderAreaP::dumpScenegraph(void)
+{
+#ifdef DEBUGGING_EGGS
+  SoOutput out;
+  SbString filename = SbTime::getTimeOfDay().format();
+  filename += "-dump.iv";
+  SbBool ok = out.openFile(filename.getString());
+  if (!ok) {
+    SoDebugError::post("So@Gui@RenderAreaP::dumpScenegraph",
+                       "couldn't open file '%s'", filename.getString());
+    return;
+  }
+  SoWriteAction wa(&out);
+  wa.apply(this->normalManager->getSceneGraph());
+  SoDebugError::postInfo("So@Gui@RenderAreaP::dumpScenegraph",
+                         "dumped scenegraph to '%s'", filename.getString());
+#endif // DEBUGGING_EGGS
+}
+
 int
 So@Gui@RenderAreaP::checkMagicSequences(const char c)
 {
@@ -349,6 +371,7 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   static const char glinfoseq[] = "glinfo";
   static const char ivinfoseq[] = "ivinfo";
   static const char soinfoseq[] = "soinfo";
+  static const char dumpiv[] = "dumpiv";
 
   int ml = strlen(glinfoseq);
   if (cl >= ml && this->currentinput.getSubString(cl - ml) == glinfoseq) {
@@ -361,6 +384,10 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   ml = strlen(soinfoseq);
   if (cl >= ml && this->currentinput.getSubString(cl - ml) == soinfoseq) {
     return So@Gui@RenderAreaP::TOOLKIT;
+  }
+  ml = strlen(dumpiv);
+  if (cl >= ml && this->currentinput.getSubString(cl - ml) == dumpiv) {
+    return So@Gui@RenderAreaP::DUMPSCENEGRAPH;
   }
 
   // Limit memory usage.
@@ -1193,6 +1220,9 @@ So@Gui@RenderArea::redraw(void)
 /*!
   This method redraws the normal scenegraph by calling
   SoSceneManager::render().
+
+  Subclasses may override this method to add their own rendering
+  before or after Coin renders it's scenegraph.
 */
 void
 So@Gui@RenderArea::actualRedraw(void)
@@ -1472,6 +1502,9 @@ So@Gui@RenderArea::processEvent(@EVENT@ event)
           break;
         case So@Gui@RenderAreaP::TOOLKIT:  // "soinfo"
           PRIVATE(this)->showToolkitInformation();
+          break;
+        case So@Gui@RenderAreaP::DUMPSCENEGRAPH:  // "dumpiv"
+          PRIVATE(this)->dumpScenegraph();
           break;
         default:
           assert(FALSE && "unknown debug key sequence");
