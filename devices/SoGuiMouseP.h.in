@@ -46,9 +46,6 @@ protected:
   class So@Gui@Mouse * pub;
 };
 
-#define PRIVATE(p) (p->pimpl)
-#define PUBLIC(p) (p->pub)
-
 // *************************************************************************
 
 #endif // ! SOGUI_MOUSEP_H

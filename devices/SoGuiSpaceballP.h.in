@@ -41,9 +41,6 @@ protected:
   class So@Gui@Spaceball * pub;
 };
 
-#define PRIVATE(p) (p->pimpl)
-#define PUBLIC(p) (p->pub)
-
 // *************************************************************************
 
 #endif // ! SOGUI_SPACEBALLP_H

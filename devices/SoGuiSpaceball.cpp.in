@@ -40,6 +40,9 @@
 #include <Inventor/@Gui@/devices/So@Gui@Spaceball.h>
 #include <Inventor/@Gui@/devices/So@Gui@SpaceballP.h>
 
+#define PRIVATE(p) (p->pimpl)
+#define PUBLIC(p) (p->pub)
+
 // *************************************************************************
 
 SO@GUI@_OBJECT_SOURCE(So@Gui@Spaceball);
@@ -150,3 +153,7 @@ SoGuiSpaceballP::~SoGuiSpaceballP()
 #endif // !DOXYGEN_SKIP_THIS
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+

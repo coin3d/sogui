@@ -57,6 +57,9 @@
 #include <Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h>
 #endif // HAVE_JOYSTICK_LINUX
 
+#define PRIVATE(p) (p->pimpl)
+#define PUBLIC(p) (p->pub)
+
 // *************************************************************************
 
 /*!
@@ -275,3 +278,7 @@ SoGuiDeviceP::invokeHandlers(HandlerCB * cb, @EVENT@ event)
 }
 
 #endif // DOXYGEN_SKIP_THIS
+
+#undef PRIVATE
+#undef PUBLIC
+

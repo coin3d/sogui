@@ -60,9 +60,6 @@ private:
   class So@Gui@Device * pub;
 };
 
-#define PRIVATE(p) (p->pimpl)
-#define PUBLIC(p) (p->pub)
-
 // *************************************************************************
 
 #endif // !SOGUI_DEVICEP_H

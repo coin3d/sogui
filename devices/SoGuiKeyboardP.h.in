@@ -41,9 +41,6 @@ public:
   SoKeyboardEvent * kbdevent;
 };
 
-#define PRIVATE(p) (p->pimpl)
-#define PUBLIC(p) (p->pub)
-
 // *************************************************************************
 
 #endif // ! SOGUI_KEYBOARDP_H
