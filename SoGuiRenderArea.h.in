@@ -173,7 +173,7 @@ protected:
   virtual void glReshape( int width, int height );
   virtual void glRender(void);
 
-  SoEvent * getSoEvent( @EVENT@ event );
+  const SoEvent * getSoEvent( @EVENT@ event );
 
 private:
   void constructor( SbBool mouseInput, SbBool keyboardInput, SbBool build );

@@ -1136,11 +1136,11 @@ So@Gui@RenderArea::processEvent( // virtual, protected
   NULL if there are none.
 */
 
-SoEvent *
+const SoEvent *
 So@Gui@RenderArea::getSoEvent(
   @EVENT@ event )
 {
-  SoEvent * soevent = NULL;
+  const SoEvent * soevent = NULL;
 
   if ( this->devices.extra ) {
     const int numDevices = this->devices.extra->getLength();
@@ -1157,7 +1157,7 @@ So@Gui@RenderArea::getSoEvent(
        (soevent = this->devices.keyboard->translateEvent( event )) != NULL )
     return soevent;
 
-  return (SoEvent *) NULL;
+  return soevent;
 } // getSoEvent()
 
 // *************************************************************************
