@@ -1812,7 +1812,7 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
   PRIVATE(this)->overlayManager->setWindowSize(glsize);
   PRIVATE(this)->overlayManager->setSize(glsize);
 
-  this->scheduleRedraw();
+  // this->scheduleRedraw(); // already done through setViewportRegion()
 }
 
 // Documented in superclass.
