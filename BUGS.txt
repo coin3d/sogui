@@ -72,7 +72,8 @@ NOTE: see also So@Gui@/BUGS.txt.
 
 =====================================================================
 
-002 Should search for and pick up VRML97 Viewpoint nodes.
+002 Should search for and pick up VRML97 Viewpoint and other bindable
+    nodes.
 
     As of now, the SoGuiViewer only scans a newly set scene graph for
     SoCamera nodes. (If found, it will "attach" the viewer controls to
@@ -81,7 +82,7 @@ NOTE: see also So@Gui@/BUGS.txt.
 
     This doesn't work with VRML97 scene graphs, obviously, so
     SoGuiViewer should also scan for Viewpoint nodes to be set up as
-    the viewer's camera.
+    the viewer's camera. 
 
     Note that matters are complicated a bit by the fact that we can't
     be sure that an implementation of any VRML97 nodes is actually
@@ -92,6 +93,9 @@ NOTE: see also So@Gui@/BUGS.txt.
     VRML97 is supported), and connect up it's position, orientation
     and fieldOfViewer fields by using the introspection features of
     SoFieldContainer.
+
+    In addition to the Viewpoint nodes, other bindable nodes should
+    also be handled (Fog and Background).
 
     20030107 mortene.
 

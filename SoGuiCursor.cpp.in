@@ -305,6 +305,7 @@ So@Gui@Cursor::operator=(const So@Gui@Cursor & c)
   delete this->cc;
   this->cc = NULL;
   this->commonConstructor(c.shape, c.cc);
+  return *this;
 }
 
 /*!
