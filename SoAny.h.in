@@ -52,11 +52,10 @@ public:
   void unregisterGLContext(void * context);
   int getSharedCacheContextId(void * context);
 
-  So@Gui@::FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
-                                               void * userdata);
+  static void listWin32ProcessModules(void);
+
+  So@Gui@::FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata);
   SbBool invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode);
-
-
   typedef void InternalFatalErrorCB(void * userdata);
   void addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
                                     void * ud);
