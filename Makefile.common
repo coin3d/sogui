@@ -84,13 +84,20 @@ SoGui_src_Inventor_Gui_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@SliderSetBase.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@TransformSliderSet.cpp
 
+if HAVE_JOYSTICK_LINUX
+SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles = \
+  $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystick.cpp
+else
+SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles =
+endif
+
 SoGui_src_Inventor_Gui_devices_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Device.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystick.cpp
+  $(SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles)
 
 SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@Viewer.cpp \
