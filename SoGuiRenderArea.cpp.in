@@ -525,8 +525,27 @@ So@Gui@RenderArea::setAntialiasing(
   int numPasses )
 {
   assert( PRIVATE(this)->normalManager != NULL );
-  PRIVATE(this)->normalManager->setAntialiasing( smoothing, numPasses );
-//  this->overlayManager->setAntialiasing( smoothing, numPasses );
+
+  // Instead of piping the call further to
+  // SoSceneManager::setAntialiasing(), we duplicate the code found in
+  // that function. The reason for this is that we want to work around
+  // a bug found in SGI Inventor, where they define the
+  // setAntialiasing() method, but doesn't actually implement it.
+  //
+  // We should perhaps throw in a configure check for the
+  // SoSceneManager::setAntialiasing() method and only activate this
+  // code when actually needed?
+  //                                                   mortene@sim.no
+  const static int MGRS = 2;
+  SoSceneManager * mgrs[MGRS] = { PRIVATE(this)->normalManager,
+                                  PRIVATE(this)->overlayManager };
+  for (int i=0; i < MGRS; i++) {
+    SoGLRenderAction * glra = mgrs[i]->getGLRenderAction();
+    if (glra) {
+      glra->setSmoothing(smoothing);
+      glra->setNumPasses(numPasses);
+    }
+  }
 } // setAntialiasing()
 
 /*!
@@ -538,6 +557,15 @@ So@Gui@RenderArea::getAntialiasing(
   SbBool & smoothing,
   int & numPasses) const
 {
+  // FIXME: there's an API design flaw here, as it is assumed that the
+  // antialiasing setting for the renderaction in the "normal"
+  // rendering context always matches what is the case for the
+  // renderaction in the overlay manager. This is not necessarily
+  // true. Could be solved by an additional argument to
+  // getAntialiasing(): a boolean indicator on whether or not we want
+  // the overlay context with a default value (false) to keep API
+  // compatibility. 20010331 mortene.
+
   assert( PRIVATE(this)->normalManager != NULL );
   PRIVATE(this)->normalManager->getAntialiasing(smoothing, numPasses);
 } // getAntialiasing()
