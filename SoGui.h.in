@@ -146,9 +146,6 @@ public:
   static void selectBestVisual(Display * dpy, Visual * & visual,
                                Colormap & cmap, int & depth);
 
-  static const char * getAppName(void);
-  static const char * getAppClass(void);
-
 protected:
   static void getExtensionEventHandler(XEvent * event, Widget & widget,
                                        XtEventHandler & proc,
