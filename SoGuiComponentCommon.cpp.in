@@ -211,8 +211,9 @@
 @WIDGET@
 So@Gui@Component::getShellWidget(void) const
 {
-  return this->isTopLevelShell() ?
-    So@Gui@::getShellWidget(this->getWidget()) : NULL;
+  @WIDGET@ w = this->getWidget();
+  assert(w != NULL && "widget not built yet!");
+  return (this->isTopLevelShell() && w) ? So@Gui@::getShellWidget(w) : NULL;
 }
 
 /*!
