@@ -182,14 +182,6 @@ public:
   PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
   virtual void setPixelFormat(int format);
   int getPixelFormat(void);
-
-protected:
-  static LRESULT CALLBACK glWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  static LRESULT CALLBACK mgrWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  int getDisplayListShareGroup(HGLRC ctx);
-  HWND getManagerWidget(void);
-  HWND parent;
-  HWND toplevel;
 #endif // __COIN_SOWIN__
 
 #ifdef __COIN_SOGTK__
