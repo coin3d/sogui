@@ -279,8 +279,8 @@ So@Gui@Component::getShellWidget(void) const
 /*!
   This method returns the default name of a component widget class.
 
-  It should be overridden by So@Gui@Component-derived classes so the
-  topmost widget in the component gets a proper name.
+  It should be overridden by derived non-abstract classes for the
+  topmost widget in the component to have a proper name.
 */
 const char *
 So@Gui@Component::getDefaultWidgetName(void) const
@@ -292,7 +292,7 @@ So@Gui@Component::getDefaultWidgetName(void) const
   This method returns the default window caption string of the
   component.
 
-  It should be overridden by So@Gui@Component-derived classes so the
+  It should be overridden by derived non-abstract classes so the
   window and popup menu will get a proper title.
 */
 const char *
@@ -304,8 +304,8 @@ So@Gui@Component::getDefaultTitle(void) const
 /*!
   This method returns the default icon title of the component.
 
-  It should be overridden by SoXtComponent-derived classes so icons will
-  get proper titles.
+  It should be overridden by derived non-abstract classes so icons
+  will get proper titles.
 */
 const char *
 So@Gui@Component::getDefaultIconTitle(void) const

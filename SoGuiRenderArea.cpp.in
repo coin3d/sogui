@@ -1217,6 +1217,8 @@ So@Gui@RenderArea::redraw(void)
 #endif // debug
 }
 
+// Note: the following function documentation block will also be used
+// for all the miscellaneous viewer subclasses, so keep it general.
 /*!
   This method redraws the normal scenegraph by calling
   SoSceneManager::render().
@@ -1224,9 +1226,9 @@ So@Gui@RenderArea::redraw(void)
   Subclasses may override this method to add their own rendering
   before or after Coin renders it's scenegraph.
 
-  Following is a complete example that demonstrates one way of adding
-  both a background image and foreground (overlay) geometry to the
-  "normal" rendering:
+  The following is a complete example that demonstrates one way of
+  adding both a background image and foreground (overlay) geometry to
+  the "normal" rendering:
 
   \code
   // This example shows how to put a permanent background image on your
@@ -1571,9 +1573,7 @@ So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
   return widget;
 }
 
-/*!
-  This method returns a default widget name for the base widget.
-*/
+// Documented in superclass.
 const char *
 So@Gui@RenderArea::getDefaultWidgetName(void) const
 {
@@ -1581,9 +1581,7 @@ So@Gui@RenderArea::getDefaultWidgetName(void) const
   return defaultWidgetName;
 }
 
-/*!
-  This method returns a default title for the component window.
-*/
+// Documented in superclass.
 const char *
 So@Gui@RenderArea::getDefaultTitle(void) const
 {
@@ -1591,9 +1589,7 @@ So@Gui@RenderArea::getDefaultTitle(void) const
   return defaultTitle;
 }
 
-/*!
-  This method returns a default title for the component window icon.
-*/
+// Documented in superclass.
 const char *
 So@Gui@RenderArea::getDefaultIconTitle(void) const
 {
@@ -1623,12 +1619,14 @@ So@Gui@RenderArea::invokeAppCB(@EVENT@ event)
   catch events of particular interest to the viewer classes, for
   instance.
 
-  Returns \c TRUE iff the event was processed, if not it should be
+  Return \c TRUE iff the event was processed. If not it should be
   passed on further up in the inheritance hierarchy by the caller.
   This last point is extremely important to take note of if you are
   expanding the toolkit with your own viewer class.
 
-  This method is not part of the original SGI InventorXt API.
+  This method is not part of the original SGI InventorXt API. Note
+  that you can still override the toolkit-native processEvent() method
+  instead of this "generic" method.
 */
 SbBool
 So@Gui@RenderArea::processSoEvent(const SoEvent * const event)

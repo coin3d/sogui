@@ -843,7 +843,7 @@ So@Gui@Viewer::~So@Gui@Viewer()
   of the viewer's scenegraph.
 
   If the application code doesn't explicitly set up a camera through
-  this method, the So@Gui@Viewer will automatically scan through the
+  this method, the viewer will automatically scan through the
   scenegraph to find a camera to use. If no camera is available in the
   scenegraph at all, it will set up it's own camera.
 
@@ -1262,7 +1262,7 @@ So@Gui@Viewer::getBufferingType(void) const
 
   Default is to have the view mode active.
 
-  \sa getViewing()
+  \sa isViewing()
 */
 void
 So@Gui@Viewer::setViewing(SbBool enable)
@@ -1311,7 +1311,7 @@ So@Gui@Viewer::isViewing(void) const
 
   Default value is on.
 
-  \sa getCursorEnabled()
+  \sa isCursorEnabled()
 */
 
 void
@@ -1990,6 +1990,8 @@ So@Gui@Viewer::getSceneGraph(void)
 
 // *************************************************************************
 
+// Note: the following function documentation block will also be used
+// for all the miscellaneous viewer subclasses, so keep it general.
 /*!
   Put the viewer in or out of "waiting-to-seek" mode.
 
