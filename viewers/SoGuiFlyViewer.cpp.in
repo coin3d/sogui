@@ -639,7 +639,7 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
     if ((PRIVATE(this)->getMode() == So@Gui@FlyViewerP::FLYING) &&
          (PRIVATE(this)->lctrldown || PRIVATE(this)->rctrldown)) {
       PRIVATE(this)->setMode(So@Gui@FlyViewerP::TILTING);
-      PRIVATE(this)->tiltrotation = camera->orientation.getValue();
+      PRIVATE(this)->tiltrotation = this->getCamera()->orientation.getValue();
       PRIVATE(this)->tiltup = this->getUpDirection();
       PRIVATE(this)->tiltpos = PRIVATE(this)->mouseloc;
       PRIVATE(this)->currentspeed = 0.0f;

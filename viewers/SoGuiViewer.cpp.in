@@ -125,6 +125,14 @@ public:
   static void convertPerspective2Ortho(const SoPerspectiveCamera * in,
                                        SoOrthographicCamera * out);
 
+  SoCamera * camera;
+  So@Gui@Viewer::Type type;
+  SbBool viewingflag;
+  SoGetBoundingBoxAction * autoclipbboxaction;
+  SoSeparator * sceneroot;
+  SoNode * scenegraph;
+
+
   // Seek functionality
   SoTimerSensor * seeksensor;
   float seekperiod;
@@ -220,7 +228,7 @@ public:
 
 So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
 {
-  this->pub = publ;
+  PUBLIC(this) = publ;
   this->searchaction = new SoSearchAction;
   this->matrixaction = new SoGetMatrixAction(SbViewportRegion(100,100));
   this->superimpositions = NULL;
@@ -419,8 +427,12 @@ So@Gui@ViewerP::createFPSSuperimposition(void)
   return (SoSeparator *) root;
 }
 
-// returns the camera coordinate system. Useful when there area
-// transformations before the camera in the scene graph.
+// Returns the coordinate system the current camera is located in. If
+// there are transformations before the camera in the scene graph,
+// this must be considered before doing certain operations. \a matrix
+// and \a inverse will not contain the transformations caused by the
+// camera fields, only the transformations traversed before the camera
+// in the scene graph.
 void
 So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * camera,
                                           SoNode * root,
@@ -645,39 +657,27 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 */
 
 /*!
-  \var SbBool So@Gui@Viewer::viewingFlag
+  \var SbBool So@Gui@Viewer::viewingflag
 
   Whether the viewer is in view mode or not.
 */
 
 /*!
-  \var SoSeparator * So@Gui@Viewer::sceneRoot
+  \var SoSeparator * So@Gui@Viewer::sceneroot
 
   The root of the viewer scene graph.
 */
 
 /*!
-  \var SoNode * So@Gui@Viewer::sceneGraph
+  \var SoNode * So@Gui@Viewer::scenegraph
 
   The root of the user scene graph.
 */
 
 /*!
-  \var SbBool So@Gui@Viewer::altSwitchBack
-
-  Flag on returning from alt in pick mode?
-*/
-
-/*!
-  \var SoGetBoundingBoxAction So@Gui@Viewer::autoClipBboxAction
+  \var SoGetBoundingBoxAction So@Gui@Viewer::autoclipbboxaction
 
   Action for getting the scene bounding box, for setting the clip planes.
-*/
-
-/*!
-  \var float So@Gui@Viewer::minimumNearPlane
-
-  Percentage of distance to far plane for distance to near plane.
 */
 
 // *************************************************************************
@@ -750,11 +750,10 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
   PRIVATE(this) = new So@Gui@ViewerP(this);
 
   // initialization of protected data
-  this->type = t;
-  this->viewingFlag = TRUE;
-  this->camera = NULL;
-  this->altSwitchBack = FALSE;
-  this->sceneGraph = NULL;
+  PRIVATE(this)->type = t;
+  PRIVATE(this)->viewingflag = TRUE;
+  PRIVATE(this)->camera = NULL;
+  PRIVATE(this)->scenegraph = NULL;
 
   // initialization of internal data
   PRIVATE(this)->cursoron = TRUE;
@@ -775,8 +774,8 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
   PRIVATE(this)->inseekmode = FALSE;
   PRIVATE(this)->seeksensor = new SoTimerSensor(So@Gui@ViewerP::seeksensorCB, this);
 
-  this->sceneRoot = PRIVATE(this)->createSuperScene();
-  this->sceneRoot->ref();
+  PRIVATE(this)->sceneroot = PRIVATE(this)->createSuperScene();
+  PRIVATE(this)->sceneroot->ref();
 
   PRIVATE(this)->drawstyles[STILL] = VIEW_AS_IS;
   PRIVATE(this)->drawstyles[INTERACTIVE] = VIEW_SAME_AS_STILL;
@@ -785,7 +784,7 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
   this->addFinishCallback(So@Gui@ViewerP::interactiveendCB);
 
   PRIVATE(this)->adjustclipplanes = TRUE;
-  this->autoClipBboxAction = NULL;
+  PRIVATE(this)->autoclipbboxaction = NULL;
 
   PRIVATE(this)->stereoviewing = FALSE;
   PRIVATE(this)->stereooffset = 0.1f;
@@ -814,15 +813,15 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
 
 So@Gui@Viewer::~So@Gui@Viewer()
 {
-  delete this->autoClipBboxAction;
+  delete PRIVATE(this)->autoclipbboxaction;
 
   delete PRIVATE(this)->interactionstartCallbacks;
   delete PRIVATE(this)->interactionendCallbacks;
 
   delete PRIVATE(this)->seeksensor;
 
-  if (this->sceneGraph) this->setSceneGraph(NULL);
-  this->sceneRoot->unref();
+  if (PRIVATE(this)->scenegraph) this->setSceneGraph(NULL);
+  PRIVATE(this)->sceneroot->unref();
   if (PRIVATE(this)->superimpositions != NULL) {
     for (int i = PRIVATE(this)->superimpositions->getLength() - 1; i >= 0; i--) {
       SoNode * node = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
@@ -852,25 +851,25 @@ So@Gui@Viewer::~So@Gui@Viewer()
 void
 So@Gui@Viewer::setCamera(SoCamera * cam)
 {
-  if (this->camera) {
+  if (PRIVATE(this)->camera) {
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (PRIVATE(this)->deletecamera) {
       SoGroup * cameraparent =
-	get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
-      cameraparent->removeChild(this->camera);
+	get_parent_of_node(PRIVATE(this), PRIVATE(this)->sceneroot, PRIVATE(this)->camera);
+      cameraparent->removeChild(PRIVATE(this)->camera);
       PRIVATE(this)->deletecamera = FALSE;
     }
 
-    this->camera->unref();
+    PRIVATE(this)->camera->unref();
   }
 
-  this->camera = cam;
+  PRIVATE(this)->camera = cam;
 
-  if (this->camera) {
-    this->camera->ref();
+  if (PRIVATE(this)->camera) {
+    PRIVATE(this)->camera->ref();
     this->saveHomePosition();
-    PRIVATE(this)->cameratype = this->camera->getTypeId();
+    PRIVATE(this)->cameratype = PRIVATE(this)->camera->getTypeId();
   }
 }
 
@@ -893,7 +892,7 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
 SoCamera *
 So@Gui@Viewer::getCamera(void) const
 {
-  return this->camera;
+  return PRIVATE(this)->camera;
 }
 
 // *************************************************************************
@@ -943,24 +942,24 @@ So@Gui@Viewer::setCameraType(SoType t)
     }
   }
 
-  if (this->camera != NULL) {
+  if (PRIVATE(this)->camera != NULL) {
     SoCamera * newcamera = (SoCamera *)t.createInstance();
 
     // Transfer and convert values from one camera type to the other.
     if (newisperspective) {
-      So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
+      So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)PRIVATE(this)->camera,
                                                (SoPerspectiveCamera *)newcamera);
     }
     else {
-      So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
+      So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)PRIVATE(this)->camera,
                                                (SoOrthographicCamera *)newcamera);
     }
 
     SoGroup * cameraparent =
-      get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
+      get_parent_of_node(PRIVATE(this), PRIVATE(this)->sceneroot, PRIVATE(this)->camera);
     cameraparent->insertChild(newcamera,
-                              cameraparent->findChild(this->camera));
-    SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
+                              cameraparent->findChild(PRIVATE(this)->camera));
+    SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? PRIVATE(this)->camera : NULL;
 
     // Store the current home position, as it will be implicitly reset
     // by setCamera().
@@ -1014,8 +1013,8 @@ So@Gui@Viewer::getCameraType(void) const
 void
 So@Gui@Viewer::viewAll(void)
 {
-  if (this->camera && this->sceneGraph)
-    this->camera->viewAll(this->sceneGraph, this->getViewportRegion());
+  if (PRIVATE(this)->camera && PRIVATE(this)->scenegraph)
+    PRIVATE(this)->camera->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
 }
 
 // *************************************************************************
@@ -1030,7 +1029,7 @@ So@Gui@Viewer::viewAll(void)
 void
 So@Gui@Viewer::saveHomePosition(void)
 {
-  if (! this->camera) return; // probably a scene-less viewer
+  if (! PRIVATE(this)->camera) return; // probably a scene-less viewer
 
   // FIXME: the old code here used SoType::isDerivedFrom() to test for
   // camera type. This caused a crash in SoFieldData::overlay(), line
@@ -1044,15 +1043,15 @@ So@Gui@Viewer::saveHomePosition(void)
   // just assume it's either a perspective or an orthographic camera.
   //   pederb, 2002-05-27
 
-  SoType t = this->camera->getTypeId();
+  SoType t = PRIVATE(this)->camera->getTypeId();
   if (t == SoOrthographicCamera::getClassTypeId()) {
-    PRIVATE(this)->storedortho->copyContents(this->camera, FALSE);
-    So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
+    PRIVATE(this)->storedortho->copyContents(PRIVATE(this)->camera, FALSE);
+    So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)PRIVATE(this)->camera,
                                              PRIVATE(this)->storedperspective);
   }
   else if (t == SoPerspectiveCamera::getClassTypeId()) {
-    PRIVATE(this)->storedperspective->copyContents(this->camera, FALSE);
-    So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
+    PRIVATE(this)->storedperspective->copyContents(PRIVATE(this)->camera, FALSE);
+    So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)PRIVATE(this)->camera,
                                              PRIVATE(this)->storedortho);
   }
   else {
@@ -1074,14 +1073,14 @@ So@Gui@Viewer::saveHomePosition(void)
 void
 So@Gui@Viewer::resetToHomePosition(void)
 {
-  if (! this->camera) return; // probably a scene-less viewer
+  if (! PRIVATE(this)->camera) return; // probably a scene-less viewer
   
-  SoType t = this->camera->getTypeId();
+  SoType t = PRIVATE(this)->camera->getTypeId();
   if (t == SoOrthographicCamera::getClassTypeId()) {
-    this->camera->copyContents(PRIVATE(this)->storedortho, FALSE);
+    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedortho, FALSE);
   }                                                                 
   else if (t == SoPerspectiveCamera::getClassTypeId()) {
-    this->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
+    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
   }
 }
 
@@ -1267,7 +1266,7 @@ So@Gui@Viewer::getBufferingType(void) const
 void
 So@Gui@Viewer::setViewing(SbBool enable)
 {
-  if (this->viewingFlag == enable) {
+  if (PRIVATE(this)->viewingflag == enable) {
     if (SO@GUI@_DEBUG) {
       SoDebugError::postWarning("So@Gui@Viewer::setViewing",
                                 "unnecessary called");
@@ -1275,11 +1274,11 @@ So@Gui@Viewer::setViewing(SbBool enable)
     return;
   }
 
-  this->viewingFlag = enable;
+  PRIVATE(this)->viewingflag = enable;
 
   // Turn off the selection indicators when we go back from picking
   // mode into viewing mode.
-  if (this->viewingFlag) {
+  if (PRIVATE(this)->viewingflag) {
     SoGLRenderAction * action = this->getGLRenderAction();
     if (action != NULL)
       SoLocateHighlight::turnOffCurrentHighlight(action);
@@ -1300,7 +1299,7 @@ So@Gui@Viewer::setViewing(SbBool enable)
 SbBool
 So@Gui@Viewer::isViewing(void) const
 {
-  return this->viewingFlag;
+  return PRIVATE(this)->viewingflag;
 }
 
 // *************************************************************************
@@ -1346,8 +1345,7 @@ So@Gui@Viewer::isCursorEnabled(void) const
 */
 
 void
-So@Gui@Viewer::setAutoClipping(
-  SbBool enable)
+So@Gui@Viewer::setAutoClipping(SbBool enable)
 {
   if (SO@GUI@_DEBUG) {
     if (PRIVATE(this)->adjustclipplanes == enable) {
@@ -1887,7 +1885,7 @@ So@Gui@Viewer::setDoubleBuffer(const SbBool on)
 void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
-  if (root == this->sceneGraph) {
+  if (root == PRIVATE(this)->scenegraph) {
     if (SO@GUI@_DEBUG) {
       SoDebugError::postWarning("So@Gui@Viewer::setSceneGraph",
                                 "called with the same root as already set");
@@ -1899,32 +1897,32 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   // So@Gui@Viewer "viewer root" (i.e. the viewer-generated root above
   // the user-supplied root), do that first.
   if (!inherited::getSceneGraph())
-    inherited::setSceneGraph(this->sceneRoot);
+    inherited::setSceneGraph(PRIVATE(this)->sceneroot);
 
-  if (this->sceneGraph) {
+  if (PRIVATE(this)->scenegraph) {
     if (this->getCamera())
       this->setCamera(NULL);
     // Release the old user-supplied graph.
-    PRIVATE(this)->usersceneroot->removeChild(this->sceneGraph);
-    // old: this->sceneRoot->removeChild(this->sceneGraph);
+    PRIVATE(this)->usersceneroot->removeChild(PRIVATE(this)->scenegraph);
+    // old: PRIVATE(this)->sceneroot->removeChild(PRIVATE(this)->scenegraph);
   }
 
-  this->sceneGraph = root;
+  PRIVATE(this)->scenegraph = root;
   if (!root) return;
 
-  PRIVATE(this)->usersceneroot->addChild(this->sceneGraph);
-  // old: this->sceneRoot->addChild(this->sceneGraph);
+  PRIVATE(this)->usersceneroot->addChild(PRIVATE(this)->scenegraph);
+  // old: PRIVATE(this)->sceneroot->addChild(PRIVATE(this)->scenegraph);
 
   // Search for a camera in the user-supplied scenegraph.
   // SoSearchAction search;
   // search.setType(SoCamera::getClassTypeId());
-  // search.apply(this->sceneGraph);
+  // search.apply(PRIVATE(this)->scenegraph);
   SbBool oldsearch = SoBaseKit::isSearchingChildren();
   SoBaseKit::setSearchingChildren(TRUE);
 
   PRIVATE(this)->searchaction->reset();
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
-  PRIVATE(this)->searchaction->apply(this->sceneGraph);
+  PRIVATE(this)->searchaction->apply(PRIVATE(this)->scenegraph);
 
   SoBaseKit::setSearchingChildren(oldsearch);
 
@@ -1949,28 +1947,28 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     // If type==BROWSER, camera should be inserted in the private
     // viewer "supergraph", if it's equal to EDITOR it should be
     // inserted in the user-supplied scenegraph.
-    if (this->type == So@Gui@Viewer::BROWSER) {
-      this->sceneRoot->insertChild(scenecamera, 1);
+    if (PRIVATE(this)->type == So@Gui@Viewer::BROWSER) {
+      PRIVATE(this)->sceneroot->insertChild(scenecamera, 1);
     }
-    else { // this->type == So@Gui@Viewer::EDITOR
-      if (this->sceneGraph->isOfType(SoGroup::getClassTypeId())) {
+    else { // PRIVATE(this)->type == So@Gui@Viewer::EDITOR
+      if (PRIVATE(this)->scenegraph->isOfType(SoGroup::getClassTypeId())) {
         // At the uppermost leftmost position in the user-supplied
         // scenegraph.
-        ((SoGroup *)this->sceneGraph)->insertChild(scenecamera, 0);
+        ((SoGroup *)PRIVATE(this)->scenegraph)->insertChild(scenecamera, 0);
       }
       else {
         // Make an extra depth level to fit the camera node into the
         // user-scenegraph.
         SoGroup * g = new SoGroup;
         g->addChild(scenecamera);
-        g->addChild(this->sceneGraph);
-        PRIVATE(this)->usersceneroot->removeChild(this->sceneGraph);
+        g->addChild(PRIVATE(this)->scenegraph);
+        PRIVATE(this)->usersceneroot->removeChild(PRIVATE(this)->scenegraph);
         PRIVATE(this)->usersceneroot->addChild(g);
-        this->sceneGraph = g;
+        PRIVATE(this)->scenegraph = g;
       }
     }
 
-    scenecamera->viewAll(this->sceneGraph, this->getViewportRegion());
+    scenecamera->viewAll(PRIVATE(this)->scenegraph, this->getViewportRegion());
   }
 
   this->setCamera(scenecamera);
@@ -1985,7 +1983,7 @@ So@Gui@Viewer::getSceneGraph(void)
   // Overloaded from parent class to return the root of the scene
   // graph set by the user, without the extras added by the viewer to
   // control rendering.
-  return this->sceneGraph;
+  return PRIVATE(this)->scenegraph;
 }
 
 // *************************************************************************
@@ -2050,13 +2048,13 @@ So@Gui@Viewer::isSeekMode(void) const
 SbBool
 So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 {
-  if (! this->camera)
+  if (! PRIVATE(this)->camera)
     return FALSE;
 
   SoRayPickAction rpaction(this->getViewportRegion());
   rpaction.setPoint(screenpos);
   rpaction.setRadius(2);
-  rpaction.apply(this->sceneRoot);
+  rpaction.apply(PRIVATE(this)->sceneroot);
 
   SoPickedPoint * picked = rpaction.getPickedPoint();
   if (!picked) {
@@ -2081,22 +2079,22 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
     hitpoint = bbox.getCenter();
   }
 
-  PRIVATE(this)->camerastartposition = this->camera->position.getValue();
-  PRIVATE(this)->camerastartorient = this->camera->orientation.getValue();
+  PRIVATE(this)->camerastartposition = PRIVATE(this)->camera->position.getValue();
+  PRIVATE(this)->camerastartorient = PRIVATE(this)->camera->orientation.getValue();
 
   // move point to the camera coordinate system, consider
   // transformations before camera in the scene graph
   SbMatrix cameramatrix, camerainverse;
-  PRIVATE(this)->getCameraCoordinateSystem(this->camera,
-                                           this->sceneRoot,
+  PRIVATE(this)->getCameraCoordinateSystem(PRIVATE(this)->camera,
+                                           PRIVATE(this)->sceneroot,
                                            cameramatrix,
                                            camerainverse);
   camerainverse.multVecMatrix(hitpoint, hitpoint);
 
   float fd = PRIVATE(this)->seekdistance;
   if (!PRIVATE(this)->seekdistanceabs)
-    fd *= (hitpoint - this->camera->position.getValue()).length()/100.0f;
-  this->camera->focalDistance = fd;
+    fd *= (hitpoint - PRIVATE(this)->camera->position.getValue()).length()/100.0f;
+  PRIVATE(this)->camera->focalDistance = fd;
 
   SbVec3f dir = hitpoint - PRIVATE(this)->camerastartposition;
   dir.normalize();
@@ -2104,10 +2102,10 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   // find a rotation that rotates current camera direction into new
   // camera direction.
   SbVec3f olddir;
-  this->camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), olddir);
+  PRIVATE(this)->camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), olddir);
   SbRotation diffrot(olddir, dir);
   PRIVATE(this)->cameraendposition = hitpoint - fd * dir;
-  PRIVATE(this)->cameraendorient = this->camera->orientation.getValue() * diffrot;
+  PRIVATE(this)->cameraendorient = PRIVATE(this)->camera->orientation.getValue() * diffrot;
 
   if (PRIVATE(this)->seeksensor->isScheduled()) {
     PRIVATE(this)->seeksensor->unschedule();
@@ -2142,12 +2140,12 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
     // textureQuality field of socomplexity node is always 0.0
 
-    this->sobasecolor->rgb.setValue(pub->getBackgroundColor());
+    this->sobasecolor->rgb.setValue(PUBLIC(this)->getBackgroundColor());
     this->sobasecolor->rgb.setIgnored(FALSE);
     this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
     this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
-    pub->getSceneManager()->render(clearcol, clearz);
+    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
 
     // Second pass, render wireframe on top.
 
@@ -2157,7 +2155,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->somaterialbinding->value.setIgnored(TRUE); // as-is
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
 
-    pub->getSceneManager()->render(FALSE, FALSE);
+    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
 
     return;
   }
@@ -2175,7 +2173,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->somaterialbinding->value.setIgnored(TRUE); // override with OVERALL
     this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
-    pub->getSceneManager()->render(clearcol, clearz);
+    PUBLIC(this)->getSceneManager()->render(clearcol, clearz);
 
     // Second pass, render wireframe on top.
     this->sobasecolor->rgb.setValue(this->wireframeoverlaycolor);
@@ -2188,7 +2186,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
     this->socomplexity->textureQuality.setIgnored(FALSE);
 
-    pub->getSceneManager()->render(FALSE, FALSE);
+    PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
 
     SbBool oldnot;
 
@@ -2226,7 +2224,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     break; // Include "default:" case to avoid compiler warning.
   }
 
-  pub->getSceneManager()->render(clearcol, clearzbuffer && clearz);
+  PUBLIC(this)->getSceneManager()->render(clearcol, clearzbuffer && clearz);
 }
 
 
@@ -2665,7 +2663,7 @@ So@Gui@Viewer::DrawStyle
 So@Gui@ViewerP::currentDrawStyle(
   void) const
 {
-  SbBool interactivemode = pub->getInteractiveCount() > 0 ? TRUE : FALSE;
+  SbBool interactivemode = PUBLIC(this)->getInteractiveCount() > 0 ? TRUE : FALSE;
 
   if (!interactivemode || this->drawInteractiveAsStill())
     return this->drawstyles[So@Gui@Viewer::STILL];
@@ -2720,19 +2718,19 @@ So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   case So@Gui@Viewer::VIEW_LOW_RES_LINE:
   case So@Gui@Viewer::VIEW_LOW_RES_POINT:
   case So@Gui@Viewer::VIEW_BBOX:
-    pub->glLockNormal();
+    PUBLIC(this)->glLockNormal();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glDisable(GL_DEPTH_TEST);
-    pub->glUnlockNormal();
+    PUBLIC(this)->glUnlockNormal();
     break;
 
   default:
-    pub->glLockNormal();
+    PUBLIC(this)->glLockNormal();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glEnable(GL_DEPTH_TEST);
-    pub->glUnlockNormal();
+    PUBLIC(this)->glUnlockNormal();
     break;
   }
 
@@ -2889,27 +2887,27 @@ So@Gui@ViewerP::setClippingPlanes(void)
 {
   // This is necessary to avoid a crash in case there is no scene
   // graph specified by the user.
-  if (pub->camera == NULL) return;
+  if (this->camera == NULL) return;
 
-  if (pub->autoClipBboxAction == NULL)
-    pub->autoClipBboxAction =
-      new SoGetBoundingBoxAction(pub->getViewportRegion());
+  if (this->autoclipbboxaction == NULL)
+    this->autoclipbboxaction =
+      new SoGetBoundingBoxAction(PUBLIC(this)->getViewportRegion());
   else
-    pub->autoClipBboxAction->setViewportRegion(pub->getViewportRegion());
+    this->autoclipbboxaction->setViewportRegion(PUBLIC(this)->getViewportRegion());
 
-  pub->autoClipBboxAction->apply(pub->sceneRoot);
+  this->autoclipbboxaction->apply(this->sceneroot);
 
-  SbXfBox3f xbox = pub->autoClipBboxAction->getXfBoundingBox();
+  SbXfBox3f xbox = this->autoclipbboxaction->getXfBoundingBox();
 
   SbMatrix cammat;
   SbMatrix inverse;
-  this->getCameraCoordinateSystem(pub->camera, pub->sceneRoot, cammat, inverse);
+  this->getCameraCoordinateSystem(this->camera, this->sceneroot, cammat, inverse);
   xbox.transform(inverse);
 
   SbMatrix mat;
-  mat.setTranslate(- pub->camera->position.getValue());
+  mat.setTranslate(- this->camera->position.getValue());
   xbox.transform(mat);
-  mat = pub->camera->orientation.getValue().inverse();
+  mat = this->camera->orientation.getValue().inverse();
   xbox.transform(mat);
   SbBox3f box = xbox.project();
 
@@ -2927,7 +2925,7 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // Check if scene is completely behind us.
   if (farval <= 0.0f) { return; }
 
-  if (pub->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+  if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
     // Disallow negative near clipping plane distance.
     if (nearval <= 0.0f) {
       // Set to a short distance, but make sure we're still well below
@@ -2955,8 +2953,8 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // rotated.
   const float SLACK = 0.001f;
 
-  pub->camera->nearDistance = nearval * (1.0f - SLACK);
-  pub->camera->farDistance = farval * (1.0f + SLACK);
+  this->camera->nearDistance = nearval * (1.0f - SLACK);
+  this->camera->farDistance = farval * (1.0f + SLACK);
 
 
   // FIXME: there's a possible optimization to take advantage of here,
@@ -2987,8 +2985,8 @@ So@Gui@ViewerP::setClippingPlanes(void)
   if (SO@GUI@_DEBUG && 0) { // debug
     SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
                            "near, far: %f (%f), %f (%f)",
-                           nearval, pub->camera->nearDistance.getValue(),
-                           farval, pub->camera->farDistance.getValue());
+                           nearval, this->camera->nearDistance.getValue(),
+                           farval, this->camera->farDistance.getValue());
   }
 }
 
@@ -3004,7 +3002,7 @@ So@Gui@ViewerP::setClippingPlanes(void)
 void
 So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
 {
-  SoCamera * cam = pub->getCamera();
+  SoCamera * cam = PUBLIC(this)->getCamera();
   assert(cam);
 
   if (SO@GUI@_DEBUG && 0) { // debug
@@ -3016,7 +3014,7 @@ So@Gui@ViewerP::moveCameraScreen(const SbVec2f & screenpos)
                            cam->position.getValue()[2]);
   }
 
-  SbViewVolume vv = cam->getViewVolume(pub->getGLAspectRatio());
+  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
   SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
 
   SbLine line;
@@ -3106,9 +3104,9 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
   
   t = (float) ((1.0 - cos(M_PI*t)) * 0.5);
   
-  thisp->camera->position = PRIVATE(thisp)->camerastartposition +
+  PRIVATE(thisp)->camera->position = PRIVATE(thisp)->camerastartposition +
     (PRIVATE(thisp)->cameraendposition - PRIVATE(thisp)->camerastartposition) * t;
-  thisp->camera->orientation = 
+  PRIVATE(thisp)->camera->orientation = 
     SbRotation::slerp(PRIVATE(thisp)->camerastartorient,
                       PRIVATE(thisp)->cameraendorient, 
                       t);
@@ -3355,7 +3353,7 @@ So@Gui@ViewerP::recordFPS(const double rendertime)
     char buffer[64];
     int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
     assert(nr < 64);
-    Draw2DString(buffer, pub->getGLSize(), SbVec2f(10, 10));
+    Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
   }
 }
 
@@ -3547,23 +3545,6 @@ So@Gui@Viewer::getSuperimpositionEnabled(SoNode * scene) const
                        "no such superimposition");
   }
   return FALSE;
-}
-
-/*!  
-  Returns the coordinate system the current camera is located in. If
-  there are transformations before the camera in the scene graph, this
-  must be considered before doing certain operations. \a matrix and \a
-  inverse will not contain the transformations caused by the camera
-  fields, only the transformations traversed before the camera in the
-  scene graph.
-*/
-void 
-So@Gui@Viewer::getCameraCoordinateSystem(SbMatrix & matrix, SbMatrix & inverse)
-{
-  if (this->camera && this->sceneRoot) {
-    PRIVATE(this)->getCameraCoordinateSystem(this->camera, this->sceneRoot,
-                                             matrix, inverse);
-  }  
 }
 
 // *************************************************************************

@@ -236,23 +236,9 @@ protected:
   void setSuperimpositionEnabled(SoNode * scene, const SbBool enable);
   SbBool getSuperimpositionEnabled(SoNode * scene) const;
 
-  SoCamera * camera;
-  So@Gui@Viewer::Type type;
-  SbBool viewingFlag;
-  SbBool altSwitchBack;
-
-  SoGetBoundingBoxAction * autoClipBboxAction;
-  float minimumNearPlane;
-
-  SoSeparator * sceneRoot;
-  SoNode * sceneGraph;
-
-  void getCameraCoordinateSystem(SbMatrix & matrix, SbMatrix & inverse);
-
 private:
   class So@Gui@ViewerP * pimpl;
   friend class So@Gui@ViewerP;
-
 };
 
 // *************************************************************************

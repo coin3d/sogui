@@ -22,7 +22,6 @@
 \**************************************************************************/
 
 // @configure_input@
-// $Id$
 
 #ifndef SO@GUI@_RENDERAREA_H
 #define SO@GUI@_RENDERAREA_H
@@ -138,24 +137,10 @@ protected:
 
   virtual SbBool glScheduleRedraw(void);
 
-  SbBool invokeAppCB(@EVENT@ event);
-
-  const SoEvent * getSoEvent(@EVENT@ event);
-
-  SbPList * deviceList;
-
-  So@Gui@RenderAreaEventCB * appEventHandler;
-  void * appEventHandlerData;
-
 private:
   friend class So@Gui@RenderAreaP;
   class So@Gui@RenderAreaP * priv;
-
-  void constructor(SbBool mouseInput, SbBool keyboardInput, SbBool build);
-  static void renderCB(void * user, SoSceneManager * manager);
-  static void selection_redraw_cb(void * data, SoSelection * sel);
-  void setDevicesWindowSize(const SbVec2s size);
-}; // class So@Gui@RenderArea
+};
 
 // *************************************************************************
 

@@ -93,13 +93,6 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 
-/*!
-  \var SbPList * So@Gui@RenderArea::deviceList
-  FIXME: write doc
-*/
-
-// *************************************************************************
-
 class So@Gui@RenderAreaP {
 public:
 
@@ -132,6 +125,11 @@ public:
 
   static const int GL_DEFAULT_MODE;
 
+  void constructor(SbBool mouseInput, SbBool keyboardInput, SbBool build);
+  static void renderCB(void * user, SoSceneManager * manager);
+  static void selection_redraw_cb(void * data, SoSelection * sel);
+  void setDevicesWindowSize(const SbVec2s size);
+
   // OpenGL info-window hack.
   enum { NONE, OPENGL, INVENTOR, TOOLKIT, DUMPSCENEGRAPH };
   int checkMagicSequences(const char c);
@@ -139,6 +137,13 @@ public:
   void showInventorInformation(void);
   void showToolkitInformation(void);
   void dumpScenegraph(void);
+
+  SbBool invokeAppCB(@EVENT@ event);
+  const SoEvent * getSoEvent(@EVENT@ event);
+
+  SbPList * devicelist;
+  So@Gui@RenderAreaEventCB * appeventhandler;
+  void * appeventhandlerdata;
 
 private:
   So@Gui@RenderArea * pub; // public interface class
@@ -399,27 +404,6 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
 // *************************************************************************
 
 /*!
-  \var So@Gui@RenderAreaEventCB * So@Gui@RenderArea::appEventHandler
-
-  This is an application-settable event callback that will be called with
-  X events destined for the renderarea.
-
-  Set this member through the access methods, not directly.
-*/
-
-/*!
-  \var void * So@Gui@RenderArea::appEventHandlerData
-
-  This member is the closure given to the application event handler.
-
-  Set this member through the access methods, not directly.
-*/
-
-// *************************************************************************
-
-// *************************************************************************
-
-/*!
   Public constructor.
 */
 So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
@@ -429,7 +413,8 @@ So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
                                      SbBool keyboardInput)
   : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
 {
-  this->constructor(mouseInput, keyboardInput, TRUE);
+  PRIVATE(this) = new So@Gui@RenderAreaP(this);
+  PRIVATE(this)->constructor(mouseInput, keyboardInput, TRUE);
 }
 
 /*!
@@ -443,21 +428,20 @@ So@Gui@RenderArea::So@Gui@RenderArea(@WIDGET@ parent,
                                      SbBool build)
   : inherited(parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE)
 {
-  this->constructor(mouseInput, keyboardInput, build);
+  PRIVATE(this) = new So@Gui@RenderAreaP(this);
+  PRIVATE(this)->constructor(mouseInput, keyboardInput, build);
 }
 
 // Common code for all constructors.
 void
-So@Gui@RenderArea::constructor(SbBool mouseInput,
-                               SbBool keyboardInput,
-                               SbBool build)
+So@Gui@RenderAreaP::constructor(SbBool mouseInput,
+                                SbBool keyboardInput,
+                                SbBool build)
 {
-  PRIVATE(this) = new So@Gui@RenderAreaP(this);
-
-  PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
-  PRIVATE(this)->normalManager->activate();
-  PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
-  PRIVATE(this)->overlayManager->activate();
+  this->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+  this->normalManager->activate();
+  this->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+  this->overlayManager->activate();
   // FIXME: what is this magic number doing here - shouldn't we use
   // SoGLCacheContextElement::getUniqueCacheContext() for Coin, and
   // magic numbers just for SGI / TGS Inventor?
@@ -468,14 +452,14 @@ So@Gui@RenderArea::constructor(SbBool mouseInput,
   // kosher?
   //
   // 20010831 mortene.
-  PRIVATE(this)->overlayManager->getGLRenderAction()->setCacheContext(1);
+  this->overlayManager->getGLRenderAction()->setCacheContext(1);
 
-  this->deviceList = new SbPList ;
-  this->appEventHandler = NULL;
-  this->appEventHandlerData = NULL;
+  this->devicelist = new SbPList;
+  this->appeventhandler = NULL;
+  this->appeventhandlerdata = NULL;
 
   if (mouseInput) {
-    PRIVATE(this)->devices.mouse = new So@Gui@Mouse;
+    this->devices.mouse = new So@Gui@Mouse;
 
     // FIXME: somebody debug larsa's head so he learns to write proper
     // FIXME comments (see below), which _at least_ actually contains
@@ -484,22 +468,22 @@ So@Gui@RenderArea::constructor(SbBool mouseInput,
     // and username aswell. Sheesh... 20010831 mortene.
 
     // FIXME: this does not work
-    // this->registerDevice(PRIVATE(this)->devices.mouse);
-    this->deviceList->append(PRIVATE(this)->devices.mouse);
+    // PUBLIC(this)->registerDevice(this->devices.mouse);
+    this->devicelist->append(this->devices.mouse);
   }
 
   if (keyboardInput) {
-    PRIVATE(this)->devices.keyboard = new So@Gui@Keyboard;
+    this->devices.keyboard = new So@Gui@Keyboard;
     // FIXME: this does not work
-    // this->registerDevice(PRIVATE(this)->devices.keyboard);
-    this->deviceList->append(PRIVATE(this)->devices.keyboard);
+    // PUBLIC(this)->registerDevice(this->devices.keyboard);
+    this->devicelist->append(this->devices.keyboard);
   }
 
   if (! build) return;
-  this->setClassName("So@Gui@RenderArea");
-  @WIDGET@ glarea = this->buildWidget(this->getParentWidget());
-  this->setBaseWidget(glarea);
-  this->setSize(SbVec2s(400, 400));
+  PUBLIC(this)->setClassName("So@Gui@RenderArea");
+  @WIDGET@ glarea = PUBLIC(this)->buildWidget(PUBLIC(this)->getParentWidget());
+  PUBLIC(this)->setBaseWidget(glarea);
+  PUBLIC(this)->setSize(SbVec2s(400, 400));
 }
 
 /*!
@@ -507,12 +491,12 @@ So@Gui@RenderArea::constructor(SbBool mouseInput,
 */
 So@Gui@RenderArea::~So@Gui@RenderArea()
 {
-  for (int i = this->deviceList->getLength() - 1; i >= 0; i--) {
-    So@Gui@Device * device = (So@Gui@Device *) ((*this->deviceList)[i]);
+  for (int i = PRIVATE(this)->devicelist->getLength() - 1; i >= 0; i--) {
+    So@Gui@Device * device = (So@Gui@Device *) ((*PRIVATE(this)->devicelist)[i]);
     this->unregisterDevice(device);
     delete device;
   }
-  delete this->deviceList;
+  delete PRIVATE(this)->devicelist;
   delete PRIVATE(this);
 }
 
@@ -601,14 +585,16 @@ So@Gui@RenderArea::getOverlaySceneGraph(void)
 void
 So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
 {
-  int idx = deviceList->find(device);
-  if (idx == -1)
-    deviceList->append(device);
+  int idx = PRIVATE(this)->devicelist->find(device);
+  if (idx == -1) {
+    PRIVATE(this)->devicelist->append(device);
+  }
 
   device->setWindowSize(this->getGLSize());
-  if (idx == -1)
+  if (idx == -1) {
     device->enable(this->getGLWidget(), 
-      &So@Gui@GLWidget::eventHandler, (void*) this);
+                   &So@Gui@GLWidget::eventHandler, (void*) this);
+  }
 }
 
 /*!
@@ -618,8 +604,8 @@ So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
 void
 So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
 {
-  assert(this->deviceList != NULL);
-  const int idx = this->deviceList->find(device);
+  assert(PRIVATE(this)->devicelist != NULL);
+  const int idx = PRIVATE(this)->devicelist->find(device);
   if (idx == -1) {
 #if SO@GUI@_DEBUG
     SoDebugError::post("So@Gui@RenderArea::unregisterDevice",
@@ -627,7 +613,7 @@ So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
 #endif // SO@GUI@_DEBUG
     return;
   }
-  this->deviceList->remove(idx);
+  PRIVATE(this)->devicelist->remove(idx);
   device->disable(this->getGLWidget(), NULL, NULL);
 }
 
@@ -915,8 +901,8 @@ void
 So@Gui@RenderArea::setAutoRedraw(SbBool enable)
 {
   if (enable) {
-    PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
-    PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
+    PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+    PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
   }
   else {
     PRIVATE(this)->normalManager->setRenderCallback(NULL, NULL);
@@ -1002,7 +988,7 @@ So@Gui@RenderArea::scheduleRedraw(void)
   assert(PRIVATE(this)->normalManager != NULL);
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
+  PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
   PRIVATE(this)->normalManager->scheduleRedraw(); // Redraw when idle.
 }
 
@@ -1015,7 +1001,7 @@ So@Gui@RenderArea::scheduleOverlayRedraw(void)
   assert(PRIVATE(this)->overlayManager != NULL);
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderArea::renderCB, this);
+  PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
   PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
 }
 
@@ -1039,13 +1025,13 @@ So@Gui@RenderArea::redrawOnSelectionChange(SoSelection * selection)
   if (PRIVATE(this)->normalSelection) {
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
-    PRIVATE(this)->normalSelection->removeChangeCallback(So@Gui@RenderArea::selection_redraw_cb, this);
+    PRIVATE(this)->normalSelection->removeChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
   }
 
   PRIVATE(this)->normalSelection = selection;
 
   if (selection)
-    selection->addChangeCallback(So@Gui@RenderArea::selection_redraw_cb, this);
+    selection->addChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
 
 }
 
@@ -1066,13 +1052,13 @@ So@Gui@RenderArea::redrawOverlayOnSelectionChange(SoSelection * selection)
   if (PRIVATE(this)->overlaySelection) {
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
-    PRIVATE(this)->overlaySelection->removeChangeCallback(So@Gui@RenderArea::selection_redraw_cb, this);
+    PRIVATE(this)->overlaySelection->removeChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
   }
 
   PRIVATE(this)->overlaySelection = selection;
 
   if (selection)
-    selection->addChangeCallback(So@Gui@RenderArea::selection_redraw_cb, this);
+    selection->addChangeCallback(So@Gui@RenderAreaP::selection_redraw_cb, this);
 
 }
 
@@ -1083,8 +1069,8 @@ void
 So@Gui@RenderArea::setEventCallback(So@Gui@RenderAreaEventCB * func,
                                     void * user)
 {
-  this->appEventHandler = func;
-  this->appEventHandlerData = user;
+  PRIVATE(this)->appeventhandler = func;
+  PRIVATE(this)->appeventhandlerdata = user;
 }
 
 /*!
@@ -1499,7 +1485,7 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
     return;
 
   this->setViewportRegion(SbViewportRegion(glsize));
-  this->setDevicesWindowSize(glsize);
+  PRIVATE(this)->setDevicesWindowSize(glsize);
 
   // FIXME: aren't both these calls unnecessary as we set the full
   // viewportregion a few lines above this one? 20020103 mortene.
@@ -1551,10 +1537,10 @@ So@Gui@RenderArea::widgetChanged(@WIDGET@ widget)
 So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
 {
   @WIDGET@ widget = inherited::buildWidget(parent);
-  if (this->deviceList != NULL) {
-    const int num = this->deviceList->getLength();
+  if (PRIVATE(this)->devicelist != NULL) {
+    const int num = PRIVATE(this)->devicelist->getLength();
     for (int i = 0; i < num; i++) {
-      So@Gui@Device * device = (So@Gui@Device *) (*this->deviceList)[i];
+      So@Gui@Device * device = (So@Gui@Device *) (*PRIVATE(this)->devicelist)[i];
       device->enable(this->getGLWidget(),
         &inherited::eventHandler, (void *) this);
     }
@@ -1564,7 +1550,7 @@ So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
     return widget;
 
 /*
-  this->setDevicesWindowSize(glsize);
+  PRIVATE(this)->setDevicesWindowSize(glsize);
 
   this->setViewportRegion(SbViewportRegion(glsize[0], glsize[1]));
   PRIVATE(this)->normalManager->setViewportRegion(SbViewportRegion(glsize[0], glsize[1]));
@@ -1601,10 +1587,10 @@ So@Gui@RenderArea::getDefaultIconTitle(void) const
   This method invokes the application event handler, if one is set.
 */
 SbBool
-So@Gui@RenderArea::invokeAppCB(@EVENT@ event)
+So@Gui@RenderAreaP::invokeAppCB(@EVENT@ event)
 {
-  if (this->appEventHandler != NULL)
-    return this->appEventHandler(this->appEventHandlerData, event);
+  if (this->appeventhandler != NULL)
+    return this->appeventhandler(this->appeventhandlerdata, event);
   return FALSE;
 }
 
@@ -1646,9 +1632,9 @@ So@Gui@RenderArea::processSoEvent(const SoEvent * const event)
 void
 So@Gui@RenderArea::processEvent(@EVENT@ event)
 {
-  if (this->invokeAppCB(event)) { return; }
+  if (PRIVATE(this)->invokeAppCB(event)) { return; }
 
-  const SoEvent * soevent = this->getSoEvent(event);
+  const SoEvent * soevent = PRIVATE(this)->getSoEvent(event);
 
   if (soevent != NULL) {
 #if SO@GUI@_DEBUG
@@ -1714,15 +1700,15 @@ So@Gui@RenderArea::glScheduleRedraw(void)
   event, or \c NULL if there are none.
 */
 const SoEvent *
-So@Gui@RenderArea::getSoEvent(@EVENT@ event)
+So@Gui@RenderAreaP::getSoEvent(@EVENT@ event)
 {
-  if (! this->deviceList)
+  if (!this->devicelist)
     return (SoEvent *) NULL;
 
   const SoEvent * soevent = NULL;
-  const int num = this->deviceList->getLength();
+  const int num = this->devicelist->getLength();
   for (int i = 0; (i < num) && (soevent == NULL); i++)
-    soevent = ((So@Gui@Device *)(*this->deviceList)[i])->translateEvent(event);
+    soevent = ((So@Gui@Device *)(*this->devicelist)[i])->translateEvent(event);
 
   return soevent;
 }
@@ -1734,18 +1720,18 @@ So@Gui@RenderArea::getSoEvent(@EVENT@ event)
   classes.
 */
 void
-So@Gui@RenderArea::setDevicesWindowSize(const SbVec2s size)
+So@Gui@RenderAreaP::setDevicesWindowSize(const SbVec2s size)
 {
-  if (! this->deviceList) return;
-  const int num = this->deviceList->getLength();
+  if (!this->devicelist) return;
+  const int num = this->devicelist->getLength();
   for (int i = 0; i < num; i++)
-    ((So@Gui@Device *)(*this->deviceList)[i])->setWindowSize(size);
+    ((So@Gui@Device *)(*this->devicelist)[i])->setWindowSize(size);
 }
 
 // *************************************************************************
 
 void
-So@Gui@RenderArea::renderCB(void * closure, SoSceneManager * manager)
+So@Gui@RenderAreaP::renderCB(void * closure, SoSceneManager * manager)
 {
   So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
   if (manager == PRIVATE(thisptr)->normalManager)
@@ -1762,7 +1748,7 @@ So@Gui@RenderArea::renderCB(void * closure, SoSceneManager * manager)
   Callback for automatic redraw on SoSelection changes.
 */
 void
-So@Gui@RenderArea::selection_redraw_cb(void * closure, SoSelection * sel)
+So@Gui@RenderAreaP::selection_redraw_cb(void * closure, SoSelection * sel)
 {
   So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
   if (sel == PRIVATE(ra)->normalSelection)
