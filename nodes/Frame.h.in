@@ -45,7 +45,6 @@ public:
   static void initClass(void);
 
   SoGuiFrame(void);
-  ~SoGuiFrame(void);
 
   enum FrameDesign {
     BLACK,
@@ -61,6 +60,7 @@ public:
   virtual void GLRender(SoGLRenderAction * action);
 
 protected:
+  virtual ~SoGuiFrame(void);
 
 private:
   void * internals;

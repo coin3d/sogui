@@ -61,7 +61,7 @@ public:
   virtual void getMatrix(SoGetMatrixAction * action);
 
 protected:
-  ~SoGuiViewportFix(void);
+  virtual ~SoGuiViewportFix(void);
 
 private:
   void * internals;

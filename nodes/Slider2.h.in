@@ -58,7 +58,6 @@ public:
   static void initClass(void);
 
   SoGuiSlider2(void);
-  ~SoGuiSlider2(void);
 
   SoSFVec3f size;
 
@@ -74,6 +73,9 @@ public:
 
   void sizeUpdate(void);
   void valueUpdate(void);
+
+protected:
+  virtual ~SoGuiSlider2(void);
 
 private:
   void * internals;
