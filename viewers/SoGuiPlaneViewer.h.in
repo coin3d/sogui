@@ -31,7 +31,6 @@ class SoAnyPlaneViewer;
 
 class SO@GUI@_DLL_API So@Gui@PlaneViewer : public So@Gui@FullViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@PlaneViewer, So@Gui@FullViewer);
-  friend class SoAnyPlaneViewer;
   @COMPONENTHEADER@
 
 public:
