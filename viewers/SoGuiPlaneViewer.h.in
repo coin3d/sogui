@@ -196,7 +196,6 @@ protected:
 
 private:
   friend class SoWinPlaneViewerP;
-  class SoAnyPlaneViewer * common;
   class SoWinPlaneViewerP * pimpl;
 #endif // ! __COIN_SOWIN__
 
