@@ -54,6 +54,7 @@ public:
 
   SoFieldSensor * design_sensor;
   static void design_updated_cb(void * closure, SoSensor * sensor);
+  SoFieldSensor * complement_sensor;
 
   static const char * scene[];
 };
@@ -80,6 +81,7 @@ SoGuiFrame::SoGuiFrame(void)
   SO_KIT_ADD_FIELD(size, (SbVec3f(0.0f, 0.0f, 0.0f)));
   SO_KIT_ADD_FIELD(design, (SoGuiFrame::BLACK));
   SO_KIT_ADD_FIELD(width, (1.0f));
+  SO_KIT_ADD_FIELD(complement, (FALSE));
 
   SO_KIT_DEFINE_ENUM_VALUE(FrameDesign, BLACK);
   SO_KIT_DEFINE_ENUM_VALUE(FrameDesign, COLOR);
@@ -114,6 +116,8 @@ SoGuiFrame::SoGuiFrame(void)
   PRIVATE(this)->width_sensor->attach(&(this->size));
   PRIVATE(this)->design_sensor = new SoFieldSensor(Frame::design_updated_cb, PRIVATE(this));
   PRIVATE(this)->design_sensor->attach(&(this->design));
+  PRIVATE(this)->complement_sensor = new SoFieldSensor(Frame::design_updated_cb, PRIVATE(this));
+  PRIVATE(this)->complement_sensor->attach(&(this->complement));
   this->design.touch();
 }
 
@@ -125,6 +129,7 @@ SoGuiFrame::~SoGuiFrame(void)
   delete PRIVATE(this)->size_sensor;
   delete PRIVATE(this)->width_sensor;
   delete PRIVATE(this)->design_sensor;
+  delete PRIVATE(this)->complement_sensor;
   Frame * obj = PRIVATE(this);
   delete obj;
 }
@@ -207,19 +212,28 @@ Frame::design_updated_cb(void * closure, SoSensor * sensor)
 {
   assert(closure != NULL);
   Frame * me = (Frame *) closure;
-  SoDebugError::postInfo("Frame::design_updated_cb", "");
   SoMaterial * light = me->light;
   SoMaterial * shade = me->shade;
   assert(light);
   assert(shade);
   switch ( PUBLIC(me)->design.getValue() ) {
   case SoGuiFrame::EMBOSS:
-    light->diffuseColor.setValue(SbColor(0.9f, 0.9f, 0.9f));
-    shade->diffuseColor.setValue(SbColor(0.5f, 0.5f, 0.5f));
+    if ( PUBLIC(me)->complement.getValue() ) {
+      light->diffuseColor.setValue(SbColor(0.5f, 0.5f, 0.5f));
+      shade->diffuseColor.setValue(SbColor(0.9f, 0.9f, 0.9f));
+    } else {
+      light->diffuseColor.setValue(SbColor(0.9f, 0.9f, 0.9f));
+      shade->diffuseColor.setValue(SbColor(0.5f, 0.5f, 0.5f));
+    }
     break;
   case SoGuiFrame::BLACK:
-    light->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
-    shade->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
+    if ( PUBLIC(me)->complement.getValue() ) {
+      light->diffuseColor.setValue(SbColor(1.0f, 0.0f, 0.0f));
+      shade->diffuseColor.setValue(SbColor(1.0f, 0.0f, 0.0f));
+    } else {
+      light->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
+      shade->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
+    }
     break;
   default:
     break;
