@@ -35,6 +35,8 @@ static const char rcsid[] =
 #include <Inventor/@GUI@/viewers/SoAnyFullViewer.h>
 #include <Inventor/@GUI@/viewers/So@GUI@FullViewer.h>
 
+#include <assert.h>
+
 // ************************************************************************
 
 /*!
