@@ -172,6 +172,29 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
   if (exts.getLength() > 0) { info += "\n   "; info += exts; }
   info += "\"\n";
 
+  // Limits.
+  {
+    // glPointSize()
+
+    GLfloat bounds[2];
+    glGetFloatv(GL_POINT_SIZE_RANGE, bounds);
+    GLfloat granularity[1];
+    glGetFloatv(GL_POINT_SIZE_GRANULARITY, granularity);
+    SbString limits;
+    limits.sprintf("glPointSize(): range=[%f, %f], granularity=%f\n",
+                   bounds[0], bounds[1], granularity[0]);
+    info += limits;
+
+
+    // glLineWidth()
+
+    glGetFloatv(GL_LINE_WIDTH_RANGE, bounds);
+    glGetFloatv(GL_LINE_WIDTH_GRANULARITY, granularity);
+    limits.sprintf("glLineWidth(): range=[%f, %f], granularity=%f\n",
+                   bounds[0], bounds[1], granularity[0]);
+    info += limits;
+  }
+
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
                                     info.getString());
 #endif // SO@GUI@_DEBUG
