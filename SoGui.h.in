@@ -126,9 +126,6 @@ public:
   static void doIdleTasks(void);
 
 protected:
-  static HWND createWindow(char * title, char * className,
-                           SIZE size, HWND parent = NULL, HMENU menu = NULL);
-
   static LRESULT CALLBACK eventHandler(HWND window, UINT message,
                                        WPARAM wparam, LPARAM lparam);
 
