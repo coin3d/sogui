@@ -571,7 +571,7 @@ GENERATE_HTMLHELP      = @SOGUI_DOC_HTML_HELP@
 # can add a path in front of the file if the result should not be 
 # written to the html output dir.
 
-CHM_FILE               = @path_tag@@sogui_html_help_dir@/So@Gui@-@SOGUI_MAJOR_VERSION@_@SOGUI_MINOR_VERSION@.chm
+CHM_FILE               = @path_tag@@sogui_html_help_dir@/So@Gui@-@SOGUI_MAJOR_VERSION@.chm
 
 # If the GENERATE_HTMLHELP tag is set to YES, the HHC_LOCATION tag can 
 # be used to specify the location (absolute path including file name) of 
