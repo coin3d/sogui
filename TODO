@@ -5,3 +5,15 @@ TODO
   name casing, and rename the affected files/classes if name should be
   changed.
 
+
+OTHER
+=====
+
+* common popup menu setup/management API to facilitate common source on all
+  surrounding / related code
+
+* common timer API
+
+* dynamically programmable state-machine for managing the viewer states/modes
+
+
