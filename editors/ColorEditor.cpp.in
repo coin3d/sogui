@@ -150,7 +150,6 @@ public:
   static const char * scenegraph[];
 };
 
-// FIXME: inser ClickCounter, and connect it to the switch
 const char *
 ColorEditor::scenegraph[] = {
   "#Inventor V2.1 ascii",
