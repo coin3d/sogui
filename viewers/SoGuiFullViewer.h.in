@@ -562,7 +562,6 @@ public:
 
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
   virtual void destroyPopupMenu(void);
-  virtual int displayPopupMenu(int x, int y, HWND owner);
 
   virtual void selectedPrefs(void);
 
