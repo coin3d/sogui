@@ -1065,6 +1065,33 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
 }
 
 // *************************************************************************
+
+// documented in superclass
+void
+So@Gui@ExaminerViewer::setSeekMode(SbBool on)
+{
+  // Overrides this method to make sure any animations are stopped
+  // before we go into seek mode.
+
+  // Note: this method is almost identical to the setSeekMode() in the
+  // So@Gui@FlyViewer and So@Gui@PlaneViewer, so migrate any changes.
+
+#if SO@GUI@_DEBUG
+  if (on == this->isSeekMode()) {
+    SoDebugError::postWarning("So@Gui@ExaminerViewer::setSeekMode",
+                              "seek mode already %sset", on ? "" : "un");
+    return;
+  }
+#endif // SO@GUI@_DEBUG
+
+  if (this->isAnimating()) { this->stopAnimating(); }
+  inherited::setSeekMode(on);
+  this->setMode(on ?
+                So@Gui@ExaminerViewer::WAITING_FOR_SEEK :
+                So@Gui@ExaminerViewer::EXAMINE);
+}
+
+// *************************************************************************
 // Methods used for spin animation tracking.
 
 /*!
