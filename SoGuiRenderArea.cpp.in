@@ -471,6 +471,13 @@ So@Gui@RenderArea::setViewportRegion(
 {
   if ( region.getWindowSize()[0] == -1 ) return;
 
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@RenderArea::setViewportRegion",
+                         "size=<%d, %d>",
+                         region.getWindowSize()[0],
+                         region.getWindowSize()[1]);
+#endif // debug
+
   PRIVATE(this)->normalManager->setViewportRegion( region );
   PRIVATE(this)->overlayManager->setViewportRegion( region );
 } // setViewportRegion()
@@ -1080,6 +1087,11 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
   this->setGLSize(size);
   const SbVec2s glsize = this->getGLSize();
 
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo( "So@Gui@RenderArea::sizeChanged",
+                          "glsize==<%d, %d>", glsize[0], glsize[1] );
+#endif // SO@GUI@_DEBUG
+
   if ( glsize[0] <= 0 || glsize[1] <= 0 )
     return;
 
@@ -1111,6 +1123,8 @@ So@Gui@RenderArea::widgetChanged( // virtual, protected
 
   // FIXME: this code needs to be enabled (and rewritten to work) to
   // handle display list caching. 20001121 mortene.
+  // UPDATE: check with pederb if any of this is really needed, or if
+  // it should just be removed. 20010802 mortene.
 #if 0
   SoGLRenderAction * ra = PRIVATE(this)->normalManager->getGLRenderAction();
   ra->setCacheContext(XXX);
