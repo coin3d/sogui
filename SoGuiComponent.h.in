@@ -163,7 +163,6 @@ protected:
 
 #ifdef __COIN_SOGTK__
   virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
-  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
 #endif // __COIN_SOGTK__
 
 
@@ -182,7 +181,11 @@ private:
   // FIXME: get rid of this? 20011012 mortene.
   static void event_handler(Widget, XtPointer, XEvent *, Boolean *);
 #endif // __COIN_SOXT__
-}; // class So@Gui@Component
+
+#ifdef __COIN_SOGTK__
+  static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
+#endif // __COIN_SOGTK__
+};
 
 // *************************************************************************
 
