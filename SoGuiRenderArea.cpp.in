@@ -57,35 +57,34 @@ static const char rcsid[] =
 // *************************************************************************
 
 /*!
+  Public constructor.
 */
 
 So@GUI@RenderArea::So@GUI@RenderArea(
   @WIDGET@ parent,
   const char * name,
-  SbBool inParent,
+  SbBool embed,
   SbBool mouseInput,
   SbBool keyboardInput )
-: inherited( parent, name, inParent, SO_GL_DEFAULT_MODE, FALSE )
+: inherited( parent, name, embed, SO_GL_DEFAULT_MODE, FALSE )
 {
-  this->constructor( mouseInput, keyboardInput );
-  this->buildWidget( inParent != FALSE ? parent : NULL );
+  this->constructor( mouseInput, keyboardInput, TRUE );
 } // So@GUI@RenderArea()
 
 /*!
+  Protected constructor used by derived classes.
 */
 
 So@GUI@RenderArea::So@GUI@RenderArea( // protected
   @WIDGET@ parent,
   const char * name,
-  SbBool inParent,
+  SbBool embed,
   SbBool mouseInput,
   SbBool keyboardInput,
   SbBool build )
-: inherited( parent, name, inParent, SO_GL_DEFAULT_MODE, FALSE )
+: inherited( parent, name, embed, SO_GL_DEFAULT_MODE, FALSE )
 {
-  this->constructor( mouseInput, keyboardInput );
-  if ( build )
-    this->buildWidget( inParent ? parent : NULL );
+  this->constructor( mouseInput, keyboardInput, build );
 } // So@GUI@RenderArea()
 
 /*!
@@ -95,7 +94,8 @@ So@GUI@RenderArea::So@GUI@RenderArea( // protected
 void
 So@GUI@RenderArea::constructor( // private
   SbBool mouseInput,
-  SbBool keyboardInput )
+  SbBool keyboardInput,
+  SbBool build )
 {
   this->normalManager = new SoSceneManager;
   this->normalManager->setRenderCallback( So@GUI@RenderArea::renderCB, this );
@@ -122,6 +122,13 @@ So@GUI@RenderArea::constructor( // private
   this->devices.extra = NULL;
 
   this->appEventHandler = NULL;
+
+  if ( build ) {
+    this->setClassName( "So@GUI@RenderArea" );
+    Widget glarea = this->buildWidget( this->getParentWidget() );
+    this->setBaseWidget( glarea );
+    this->setSize( SbVec2s( 400, 400 ) );
+  }
 } // constructor()
 
 /*!
@@ -801,11 +808,14 @@ So@GUI@RenderArea::widgetChanged( // virtual, protected
 So@GUI@RenderArea::buildWidget( // protected
   @WIDGET@ parent )
 {
+  return inherited::buildWidget( parent );
+/*
   this->setBorder( TRUE );
   @WIDGET@ widget = inherited::buildWidget( parent );
   if ( this->getSize()[0] == -1 )
     this->setSize( SbVec2s(400, 400) );
   return widget;
+*/
 } // buildWidget()
 
 /*!

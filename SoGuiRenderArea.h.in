@@ -63,13 +63,19 @@ class So@GUI@RenderArea : public So@GUI@GLWidget {
   @COMPONENTHEADER@
 
 public:
-  So@GUI@RenderArea( @WIDGET@ parent = NULL, const char * name = NULL,
-      SbBool inParent = TRUE, SbBool mouseInput = TRUE,
-      SbBool keyboardInput = TRUE );
+  So@GUI@RenderArea(
+    @WIDGET@ parent = NULL,
+    const char * name = NULL,
+    SbBool embed = TRUE,
+    SbBool mouseInput = TRUE,
+    SbBool keyboardInput = TRUE );
 #if SO@uGUI@_HAVE_WINWIDGET
-  So@GUI@RenderArea( @WINWIDGET@ parent = NULL, const char * name = NULL,
-      SbBool inParent = TRUE, SbBool mouseInput = TRUE,
-      SbBool keyboardInput = TRUE );
+  So@GUI@RenderArea(
+    @WINWIDGET@ parent = NULL,
+    const char * name = NULL,
+    SbBool embed = TRUE,
+    SbBool mouseInput = TRUE,
+    SbBool keyboardInput = TRUE );
 #endif // SO@uGUI@_HAVE_WINWIDGET
   ~So@GUI@RenderArea(void);
 
@@ -120,11 +126,21 @@ public:
   SoGLRenderAction * getOverlayGLRenderAction(void) const;
 
 protected:
-  So@GUI@RenderArea( @WIDGET@ parent, const char * name, SbBool inParent,
-      SbBool mouseInput, SbBool keyboardInput, SbBool build );
+  So@GUI@RenderArea(
+    @WIDGET@ parent,
+    const char * name,
+    SbBool embed,
+    SbBool mouseInput,
+    SbBool keyboardInput,
+    SbBool build );
 #if SO@uGUI@_HAVE_WINWIDGET
-  So@GUI@RenderArea( @WINWIDGET@ parent, const char * name, SbBool inParent,
-      SbBool mouseInput, SbBool keyboardInput, SbBool build );
+  So@GUI@RenderArea(
+    @WINWIDGET@ parent,
+    const char * name,
+    SbBool embed,
+    SbBool mouseInput,
+    SbBool keyboardInput,
+    SbBool build );
 #endif // SO@uGUI@_HAVE_WINWIDGET
 
   virtual void redraw(void);
@@ -157,7 +173,7 @@ protected:
   virtual void glRender(void);
 
 private:
-  void constructor( SbBool mouseInput, SbBool keyboardInput );
+  void constructor( SbBool mouseInput, SbBool keyboardInput, SbBool build );
   static void renderCB( void * user, SoSceneManager * manager );
 
   SbBool clear;

@@ -225,7 +225,7 @@ GETPARENTOFNODE(SoNode * root, SoNode * node)
 // *************************************************************************
 
 /*!
-  Constructor. \a parent, \a name and \a buildInsideParent are passed on
+  Constructor. \a parent, \a name and \a embed are passed on
   to So@GUI@RenderArea, so see the documentation for that constructor for
   for more information on those.
 */
@@ -233,10 +233,10 @@ GETPARENTOFNODE(SoNode * root, SoNode * node)
 So@GUI@Viewer::So@GUI@Viewer(
   @WIDGET@ parent,
   const char * name,
-  SbBool buildInsideParent,
+  SbBool embed,
   So@GUI@Viewer::Type t,
-  SbBool buildNow )
-: inherited( parent, name, buildInsideParent, TRUE, TRUE, FALSE )
+  SbBool build )
+: inherited( parent, name, embed, TRUE, TRUE, FALSE )
 {
   this->viewertype = t;
   this->viewmode = TRUE;
@@ -330,8 +330,11 @@ So@GUI@Viewer::So@GUI@Viewer(
   this->adjustclipplanes = TRUE;
   this->autoclipbox = NULL;
 
-  if ( buildNow )
-    this->setBaseWidget( this->buildWidget(this->getParentWidget()) );
+  if ( build ) {
+    this->setClassName( "So@GUI@Viewer" );
+    @WIDGET@ widget = this->buildWidget( this->getParentWidget() );
+    this->setBaseWidget( widget );
+  }
 } // So@GUI@Viewer()
 
 // *************************************************************************

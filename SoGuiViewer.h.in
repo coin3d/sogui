@@ -203,14 +203,14 @@ protected:
   So@GUI@Viewer(
     @WIDGET@ parent,
     const char * name,
-    SbBool buildInsideParent,
+    SbBool embed,
     Type type,
     SbBool buildNow );
 #if SO@uGUI@_HAVE_WINWIDGET
   So@GUI@Viewer(
     @WINWIDGET@ parent,
     const char * name,
-    SbBool buildInsideParent,
+    SbBool embed,
     Type type,
     SbBool buildNow );
 #endif // SO@uGUI@_HAVE_WINWIDGET
