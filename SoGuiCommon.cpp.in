@@ -92,6 +92,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Inventor/@Gui@/So@Gui@.h>
+#include <Inventor/@Gui@/SoGuiP.h>
 #include <Inventor/@Gui@/SoAny.h>
 
 
@@ -104,8 +105,6 @@ So@Gui@::~So@Gui@() { }
 // *************************************************************************
 
 /*!
-  \fn @WIDGET@ So@Gui@::init(const char * appname, const char * classname)
-
   This function initializes the So@Gui@ library, as well as the
   Inventor API. The latter is done by calling \a SoDB::init(), \a
   SoNodeKit::init() and \a SoInteraction::init().
@@ -118,7 +117,7 @@ So@Gui@::~So@Gui@() { }
   and \a argv arguments and calls the So@Gui@::init() method below.
 */
 @WIDGET@
-So@Gui@::internal_init(const char * appname, const char * classname)
+So@Gui@::init(const char * appname, const char * classname)
 {
   // If this is SoQt, Qt will keep a reference to the appname string
   // -- so make it guaranteed permanent.
@@ -319,49 +318,106 @@ So@Gui@::isCompatible(unsigned int major, unsigned int minor)
   This method was not part of the original SGI InventorXt library, but
   is an extension specific to the Coin project.
 */
-So@Gui@ABIType
+So@Gui@::ABIType
 So@Gui@::getABIType(void)
 {
   // FIXME: replace this ugly shit with a configure-check to test if
   // we're on a DLL-capable platform. 20020118 mortene.
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #ifdef SO@GUI@_MAKE_DLL
-  return SO@GUI@_DLL_ABI;
+  return So@Gui@::DLL;
 #else
-  return SO@GUI@_LIB_ABI;
+  return So@Gui@::LIB;
 #endif
 #endif
-  return SO@GUI@_UNKNOWN_ABI;
+  return So@Gui@::UNKNOWN;
 }
 
-/*!
-  Abort the application due to some kind of mismatch in the ABI
-  settings / configuration. This should hopefully help application
-  programmers avoid shooting themselves in the foot by controlling
-  certain run-time parameters in the client application versus what is
-  expected by the So@Gui@ library.
+#if 0 // FIXME: not in use, see larsa's FIXME below. 20020617 mortene.
 
-  If you're an application programmer, it is very likely that you only
-  need to consider this an internal library method.
+// *************************************************************************
+// These sanity checks are designed to detect common pitfall errors for
+// Microsoft Windows linkage with So@Gui@ and Coin.
 
-  This method was not part of the original SGI InventorXt library, but
-  is an extension specific to the Coin project.
-*/
+// FIXME: use an "is-this-a-DLL-capable-platform" configure check
+// and remove the system "#if defined" tests below. 20011203 mortene.
+// FIXME: I disabled this because it wasn't inlined in the client app
+// but compiled into the library by MSVC++ and with SOWIN_DLL undefined,
+// the ABI test always tried the LIB_ABI path.  20020126 larsa
+#if 0 && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
+#define SO@GUI@_SANITY_CHECK(forward_call)                  \
+  if (So@Gui@::isDebugLibrary() &&                       \
+       SoDB::isInitialized())                          \
+    SoDebugError::postWarning("So@Gui@::init",            \
+      "unable to verify application linkage sanity "    \
+      "because Open Inventor has already been "         \
+      "initialized before So@Gui@::init call");           \
+  SO@GUI@_RUNTIME_SANITY_CHECK();                         \
+  SO@GUI@_LINKSTYLE_SANITY_CHECK();                       \
+  forward_call;                                         \
+  SO@GUI@_LINKTIME_SANITY_CHECK()
+
+#define SO@GUI@_RUNTIME_SANITY_CHECK()                    \
+  do {                                                  \
+    if (!So@Gui@::isCompatible(SO@GUI@_MAJOR_VERSION,      \
+                            SO@GUI@_MINOR_VERSION))      \
+      So@Gui@::abort(SO@GUI@_RUNTIME_MISMATCH);             \
+  } while (FALSE)
+
+#ifdef SO@GUI@_DLL
+#define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
+  do {                                                  \
+    if (So@Gui@::getABIType() != SO@GUI@_DLL_ABI)         \
+      So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
+  } while (FALSE)
+#else
+#define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
+  do {                                                  \
+    if (So@Gui@::getABIType() != SO@GUI@_LIB_ABI)         \
+      So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
+  } while (FALSE)
+#endif
+
+#define SO@GUI@_LINKTIME_SANITY_CHECK()                   \
+  do {                                                  \
+    if (!SoDB::isInitialized())                       \
+      So@Gui@::abort(SO@GUI@_LINKTIME_MISMATCH);            \
+  } while (FALSE)
+#else /* ! MS Windows */
+#define SO@GUI@_SANITY_CHECK(forward_call)                \
+  forward_call
+#endif /* ! MS Windows */
+
+#endif // OBSOLETED
+
+#ifndef DOXYGEN_SKIP_THIS
+
+// Abort the application due to some kind of mismatch in the ABI
+// settings / configuration. This should hopefully help application
+// programmers avoid shooting themselves in the foot by controlling
+// certain run-time parameters in the client application versus what
+// is expected by the So@Gui@ library.
+//
+// If you're an application programmer, it is very likely that you
+// only need to consider this an internal library method.
+//
+// This method was not part of the original SGI InventorXt library,
+// but is an extension specific to the Coin project.
 void
-So@Gui@::abort(So@Gui@ABIError error)
+SoGuiP::abort(SoGuiP::ABIError error)
 {
   switch (error) {
-  case SO@GUI@_LINKTIME_MISMATCH:
+  case SoGuiP::LINKTIME_MISMATCH:
     So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
                                      "Detected linktime mismatch error.");
     break;
 
-  case SO@GUI@_LINKSTYLE_MISMATCH:
+  case SoGuiP::LINKSTYLE_MISMATCH:
     So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
                                      "Detected linkstyle mismatch error (DLL vs. LIB).");
     break;
 
-  case SO@GUI@_RUNTIME_MISMATCH:
+  case SoGuiP::RUNTIME_MISMATCH:
     So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
                                      "Detected runtime mismatch error (versioning and ABI compatibility).");
     break;
@@ -376,6 +432,8 @@ So@Gui@::abort(So@Gui@ABIError error)
   // FIXME: call fatal error handler in SoAny. 20020118 mortene.
   exit(-1);
 }
+
+#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 

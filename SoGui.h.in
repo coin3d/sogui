@@ -63,20 +63,10 @@ class SO@GUI@_DLL_API So@Gui@
 {
 
 public:
-  static @WIDGET@ init(const char * appname, const char * classname = "So@Gui@")
-  {
-    SO@GUI@_SANITY_CHECK(@WIDGET@ retval = So@Gui@::internal_init(appname, classname));
-    return retval;
-  }
-
-  static @WIDGET@ init(int argc, char ** argv,
-                       const char * appname, const char * classname = "So@Gui@")
-  {
-    SO@GUI@_SANITY_CHECK(@WIDGET@ retval = So@Gui@::internal_init(argc, argv, appname, classname));
-    return retval;
-  }
-
-  static void init(@WIDGET@ toplevelwidget) { SO@GUI@_SANITY_CHECK(So@Gui@::internal_init(toplevelwidget)); }
+  static @WIDGET@ init(const char * appname, const char * classname = "So@Gui@");
+  static @WIDGET@ init(int & argc, char ** argv,
+                       const char * appname, const char * classname = "So@Gui@");
+  static void init(@WIDGET@ toplevelwidget);
 
   static void mainLoop(void);
   static void exitMainLoop(void);
@@ -110,11 +100,11 @@ public:
   static FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
                                              void * userdata);
 
-protected:
   static SbBool isDebugLibrary(void);
   static SbBool isCompatible(unsigned int major, unsigned int minor);
-  static So@Gui@ABIType getABIType(void);
-  static void abort(So@Gui@ABIError error);
+
+  enum ABIType { DLL, LIB, UNKNOWN };
+  static ABIType getABIType(void);
 
 private:
   // Since the class consists solely of static functions, hide the
@@ -126,13 +116,6 @@ private:
 #ifndef DOXYGEN_SKIP_THIS // To avoid having it show up in Doxygen doc.
   friend class So@Gui@P;
 #endif // DOXYGEN_SKIP_THIS
-
-  static void sensorQueueChanged(void * cbdata);
-
-  static @WIDGET@ internal_init(const char * appname, const char * classname);
-  static @WIDGET@ internal_init(int & argc, char ** argv,
-                                const char * appname, const char * classname);
-  static void internal_init(@WIDGET@ toplevelwidget);
 
 
 /// FIXME!: merge the remaining toolkit specific parts properly. 20020117 mortene. ////
