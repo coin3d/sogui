@@ -392,6 +392,7 @@ So@GUI@Viewer::setCamera(SoCamera * cam)
     this->camera->ref();
     this->saveHomePosition();
     if (headlightflag) this->setHeadlight(TRUE);
+    this->cameratype = this->camera->getTypeId();
   }
   else {
     this->lighton = headlightflag;
@@ -422,12 +423,19 @@ So@GUI@Viewer::getCamera(void) const
 
   Default is to use an SoPerspectiveCamera.
 
+  If this method is called when there is a scene graph and a camera
+  already set up, it will delete the old camera and set up a camera
+  with the new type if the \a t type is different from that of the
+  current camera.
+
   \sa getCameraType()
 */
 
 void
 So@GUI@Viewer::setCameraType(SoType t)
 {
+  if ( t == this->cameratype ) return;
+
 #if SO@uGUI@_DEBUG
   SbBool valid = TRUE;
   if (t == SoType::badType()) valid = FALSE;
@@ -446,7 +454,39 @@ So@GUI@Viewer::setCameraType(SoType t)
   }
 #endif // SO@uGUI@_DEBUG
 
-  this->cameratype = t;
+  if ( this->camera != NULL ) {
+    SoCamera * newcamera = (SoCamera *)t.createInstance();
+    newcamera->aspectRatio.setValue( this->camera->aspectRatio.getValue() );
+    newcamera->focalDistance.setValue( this->camera->focalDistance.getValue() );
+    newcamera->orientation.setValue( this->camera->orientation.getValue() );
+    newcamera->position.setValue( this->camera->position.getValue() );
+    newcamera->viewportMapping.setValue( this->camera->viewportMapping.getValue() );
+
+    if ( this->cameratype.isDerivedFrom( SoPerspectiveCamera::getClassTypeId() ) ) {
+      ((SoOrthographicCamera *)newcamera)->height =
+        2 * this->camera->focalDistance.getValue() *
+        tan(((SoPerspectiveCamera *)this->camera)->heightAngle.getValue()/2.0f);
+    }
+    else if ( this->cameratype.isDerivedFrom( SoOrthographicCamera::getClassTypeId() ) ) {
+      ((SoPerspectiveCamera *)newcamera)->heightAngle = 2.0f *
+        atan(((SoOrthographicCamera *)this->camera)->height.getValue() / 2.0f /
+             this->camera->focalDistance.getValue());
+    }
+    else {
+      assert( FALSE && "Not a supported camera type" );
+    }
+
+    SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
+    cameraparent->insertChild( newcamera,
+                               cameraparent->findChild( this->camera ) );
+    SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
+    this->setCamera( newcamera ); // This will set this->cameratype.
+    this->deletecamera = TRUE;
+    if ( oldcamera ) cameraparent->removeChild( oldcamera );
+  }
+  else { // A camera has not been instantiated for the scene.
+    this->cameratype = t; // No call to setCamera(), so set type explicitly.
+  }
 } // setCameraType()
 
 // *************************************************************************
@@ -1797,40 +1837,11 @@ So@GUI@Viewer::isSeekValuePercentage(void) const
 void
 So@GUI@Viewer::toggleCameraType(void)
 {
-  assert(this->camera);
-
-  SoType oldtype = this->camera->getTypeId();
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
-  SoType newtype = oldtype == perspectivetype ? orthotype : perspectivetype;
 
-  SoCamera * newcamera = (SoCamera *)newtype.createInstance();
-  newcamera->aspectRatio.setValue(camera->aspectRatio.getValue());
-  newcamera->focalDistance.setValue(camera->focalDistance.getValue());
-  newcamera->orientation.setValue(camera->orientation.getValue());
-  newcamera->position.setValue(camera->position.getValue());
-  newcamera->viewportMapping.setValue(camera->viewportMapping.getValue());
-
-  if (oldtype.isDerivedFrom(perspectivetype)) {
-    ((SoOrthographicCamera *)newcamera)->height =
-      2 * this->camera->focalDistance.getValue() *
-      tan(((SoPerspectiveCamera *)this->camera)->heightAngle.getValue()/2.0f);
-  }
-  else if (oldtype.isDerivedFrom(orthotype)) {
-    ((SoPerspectiveCamera *)newcamera)->heightAngle = 2.0f *
-      atan(((SoOrthographicCamera *)this->camera)->height.getValue() / 2.0f /
-           this->camera->focalDistance.getValue());
-  }
-  else {
-    assert(0);
-  }
-
-  SoGroup * cameraparent = GETPARENTOFNODE(this->viewerroot, this->camera);
-  cameraparent->insertChild(newcamera, cameraparent->findChild(this->camera));
-  SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
-  this->setCamera(newcamera);
-  this->deletecamera = TRUE;
-  if (oldcamera) cameraparent->removeChild(oldcamera);
+  this->setCameraType( this->cameratype.isDerivedFrom( perspectivetype )
+                       ? orthotype : perspectivetype );
 } // toggleCameraType()
 
 // *************************************************************************
@@ -2045,12 +2056,19 @@ So@GUI@Viewer::changeDrawStyle(So@GUI@Viewer::DrawStyle style)
   Position the near and far clipping planes just in front of and behind
   the scene's bounding box. This will give us the optimal utilization of
   the z buffer resolution by shrinking it to its minimum depth.
+
+  Near and far clipping planes are specified in the camera fields
+  nearDistance and farDistance.
 */
 
 void
 So@GUI@Viewer::setClippingPlanes(
   void )
 {
+  // This is necessary to avoid a crash in case there is no scene
+  // graph specified by the user.
+  if ( this->camera == NULL ) return;
+
   if ( this->autoclipbox == NULL )
     this->autoclipbox = new SoGetBoundingBoxAction( this->getViewportRegion() );
   else
@@ -2223,4 +2241,3 @@ getSo@GUI@ViewerRCSId(void)
 {
   return rcsid;
 }
-

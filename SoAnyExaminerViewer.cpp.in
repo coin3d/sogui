@@ -108,7 +108,7 @@ SoAnyExaminerViewer::rotXWheelMotion(
   float oldvalue )
 {
   SoCamera * camera = this->viewer->getCamera();
-  assert( camera != NULL );
+  if ( camera == NULL ) return 0.0f; // can happen for empty scenegraph
 
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
@@ -137,7 +137,7 @@ SoAnyExaminerViewer::rotYWheelMotion(
   float oldvalue )
 {
   SoCamera * camera = this->viewer->getCamera();
-  assert( camera != NULL );
+  if ( camera == NULL ) return 0.0f; // can happen for empty scenegraph
 
   SbVec3f dir;
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
@@ -559,8 +559,8 @@ void
 SoAnyExaminerViewer::reorientCamera(
   const SbRotation & rot )
 {
-  SoCamera * cam = viewer->getCamera();
-  assert( cam != NULL );
+  SoCamera * cam = this->viewer->getCamera();
+  if ( cam == NULL ) return; // can happen for an empty scene graph
 
   // Find global coordinates of focal point.
   SbVec3f direction;
@@ -643,7 +643,7 @@ SoAnyExaminerViewer::pan(
   const SbVec2f & mousepos )
 {
   SoCamera * cam = viewer->getCamera();
-  assert( cam != NULL );
+  if ( cam == NULL ) return; // can happen for empty scenegraph
 
   // Find projection points for the last and current mouse
   // coordinates.
@@ -676,7 +676,7 @@ SoAnyExaminerViewer::zoom(
   const float diffvalue )
 {
   SoCamera * cam = viewer->getCamera();
-  assert( cam != NULL );
+  if ( cam == NULL ) return; // can happen for empty scenegraph
   SoType t = cam->getTypeId();
 
   // This will be in the range of <0, ->>.
