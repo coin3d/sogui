@@ -829,9 +829,15 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
 // *************************************************************************
 
 /*!
-  Set the viewer's buffer type.
+  Set the viewer's buffer type. Available types are \c
+  So@Gui@Viewer::BUFFER_SINGLE, \c So@Gui@Viewer::BUFFER_DOUBLE and \c
+  So@Gui@Viewer::BUFFER_INTERACTIVE.
 
-  Default is to use a double buffering scheme.
+  (With a buffer type of \c So@Gui@Viewer::BUFFER_INTERACTIVE, the
+  viewer will render with doublebuffering during user interaction and
+  with single buffering otherwise.)
+
+  Default is \c So@Gui@Viewer::BUFFER_DOUBLE.
 
   \sa getBufferingType()
 */
@@ -839,21 +845,17 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
 void
 So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
 {
-#if 0 // SO@GUI@_DEBUG
-  if (type == this->buffertype) {
-    SoDebugError::postWarning("So@Gui@Viewer::setBufferingType",
-                              "buffer type 0x%x already set", type);
-    return;
-  }
+  if (type == this->buffertype) return;
 
   if (type != BUFFER_SINGLE &&
       type != BUFFER_DOUBLE &&
       type != BUFFER_INTERACTIVE) {
+#if SO@GUI@_DEBUG
     SoDebugError::postWarning("So@Gui@Viewer::setBufferingType",
                               "unknown buffer type 0x%x", type);
+#endif // SO@GUI@_DEBUG
     return;
   }
-#endif // SO@GUI@_DEBUG
 
   this->buffertype = type;
   inherited::setDoubleBuffer(type == BUFFER_DOUBLE ? TRUE : FALSE);
