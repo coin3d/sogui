@@ -136,4 +136,61 @@ inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
 # define SO@GUI@_DLL_API
 #endif /* !SO@GUI@_DLL_API */
 
+// *************************************************************************
+// These sanity checks are designed to detect common pitfall errors for
+// Microsoft Windows linkage with So@Gui@ and Coin.
+
+enum So@Gui@ABIType {
+  SO@GUI@_DLL_ABI, SO@GUI@_LIB_ABI, SO@GUI@_UNKNOWN_ABI };
+
+enum So@Gui@ABIError {
+  SO@GUI@_LINKTIME_MISMATCH, SO@GUI@_LINKSTYLE_MISMATCH,
+  SO@GUI@_RUNTIME_MISMATCH };
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#define SO@GUI@_SANITY_CHECK(forward_call)                  \
+  if ( So@Gui@::isDebugLibrary() &&                       \
+       SoDB::isInitialized() )                          \
+    SoDebugError::postWarning("So@Gui@::init",            \
+      "unable to verify application linkage sanity "    \
+      "because Open Inventor has already been "         \
+      "initialized before So@Gui@::init call");           \
+  SO@GUI@_RUNTIME_SANITY_CHECK();                         \
+  SO@GUI@_LINKSTYLE_SANITY_CHECK();                       \
+  forward_call;                                         \
+  SO@GUI@_LINKTIME_SANITY_CHECK()
+
+#define SO@GUI@_RUNTIME_SANITY_CHECK()                    \
+  do {                                                  \
+    if ( !So@Gui@::isCompatible(SO@GUI@_MAJOR_VERSION,      \
+                            SO@GUI@_MINOR_VERSION) )      \
+      So@Gui@::abort(SO@GUI@_RUNTIME_MISMATCH);             \
+  } while ( FALSE )
+
+#ifdef SO@GUI@_DLL
+#define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
+  do {                                                  \
+    if ( So@Gui@::getABIType() != SO@GUI@_DLL_ABI )         \
+      So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
+  } while ( FALSE )
+#else
+#define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
+  do {                                                  \
+    if ( So@Gui@::getABIType() != SO@GUI@_LIB_ABI )         \
+      So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
+  } while ( FALSE )
+#endif
+
+#define SO@GUI@_LINKTIME_SANITY_CHECK()                   \
+  do {                                                  \
+    if ( !SoDB::isInitialized() )                       \
+      So@Gui@::abort(SO@GUI@_LINKTIME_MISMATCH);            \
+  } while ( FALSE )
+#else /* ! MS Windows */
+#define SO@GUI@_SANITY_CHECK(forward_call)                \
+  forward_call
+#endif /* ! MS Windows */
+
+// *************************************************************************
+
 #endif // ! SO@GUI@_BASIC_H
