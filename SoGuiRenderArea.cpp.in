@@ -1439,7 +1439,7 @@ void
 So@Gui@RenderArea::redraw(void)
 {
 #if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
-  SoDebugError::postInfo("So@Gui@RenderArea::render",
+  SoDebugError::postInfo("So@Gui@RenderArea::redraw",
                          "start (isVisible=%s waitForExpose=%s)",
                          this->isVisible() ? "TRUE" : "FALSE",
                          this->waitForExpose ? "TRUE" : "FALSE");
@@ -1655,7 +1655,7 @@ void
 So@Gui@RenderArea::actualRedraw(void)
 {
   assert(PRIVATE(this)->normalManager != NULL);
-  if (! this->isVisible()) return;
+  if ( !this->isVisible() ) return;
   PRIVATE(this)->normalManager->render(PRIVATE(this)->clear, PRIVATE(this)->clearZBuffer);
 }
 
@@ -1811,6 +1811,8 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
   // viewportregion a few lines above this one? 20020103 mortene.
   PRIVATE(this)->overlayManager->setWindowSize(glsize);
   PRIVATE(this)->overlayManager->setSize(glsize);
+
+  inherited::sizeChanged(glsize);
 
   // this->scheduleRedraw(); // already done through setViewportRegion()
 }
