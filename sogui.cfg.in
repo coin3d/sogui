@@ -1,4 +1,5 @@
-prefix="@prefix@"
+# prefix is determined in so@gui@-config, making the package "movable"
+# prefix="@prefix@"
 host="@host@"
 exec_prefix="@exec_prefix@"
 version="@VERSION@"
@@ -18,7 +19,3 @@ AC_SUBST_gui="@gui@"
 AC_SUBST_WIDGET="@WIDGET@"
 AC_SUBST_EVENT="@EVENT@"
 AC_SUBST_COMPONENTHEADER="@COMPONENTHEADER@"
-have_renderarea=1
-have_examinerviewer=1
-have_planeviewer=1
-have_flyviewer=1

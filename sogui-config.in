@@ -47,7 +47,6 @@ Options:
   --datadir
   --includedir
   --frameworkdir
-  --have-feature <featurename>
   --ac-subst <string> | <sourcefile.in>
   --ac-desubst <sourcefile>
   --compile <sourcefile> [<sourcefile>]...
@@ -90,11 +89,6 @@ do
     --datadir)         echo "$datadir"       ;;
     --includedir)      echo "$includedir"    ;;
     --frameworkdir)    echo "$frameworkdir"  ;;
-    --have-feature)
-      exitcode=1
-      eval "test x\${have_$2+set} = xset && exitcode=0"
-      exit $exitcode
-      ;;
     --ac-subst)
       shift
       if test $# -eq 1; then
