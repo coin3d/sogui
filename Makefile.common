@@ -152,8 +152,6 @@ SoGuiAllBuiltFiles = \
   $(SoGuiBuiltMetaFiles)
 
 SoGuiCommonDistFiles = \
-  LICENSE.GPL \
-  HACKING \
   BUGS.txt \
   src/Inventor/@Gui@/common/BUGS.txt \
   \
