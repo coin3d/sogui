@@ -26,6 +26,8 @@ static const char rcsid[] =
   all the ExaminerViewer components for Coin.
 */
 
+#include <assert.h>
+
 #include <Inventor/nodes/SoCamera.h>
 
 #include "SoAnyExaminerViewer.h"

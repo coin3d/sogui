@@ -26,6 +26,8 @@ static const char rcsid[] =
   all the PlaneViewer components for Coin.
 */
 
+#include <assert.h>
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 

@@ -30,6 +30,8 @@
  *
 \**************************************************************************/
 
+#include <assert.h>
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/SoSceneManager.h>
