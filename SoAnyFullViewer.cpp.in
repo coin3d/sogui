@@ -76,254 +76,252 @@ SoAnyFullViewer::setupStandardPopupMenu(
 {
   SoAnyPopupMenu * menu = new So@Gui@PopupMenu;
 
-  menu->NewMenu( "rootmenu", ROOT_MENU );
+  menu->newMenu( "rootmenu", ROOT_MENU );
 
-  menu->NewMenu( "functionsmenu", FUNCTIONS_MENU );
-  menu->SetMenuTitle( FUNCTIONS_MENU, "Functions" );
-  menu->NewMenu( "drawstylesmenu", DRAWSTYLES_MENU );
-  menu->SetMenuTitle( DRAWSTYLES_MENU, "Draw Styles" );
-  menu->NewMenu( "stereomenu", STEREO_MENU );
-  menu->SetMenuTitle( STEREO_MENU, "Stereo Viewing" );
-  menu->NewMenuItem( "examining", EXAMINING_ITEM );
-  menu->SetMenuItemTitle( EXAMINING_ITEM, "Viewing" );
-  menu->NewMenuItem( "decoration", DECORATION_ITEM );
-  menu->SetMenuItemTitle( DECORATION_ITEM, "Decorations" );
-  menu->NewMenuItem( "headlight", HEADLIGHT_ITEM );
-  menu->SetMenuItemTitle( HEADLIGHT_ITEM, "Headlight" );
-  menu->NewMenuItem( "preferences", PREFERENCES_ITEM );
-  menu->SetMenuItemTitle( PREFERENCES_ITEM, "Preferences..." );
+  menu->newMenu( "functionsmenu", FUNCTIONS_MENU );
+  menu->setMenuTitle( FUNCTIONS_MENU, "Functions" );
+  menu->newMenu( "drawstylesmenu", DRAWSTYLES_MENU );
+  menu->setMenuTitle( DRAWSTYLES_MENU, "Draw Styles" );
+  menu->newMenu( "stereomenu", STEREO_MENU );
+  menu->setMenuTitle( STEREO_MENU, "Stereo Viewing" );
+  menu->newMenuItem( "examining", EXAMINING_ITEM );
+  menu->setMenuItemTitle( EXAMINING_ITEM, "Viewing" );
+  menu->newMenuItem( "decoration", DECORATION_ITEM );
+  menu->setMenuItemTitle( DECORATION_ITEM, "Decorations" );
+  menu->newMenuItem( "headlight", HEADLIGHT_ITEM );
+  menu->setMenuItemTitle( HEADLIGHT_ITEM, "Headlight" );
+  menu->newMenuItem( "preferences", PREFERENCES_ITEM );
+  menu->setMenuItemTitle( PREFERENCES_ITEM, "Preferences..." );
 
-  menu->AddMenu( ROOT_MENU, FUNCTIONS_MENU );
-  menu->AddMenu( ROOT_MENU, DRAWSTYLES_MENU );
-  menu->AddMenu( ROOT_MENU, STEREO_MENU );
-  menu->AddMenuItem( ROOT_MENU, EXAMINING_ITEM );
-  menu->AddMenuItem( ROOT_MENU, DECORATION_ITEM );
-  menu->AddMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
-  menu->AddSeparator( ROOT_MENU );
-  menu->AddMenuItem( ROOT_MENU, PREFERENCES_ITEM );
+  menu->addMenu( ROOT_MENU, FUNCTIONS_MENU );
+  menu->addMenu( ROOT_MENU, DRAWSTYLES_MENU );
+  menu->addMenu( ROOT_MENU, STEREO_MENU );
+  menu->addMenuItem( ROOT_MENU, EXAMINING_ITEM );
+  menu->addMenuItem( ROOT_MENU, DECORATION_ITEM );
+  menu->addMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
+  menu->addSeparator( ROOT_MENU );
+  menu->addMenuItem( ROOT_MENU, PREFERENCES_ITEM );
 
-  menu->NewMenuItem( "help", HELP_ITEM );
-  menu->SetMenuItemTitle( HELP_ITEM, "Help" );
-  menu->NewMenuItem( "home", HOME_ITEM );
-  menu->SetMenuItemTitle( HOME_ITEM, "Home" );
-  menu->NewMenuItem( "set_home", SET_HOME_ITEM );
-  menu->SetMenuItemTitle( SET_HOME_ITEM, "Set Home" );
-  menu->NewMenuItem( "view_all", VIEW_ALL_ITEM );
-  menu->SetMenuItemTitle( VIEW_ALL_ITEM, "View All" );
-  menu->NewMenuItem( "seek", SEEK_ITEM );
-  menu->SetMenuItemTitle( SEEK_ITEM, "Seek" );
-  menu->NewMenuItem( "copy_view", COPY_VIEW_ITEM );
-  menu->SetMenuItemTitle( COPY_VIEW_ITEM, "Copy View" );
-  menu->NewMenuItem( "paste_view", PASTE_VIEW_ITEM );
-  menu->SetMenuItemTitle( PASTE_VIEW_ITEM, "Paste View" );
+  menu->newMenuItem( "help", HELP_ITEM );
+  menu->setMenuItemTitle( HELP_ITEM, "Help" );
+  menu->newMenuItem( "home", HOME_ITEM );
+  menu->setMenuItemTitle( HOME_ITEM, "Home" );
+  menu->newMenuItem( "set_home", SET_HOME_ITEM );
+  menu->setMenuItemTitle( SET_HOME_ITEM, "Set Home" );
+  menu->newMenuItem( "view_all", VIEW_ALL_ITEM );
+  menu->setMenuItemTitle( VIEW_ALL_ITEM, "View All" );
+  menu->newMenuItem( "seek", SEEK_ITEM );
+  menu->setMenuItemTitle( SEEK_ITEM, "Seek" );
+  menu->newMenuItem( "copy_view", COPY_VIEW_ITEM );
+  menu->setMenuItemTitle( COPY_VIEW_ITEM, "Copy View" );
+  menu->newMenuItem( "paste_view", PASTE_VIEW_ITEM );
+  menu->setMenuItemTitle( PASTE_VIEW_ITEM, "Paste View" );
 
-  menu->AddMenuItem( FUNCTIONS_MENU, HELP_ITEM );
-  menu->AddMenuItem( FUNCTIONS_MENU, HOME_ITEM );
-  menu->AddMenuItem( FUNCTIONS_MENU, SET_HOME_ITEM );
-  menu->AddMenuItem( FUNCTIONS_MENU, VIEW_ALL_ITEM );
-  menu->AddMenuItem( FUNCTIONS_MENU, SEEK_ITEM );
-  menu->AddSeparator( FUNCTIONS_MENU );
-  menu->AddMenuItem( FUNCTIONS_MENU, COPY_VIEW_ITEM );
-  menu->AddMenuItem( FUNCTIONS_MENU, PASTE_VIEW_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, HELP_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, HOME_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, SET_HOME_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, VIEW_ALL_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, SEEK_ITEM );
+  menu->addSeparator( FUNCTIONS_MENU );
+  menu->addMenuItem( FUNCTIONS_MENU, COPY_VIEW_ITEM );
+  menu->addMenuItem( FUNCTIONS_MENU, PASTE_VIEW_ITEM );
 
-  menu->NewMenu( "drawstylesstill", DRAWSTYLES_STILL_MENU );
-  menu->SetMenuTitle( DRAWSTYLES_STILL_MENU, "Still Drawstyle" );
+  menu->newMenu( "drawstylesstill", DRAWSTYLES_STILL_MENU );
+  menu->setMenuTitle( DRAWSTYLES_STILL_MENU, "Still Drawstyle" );
 
-  menu->NewMenuItem( "as_is", AS_IS_ITEM );
-  menu->SetMenuItemTitle( AS_IS_ITEM, "as is" );
-  menu->NewMenuItem( "hidden_line", HIDDEN_LINE_ITEM );
-  menu->SetMenuItemTitle( HIDDEN_LINE_ITEM, "hidden line" );
-  menu->NewMenuItem( "no_textures", NO_TEXTURE_ITEM );
-  menu->SetMenuItemTitle( NO_TEXTURE_ITEM, "no texture" );
-  menu->NewMenuItem( "low_resolution", LOW_RESOLUTION_ITEM );
-  menu->SetMenuItemTitle( LOW_RESOLUTION_ITEM, "low resolution" );
-  menu->NewMenuItem( "wireframe", WIREFRAME_ITEM );
-  menu->SetMenuItemTitle( WIREFRAME_ITEM, "wireframe" );
-  menu->NewMenuItem( "points", POINTS_ITEM );
-  menu->SetMenuItemTitle( POINTS_ITEM, "points" );
-  menu->NewMenuItem( "bounding_box", BOUNDING_BOX_ITEM );
-  menu->SetMenuItemTitle( BOUNDING_BOX_ITEM, "bounding box (no depth)" );
+  menu->newMenuItem( "as_is", AS_IS_ITEM );
+  menu->setMenuItemTitle( AS_IS_ITEM, "as is" );
+  menu->newMenuItem( "hidden_line", HIDDEN_LINE_ITEM );
+  menu->setMenuItemTitle( HIDDEN_LINE_ITEM, "hidden line" );
+  menu->newMenuItem( "no_textures", NO_TEXTURE_ITEM );
+  menu->setMenuItemTitle( NO_TEXTURE_ITEM, "no texture" );
+  menu->newMenuItem( "low_resolution", LOW_RESOLUTION_ITEM );
+  menu->setMenuItemTitle( LOW_RESOLUTION_ITEM, "low resolution" );
+  menu->newMenuItem( "wireframe", WIREFRAME_ITEM );
+  menu->setMenuItemTitle( WIREFRAME_ITEM, "wireframe" );
+  menu->newMenuItem( "points", POINTS_ITEM );
+  menu->setMenuItemTitle( POINTS_ITEM, "points" );
+  menu->newMenuItem( "bounding_box", BOUNDING_BOX_ITEM );
+  menu->setMenuItemTitle( BOUNDING_BOX_ITEM, "bounding box (no depth)" );
 
-  menu->NewRadioGroup( STILL_GROUP );
-  menu->AddRadioGroupItem( STILL_GROUP, AS_IS_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, HIDDEN_LINE_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, NO_TEXTURE_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, LOW_RESOLUTION_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, WIREFRAME_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, POINTS_ITEM );
-  menu->AddRadioGroupItem( STILL_GROUP, BOUNDING_BOX_ITEM );
-  menu->SetMenuItemMarked( AS_IS_ITEM, TRUE );
+  menu->newRadioGroup( STILL_GROUP );
+  menu->addRadioGroupItem( STILL_GROUP, AS_IS_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, HIDDEN_LINE_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, NO_TEXTURE_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, LOW_RESOLUTION_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, POINTS_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, BOUNDING_BOX_ITEM );
+  menu->setMenuItemMarked( AS_IS_ITEM, TRUE );
 
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, AS_IS_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, NO_TEXTURE_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, LOW_RESOLUTION_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, POINTS_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_STILL_MENU, BOUNDING_BOX_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, AS_IS_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, NO_TEXTURE_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, LOW_RESOLUTION_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, POINTS_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, BOUNDING_BOX_ITEM );
 
-  menu->NewMenu( "drawstylesanimation", DRAWSTYLES_ANIMATING_MENU );
-  menu->SetMenuTitle( DRAWSTYLES_ANIMATING_MENU, "Animating Drawstyle" );
+  menu->newMenu( "drawstylesanimation", DRAWSTYLES_ANIMATING_MENU );
+  menu->setMenuTitle( DRAWSTYLES_ANIMATING_MENU, "Animating Drawstyle" );
 
-  menu->NewMenuItem( "move_same_as_still", MOVE_SAME_AS_STILL_ITEM );
-  menu->SetMenuItemTitle( MOVE_SAME_AS_STILL_ITEM, "same as still" );
-  menu->NewMenuItem( "move_no_texture", MOVE_NO_TEXTURE_ITEM );
-  menu->SetMenuItemTitle( MOVE_NO_TEXTURE_ITEM, "no texture" );
-  menu->NewMenuItem( "move_low_res", MOVE_LOW_RES_ITEM );
-  menu->SetMenuItemTitle( MOVE_LOW_RES_ITEM, "low resolution" );
-  menu->NewMenuItem( "move_wireframe", MOVE_WIREFRAME_ITEM );
-  menu->SetMenuItemTitle( MOVE_WIREFRAME_ITEM, "wireframe" );
-  menu->NewMenuItem( "move_low_res_wireframe", MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->SetMenuItemTitle( MOVE_LOW_RES_WIREFRAME_ITEM,
+  menu->newMenuItem( "move_same_as_still", MOVE_SAME_AS_STILL_ITEM );
+  menu->setMenuItemTitle( MOVE_SAME_AS_STILL_ITEM, "same as still" );
+  menu->newMenuItem( "move_no_texture", MOVE_NO_TEXTURE_ITEM );
+  menu->setMenuItemTitle( MOVE_NO_TEXTURE_ITEM, "no texture" );
+  menu->newMenuItem( "move_low_res", MOVE_LOW_RES_ITEM );
+  menu->setMenuItemTitle( MOVE_LOW_RES_ITEM, "low resolution" );
+  menu->newMenuItem( "move_wireframe", MOVE_WIREFRAME_ITEM );
+  menu->setMenuItemTitle( MOVE_WIREFRAME_ITEM, "wireframe" );
+  menu->newMenuItem( "move_low_res_wireframe", MOVE_LOW_RES_WIREFRAME_ITEM );
+  menu->setMenuItemTitle( MOVE_LOW_RES_WIREFRAME_ITEM,
     "low res wireframe (no depth)" );
-  menu->NewMenuItem( "move_points", MOVE_POINTS_ITEM );
-  menu->SetMenuItemTitle( MOVE_POINTS_ITEM, "points" );
-  menu->NewMenuItem( "move_low_res_points", MOVE_LOW_RES_POINTS_ITEM );
-  menu->SetMenuItemTitle( MOVE_LOW_RES_POINTS_ITEM,
+  menu->newMenuItem( "move_points", MOVE_POINTS_ITEM );
+  menu->setMenuItemTitle( MOVE_POINTS_ITEM, "points" );
+  menu->newMenuItem( "move_low_res_points", MOVE_LOW_RES_POINTS_ITEM );
+  menu->setMenuItemTitle( MOVE_LOW_RES_POINTS_ITEM,
     "low res points (no depth)" );
-  menu->NewMenuItem( "move_bounding_box", MOVE_BOUNDING_BOX_ITEM );
-  menu->SetMenuItemTitle( MOVE_BOUNDING_BOX_ITEM, "bounding box (no depth)" );
+  menu->newMenuItem( "move_bounding_box", MOVE_BOUNDING_BOX_ITEM );
+  menu->setMenuItemTitle( MOVE_BOUNDING_BOX_ITEM, "bounding box (no depth)" );
 
-  menu->NewRadioGroup( MOVE_GROUP );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_SAME_AS_STILL_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_NO_TEXTURE_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_WIREFRAME_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_POINTS_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_POINTS_ITEM );
-  menu->AddRadioGroupItem( MOVE_GROUP, MOVE_BOUNDING_BOX_ITEM );
-  menu->SetMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
+  menu->newRadioGroup( MOVE_GROUP );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_SAME_AS_STILL_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_NO_TEXTURE_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_WIREFRAME_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_WIREFRAME_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_POINTS_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_POINTS_ITEM );
+  menu->addRadioGroupItem( MOVE_GROUP, MOVE_BOUNDING_BOX_ITEM );
+  menu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
 
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_SAME_AS_STILL_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_NO_TEXTURE_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_WIREFRAME_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_POINTS_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_POINTS_ITEM );
-  menu->AddMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_BOUNDING_BOX_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_SAME_AS_STILL_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_NO_TEXTURE_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_WIREFRAME_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_WIREFRAME_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_POINTS_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_POINTS_ITEM );
+  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_BOUNDING_BOX_ITEM );
 
-  menu->NewMenu( "transparencytype", TRANSPARENCY_TYPE_MENU );
-  menu->SetMenuTitle( TRANSPARENCY_TYPE_MENU, "Transparency Type" );
+  menu->newMenu( "transparencytype", TRANSPARENCY_TYPE_MENU );
+  menu->setMenuTitle( TRANSPARENCY_TYPE_MENU, "Transparency Type" );
 
-  menu->NewMenuItem( "screen_door", SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( SCREEN_DOOR_TRANSPARENCY_ITEM, "screen door" );
-  menu->NewMenuItem( "add", ADD_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( ADD_TRANSPARENCY_ITEM, "add" );
-  menu->NewMenuItem( "delayed_add", DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( DELAYED_ADD_TRANSPARENCY_ITEM, "delayed add" );
-  menu->NewMenuItem( "sorted_object_add", SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM,
+  menu->newMenuItem( "screen_door", SCREEN_DOOR_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( SCREEN_DOOR_TRANSPARENCY_ITEM, "screen door" );
+  menu->newMenuItem( "add", ADD_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( ADD_TRANSPARENCY_ITEM, "add" );
+  menu->newMenuItem( "delayed_add", DELAYED_ADD_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( DELAYED_ADD_TRANSPARENCY_ITEM, "delayed add" );
+  menu->newMenuItem( "sorted_object_add", SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM,
                           "sorted object add" );
-  menu->NewMenuItem( "blend", BLEND_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( BLEND_TRANSPARENCY_ITEM, "blend" );
-  menu->NewMenuItem( "delayed_blend", DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( DELAYED_BLEND_TRANSPARENCY_ITEM, "delayed blend" );
-  menu->NewMenuItem( "sorted_object_blend",
+  menu->newMenuItem( "blend", BLEND_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( BLEND_TRANSPARENCY_ITEM, "blend" );
+  menu->newMenuItem( "delayed_blend", DELAYED_BLEND_TRANSPARENCY_ITEM );
+  menu->setMenuItemTitle( DELAYED_BLEND_TRANSPARENCY_ITEM, "delayed blend" );
+  menu->newMenuItem( "sorted_object_blend",
                      SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
-  menu->SetMenuItemTitle( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM,
+  menu->setMenuItemTitle( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM,
                           "sorted object blend" );
 
-  menu->NewRadioGroup( TRANSPARENCY_GROUP );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP, SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP, ADD_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP, DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP,
+  menu->newRadioGroup( TRANSPARENCY_GROUP );
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP, SCREEN_DOOR_TRANSPARENCY_ITEM );
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP, ADD_TRANSPARENCY_ITEM );
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP, DELAYED_ADD_TRANSPARENCY_ITEM );
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
                            SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP, BLEND_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP,
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP, BLEND_TRANSPARENCY_ITEM );
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
                            DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->AddRadioGroupItem( TRANSPARENCY_GROUP,
+  menu->addRadioGroupItem( TRANSPARENCY_GROUP,
                            SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
   switch ( this->viewer->getGLRenderAction()->getTransparencyType() ) {
   case SoGLRenderAction::SCREEN_DOOR:
-    menu->SetMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::ADD:
-    menu->SetMenuItemMarked( ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( ADD_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::DELAYED_ADD:
-    menu->SetMenuItemMarked( DELAYED_ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( DELAYED_ADD_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::SORTED_OBJECT_ADD:
-    menu->SetMenuItemMarked( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::BLEND:
-    menu->SetMenuItemMarked( BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::DELAYED_BLEND:
-    menu->SetMenuItemMarked( DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
   case SoGLRenderAction::SORTED_OBJECT_BLEND:
-    menu->SetMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
   } // switch ( this->viewer->getGLRenderAction()->getTransparencyType() )
 
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU, SCREEN_DOOR_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU, ADD_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_ADD_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU,
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, SCREEN_DOOR_TRANSPARENCY_ITEM );
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, ADD_TRANSPARENCY_ITEM );
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_ADD_TRANSPARENCY_ITEM );
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU,
                      SORTED_OBJECT_ADD_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU, BLEND_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_BLEND_TRANSPARENCY_ITEM );
-  menu->AddMenuItem( TRANSPARENCY_TYPE_MENU,
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, BLEND_TRANSPARENCY_ITEM );
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU, DELAYED_BLEND_TRANSPARENCY_ITEM );
+  menu->addMenuItem( TRANSPARENCY_TYPE_MENU,
                      SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
 
 
-  menu->NewMenuItem( "stereooff", STEREO_OFF_ITEM );
-  menu->NewMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
-  menu->SetMenuItemTitle( STEREO_OFF_ITEM, "Off" );
-  menu->SetMenuItemTitle( STEREO_ANAGLYPH_ITEM, "Red/Cyan" );
+  menu->newMenuItem( "stereooff", STEREO_OFF_ITEM );
+  menu->newMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
+  menu->setMenuItemTitle( STEREO_OFF_ITEM, "Off" );
+  menu->setMenuItemTitle( STEREO_ANAGLYPH_ITEM, "Red/Cyan" );
 
-  menu->NewRadioGroup( STEREO_GROUP );
-  menu->AddRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
-  menu->AddRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
+  menu->newRadioGroup( STEREO_GROUP );
+  menu->addRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
+  menu->addRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
 
-  if (this->viewer->isStereoViewing()) {
-    menu->SetMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
-  }
-  else {
-    menu->SetMenuItemMarked( STEREO_OFF_ITEM, TRUE );
-  }
+  if ( this->viewer->isStereoViewing() )
+    menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
+  else
+    menu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
   
-  menu->AddMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
-  menu->AddMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
+  menu->addMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
+  menu->addMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
 
-  menu->NewMenu( "renderbuffertype", RENDER_BUFFER_TYPE_MENU );
-  menu->SetMenuTitle( RENDER_BUFFER_TYPE_MENU, "Render Buffer Type" );
+  menu->newMenu( "renderbuffertype", RENDER_BUFFER_TYPE_MENU );
+  menu->setMenuTitle( RENDER_BUFFER_TYPE_MENU, "Render Buffer Type" );
 
-  menu->NewMenuItem( "single_buffer", SINGLE_BUFFER_ITEM );
-  menu->SetMenuItemTitle( SINGLE_BUFFER_ITEM, "single" );
-  menu->NewMenuItem( "double_buffer", DOUBLE_BUFFER_ITEM );
-  menu->SetMenuItemTitle( DOUBLE_BUFFER_ITEM, "double" );
-  menu->NewMenuItem( "interactive_buffer", INTERACTIVE_BUFFER_ITEM );
-  menu->SetMenuItemTitle( INTERACTIVE_BUFFER_ITEM, "interactive" );
+  menu->newMenuItem( "single_buffer", SINGLE_BUFFER_ITEM );
+  menu->setMenuItemTitle( SINGLE_BUFFER_ITEM, "single" );
+  menu->newMenuItem( "double_buffer", DOUBLE_BUFFER_ITEM );
+  menu->setMenuItemTitle( DOUBLE_BUFFER_ITEM, "double" );
+  menu->newMenuItem( "interactive_buffer", INTERACTIVE_BUFFER_ITEM );
+  menu->setMenuItemTitle( INTERACTIVE_BUFFER_ITEM, "interactive" );
 
-  menu->NewRadioGroup( BUFFER_GROUP );
-  menu->AddRadioGroupItem( BUFFER_GROUP, SINGLE_BUFFER_ITEM );
-  menu->AddRadioGroupItem( BUFFER_GROUP, DOUBLE_BUFFER_ITEM );
-  menu->AddRadioGroupItem( BUFFER_GROUP, INTERACTIVE_BUFFER_ITEM );
-  menu->SetMenuItemMarked( DOUBLE_BUFFER_ITEM, TRUE );
+  menu->newRadioGroup( BUFFER_GROUP );
+  menu->addRadioGroupItem( BUFFER_GROUP, SINGLE_BUFFER_ITEM );
+  menu->addRadioGroupItem( BUFFER_GROUP, DOUBLE_BUFFER_ITEM );
+  menu->addRadioGroupItem( BUFFER_GROUP, INTERACTIVE_BUFFER_ITEM );
+  menu->setMenuItemMarked( DOUBLE_BUFFER_ITEM, TRUE );
 
-  menu->AddMenuItem( RENDER_BUFFER_TYPE_MENU, SINGLE_BUFFER_ITEM );
-  menu->AddMenuItem( RENDER_BUFFER_TYPE_MENU, DOUBLE_BUFFER_ITEM );
-  menu->AddMenuItem( RENDER_BUFFER_TYPE_MENU, INTERACTIVE_BUFFER_ITEM );
+  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, SINGLE_BUFFER_ITEM );
+  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, DOUBLE_BUFFER_ITEM );
+  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, INTERACTIVE_BUFFER_ITEM );
 
-  menu->AddMenu( DRAWSTYLES_MENU, DRAWSTYLES_STILL_MENU );
-  menu->AddMenu( DRAWSTYLES_MENU, DRAWSTYLES_ANIMATING_MENU );
-  menu->AddMenu( DRAWSTYLES_MENU, TRANSPARENCY_TYPE_MENU );
-  menu->AddMenu( DRAWSTYLES_MENU, RENDER_BUFFER_TYPE_MENU );
+  menu->addMenu( DRAWSTYLES_MENU, DRAWSTYLES_STILL_MENU );
+  menu->addMenu( DRAWSTYLES_MENU, DRAWSTYLES_ANIMATING_MENU );
+  menu->addMenu( DRAWSTYLES_MENU, TRANSPARENCY_TYPE_MENU );
+  menu->addMenu( DRAWSTYLES_MENU, RENDER_BUFFER_TYPE_MENU );
 
   int toggle;
-  toggle = menu->NewRadioGroup();
-  menu->AddRadioGroupItem( toggle, EXAMINING_ITEM );
-  toggle = menu->NewRadioGroup();
-  menu->AddRadioGroupItem( toggle, DECORATION_ITEM );
-  toggle = menu->NewRadioGroup();
-  menu->AddRadioGroupItem( toggle, HEADLIGHT_ITEM );
+  toggle = menu->newRadioGroup();
+  menu->addRadioGroupItem( toggle, EXAMINING_ITEM );
+  toggle = menu->newRadioGroup();
+  menu->addRadioGroupItem( toggle, DECORATION_ITEM );
+  toggle = menu->newRadioGroup();
+  menu->addRadioGroupItem( toggle, HEADLIGHT_ITEM );
 
-  menu->AddMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
+  menu->addMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
     (void *) this );
 
   this->prefmenu = menu;
@@ -420,11 +418,11 @@ SoAnyFullViewer::menuSelection( // virtual
     break;
 
   case STEREO_OFF_ITEM:    
-    this->prefmenu->SetMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+    this->prefmenu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
     this->viewer->setStereoViewing(FALSE);
     break;
   case STEREO_ANAGLYPH_ITEM:
-    this->prefmenu->SetMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
+    this->prefmenu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
     this->viewer->setStereoViewing(TRUE);
     break;
     
@@ -464,25 +462,25 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
   case So@Gui@Viewer::STILL:
     switch ( value ) {
     case So@Gui@Viewer::VIEW_AS_IS:
-      viewer->prefmenu->SetMenuItemMarked( AS_IS_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( AS_IS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_HIDDEN_LINE:
-      viewer->prefmenu->SetMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      viewer->prefmenu->SetMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      viewer->prefmenu->SetMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LINE:
-      viewer->prefmenu->SetMenuItemMarked( WIREFRAME_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_POINT:
-      viewer->prefmenu->SetMenuItemMarked( POINTS_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      viewer->prefmenu->SetMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
       break;
     default:
       assert( 0 && "unsupported default switch-case" );
@@ -493,28 +491,28 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
   case So@Gui@Viewer::INTERACTIVE:
     switch ( value ) {
     case So@Gui@Viewer::VIEW_SAME_AS_STILL:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LINE:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_POINT:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      viewer->prefmenu->SetMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
+      viewer->prefmenu->setMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
       break;
     default:
       assert( 0 && "unsupported default switch-case" );
@@ -558,31 +556,31 @@ SoAnyFullViewer::drawstyleActivated(
     switch ( menuitemid ) {
     case SCREEN_DOOR_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::SCREEN_DOOR );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case ADD_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::ADD );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case DELAYED_ADD_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::DELAYED_ADD );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_ADD );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case BLEND_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::BLEND );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case DELAYED_BLEND_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::DELAYED_BLEND );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
       ra->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
-      viewer->prefmenu->SetMenuItemMarked( menuitemid, TRUE );
+      viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
       return;
     default:
       break;
