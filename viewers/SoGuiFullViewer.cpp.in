@@ -33,6 +33,10 @@ static const char rcsid[] =
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 
+// FIXME: get rid of this hack and make this file truly
+// "generic". 20020109 mortene.
+#ifndef __COIN_SOWIN__
+
 // *************************************************************************
 
 // Doc in superclass.
@@ -82,3 +86,5 @@ So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
 }
 
 // *************************************************************************
+
+#endif // ! __COIN_SOWIN__
