@@ -55,10 +55,10 @@
 // *************************************************************************
 
 template <class Type>
-inline Type So@Gui@Max( Type a, Type b ) { return (b > a) ? b : a; }
+inline Type So@Gui@Min( Type a, Type b ) { return (b < a) ? b : a; }
 
 template <class Type>
-inline Type So@Gui@Min( Type a, Type b ) { return (b < a) ? b : a; }
+inline Type So@Gui@Max( Type a, Type b ) { return (b > a) ? b : a; }
 
 template <class Type>
 inline Type So@Gui@Clamp( Type val, Type min, Type max )
@@ -72,17 +72,17 @@ inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
 /* Enable to generate SO@GUI@.DLL (under Win32). */
 #ifdef SO@GUI@_MAKE_DLL
 #define SO@GUI@_DLL_API __declspec(dllexport)
-#endif /* !SO@GUI@_MAKE_DLL */
+#endif /* ! SO@GUI@_MAKE_DLL */
 
 /* Enable to build against SO@GUI@.DLL (under Win32). */
 #ifdef SO@GUI@_DLL
 #define SO@GUI@_DLL_API __declspec(dllimport)
-#endif /* !SO@GUI@_DLL */
+#endif /* ! SO@GUI@_DLL */
 
 /* Empty define to avoid errors when _not_ compiling as a DLL. */
 #ifndef SO@GUI@_DLL_API
 #define SO@GUI@_DLL_API
-#endif /* !SO@GUI@_DLL_API */
+#endif /* ! SO@GUI@_DLL_API */
 
 // *************************************************************************
 
