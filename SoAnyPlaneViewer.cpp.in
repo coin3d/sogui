@@ -31,15 +31,33 @@ static const char rcsid[] =
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 
-#include "SoAnyPlaneViewer.h"
+#include <Inventor/@GUI@/viewers/SoAnyPlaneViewer.h>
+#include <Inventor/@GUI@/viewers/So@GUI@PlaneViewer.h>
 
 // ************************************************************************
 
 /*!
 */
 
+SoAnyPlaneViewer::SoAnyPlaneViewer(
+  So@GUI@PlaneViewer * const _viewer )
+: viewer( _viewer )
+{
+} // SoAnyPlaneViewer()
+
+/*!
+*/
+
+SoAnyPlaneViewer::~SoAnyPlaneViewer(
+  void )
+{
+} // ~SoAnyPlaneViewer()
+
+/*!
+*/
+
 float
-SoAnyPlaneViewer::transYWheelMotion( // static
+SoAnyPlaneViewer::transYWheelMotion(
   const float value,
   const float oldvalue,
   SoCamera * const camera )
@@ -57,7 +75,7 @@ SoAnyPlaneViewer::transYWheelMotion( // static
 */
 
 float
-SoAnyPlaneViewer::transXWheelMotion( // static
+SoAnyPlaneViewer::transXWheelMotion(
   const float value,
   const float oldvalue,
   SoCamera * const camera )
@@ -77,7 +95,7 @@ SoAnyPlaneViewer::transXWheelMotion( // static
 */
 
 void
-SoAnyPlaneViewer::rotZ( // static
+SoAnyPlaneViewer::rotZ(
   SbVec2f position,
   SbVec2f oldposition,
   float aspectratio,
@@ -93,7 +111,7 @@ SoAnyPlaneViewer::rotZ( // static
 */
 
 void
-SoAnyPlaneViewer::viewPlaneX( // static
+SoAnyPlaneViewer::viewPlaneX(
   SoCamera * const camera )
 {
   assert( camera != NULL );
@@ -110,7 +128,7 @@ SoAnyPlaneViewer::viewPlaneX( // static
 */
 
 void
-SoAnyPlaneViewer::viewPlaneY( // static
+SoAnyPlaneViewer::viewPlaneY(
   SoCamera * const camera )
 {
   assert( camera != NULL );
@@ -127,7 +145,7 @@ SoAnyPlaneViewer::viewPlaneY( // static
 */
 
 void
-SoAnyPlaneViewer::viewPlaneZ( // static
+SoAnyPlaneViewer::viewPlaneZ(
   SoCamera * const camera )
 {
   assert( camera != NULL );

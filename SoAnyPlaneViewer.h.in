@@ -25,21 +25,28 @@
 #include <Inventor/SbLinear.h>
 
 class SoCamera;
+class So@GUI@PlaneViewer;
 
 // ************************************************************************
 
 class SoAnyPlaneViewer {
 public:
-  static float transYWheelMotion( const float value, const float oldvalue,
+  SoAnyPlaneViewer( So@GUI@PlaneViewer * const viewer );
+  ~SoAnyPlaneViewer(void);
+
+  float transYWheelMotion( const float value, const float oldvalue,
     SoCamera * const camera );
-  static float transXWheelMotion( const float value, const float oldvalue,
+  float transXWheelMotion( const float value, const float oldvalue,
     SoCamera * const camera );
-  static void rotZ( SbVec2f position, SbVec2f oldposition, float aspectratio,
+  void rotZ( SbVec2f position, SbVec2f oldposition, float aspectratio,
     SoCamera * const camera );
 
-  static void viewPlaneX( SoCamera * const camera );
-  static void viewPlaneY( SoCamera * const camera );
-  static void viewPlaneZ( SoCamera * const camera );
+  void viewPlaneX( SoCamera * const camera );
+  void viewPlaneY( SoCamera * const camera );
+  void viewPlaneZ( SoCamera * const camera );
+
+private:
+  So@GUI@PlaneViewer * const viewer;
 
 }; // class SoAnyPlaneViewer
 
