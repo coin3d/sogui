@@ -182,6 +182,35 @@ So@Gui@::init(const char * appname, const char * classname)
   library.
 */
 
+/*!
+  \fn void So@Gui@::mainLoop(void)
+
+  This is the event dispatch loop.
+
+  It doesn't return until application exit is somehow forced, either
+  programmatically from the relevant API-call of the native toolkit,
+  or when the user closes the application's main widget.
+*/
+
+/*!
+  \fn void So@Gui@::exitMainLoop(void)
+
+  This function will make the main event loop finish looping.
+
+  NOTE: exitMainLoop() is not present in the original API for SGI's
+  InventorXt library.
+*/
+
+/*!
+  \fn @WIDGET@ So@Gui@::getTopLevelWidget(void)
+
+  Returns the @WIDGET@ which is the main widget for the
+  application. When this widget gets closed, So@Gui@::mainLoop() will
+  return (unless the close event is caught by the user).
+
+  \sa getShellWidget()
+*/
+
 // *************************************************************************
 
 /*!
