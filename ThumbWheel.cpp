@@ -308,16 +308,17 @@ ThumbWheel::GetBitmapForValue(
   bool enabled )
 {
   this->Validate();
+//  float svalue = value; // store for debug message
 
   if ( enabled == false )
     return 0; // only one disabled bitmap in this implementation
 
-//  float numsquares = 
   float squarerange = (2.0f * M_PI) / (float) numsquares;
   float normalizedmodval = fmod( value, squarerange ) / squarerange;
-  int bitmap = 1 + (int) floor( normalizedmodval * (float) (this->width - 4 + 2));
-//  return 1 + (squaresize + 2) * fmod( value, (2.0f*M_PI) / numsquares );
-//  fprintf( stderr, "bitmap = %d\n", bitmap );
+  // fmod doesn't wrap negative values to positive ones
+  if ( normalizedmodval < 0.0f ) normalizedmodval += 1.0f;
+  int bitmap = 1 + (int) (normalizedmodval * (float) (this->width - 4 + 2));
+//  fprintf( stderr, "value %8.4f gives bitmap %d\n", svalue, bitmap );
   return bitmap;
 } // GetBitmapForValue()
 
