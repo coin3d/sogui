@@ -242,13 +242,9 @@ public:
 
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
 
-  virtual void selectedPrefs(void);
-
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-
-  void seekbuttonClicked(void);
 
   class SoFieldSensor * zoomSensor;
 
