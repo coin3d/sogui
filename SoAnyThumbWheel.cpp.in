@@ -85,9 +85,9 @@ SoAnyThumbWheel::SoAnyThumbWheel(
   disabledgreen = 255;
   disabledblue = 255;
 
-  red = 180;
+  red = 220;
   green = 180;
-  blue = 220;
+  blue = 180;
   
   light = 1.3f;
   front = 1.2f;
