@@ -2208,11 +2208,9 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 }
 
 
-/*!
-  Overloaded from parent class to be able to do the necessary two-pass
-  rendering e.g. if the drawing style is \e hidden \e line.
-*/
-
+// Documented in superclass. Overridden from parent class to be able
+// to do the necessary two-pass rendering e.g. if the drawing style is
+// hidden line.
 void
 So@Gui@Viewer::actualRedraw(void)
 {

@@ -806,8 +806,7 @@ So@Gui@FlyViewer::setSeekMode(// virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::actualRedraw(// virtual
-  void)
+So@Gui@FlyViewer::actualRedraw(void)
 {
   if (!this->isViewing()) {
     inherited::actualRedraw();
