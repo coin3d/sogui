@@ -36,6 +36,10 @@
 #include <Xm/Xm.h>
 #endif // __COIN_SOXT__
 #ifdef __COIN_SOGTK__
+// Fetch stdlib.h, so NULL is defined before glib.h is (indirectly)
+// included. Otherwise we get a compile error with KCC on some
+// systems.
+#include <stdlib.h>
 #include <gtk/gtk.h>
 class SoGtkComponent;
 class SbPList;
