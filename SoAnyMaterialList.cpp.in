@@ -33,8 +33,12 @@ static const char rcsid[] =
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_DIRENT_H
 #include <dirent.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 
 #include <Inventor/SbPList.h>
@@ -218,6 +222,7 @@ int
 containsFiles(
   const char * const path )
 {
+#ifdef HAVE_DIRENT_H
   DIR * directory = opendir( path );
   struct dirent * entry;
   struct stat entrystats;
@@ -238,6 +243,7 @@ containsFiles(
     }
     closedir( directory );
   }
+#endif
   return 0;
 } // containsFiles()
 
@@ -249,6 +255,7 @@ char **
 SoAnyMaterialList::getNonemptySubdirs( // static, private
   const char * const path )
 {
+#ifdef HAVE_DIRENT_H
   DIR * dir = opendir( path );
   if ( ! dir ) return NULL;
 
@@ -292,6 +299,8 @@ SoAnyMaterialList::getNonemptySubdirs( // static, private
     subdirarray[i] = (char *) subdirs[i];
   subdirarray[num] = NULL;
   return subdirarray;
+#endif
+  return NULL;
 } // numNonemptySubdirs()
 
 
@@ -303,6 +312,7 @@ char **
 SoAnyMaterialList::getRegularFiles( // static, private
   const char * const path )
 {
+#ifdef HAVE_DIRENT_H
   DIR * dir = opendir( path );
   if ( ! dir ) return NULL;
 
@@ -327,6 +337,8 @@ SoAnyMaterialList::getRegularFiles( // static, private
     filearray[i] = (char *) files[i];
   filearray[num] = NULL;
   return filearray;
+#endif
+  return NULL;
 } // getRegularFiles()
 
 /*!
