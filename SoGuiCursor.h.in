@@ -39,7 +39,6 @@ public:
     CUSTOM_BITMAP = -1,
     DEFAULT = 0,
     BUSY,
-    BLANK,
     CROSSHAIR,
     UPARROW
   };
@@ -57,6 +56,7 @@ public:
   static const So@Gui@Cursor & getZoomCursor(void);
   static const So@Gui@Cursor & getPanCursor(void);
   static const So@Gui@Cursor & getRotateCursor(void);
+  static const So@Gui@Cursor & getBlankCursor(void);
   
 private:
   void commonConstructor(const Shape shape, const CustomCursor * cc);

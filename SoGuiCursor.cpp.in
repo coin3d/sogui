@@ -124,12 +124,24 @@ static unsigned char rotate_mask_bitmap[ROTATE_BYTES] = {
  0xf7,0x0f
 };
 
+/*** just a blank cursor ****/
+
+#define BLANK_WIDTH 1
+#define BLANK_HEIGHT 1
+#define BLANK_BYTES ((BLANK_WIDTH + 7) / 8) * BLANK_HEIGHT
+#define BLANK_HOT_X 0
+#define BLANK_HOT_Y 0
+
+static unsigned char blank_bitmap[BLANK_BYTES] = { 0x00 };
+static unsigned char blank_mask_bitmap[BLANK_BYTES] = { 0x00 };
+
 /***********************************************************************/
 
 
 static So@Gui@Cursor::CustomCursor zoom;
 static So@Gui@Cursor::CustomCursor pan;
 static So@Gui@Cursor::CustomCursor rotate;
+static So@Gui@Cursor::CustomCursor blank;
 static SbBool first = TRUE;
 
 
@@ -184,6 +196,11 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
     rotate.hotspot = SbVec2s(ROTATE_HOT_X, ROTATE_HOT_Y);
     rotate.bitmap = rotate_bitmap;
     rotate.mask = rotate_mask_bitmap;
+
+    blank.dim = SbVec2s(BLANK_WIDTH, BLANK_HEIGHT);
+    blank.hotspot = SbVec2s(BLANK_HOT_X, BLANK_HOT_Y);
+    blank.bitmap = blank_bitmap;
+    blank.mask = blank_mask_bitmap;
 
     first = FALSE;
   }
@@ -273,4 +290,18 @@ So@Gui@Cursor::getRotateCursor(void)
   // FIXME: memory leak. 20011120 mortene.
   if (!rotatecursor) { rotatecursor = new So@Gui@Cursor(&rotate); }
   return *rotatecursor;
+}
+
+/*!
+  Because all toolkits don't easily support setting up a blank cursor
+  from pre-defined shapes or API functions, we also provide a simple
+  completely transparent cursor.
+*/
+const So@Gui@Cursor &
+So@Gui@Cursor::getBlankCursor(void)
+{
+  static So@Gui@Cursor * blankcursor = NULL;
+  // FIXME: memory leak. 20011120 mortene.
+  if (!blankcursor) { blankcursor = new So@Gui@Cursor(&blank); }
+  return *blankcursor;
 }
