@@ -20,8 +20,53 @@
 
 // @configure_input@
 
+/*!
+  \class So@Gui@ So@Gui@.h Inventor/@Gui@/So@Gui@.h
+  \brief The So@Gui@ class takes care of @Gui@ initialization and event dispatching.
+  \ingroup misc
+
+  This is the "application-wide" class with solely static methods
+  handling initialization and event processing tasks. You must use
+  this class in any application built on top of the So@Gui@
+  library. Typical usage is as follows (complete application code):
+
+  \code
+#include <qwidget.h>
+
+#include <Inventor/nodes/SoCube.h>
+
+#include <Inventor/@Gui@/So@Gui@.h>
+#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+
+int
+main(int argc, char **argv)
+{
+  // Initialize So@Gui@ and Open Inventor libraries. This returns a main
+  // window to use.
+  QWidget * mainwin = So@Gui@::init(argv[0]);
+
+   // Make a dead simple scene graph, only containing a single cube.
+  SoCube * cube = new SoCube;
+
+  // Use one of the convenient viewer classes.
+  So@Gui@ExaminerViewer * eviewer = new So@Gui@ExaminerViewer(mainwin);
+  eviewer->setSceneGraph(cube);
+  eviewer->show();
+
+  // Pop up the main window.
+  So@Gui@::show(mainwin);
+  // Loop until exit.
+  So@Gui@::mainLoop();
+  return 0;
+}
+  \endcode
+
+  \sa So@Gui@Component
+*/
+
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/SoAny.h>
+
 
 /*!
   \typedef void So@Gui@::FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode, void * userdata)
