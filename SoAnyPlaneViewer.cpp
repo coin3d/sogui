@@ -101,7 +101,7 @@ SoAnyPlaneViewer::viewPlaneX( // static
     camera->focalDistance.getValue() * dir;
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f( 1, 0, 0 );
-  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), SB_PI/2.0f );
+  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), M_PI/2.0f );
 } // viewPlaneX()
 
 /*!
@@ -118,7 +118,7 @@ SoAnyPlaneViewer::viewPlaneY( // static
     camera->focalDistance.getValue() * dir;
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f( 0, 1, 0 );
-  camera->orientation = SbRotation( SbVec3f( 1, 0, 0 ), -SB_PI/2.0f );
+  camera->orientation = SbRotation( SbVec3f( 1, 0, 0 ), -M_PI/2.0f );
 } // viewPlaneY()
 
 /*!
