@@ -31,8 +31,8 @@ typedef void So@Gui@MaterialListCB(void * closure, const SoMaterial * material);
 
 // *************************************************************************
 
-class SOQT_DLL_API So@Gui@MaterialList : public So@Gui@Component {
-  SOQT_OBJECT_HEADER(So@Gui@MaterialList, So@Gui@Component);
+class SO@GUI@_DLL_API So@Gui@MaterialList : public So@Gui@Component {
+  SO@GUI@_OBJECT_HEADER(So@Gui@MaterialList, So@Gui@Component);
 
 public:
   So@Gui@MaterialList(
