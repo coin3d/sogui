@@ -29,6 +29,10 @@
 #include <qevent.h>
 #include <qobject.h>
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+#include <X11/Intrinsic.h>
+#include <Xm/Xm.h>
+#endif // __COIN_SOXT__
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
@@ -47,11 +51,43 @@ public:
   enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
   static class QApplication * getApplication(void);
 #endif // __COIN_SOQT__
+
+#ifdef __COIN_SOXT__
+  static void getVersionInfo(int * const major = NULL,
+                             int * const minor = NULL,
+                             int * const micro = NULL);
+  static const char * getVersionString(void);
+  static void nextEvent(XtAppContext, XEvent *);
+  static Boolean dispatchEvent(XEvent * event);
+  static XtAppContext getAppContext(void);
+  static Display * getDisplay(void);
+  static XmString encodeString(const char * const string);
+  static char * decodeString(XmString xstring);
+  static void getPopupArgs(Display * display, int screen,
+                           ArgList args, int * n);
+
+  static void registerColormapLoad(Widget widget, Widget shell);
+  static void addColormapToShell(Widget widget, Widget shell);
+  static void removeColormapFromShell(Widget widget, Widget shell);
+
+  static void addExtensionEventHandler(Widget widget,
+                                       int eventType, XtEventHandler proc,
+                                       XtPointer clientData);
+  static void removeExtensionEventHandler(Widget widget,
+                                          int eventType, XtEventHandler proc,
+                                          XtPointer clientData);
+
+  static void selectBestVisual(Display * & dpy, Visual * & visual,
+                               Colormap & cmap, int & depth);
+
+  static const char * getAppName(void);
+  static const char * getAppClass(void);
+#endif // __COIN_SOXT__
   
   static @WIDGET@ init(const char * const appName,
                        const char * const className = "So@Gui@");
 
-  static @WIDGET@ init(int argc, char ** argv,
+  static @WIDGET@ init(int & argc, char ** argv,
                        const char * const appName,
                        const char * const className = "So@Gui@");
 
@@ -61,23 +97,28 @@ public:
   static void exitMainLoop(void);
 
   static @WIDGET@ getTopLevelWidget(void);
-  static @WIDGET@ getShellWidget(const @WIDGET@ const w);
+  static @WIDGET@ getShellWidget(const @WIDGET@ w);
 
   static void show(@WIDGET@ const widget);
   static void hide(@WIDGET@ const widget);
 
   static void setWidgetSize(@WIDGET@ const widget, const SbVec2s size);
-  static SbVec2s getWidgetSize(const @WIDGET@ const widget);
+  static SbVec2s getWidgetSize(const @WIDGET@ widget);
 
-  static void createSimpleErrorDialog(@WIDGET@ const widget,
-                                      const char * const dialogTitle,
-                                      const char * const errorStr1,
-                                      const char * const errorStr2 = NULL);
+  static void createSimpleErrorDialog(@WIDGET@ widget,
+                                      const char * dialogTitle,
+                                      const char * errorStr1,
+                                      const char * errorStr2 = NULL);
 
 protected:
 #ifdef __COIN_SOQT__
   bool eventFilter(QObject *, QEvent *);
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+  static void getExtensionEventHandler(XEvent * event, Widget & widget,
+                                       XtEventHandler & proc,
+                                       XtPointer & clientData);
+#endif // __COIN_SOXT__
 
 #ifdef __COIN_SOQT__
 private slots:
@@ -88,6 +129,12 @@ private slots:
 
 private:
   static void sensorQueueChanged(void * cbdata);
+
+#ifdef __COIN_SOXT__
+  static void timerSensorCB(XtPointer, XtIntervalId *);
+  static void delaySensorCB(XtPointer, XtIntervalId *);
+  static Boolean idleSensorCB(XtPointer);
+#endif // __COIN_SOXT__
 
 }; // class So@Gui@
 
