@@ -71,10 +71,10 @@ public:
   void setRadioGroupMarkedItem(int itemid);
   int getRadioGroupMarkedItem(int groupid);
 
-  void addMenuSelectionCallback(
-    SoAnyMenuSelectionCallback * callback, void * data);
-  void removeMenuSelectionCallback(
-    SoAnyMenuSelectionCallback * callback, void * data);
+  void addMenuSelectionCallback(SoAnyMenuSelectionCallback * callback,
+                                void * data);
+  void removeMenuSelectionCallback(SoAnyMenuSelectionCallback * callback,
+                                   void * data);
 
 protected:
   SoAnyPopupMenu(void);
@@ -84,10 +84,7 @@ protected:
   void invokeMenuSelection(int itemid);
 
 private:
-  SbIntList * menuitems;
-  SbIntList * radiogroups;
-  SbPList * callbacks;
-  SbPList * userdata;
+  class SoAnyPopupMenuP * pimpl;
 
 }; // class SoAnyPopupMenu
 
