@@ -45,7 +45,7 @@
 
 // This stupid thing is here to silence some compilers that complain on
 // constant if-expressions.
-inline int _not_null( void * arg ) { return (! arg) ? 0 : 1; }
+inline int _not_null( const void * arg ) { return (! arg) ? 0 : 1; }
 
 #define SOGUI_STUB() \
   do { \
