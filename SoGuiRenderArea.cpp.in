@@ -944,8 +944,15 @@ So@Gui@RenderArea::actualRedraw( // virtual, protected
   void )
 {
   assert( THIS->normalManager != NULL );
-  if ( this->isVisible() )
-    THIS->normalManager->render( THIS->clear, THIS->clearZBuffer );
+  if ( ! this->isVisible() ) return;
+#if SO@GUI@_DEBUG && 0
+  if ( this->getLockLevel() == 0 ) {
+    SoDebugError::post( "So@Gui@RenderArea::actualRedraw",
+      "invoked without being locked - trace the core dump!" );
+    assert( 0 );
+  }
+#endif
+  THIS->normalManager->render( THIS->clear, THIS->clearZBuffer );
 } // actualRedraw()
 
 /*!
@@ -969,15 +976,13 @@ So@Gui@RenderArea::actualOverlayRedraw( // virtual, protected
 {
   assert( THIS->overlayManager != NULL );
   if ( ! this->isVisible() ) return;
-
-#if 0
-  static int first = 1;
-  if ( first ) {
-    first = 0;
-    return;
+#if SO@GUI@_DEBUG && 0
+  if ( this->getLockLevel() == 0 ) {
+    SoDebugError::post( "So@Gui@RenderArea::actualRedraw",
+      "invoked without being locked - trace the core dump!" );
+    assert( 0 );
   }
 #endif
-
   THIS->overlayManager->render( THIS->clearOverlay, THIS->clearZBuffer );
 } // actualOverlayRedraw()
 
@@ -990,6 +995,9 @@ So@Gui@RenderArea::initGraphic( // virtual, protected
   void )
 {
   SO@GUI@_STUB();
+  // FIXME: method is not invoked
+  // FIXME: this method should probably enable DEPTH_TEST, but preferably
+  // in an indirect way (we want the GL calls / include out of this file)
 } // initGraphic()
 
 /*!
@@ -1001,6 +1009,9 @@ So@Gui@RenderArea::initOverlayGraphic( // virtual, protected
   void )
 {
   SO@GUI@_STUB();
+  // FIXME: method is not invoked
+  // FIXME: this method should probably set up the colormap, but preferable
+  // in an indirect way (we want the GL calls / include out of this file)
 } // initOverlayGraphic()
 
 /*!
