@@ -152,11 +152,17 @@ const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
                                                  SO_GL_ZBUFFER |
                                                  SO_GL_DOUBLE );
 
+#if SO@GUI@_DEBUG && defined(__COIN__)
+// Disabled when compiling against SGI / TGS Inventor, as we're using
+// our Coin-specific extension SbString::sprintf() a lot.
+#define DEBUGGING_EGGS 1
+#endif // SO@GUI@_DEBUG && __COIN__
+
 // Note: assumes a valid current OpenGL context.
 void
 So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
 {
-#if SO@GUI@_DEBUG
+#if DEBUGGING_EGGS
   const GLubyte * vendor = glGetString(GL_VENDOR);
   const GLubyte * renderer = glGetString(GL_RENDERER);
   const GLubyte * version = glGetString(GL_VERSION);
@@ -205,13 +211,13 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
                                     info.getString());
-#endif // SO@GUI@_DEBUG
+#endif // DEBUGGING_EGGS
 }
 
 void
 So@Gui@RenderAreaP::showInventorInformation(void)
 {
-#if SO@GUI@_DEBUG
+#if DEBUGGING_EGGS
   SbString info;
   info.sprintf("%s\n", SoDB::getVersion());
 
@@ -236,13 +242,13 @@ So@Gui@RenderAreaP::showInventorInformation(void)
   So@Gui@::createSimpleErrorDialog(NULL, "Inventor implementation info",
                                     info.getString());
 
-#endif // SO@GUI@_DEBUG
+#endif // DEBUGGING_EGGS
 }
 
 void
 So@Gui@RenderAreaP::showToolkitInformation(void)
 {
-#if SO@GUI@_DEBUG
+#if DEBUGGING_EGGS
   SbString info = "So@Gui@ version "; info += SO@GUI@_VERSION; info += "\n";
 #if SO@GUI@_MAKE_DLL
   info += "Built as MSWindows DLL.\n";
@@ -309,13 +315,13 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
 
   So@Gui@::createSimpleErrorDialog(NULL, "So@Gui@ implementation info",
                                     info.getString());
-#endif // SO@GUI@_DEBUG
+#endif // DEBUGGING_EGGS
 }
 
 int
 So@Gui@RenderAreaP::checkMagicSequences(const char c)
 {
-#if SO@GUI@_DEBUG
+#if DEBUGGING_EGGS
   this->currentinput += c;
   int cl = this->currentinput.getLength();
 
@@ -338,7 +344,7 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
 
   // Limit memory usage.
   if (cl > 1024) { this->currentinput = ""; }
-#endif // SO@GUI@_DEBUG
+#endif // DEBUGGING_EGGS
   return So@Gui@RenderAreaP::NONE;
 }
 
@@ -571,7 +577,7 @@ So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
   if (idx == -1) {
 #if SO@GUI@_DEBUG
     SoDebugError::post("So@Gui@RenderArea::unregisterDevice",
-        "tried to remove nonexisting device");
+                       "tried to remove nonexisting device");
 #endif // SO@GUI@_DEBUG
     return;
   }
