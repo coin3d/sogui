@@ -493,19 +493,12 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->setMenuItemTitle(VIEW_ALL_ITEM, _("View All"));
   menu->newMenuItem("seek", SEEK_ITEM);
   menu->setMenuItemTitle(SEEK_ITEM, _("Seek"));
-  menu->newMenuItem("copy_view", COPY_VIEW_ITEM);
-  menu->setMenuItemTitle(COPY_VIEW_ITEM, _("Copy View"));
-  menu->newMenuItem("paste_view", PASTE_VIEW_ITEM);
-  menu->setMenuItemTitle(PASTE_VIEW_ITEM, _("Paste View"));
 
   menu->addMenuItem(FUNCTIONS_MENU, HELP_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, HOME_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, SET_HOME_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, VIEW_ALL_ITEM);
   menu->addMenuItem(FUNCTIONS_MENU, SEEK_ITEM);
-  menu->addSeparator(FUNCTIONS_MENU);
-  menu->addMenuItem(FUNCTIONS_MENU, COPY_VIEW_ITEM);
-  menu->addMenuItem(FUNCTIONS_MENU, PASTE_VIEW_ITEM);
 
   menu->newMenu("drawstylesstill", DRAWSTYLES_STILL_MENU);
   menu->setMenuTitle(DRAWSTYLES_STILL_MENU, _("Still Drawstyle"));
@@ -798,13 +791,6 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     break;
   case SEEK_ITEM:
     ((So@Gui@FullViewerP *)this)->seekbuttonClicked();
-    break;
-  case COPY_VIEW_ITEM:
-    PUBLIC(this)->copyView(SbTime::getTimeOfDay());
-
-    break;
-  case PASTE_VIEW_ITEM:
-    PUBLIC(this)->pasteView(SbTime::getTimeOfDay());
     break;
 
   case AS_IS_ITEM:

@@ -163,9 +163,6 @@ public:
   void removeStartCallback(So@Gui@ViewerCB * func, void * data = NULL);
   void removeFinishCallback(So@Gui@ViewerCB * func, void * data = NULL);
 
-  void copyView(const SbTime eventTime);
-  void pasteView(const SbTime eventTime);
-
   virtual void recomputeSceneSize(void);
 
   void setDecimationStrategy(const DecimationStrategy strategy);

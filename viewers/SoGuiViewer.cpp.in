@@ -2333,41 +2333,6 @@ So@Gui@Viewer::removeFinishCallback(So@Gui@ViewerCB * func, void * data)
 // *************************************************************************
 
 /*!
-  Copy the current camera to the system clipboard. This makes it
-  easy to synchronize camera settings over different applications.
-
-  Note: has not been implemented yet.
-
-  \sa pasteView()
-*/
-
-void
-So@Gui@Viewer::copyView(const SbTime eventTime)
-{
-  // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
-  SO@GUI@_STUB();
-}
-
-// *************************************************************************
-
-/*!
-  Set a new camera from the system clipboard.
-
-  Note: has not been implemented yet.
-
-  \sa copyView()
-*/
-
-void
-So@Gui@Viewer::pasteView(const SbTime eventTime)
-{
-  // FIXME: Needs So@Gui@Clipboard implementation first. 19990507 mortene.
-  SO@GUI@_STUB();
-}
-
-// *************************************************************************
-
-/*!
   Not used, only included for compatibility reasons.
 */
 

@@ -53,8 +53,6 @@ public:
       SET_HOME_ITEM,
       VIEW_ALL_ITEM,
       SEEK_ITEM,
-      COPY_VIEW_ITEM,
-      PASTE_VIEW_ITEM,
 
       DRAWSTYLES_MENU,
       DRAWSTYLES_STILL_MENU,
