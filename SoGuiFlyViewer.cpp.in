@@ -367,6 +367,18 @@ So@Gui@FlyViewer::resetToHomePosition( // virtual
 
 // doc in super
 void
+So@Gui@FlyViewer::viewAll( // virtual
+  void )
+{
+  PRIVATE(this)->maxspeed = 0.0f;
+  PRIVATE(this)->currentspeed = 0.0f;
+  inherited::viewAll();
+} // viewAll()
+
+// ************************************************************************
+
+// doc in super
+void
 So@Gui@FlyViewer::setCamera( // virtual
   SoCamera * camera )
 {
@@ -627,6 +639,11 @@ So@Gui@FlyViewer::actualRedraw( // virtual
            PRIVATE(this)->maxspeed * factor) / 2.0f)
          - PRIVATE(this)->currentspeed) * t;
 
+      // need some lower epsilon since the above may not get down to 0...
+      if ( (PRIVATE(this)->currentspeed <  0.001f) &&
+           (PRIVATE(this)->currentspeed > -0.001f) )
+        PRIVATE(this)->currentspeed = 0.0f;
+        
       PRIVATE(this)->updateSpeedIndicator();
 
       if ( PRIVATE(this)->currentspeed != 0.0f ) {
