@@ -31,7 +31,10 @@
 
 #include "spwinput.h"
 
-#ifdef X_DISPLAY_MISSING
+/* The setting of this define needs to be added manually to
+   configure.in for all relevant projects. */
+#ifndef HAVE_X11_AVAILABLE
+
 /* just provide empty methods if X is not available */
 int 
 SPW_CheckForSpaceballX11(void *, int, char *)
@@ -45,7 +48,7 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
   return 0;
 }
 
-#else /* ! X_DISPLAY_MISSING */
+#else /* HAVE_X11_AVAILABLE */
 
 #include <ctype.h>
 #include <stdio.h>
@@ -1969,4 +1972,4 @@ int SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
 
 } /* end of SPW_InputDispatchEx */
 
-#endif /* ! X_DISPLAY_MMISSING */
+#endif /* HAVE_X11_AVAILABLE */
