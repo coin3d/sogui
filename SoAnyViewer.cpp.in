@@ -157,10 +157,6 @@ static const char rcsid[] =
   \var So@GUI@Viewer::DrawStyle So@GUI@Viewer::VIEW_SAME_AS_STILL
   FIXME: write documentation for enum definition
 */
-/*!
-  \var So@GUI@Viewer::DrawStyle So@GUI@Viewer::ALL_STYLES_COMBINED
-  FIXME: write documentation for enum definition
-*/
 
 /*!
   \enum So@GUI@Viewer::DrawType
@@ -638,14 +634,6 @@ So@GUI@Viewer::setDrawStyle(So@GUI@Viewer::DrawType type,
   if ((type != STILL) && (type != INTERACTIVE)) {
     SoDebugError::postWarning("So@GUI@Viewer::setDrawStyle",
                               "unknown drawstyle type setting 0x%x", type);
-    return;
-  }
-  int s = style & ALL_STYLES_COMBINED;
-  int bits = 0;
-  while (s) { if (s & 0x0001) bits++; s >>= 1; }
-  if (bits != 1) {
-    SoDebugError::postWarning("So@GUI@Viewer::setDrawStyle",
-                              "unknown drawstyle setting 0x04%x", style);
     return;
   }
 #endif // SO@uGUI@_DEBUG
