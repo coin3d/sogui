@@ -85,9 +85,9 @@ SoGuiClickCounter::SoGuiClickCounter(void)
   SO_KIT_CONSTRUCTOR(SoGuiClickCounter);
 
   SO_KIT_ADD_FIELD(size, (SbVec3f(1.0f, 1.0f, 0.0f)));
-  SO_KIT_ADD_FIELD(value, (0));
   SO_KIT_ADD_FIELD(first, (0));
   SO_KIT_ADD_FIELD(last, (0));
+  SO_KIT_ADD_FIELD(value, (0));
   SO_KIT_ADD_FIELD(click, ());
 
   SO_KIT_ADD_CATALOG_ENTRY(surfaceFaceSet, SoIndexedFaceSet, FALSE, topSeparator, "", FALSE);
@@ -116,9 +116,11 @@ SoGuiClickCounter::SoGuiClickCounter(void)
   this->sizeUpdate();
 
   PRIVATE(this)->sizesensor = new SoFieldSensor(ClickCounter::sizeCB, PRIVATE(this));
+  PRIVATE(this)->sizesensor->setPriority(0);
   PRIVATE(this)->sizesensor->attach(&(this->size));
   PRIVATE(this)->firstsensor = new SoFieldSensor(ClickCounter::firstCB, PRIVATE(this));
-  PRIVATE(this)->firstsensor->attach(&(this->size));
+  PRIVATE(this)->firstsensor->setPriority(0);
+  PRIVATE(this)->firstsensor->attach(&(this->first));
 }
 
 SoGuiClickCounter::~SoGuiClickCounter(void)
@@ -187,6 +189,16 @@ SoGuiClickCounter::firstUpdate(void)
   this->value.setValue(this->first.getValue());
 }
 
+SbBool
+SoGuiClickCounter::readInstance(SoInput * in, unsigned short flags)
+{
+  assert(PRIVATE(this)->firstsensor != NULL);
+  PRIVATE(this)->firstsensor->detach();
+  SbBool retval = inherited::readInstance(in, flags);
+  PRIVATE(this)->firstsensor->attach(&(this->first));
+  return retval;
+}
+
 // *************************************************************************
 
 ClickCounter::ClickCounter(void)
@@ -218,3 +230,4 @@ ClickCounter::firstCB(void * closure, SoSensor * sensor)
   me->api->firstUpdate();
 }
 
+// *************************************************************************
