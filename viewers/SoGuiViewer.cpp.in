@@ -3333,20 +3333,6 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 
 // *************************************************************************
 
-// FIXME: it seems bogus that this should be obsoleted, as it still
-// does something seemingly useful. Investigate. 20020510 mortene.
-/*!
-  This method is obsoleted.
-*/
-SbBool
-So@Gui@Viewer::processCommonEvents(@EVENT@ event)
-{
-  if (this->invokeAppCB(event)) return TRUE;
-  return FALSE;
-}
-
-// *************************************************************************
-
 /*!
   This method is for setting up a superimposed scene graph on top
   of the viewer scene graph.  It will be used for adding spin-rotation
