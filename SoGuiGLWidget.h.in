@@ -122,6 +122,11 @@ public:
 
   unsigned long getOverlayTransparentPixel(void);
 
+  // OpenGL query functions.
+  void getPointSizeLimits(SbVec2f & range, float & granularity);
+  void getLineWidthLimits(SbVec2f & range, float & granularity);
+
+
 protected:
   So@Gui@GLWidget(@WIDGET@ const parent = NULL,
                   const char * const name = NULL,
