@@ -68,7 +68,6 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
-// #include <Inventor/SbViewportRegion.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/events/SoLocation2Event.h>
 #include <Inventor/events/SoMouseButtonEvent.h>
@@ -78,12 +77,12 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoScale.h>
 #include <Inventor/nodes/SoTranslation.h>
-// #if SO@GUI@_DEBUG
 #include <Inventor/errors/SoDebugError.h>
-// #endif // SO@GUI@_DEBUG
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
 #include <string.h> // strlen() etc
+#include <Inventor/@Gui@/So@Gui@Cursor.h>
+
 
 // ************************************************************************
 
@@ -1077,5 +1076,57 @@ So@Gui@FlyViewerP::updateSpeedIndicator(
 
 // ************************************************************************
 
-// Contains the toolkit-specific code.
-#include <SoNativeFlyViewer.cpp>
+/*!
+  \internal
+  Set cursor graphics according to mode.
+*/
+void
+So@Gui@FlyViewerP::updateCursorRepresentation(void)
+{
+  if (!this->viewer->isCursorEnabled()) {
+    this->viewer->setComponentCursor(So@Gui@Cursor::getBlankCursor());
+    return;
+  }
+
+  switch (this->viewermode) {
+  case So@Gui@FlyViewerP::FLYING:
+    this->viewer->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
+    break;
+
+  case So@Gui@FlyViewerP::WAITING_FOR_SEEK:
+    this->viewer->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
+    break;
+
+  case So@Gui@FlyViewerP::WAITING_FOR_UP_PICK:
+    this->viewer->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
+    break;
+
+  default:
+    // FIXME: enable again when implementation completed. 20010910 mortene.
+//      assert(0);
+    SO@GUI@_STUB();
+    break;
+  }
+}
+
+// ************************************************************************
+
+// FIXME: this code is "left over" after we migrated to a common
+// code-base in SoGuiFlyViewer.cpp.in. Fix up and re-enable. 20011209 mortene.
+
+//  void
+//  SoXtFlyViewer::createPrefSheet(// virtual, protected
+//    void)
+//  {
+//    if (! this->prefshell) {
+//      this->prefparts = new Widget [ 16 ];
+//      this->createPrefSheetShellAndForm(this->prefshell, this->prefsheet);
+//      this->createDefaultPrefSheetParts(this->prefparts, this->numprefparts,
+//        this->prefsheet);
+//      this->prefparts[this->numprefparts] =
+//        this->createFramedSpeedPrefSheetGuts(this->prefsheet);
+//      if (this->prefparts[this->numprefparts] != NULL) this->numprefparts++;
+//    }
+//    this->layoutPartsAndMapPrefSheet(this->prefparts, this->numprefparts,
+//      this->prefsheet, this->prefshell);
+//  } // createPrefSheet()
