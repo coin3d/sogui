@@ -27,7 +27,7 @@
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
 class SoEvent;
-class SoAnyPopupMenu;
+class So@Gui@PopupMenu;
 class So@Gui@FullViewer;
 
 enum SoAnyFullViewerPopupMenuItem {
@@ -112,8 +112,8 @@ public:
   SoAnyFullViewer(So@Gui@FullViewer * const v);
   ~SoAnyFullViewer(void);
 
-  SoAnyPopupMenu * setupStandardPopupMenu(void);
-  void prepareMenu(SoAnyPopupMenu * menu);
+  So@Gui@PopupMenu * setupStandardPopupMenu(void);
+  void prepareMenu(So@Gui@PopupMenu * menu);
   void setPopupMenuString(const char * title);
 
   void setDrawStyleMenuActivation(
@@ -129,7 +129,7 @@ public:
 
 private:
   So@Gui@FullViewer * const viewer;
-  SoAnyPopupMenu * prefmenu;
+  So@Gui@PopupMenu * prefmenu;
   SbString popupmenutitle;
 
 }; // class SoAnyFullViewer

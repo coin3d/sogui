@@ -41,7 +41,7 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Component.h>
-#include <Inventor/@Gui@/widgets/SoAnyPopupMenu.h>
+#include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 #include <Inventor/@Gui@/viewers/SoAnyFullViewer.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 
@@ -85,11 +85,11 @@ SoAnyFullViewer::setPopupMenuString(const char * name)
 
 // ************************************************************************
 
-SoAnyPopupMenu *
+So@Gui@PopupMenu *
 SoAnyFullViewer::setupStandardPopupMenu(
   void)
 {
-  SoAnyPopupMenu * menu = SoAnyPopupMenu::createInstance();
+  So@Gui@PopupMenu * menu = So@Gui@PopupMenu::createInstance();
 
   menu->newMenu("rootmenu", ROOT_MENU);
   // FIXME: none of the So*-toolkits so far uses the rootmenu title to
@@ -332,7 +332,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
 // ************************************************************************
 
 void
-SoAnyFullViewer::prepareMenu(SoAnyPopupMenu * menu)
+SoAnyFullViewer::prepareMenu(So@Gui@PopupMenu * menu)
 {
   //// Misc. //////////////////////////////////////////////////////////
   menu->setMenuItemMarked(DECORATION_ITEM, this->viewer->isDecoration());

@@ -26,8 +26,8 @@ static const char rcsid[] =
 #endif // SO@GUI@_DEBUG
 
 /*!
-  \class SoAnyPopupMenu Inventor/Any/widgets/SoAnyPopupMenu.h
-  \brief The SoAnyPopupMenu class implements a common interface for popup
+  \class So@Gui@PopupMenu Inventor/@Gui@/widgets/So@Gui@PopupMenu.h
+  \brief The So@Gui@PopupMenu class implements a common interface for popup
   menu management for all the Coin GUI toolkit libraries.
 
   The point of this class is to enable client code to be exactly the
@@ -44,14 +44,14 @@ static const char rcsid[] =
 #include <Inventor/errors/SoDebugError.h>
 
 #include <so@gui@defs.h>
-#include <Inventor/@Gui@/widgets/SoAnyPopupMenu.h>
+#include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 #include <Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h>
 
 // *************************************************************************
 
-// The private data for the SoAnyPopupMenu.
+// The private data for the So@Gui@PopupMenu.
 
-class SoAnyPopupMenuP {
+class So@Gui@PopupMenuP {
 public:
   SbIntList * menuitems;
   SbIntList * radiogroups;
@@ -67,41 +67,41 @@ public:
 /*!
   Instantiation method.
 
-  SoAnyPopupMenu is implemented with this "factory" method instead of
+  So@Gui@PopupMenu is implemented with this "factory" method instead of
   a public constructor to provide a completely generic interface on
   top of the toolkit's native popup menu implementation.
 */
-SoAnyPopupMenu *
-SoAnyPopupMenu::createInstance(void)
+So@Gui@PopupMenu *
+So@Gui@PopupMenu::createInstance(void)
 {
   return new @Gui@NativePopupMenu();
 }
 
 
 /*!
-  The class constructor is protected, as SoAnyPopupMenu uses a factory
+  The class constructor is protected, as So@Gui@PopupMenu uses a factory
   instantiation method.
 */
-SoAnyPopupMenu::SoAnyPopupMenu(void)
+So@Gui@PopupMenu::So@Gui@PopupMenu(void)
 {
-  PRIVATE(this) = new SoAnyPopupMenuP;
+  PRIVATE(this) = new So@Gui@PopupMenuP;
 
   PRIVATE(this)->menuitems = new SbIntList;
   PRIVATE(this)->radiogroups = new SbIntList;
   PRIVATE(this)->callbacks = NULL;
   PRIVATE(this)->userdata = NULL;
-} // SoAnyPopupMenu()
+} // So@Gui@PopupMenu()
 
 /*!
   Destructor.
 */
-SoAnyPopupMenu::~SoAnyPopupMenu()
+So@Gui@PopupMenu::~So@Gui@PopupMenu()
 {
   delete PRIVATE(this)->menuitems;
   delete PRIVATE(this)->radiogroups;
   delete PRIVATE(this)->callbacks;
   delete PRIVATE(this)->userdata;
-} // ~SoAnyPopupMenu()
+} // ~So@Gui@PopupMenu()
 
 // *************************************************************************
 
@@ -109,7 +109,7 @@ SoAnyPopupMenu::~SoAnyPopupMenu()
 */
 
 void
-SoAnyPopupMenu::setMenuItemMarked(
+So@Gui@PopupMenu::setMenuItemMarked(
   int itemid,
   SbBool marked)
 {
@@ -128,7 +128,7 @@ SoAnyPopupMenu::setMenuItemMarked(
   }
   if (this->getMenuItemMarked(itemid) == marked) {
 #if SO@GUI@_DEBUG && 0
-    SoDebugError::postWarning("SoAnyPopupMenu::SetMenuItemEnabled",
+    SoDebugError::postWarning("So@Gui@PopupMenu::SetMenuItemEnabled",
       "Marked state already '%s'.", marked ? "on" : "off");
 #endif // SO@GUI@_DEBUG
   } else if (groupsize == 0) {
@@ -147,7 +147,7 @@ SoAnyPopupMenu::setMenuItemMarked(
     }
   } else {
 #if SO@GUI@_DEBUG
-    SoDebugError::postWarning("SoAnyPopupMenu::SetMenuItemEnabled",
+    SoDebugError::postWarning("So@Gui@PopupMenu::SetMenuItemEnabled",
       "Couldn't handle request.  "
       "Consider that radio grouping is handled automatically.");
 #endif // SO@GUI@_DEBUG
@@ -160,7 +160,7 @@ SoAnyPopupMenu::setMenuItemMarked(
 */
 
 int
-SoAnyPopupMenu::newRadioGroup(
+So@Gui@PopupMenu::newRadioGroup(
   int groupid)
 {
   const int numGroupedItems = PRIVATE(this)->radiogroups->getLength();
@@ -174,7 +174,7 @@ SoAnyPopupMenu::newRadioGroup(
     }
     if (hit == TRUE) {
 #if SO@GUI@_DEBUG
-      SoDebugError::postInfo("SoAnyPopupMenu::NewRadioGroup",
+      SoDebugError::postInfo("So@Gui@PopupMenu::NewRadioGroup",
         "requested group id already taken");
 #endif // SO@GUI@_DEBUG
       return -1; 
@@ -202,7 +202,7 @@ SoAnyPopupMenu::newRadioGroup(
 */
 
 int
-SoAnyPopupMenu::getRadioGroup(
+So@Gui@PopupMenu::getRadioGroup(
   int itemid)
 {
   assert(itemid != -1);
@@ -219,7 +219,7 @@ SoAnyPopupMenu::getRadioGroup(
 */
 
 int
-SoAnyPopupMenu::getRadioGroupSize(
+So@Gui@PopupMenu::getRadioGroupSize(
   int groupid)
 {
   int count = 0;
@@ -237,7 +237,7 @@ SoAnyPopupMenu::getRadioGroupSize(
 */
 
 void
-SoAnyPopupMenu::addRadioGroupItem(
+So@Gui@PopupMenu::addRadioGroupItem(
   int groupid,
   int itemid)
 {
@@ -249,7 +249,7 @@ SoAnyPopupMenu::addRadioGroupItem(
 */
 
 void
-SoAnyPopupMenu::removeRadioGroupItem(
+So@Gui@PopupMenu::removeRadioGroupItem(
   int itemid)
 {
   assert(itemid != -1);
@@ -265,7 +265,7 @@ SoAnyPopupMenu::removeRadioGroupItem(
 } // removeRadioGroupItem()
 
 void
-SoAnyPopupMenu::setRadioGroupMarkedItem(
+So@Gui@PopupMenu::setRadioGroupMarkedItem(
   int itemid)
 {
   const int numItems = PRIVATE(this)->menuitems->getLength();
@@ -287,7 +287,7 @@ SoAnyPopupMenu::setRadioGroupMarkedItem(
 } // setRadioGroupItemEnabled()
 
 int
-SoAnyPopupMenu::getRadioGroupMarkedItem(
+So@Gui@PopupMenu::getRadioGroupMarkedItem(
   int groupid)
 {
   const int numItems = PRIVATE(this)->menuitems->getLength();
@@ -308,8 +308,8 @@ SoAnyPopupMenu::getRadioGroupMarkedItem(
 */
 
 void
-SoAnyPopupMenu::addMenuSelectionCallback(
-  SoAnyMenuSelectionCallback * callback,
+So@Gui@PopupMenu::addMenuSelectionCallback(
+  So@Gui@MenuSelectionCallback * callback,
   void * user)
 {
   if (PRIVATE(this)->callbacks == NULL) {
@@ -324,13 +324,13 @@ SoAnyPopupMenu::addMenuSelectionCallback(
 */
 
 void
-SoAnyPopupMenu::removeMenuSelectionCallback(
-  SoAnyMenuSelectionCallback * callback,
+So@Gui@PopupMenu::removeMenuSelectionCallback(
+  So@Gui@MenuSelectionCallback * callback,
   void * user)
 {
   if (PRIVATE(this)->callbacks == NULL) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postInfo("SoAnyPopupMenu::RemoveMenuSelectionCallback",
+    SoDebugError::postInfo("So@Gui@PopupMenu::RemoveMenuSelectionCallback",
       "no callbacks at all");
 #endif // SO@GUI@_DEBUG
     return;
@@ -352,7 +352,7 @@ SoAnyPopupMenu::removeMenuSelectionCallback(
 */
 
 void
-SoAnyPopupMenu::invokeMenuSelection(
+So@Gui@PopupMenu::invokeMenuSelection(
   int itemid)
 {
   if (PRIVATE(this)->callbacks == NULL)
@@ -360,7 +360,7 @@ SoAnyPopupMenu::invokeMenuSelection(
   const int numCallbacks = PRIVATE(this)->callbacks->getLength();
   int i;
   for (i = 0; i < numCallbacks; i++) {
-    SoAnyMenuSelectionCallback * cb = (SoAnyMenuSelectionCallback *)
+    So@Gui@MenuSelectionCallback * cb = (So@Gui@MenuSelectionCallback *)
       (*PRIVATE(this)->callbacks)[i];
     (*cb)(itemid, (*PRIVATE(this)->userdata)[i]);
   }
@@ -370,6 +370,6 @@ SoAnyPopupMenu::invokeMenuSelection(
 
 // silence some compilers
 #if SO@GUI@_DEBUG
-static const char * getSoAnyPopupMenuRCSId(void) { return rcsid; }
+static const char * getSo@Gui@PopupMenuRCSId(void) { return rcsid; }
 #endif // SO@GUI@_DEBUG
 

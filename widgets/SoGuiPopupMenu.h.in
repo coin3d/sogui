@@ -21,24 +21,21 @@
 // @configure_input@
 // $Id$
 
-#ifndef SOANY_POPUPMENU_H
-#define SOANY_POPUPMENU_H
+#ifndef SO@GUI@_POPUPMENU_H
+#define SO@GUI@_POPUPMENU_H
 
 #include <Inventor/SbBasic.h>
 
 #include <Inventor/@Gui@/So@Gui@Component.h>
 
-class SbIntList;
-class SbPList;
-
 // *************************************************************************
 
-typedef void SoAnyMenuSelectionCallback(int itemid, void * user);
+typedef void So@Gui@MenuSelectionCallback(int itemid, void * user);
 
-class SoAnyPopupMenu { // abstract interface class
+class So@Gui@PopupMenu { // abstract interface class
 public:
-  static SoAnyPopupMenu * createInstance(void);
-  virtual ~SoAnyPopupMenu();
+  static So@Gui@PopupMenu * createInstance(void);
+  virtual ~So@Gui@PopupMenu();
 
   virtual int newMenu(const char * name, int menuid = -1) = 0;
   virtual int getMenu(const char * name) = 0;
@@ -71,23 +68,23 @@ public:
   void setRadioGroupMarkedItem(int itemid);
   int getRadioGroupMarkedItem(int groupid);
 
-  void addMenuSelectionCallback(SoAnyMenuSelectionCallback * callback,
+  void addMenuSelectionCallback(So@Gui@MenuSelectionCallback * callback,
                                 void * data);
-  void removeMenuSelectionCallback(SoAnyMenuSelectionCallback * callback,
+  void removeMenuSelectionCallback(So@Gui@MenuSelectionCallback * callback,
                                    void * data);
 
 protected:
-  SoAnyPopupMenu(void);
+  So@Gui@PopupMenu(void);
 
   virtual void _setMenuItemMarked(int itemid, SbBool marked) = 0;
 
   void invokeMenuSelection(int itemid);
 
 private:
-  class SoAnyPopupMenuP * pimpl;
+  class So@Gui@PopupMenuP * pimpl;
 
-}; // class SoAnyPopupMenu
+}; // class So@Gui@PopupMenu
 
 // *************************************************************************
 
-#endif // ! SOANY_POPUPMENU_H
+#endif // ! SO@GUI@_POPUPMENU_H
