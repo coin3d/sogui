@@ -366,6 +366,8 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   // it's an ESC press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
 
+  SbBool processed = FALSE;
+
   const SoType type(ev->getTypeId());
 
   const SbVec2s size(this->getGLSize());
@@ -402,22 +404,22 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
         if (this->mode == IDLE_MODE) {
           this->interactiveCountInc();
           this->mode = DOLLY_MODE;
-        } else if (this->mode == SEEK_WAIT_MODE) {
+        } 
+        else if (this->mode == SEEK_WAIT_MODE) {
           this->interactiveCountInc();
           this->seekToPoint(pos);
         }
         break;
 
       case SoMouseButtonEvent::BUTTON2:
-        // FIXME: shouldn't these events be passed on to the
-        // superclass? 20020113 mortene.
-        return FALSE;
+        break;
 
       case SoMouseButtonEvent::BUTTON3:
         if (this->mode == IDLE_MODE) {
           this->interactiveCountInc();
           this->mode = TRANSLATE_MODE;
-        } else if (this->mode == ROTZ_WAIT_MODE) {
+        } 
+        else if (this->mode == ROTZ_WAIT_MODE) {
           this->mode = ROTZ_MODE;
         }
         break;
@@ -435,7 +437,8 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       default:
         break;
       } // switch (event->getButton())
-    } else {
+    } 
+    else {
       switch (event->getButton()) {
       case SoMouseButtonEvent::BUTTON1:
       case SoMouseButtonEvent::BUTTON3:
@@ -449,8 +452,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
         break;
       } // switch (((XButtonEvent *) event)->button)
     }
-
-    return TRUE;
+    processed = TRUE;
   }
 
   if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
@@ -492,7 +494,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       }
 
     } while (FALSE);
-    return TRUE;
+    processed = TRUE;
   } // LOCATION2_EVENT_TYPE
 
   if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
@@ -503,16 +505,17 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
     case SoKeyboardEvent::LEFT_CONTROL:
     case SoKeyboardEvent::RIGHT_CONTROL:
       this->controldown = press;
-
+      
       if (press) {
         this->setCanvasSize(size);
         this->setPointerLocation(pos);
         this->setPointerLocation(pos);
         this->scheduleRedraw();
-      } else {
+      } 
+      else {
         this->scheduleRedraw();
       }
-      return TRUE;
+      processed = TRUE;
       break;
     default:
       break;
@@ -520,9 +523,9 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 
   } // KEYBOARD_EVENT_TYPE
 
-  // FIXME: shouldn't unhandled events be passed on to the superclass?
-  // 20020113 mortene.
-  return FALSE;
+  // If not handled in this class, pass on upwards in the inheritance
+  // hierarchy.
+  return processed || inherited::processSoEvent(ev);
 }
 
 // ************************************************************************
