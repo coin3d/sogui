@@ -92,7 +92,7 @@ public:
   SoFieldSensor * maxSensor;
 
   SbBool grabbing;
-  float lastpos;
+  SbVec3f grabpos;
 
   Slider1(void);
   ~Slider1(void);
@@ -437,57 +437,64 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
   if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
     if ( PRIVATE(this)->grabbing ) {
       // we're dragging on the knob
+      // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "what a drag");
       action->setPickRadius(0);
       const SoPickedPointList & pplist = action->getPickedPointList();
     }
   }
   else if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
     SoMouseButtonEvent * mbevent = (SoMouseButtonEvent *) event;
-    if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
-         (mbevent->getState() == SoButtonEvent::DOWN) ) {
-
-    action->setPickRadius(0);
-    const SoPickedPointList & pplist = action->getPickedPointList();
-    if ( pplist.getLength() > 0 ) {
-      int i;
-      for ( i = 0; i < pplist.getLength(); i++ ) {
-        const SoPickedPoint * pp = pplist[i];
-        const SoPath * path = pp->getPath();
-        SoNode * node = path->getTail();
-        SbVec3f point = pp->getObjectPoint();
-        if ( node == ((SoNode *) this) ) {
-          SbVec3f size = this->size.getValue();
-          SoCoordinate3 * knobcoords = SO_GET_ANY_PART(this, "knobCoords", SoCoordinate3);
-          assert(knobcoords);
-          SbVec3f knobmin = knobcoords->point[12];
-          SbVec3f knobmax = knobcoords->point[14];
-          if ( point[0] >= knobmin[0] && point[0] <= knobmax[0] &&
-              point[1] >= knobmin[1] && point[1] <= knobmax[1] ) {
-            // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "locator is on knob (%g %g)  [%g %g] [%g %g]", point[0], point[1], knobmin[0], knobmin[1], knobmax[0], knobmax[1]);
-            action->setHandled();
+    if ( (PRIVATE(this)->grabbing != FALSE) &&
+         (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
+         (mbevent->getState() == SoButtonEvent::UP) ) {
+      if ( action->getGrabber() == (SoNode *) this ) {
+        action->releaseGrabber();
+        PRIVATE(this)->grabbing = FALSE;
+      }
+    }
+    else if ( (mbevent->getButton() == SoMouseButtonEvent::BUTTON1) &&
+              (mbevent->getState() == SoButtonEvent::DOWN) ) {
+      action->setPickRadius(0);
+      const SoPickedPointList & pplist = action->getPickedPointList();
+      if ( pplist.getLength() > 0 ) {
+        int i;
+        for ( i = 0; i < pplist.getLength(); i++ ) {
+          if ( action->isHandled() ) break;
+          const SoPickedPoint * pp = pplist[i];
+          const SoPath * path = pp->getPath();
+          SoNode * node = ((SoFullPath *) path)->getTail();
+          if ( node == ((SoNode *) SO_GET_ANY_PART(this, "knobFaceSet", SoIndexedFaceSet)) ) {
+            SbVec3f point = pp->getObjectPoint();
+            SbVec3f size = this->size.getValue();
+            SoCoordinate3 * knobcoords = SO_GET_ANY_PART(this, "knobCoords", SoCoordinate3);
+            assert(knobcoords);
+            SbVec3f knobmin = knobcoords->point[12];
+            SbVec3f knobmax = knobcoords->point[14];
+            if ( point[0] >= knobmin[0] && point[0] <= knobmax[0] &&
+                 point[1] >= knobmin[1] && point[1] <= knobmax[1] ) {
+              // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "locator is on knob (%g %g)  [%g %g] [%g %g]", point[0], point[1], knobmin[0], knobmin[1], knobmax[0], knobmax[1]);
+              PRIVATE(this)->grabbing = TRUE;
+              PRIVATE(this)->grabpos = point;
+              action->setGrabber(this);
+              action->setHandled();
+            }
           }
-          else if ( point[0] >= 0.0f && point[0] <= size[0] &&
-              point[1] >= 0.0f && point[1] <= size[1] ) {
+        }
+        for ( i = 0; i < pplist.getLength(); i++ ) {
+          if ( action->isHandled() ) break;
+          const SoPickedPoint * pp = pplist[i];
+          const SoPath * path = pp->getPath();
+          SoNode * node = ((SoFullPath *) path)->getTail();
+          if ( node == ((SoNode *) SO_GET_ANY_PART(this, "surfaceFaceSet", SoIndexedFaceSet)) ) {
             // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "locator is on slider surface");
+            SbVec3f point = pp->getObjectPoint();
+            SbVec3f size = this->size.getValue();
             this->value = this->min.getValue() + ((point[0] / size[0]) * (this->max.getValue() - this->min.getValue()));
             action->setHandled();
           }
         }
       }
     }
-    }
   }
-
-/*
-  void setHandled(void);
-  SbBool isHandled(void) const;
-  void setGrabber(SoNode * node);
-  void releaseGrabber(void);
-  SoNode * getGrabber(void) const;
-*/
-
-  
-  // ugh - another state machine
-  // SoDebugError::postInfo("SoGuiSlider1::handleEvent", "received %s event", event->getTypeId().getName().getString());
 }
 
