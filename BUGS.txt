@@ -43,6 +43,31 @@ NOTE: see also So@Gui@/BUGS.txt.
       z-buffer offset). SoText2 characters are drawn as bitmaps, which
       are not affected by polygon offset.
 
+    Consider this a fairly low priority bug.
+
     <mortene@sim.no> 20020521.
+
+=====================================================================
+
+001 Using the dolly-wheel of the ExaminerViewer to zoom waaaay out
+    eventually leads to error messages and an assert crash.
+
+    This problem was reported for SoWinExaminerViewer, but I can
+    reproduce it with the SoQtExaminerViewer, so it's probably a
+    common bug for all toolkits.
+
+    The error messages are (many of this)
+
+        Coin warning in SbVec3f::normalize(): The length of the vector should be > 0.0f to be able to normalize.
+
+    and one of this:
+
+        Coin warning in SbBox3f::setBounds(): The box is not valid.
+
+    The assert is:
+
+        examinerviewer: <Coin>/src/base/SbBox3f.cpp:263: void SbBox3f::setBounds(const SbVec3f &, const SbVec3f &): Assertion `0' failed.
+
+    20021118 mortene, reported by Michael Wimmer on coin-discuss.
 
 =====================================================================
