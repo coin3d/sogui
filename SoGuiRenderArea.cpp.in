@@ -45,10 +45,10 @@ static const char rcsid[] =
 #endif // HAVE_WINDOWS_H
 #include <GL/gl.h> // glDrawBuffer()
 
-#include <Inventor/misc/SoBasic.h>
-#include <Inventor/errors/SoDebugError.h>
-#include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoSceneManager.h>
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/misc/SoBasic.h>
+#include <Inventor/nodes/SoSelection.h>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Basic.h>
@@ -90,7 +90,7 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 // *************************************************************************
 
 class So@Gui@RenderAreaP {
-  friend class So@Gui@RenderArea;
+public:
 
   So@Gui@RenderAreaP( class So@Gui@RenderArea * pub );
   ~So@Gui@RenderAreaP(void);
@@ -121,13 +121,73 @@ class So@Gui@RenderAreaP {
 
   static const int GL_DEFAULT_MODE;
 
+  // OpenGL info-window hack.
+  SbBool checkMagicSequence( const char c );
+  void showOpenGLDriverInformation( void );
 
+private:
   So@Gui@RenderArea * pub; // public interface class
+  SbString currentinput; // For the OpenGL info-window hack.
 }; // class So@Gui@RenderAreaP
 
 const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
                                                  SO_GL_ZBUFFER |
                                                  SO_GL_DOUBLE );
+
+// Note: assumes a valid current OpenGL context.
+void
+So@Gui@RenderAreaP::showOpenGLDriverInformation( void )
+{
+#if SO@GUI@_DEBUG
+  const GLubyte * vendor = glGetString( GL_VENDOR );
+  const GLubyte * renderer = glGetString( GL_RENDERER );
+  const GLubyte * version = glGetString( GL_VERSION );
+  const GLubyte * extensions = glGetString( GL_EXTENSIONS );
+
+  SbString info = "GL_VENDOR: \""; info += (const char *)vendor; info += "\"\n";
+  info += "GL_RENDERER: \""; info += (const char *)renderer; info += "\"\n";
+  info += "GL_VERSION: \""; info += (const char *)version; info += "\"\n";
+  info += "GL_EXTENSIONS: \"\n   ";
+    
+  SbString exts = (const char *)extensions;
+  const char * p;
+  int count = 0;
+  while (p = strchr(exts.getString(), ' ')) {
+    const char * start = exts.getString();
+    info += exts.getSubString(0, p - start);
+    exts.deleteSubString(0, p - start);
+    count++;
+    if (count == 4) { // number of extensions listed on each line
+      info += "\n   ";
+      count = 0;
+    }
+  }
+  if (exts.getLength() > 0) { info += "\n   "; info += exts; }
+  info += "\"\n";
+
+  SoWin::createSimpleErrorDialog( NULL, "OpenGL driver information",
+                                  info.getString() );
+#endif // SO@GUI@_DEBUG
+}
+
+SbBool
+So@Gui@RenderAreaP::checkMagicSequence( const char c )
+{
+#if SO@GUI@_DEBUG
+  this->currentinput += c;
+  static const char magicseq[] = "glinfo";
+  int ml = strlen( magicseq );
+  int cl = this->currentinput.getLength( );
+
+  if ( cl >= ml && this->currentinput.getSubString( cl - ml ) == magicseq ) {
+    return TRUE;
+  }
+
+  // Limit memory usage.
+  if ( cl > 1024 ) { this->currentinput = ""; }
+#endif // SO@GUI@_DEBUG
+  return FALSE;
+}
 
 #define PRIVATE(ptr) (ptr->priv)
 #define PUBLIC(ptr) (ptr->pub)
@@ -1322,6 +1382,22 @@ So@Gui@RenderArea::processEvent( // virtual, protected
   const SoEvent * soevent = this->getSoEvent( event );
 
   if ( soevent != NULL ) {
+#if SO@GUI@_DEBUG
+    // Undocumented feature: tap in the characters in "glinfo" to pop
+    // up a dialog box with information about GL driver, vendor etc.
+    if ( soevent->isOfType( SoKeyboardEvent::getClassTypeId( ) ) ) {
+      SoKeyboardEvent * ke = ( SoKeyboardEvent * )soevent;
+      if ( ke->getState( ) == SoButtonEvent::UP ) {
+        char c = ke->getPrintableCharacter();
+        if ( PRIVATE( this )->checkMagicSequence( c ) ) {
+          this->glLockNormal();
+          PRIVATE( this )->showOpenGLDriverInformation( );
+          this->glUnlockNormal();
+        }
+      }
+    }
+#endif // SO@GUI@_DEBUG
+
     SbBool processed = this->processSoEvent(soevent);
     if ( processed ) return;
   }
