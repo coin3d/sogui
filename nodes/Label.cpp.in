@@ -21,9 +21,12 @@
  *
 \**************************************************************************/
 
+#include <assert.h>
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoAsciiText.h>
+#include <Inventor/sensors/SoFieldSensor.h>
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiLabel.h>
@@ -37,6 +40,10 @@ public:
   SoGuiLabel * api;
 
   SoAsciiText * text;
+
+  SoFieldSensor * text_sensor;
+  SoFieldSensor * which_sensor;
+  static void text_updated_cb(void * closure, SoSensor * sensor);
 
   static const char * scene[];
 };
@@ -60,6 +67,7 @@ SoGuiLabel::SoGuiLabel(void)
 
   SO_KIT_CONSTRUCTOR(SoGuiLabel);
   SO_KIT_ADD_FIELD(text, (""));
+  SO_KIT_ADD_FIELD(which, (0));
 
   SO_KIT_ADD_CATALOG_ENTRY(scene, SoSeparator, FALSE, this, "", FALSE);
 
@@ -71,15 +79,22 @@ SoGuiLabel::SoGuiLabel(void)
 
   PRIVATE(this)->text = (SoAsciiText *) SoAny::scanSceneForName(scene, "text");
   assert(PRIVATE(this)->text);
-  PRIVATE(this)->text->string.connectFrom(&(this->text));
 
   scene->unrefNoDelete();
   SbBool ok = this->setAnyPart("scene", scene);
   assert(ok);
+
+  PRIVATE(this)->text_sensor = new SoFieldSensor(Label::text_updated_cb, PRIVATE(this));
+  PRIVATE(this)->text_sensor->attach(&(this->text));
+  PRIVATE(this)->which_sensor = new SoFieldSensor(Label::text_updated_cb, PRIVATE(this));
+  PRIVATE(this)->which_sensor->attach(&(this->which));
+  Label::text_updated_cb(PRIVATE(this), NULL);
 }
 
 SoGuiLabel::~SoGuiLabel(void)
 {
+  delete PRIVATE(this)->text_sensor;
+  delete PRIVATE(this)->which_sensor;
   Label * obj = PRIVATE(this);
   delete obj;
 }
@@ -87,6 +102,8 @@ SoGuiLabel::~SoGuiLabel(void)
 #undef PRIVATE
 
 // *************************************************************************
+
+#define PUBLIC(obj) (obj->api)
 
 const char *
 Label::scene[] =
@@ -105,6 +122,22 @@ Label::scene[] =
 Label::Label(void)
 {
   this->api = NULL;
+  this->text = NULL;
+  this->which_sensor = NULL;
 }
+
+void
+Label::text_updated_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  Label * me = (Label *) closure;
+  assert(me->text);
+  int which = PUBLIC(me)->which.getValue();
+  // SbString string = PUBLIC(me)->text.getValue();
+  SbString string = PUBLIC(me)->text[which];
+  me->text->string.setValue(string);
+}
+
+#undef PUBLIC
 
 // *************************************************************************

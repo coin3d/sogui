@@ -28,7 +28,8 @@
 #error this is a private header file
 #endif // !SO@GUI@_INTERNAL
 
-#include <Inventor/fields/SoSFString.h>
+#include <Inventor/fields/SoSFShort.h>
+#include <Inventor/fields/SoMFString.h>
 #include <Inventor/nodekits/SoBaseKit.h>
 
 class SoGuiLabel : public SoBaseKit {
@@ -40,7 +41,8 @@ public:
   static void initClass(void);
   SoGuiLabel(void);
 
-  SoSFString text;
+  SoMFString text;
+  SoSFShort which;
 
 protected:
   ~SoGuiLabel(void);
