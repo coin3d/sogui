@@ -67,7 +67,7 @@
 
   Then put the SO@GUI@_OBJECT_SOURCE(classname) macro within the
   actual implementation sourcecode file to include the necessary
-  implementation code for the run-time system:
+  code for the run-time type system:
 
   \code
   #include <MySpecialViewer.h>
