@@ -770,7 +770,9 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed.
 
-PREDEFINED             = DOXYGEN_SKIP_THIS
+# FIXME: remove the __COIN_SO@GUI@__ define when the ifdefs dependent on this
+# have been cleaned out of the common, generic template code. 20020607 mortene.
+PREDEFINED             = DOXYGEN_SKIP_THIS __COIN_SO@GUI@__
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
