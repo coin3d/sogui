@@ -114,6 +114,7 @@ private:
   virtual ~So@Gui@();
 
 #ifndef DOXYGEN_SKIP_THIS // To avoid having it show up in Doxygen doc.
+  friend class SoGuiP;
   friend class So@Gui@P;
 #endif // DOXYGEN_SKIP_THIS
 
