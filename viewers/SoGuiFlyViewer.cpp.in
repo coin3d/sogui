@@ -131,13 +131,11 @@ public:
 
   void updateSpeedIndicator(void);
   void updateCamera( SoCamera * camera, float dt );
+  void updateCamera( SoCamera * camera, float d_tilt, float d_pan, float dt );
 
   float calculateChangeInTime();
   void  updateCurrentSpeed( float dt );
 
-
-
-  
 
   // Current keyboard state.
   SbBool button1down;
@@ -174,9 +172,8 @@ public:
   float pan_increment;  // Rotation-adjustment around View-up
 
   SbVec2s mouseloc;
+  SbVec2s lastpos;
   SbVec2s tiltpos;
-  SbRotation tiltrotation;
-  SbVec3f tiltup;
 
   // FIXME: Refactor event handlers and PUBLIC(this)->processSoEvent
   // in a way similar to that in SoGuiExaminerViewer, where only
@@ -565,9 +562,9 @@ So@Gui@FlyViewerP::processKeyboardEvent( const SoKeyboardEvent * const ke )
   if ((this->getMode() == So@Gui@FlyViewerP::FLYING) &&
       (this->lctrldown || this->rctrldown)) {
     this->setMode(So@Gui@FlyViewerP::TILTING);
-    this->tiltrotation = PUBLIC(this)->getCamera()->orientation.getValue();
-    this->tiltup = PUBLIC(this)->getUpDirection();
+    
     this->tiltpos = this->mouseloc;
+    this->lastpos = this->mouseloc;
 
     this->stopMoving();
     this->updateSpeedIndicator();
@@ -664,26 +661,16 @@ So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
   if (this->getMode() == So@Gui@FlyViewerP::TILTING) {
 
     SbVec2s newpos = lev->getPosition();
-    float dx = newpos[0] - this->tiltpos[0];
-    float dy = newpos[1] - this->tiltpos[1];
+    float pan = (this->lastpos[0] - newpos[0])/100.0f;
+    float tilt = (this->lastpos[1] - newpos[1])/100.0f;
 
-    if (dx != 0.0f || dy != 0.0f) {
+    if (pan != 0.0f || tilt!= 0.0f) {
       SoCamera * camera = PUBLIC(this)->getCamera();
       if (camera == NULL) 
         return TRUE; // probably sceneless
-      SbVec3f up(this->tiltup);
-      SbVec3f dir;
-      SbRotation orientation(this->tiltrotation);
-      orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
-      SbVec3f horizon(dir.cross(up));
-      horizon.normalize();
-      SbRotation tilt = SbRotation(horizon, dy / 100.0f);
-      SbVec3f newup;
-      tilt.multVec(up, newup);
-      SbRotation newOrientation = this->tiltrotation;
-      newOrientation *= tilt;
-      newOrientation *= SbRotation(newup, -dx / 100.0f);
-      camera->orientation.setValue(newOrientation);
+
+      this->updateCamera( camera, tilt, pan, 0.0f );
+      this->lastpos = newpos;
     }
   }
 
@@ -692,12 +679,13 @@ So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
   // the dependency on the PUBLIC(this) class. 20021021 rolvs
   this->mouseloc = lev->getPosition();
   SbVec2s glsize( PUBLIC(this)->getGLSize() );
-  
+
   SbVec2s mid( glsize[0]/2, glsize[1]/2 );  
   this->pan_increment = 0.002f *
     float(mid[0] - this->mouseloc[0]) / float(mid[0]);
   this->tilt_increment =
     (float(mid[1] - this->mouseloc[1]) / float(mid[1])) * 0.002f;
+
   return TRUE;
 }
 
@@ -805,14 +793,24 @@ void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
       this->maxspeed * factor) / 2.0f)- this->currentspeed) * dt;
 }
 
+
 void
 So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
 {
   assert( camera != NULL );
+  this->updateCamera( camera, this->tilt_increment, this->pan_increment, dt );
+}
+
+void So@Gui@FlyViewerP::updateCamera( SoCamera * camera, 
+                                      float tilt_increment,
+                                      float pan_increment, 
+                                      float dt )
+{
+  assert( camera != NULL );
+
   // FIXME: Camera position movement and changes in orientation is
   // general behaviour that could be factored out for re-use. 
   // 20021017 rolvs
-  
   SbRotation orientation = camera->orientation.getValue();
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f(0,0,-1), dir );
@@ -824,11 +822,12 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
 
   // FIXME: Make sure that the angle between direction and up-vector
   // stays larger than zero, or else it gets 'locked' in an undefined
-  // state and starts to act weird. 20021017 rolvs
-  PUBLIC( this )->tiltCamera( this->tilt_increment );
+  // state and starts to act weird. This should probably be done in
+  // parent class. 20021017 rolvs
+  PUBLIC( this )->tiltCamera( tilt_increment );
 
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( PUBLIC(this)->getUpDirection(), this->pan_increment );
+    SbRotation( PUBLIC(this)->getUpDirection(), pan_increment );
 }
 
 void
@@ -858,12 +857,12 @@ void So@Gui@FlyViewerP::updateSpeedScalingFactor()
   
   SbBox3f bbox = bbact.getBoundingBox();
   float bbox_diagonal = (bbox.getMax() - bbox.getMin()).length();
-  
+
   // FIXME: It should be possible to create a simple scaling function,
   // based on some logaritmic evaluation. 20021017 rolvs.
   if( bbox_diagonal>100 )
-    this->speed_scaling_factor = log10(bbox_diagonal);
-  if( bbox_diagonal>10 && bbox_diagonal < 100 )
+    this->speed_scaling_factor = 1.0f; // log(bbox_diagonal);
+  else if( bbox_diagonal>10 && bbox_diagonal < 100 )
     this->speed_scaling_factor = 0.4f; 
   else if( bbox_diagonal>1 && bbox_diagonal<10 )
     this->speed_scaling_factor = 0.3f; 
