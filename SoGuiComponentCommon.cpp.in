@@ -1,0 +1,411 @@
+/**************************************************************************\
+ *
+ *  This file is part of the Coin GUI toolkit libraries.
+ *  Copyright (C) 1998-2002 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  version 2.1 as published by the Free Software Foundation.  See the
+ *  file LICENSE.LGPL at the root directory of this source distribution
+ *  for more details.
+ *
+ *  If you want to use this library with software that is incompatible
+ *  licensewise with the LGPL, and / or you would like to take
+ *  advantage of the additional benefits with regard to our support
+ *  services, please contact Systems in Motion about acquiring a Coin
+ *  Professional Edition License.  See <URL:http://www.coin3d.org> for
+ *  more information.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, 7030 Trondheim, NORWAY
+ *  <URL:http://www.sim.no>, <mailto:support@sim.no>
+ *
+\**************************************************************************/
+
+// @configure_input@
+
+/*!
+  \class So@Gui@Component So@Gui@Component.h Inventor/@Gui@/So@Gui@Component.h
+  \brief The So@Gui@Component class is the base class for all GUI components.
+
+  Components in the So@Gui@ component library all inherit this
+  abstract base class. It provides basic methods for setting and
+  querying about the relationship between the component object and its
+  underlying @Gui@ object(s).
+
+  Application programmers should not need to interface any code
+  against this class, unless they want to extend the So@Gui@ library
+  in entirely new directions. For making new viewer components, for
+  instance, other classes further down the inheritance hierarchy would
+  be better suited for subclassing.
+
+  Note that the relationship between all So@Gui@Component derived
+  classes and @Gui@ widgets is one of "has-A", \e not "is-A" --
+  i.e. So@Gui@Component \e contains a @WIDGET@.
+*/
+
+#include <Inventor/@Gui@/So@Gui@.h>
+#include <Inventor/@Gui@/So@Gui@Component.h>
+
+/*!
+  \fn void So@Gui@Component::initClasses(void)
+
+  \internal
+
+  This function initializes the type system for all the component
+  classes.  It is called indirectly for you when you call
+  So@Gui@::init().
+
+  \sa So@Gui@::init(), So@Gui@Device::initClasses()
+*/
+
+/*!
+  \fn So@Gui@Component::So@Gui@Component(@WIDGET@ const parent, const char * const name, const SbBool embed)
+
+  This is a protected constructor, used only by derived classes.
+
+  The \a parent argument is the parent widget of the component.  If
+  you don't supply a parent, the main window (the one given to or
+  returned from So@Gui@::init()) is used (and the \a embed argument is
+  considered to be \c FALSE).
+
+  The \a name argument is the name of the component. If you don't
+  supply one, the name will default to something, depending on the
+  inheritance hierarchy.
+
+  The \a embed argument tells wether the component should be embedded
+  in the \a parent widget or should create its own shell. This flag is
+  only checked if the \a parent widget argument is specified (not
+  \c NULL).
+
+  If you create a non-embedded component, the component will create
+  its own shell, which will be a toplevelshell type. If you embed the
+  component, the component will create a formwidget type widget inside
+  the \a parent widget, which you can get the handle of by calling
+  So@Gui@Component::getBaseWidget().
+*/
+
+/*!
+  \fn So@Gui@Component::~So@Gui@Component()
+
+  Destructor.
+*/
+
+/*!
+  \fn void So@Gui@Component::addVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func, void * const user)
+
+  Add a callback which will be called whenever the widget component
+  changes visibility status (because of iconification or
+  deiconification, for instance).
+
+  \sa removeVisibilityChangeCallback(), isVisible()
+*/
+
+/*!
+  \fn void So@Gui@Component::removeVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func, void * const data)
+
+  Remove one of the callbacks from the list of visibility notification
+  callbacks.
+
+  \sa addVisibilityChangeCallback(), isVisible()
+*/
+
+/*!
+  \fn void So@Gui@Component::setClassName(const char * const name)
+
+  Set class name of component.
+
+  \sa getClassName(), componentClassName()
+*/
+
+/*!
+  \fn void So@Gui@Component::setBaseWidget(@WIDGET@ widget)
+
+  Set the core widget for this So@Gui@ component. It is important that
+  subclasses get this correct, as the widget set here will be the
+  widget returned from query methods.
+
+  \sa baseWidget()
+*/
+
+/*!
+  \fn void So@Gui@Component::setBaseWidget(@WIDGET@ widget)
+
+  Set the core widget for this So@Gui@ component. It is important that
+  subclasses get this correct, as the widget set here will be the
+  widget returned from query methods.
+
+  \sa baseWidget()
+*/
+
+/*!
+  \fn void So@Gui@Component::show(void)
+
+  This will show the widget, de-iconifiying and raising it if
+  necessary.
+
+  \sa hide(), isVisible()
+*/
+
+/*!
+  \fn void So@Gui@Component::hide(void)
+
+  This will hide the widget.
+
+  \sa show(), isVisible()
+*/
+
+/*!
+  \fn SbBool So@Gui@Component::isVisible(void)
+
+  Returns visibility status on the widget. If any parents of this
+  widget or this widget itself is hidden, returns \c FALSE.
+
+  Note that a widget which is just obscured by other windows on the
+  desktop is not hidden in this sense, and \c TRUE will be returned.
+
+  \sa show(), hide()
+*/
+
+/*!
+  \fn @WIDGET@ So@Gui@Component::getWidget(void) const
+
+  Returns a pointer to the component's window system widget.
+
+  \sa getShellWidget(), getParentWidget()
+*/
+
+/*!
+  \fn @WIDGET@ So@Gui@Component::getBaseWidget(void) const
+
+  An So@Gui@Component may be composed of any number of widgets in
+  parent-children relationships in a tree structure with any depth.
+  This method will return the root widget in that tree.
+
+  \sa setBaseWidget()
+*/
+
+/*!
+  \fn SbBool So@Gui@Component::isTopLevelShell(void) const
+
+  Returns \c TRUE if this component is a toplevel shell, i.e. it has a
+  window representation on the desktop.
+
+  \sa getShellWidget()
+*/
+
+/*!
+  This method returns the shell widget of the component, but only if
+  it was created as a toplevel shell.  \c NULL will be returned for
+  embedded components.
+
+  (The toplevel shell is the desktop window which contains the
+  component.)
+
+  To get the toplevel shell of embedded components, you can use the
+  So@Gui@::getShellWidget() method.
+
+  \sa isTopLevelShell(), getWidget()
+*/
+@WIDGET@
+So@Gui@Component::getShellWidget(void) const
+{
+  return this->isTopLevelShell() ?
+    So@Gui@::getShellWidget(this->getWidget()) : NULL;
+}
+
+/*!
+  \fn @WIDGET@ So@Gui@Component::getParentWidget(void) const
+
+  Returns the widget which is the parent (i.e. contains) this
+  component's base widget.
+
+  \sa getWidget(), baseWidget(), isTopLevelShell()
+*/
+
+/*!
+  \fn void So@Gui@Component::setTitle(const char * const title)
+
+  Set the window title of this component. The title will appear on the
+  window title bar, if the component manages its own window.
+
+  \sa getTitle(), setIconTitle(), isTopLevelShell()
+*/
+
+/*!
+  \fn const char * So@Gui@Component::getTitle(void) const
+
+  Returns the window title.
+
+  If a title has been set, that title will be returned.
+  If no title has been set, the default title is returned.
+
+  \sa setTitle(), isTopLevelShell()
+*/
+
+/*!
+  \fn void So@Gui@Component::setIconTitle(const char * const title)
+
+  This method sets the title of the icon representation of the window.
+
+  The title will appear on the window icon, if the component manages
+  its own window.
+
+  \sa getIconTitle(), setTitle(), isTopLevelShell()
+*/
+
+/*!
+  \fn const char * So@Gui@Component::getIconTitle(void) const
+
+  Returns the title the window has when iconfied.
+
+  If an icon title has been set, that icon title is returned.  If no
+  icon title has been set, the default icon title is returned.
+
+  \sa setIconTitle(), isTopLevelShell()
+*/
+
+/*!
+  \fn const char * So@Gui@Component::getWidgetName(void) const
+
+  Returns name of the widget.
+*/
+
+/*!
+  \fn const char * So@Gui@Component::getClassName(void) const
+
+  Returns class name of widget.
+*/
+
+/*!
+  This method returns the default name of an So@Gui@Component widget.
+
+  It should be overridden by So@Gui@Component-derived classes so the
+  topmost widget in the component gets a proper name.
+*/
+const char *
+So@Gui@Component::getDefaultWidgetName(void) const
+{
+  return "So@Gui@Component";
+}
+
+/*!
+  This method returns the default window caption string of the
+  component.
+
+  It should be overridden by So@Gui@Component-derived classes so the
+  window and popup menu will get a proper title.
+*/
+const char *
+So@Gui@Component::getDefaultTitle(void) const
+{
+  return "@Gui@ Component";
+}
+
+/*!
+  This method returns the default icon title of the component.
+
+  It should be overridden by SoXtComponent-derived classes so icons will
+  get proper titles.
+*/
+const char *
+So@Gui@Component::getDefaultIconTitle(void) const
+{
+  return "@Gui@ Component";
+}
+
+/*!
+  \fn void So@Gui@Component::setSize(const SbVec2s size)
+
+  Resize the component widget.
+
+  The method assumes the caller knows what he is doing.
+
+  \sa getSize()
+*/
+
+/*!
+  \fn SbVec2s So@Gui@Component::getSize(void) const
+
+  Returns the component widget size.
+
+  The size that is returned is a cached size value, not a value
+  fetched from the GUI system.
+
+  \sa setSize()
+*/
+
+/*!
+  \fn void So@Gui@Component::sizeChanged(const SbVec2s & size)
+
+  Called internally from within the So@Gui@ library when the widget
+  embedded in a component changes it size, which is usually triggered
+  by end-user interaction.
+
+  This method is then invoked to notify the component that the size
+  has changed.  It is called from the top and all the way down to the
+  bottom, the size being adjusted to take into account extra
+  decorations having been added at each level in the component class
+  hierarchy.
+*/
+
+/*!
+  \fn void So@Gui@Component::openHelpCard(const char * const name)
+
+  Open a dialog providing help about use of this component.
+
+  NB: no help system has been implemented yet, so for the time being
+  this will only pop up an error message.
+*/
+
+/*!
+  \fn void So@Gui@Component::setWindowCloseCallback(So@Gui@ComponentCB * const func, void * const data)
+
+  Set up a callback function to use when the component gets closed. A
+  component must be a toplevel shell for this to have any effect.
+
+  For toplevel shells with no close callback set, the window will
+  simply be hidden. The typical action to take in the callback would
+  be to delete the component.
+
+  \sa isTopLevelShell()
+*/
+
+/*!
+  \fn So@Gui@Component * So@Gui@Component::getComponent(@WIDGET@ const widget)
+
+  Finds and returns the So@Gui@Component corresponding to the given
+  @WIDGET@, if any. If no So@Gui@Component is the "owner" of the
+  widget, \c NULL will be returned.
+*/
+
+/*!
+  \fn SbBool So@Gui@Component::setFullScreen(const SbBool onoff)
+
+  Toggle full screen mode for this component, if possible.
+
+  Returns \c FALSE if operation failed.  This might happen if the
+  toolkit doesn't support attempts at making the component cover the
+  complete screen or if the component is not a toplevel window.
+*/
+
+/*!
+  \fn SbBool So@Gui@Component::isFullScreen(void) const
+
+  Returns if this widget/component is in full screen mode.
+*/
+
+/*!
+  \fn void So@Gui@Component::setComponentCursor(const So@Gui@Cursor & cursor)
+
+  Sets the cursor for this component.
+
+  Note: not part of the original SGI InventorXt API.
+*/
+
+/*!
+  \fn void So@Gui@Component::setWidgetCursor(@WIDGET@ w, const So@Gui@Cursor & cursor)
+
+  Set cursor for a native widget in the underlying toolkit.
+
+  Note: not part of the original SGI InventorXt API.
+*/

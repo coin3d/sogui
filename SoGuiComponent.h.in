@@ -29,9 +29,6 @@
 #include <Inventor/SbLinear.h>
 #include <Inventor/@Gui@/So@Gui@Object.h>
 
-#ifdef __COIN_SOQT__
-class QWidget;
-#endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
 #include <X11/Intrinsic.h>
 #endif // __COIN_SOXT__
@@ -41,9 +38,6 @@ class QWidget;
 #ifdef __COIN_SOWIN__
 #include <wtypes.h>
 #endif // __COIN_SOWIN__
-#ifdef __COIN_SOMAC__
-// WORK-IN-PROGRESS
-#endif // __COIN_SOMAC__
 
 
 class So@Gui@Component;
@@ -74,17 +68,15 @@ public:
   SbBool isTopLevelShell(void) const;
 
   @WIDGET@ getWidget(void) const;
-  @WIDGET@ baseWidget(void) const;
+  @WIDGET@ getBaseWidget(void) const;
   @WIDGET@ getShellWidget(void) const;
   @WIDGET@ getParentWidget(void) const;
 
 #ifdef __COIN_SOWIN__
-  HWND getBaseWidget(void) const;
   HWND setFocusProxy(HWND widget);
   HWND getFocusProxy(void);
 #endif // __COIN_SOWIN__
 #ifdef __COIN_SOXT__
-  Widget getBaseWidget(void) const;
   Display * getDisplay(void);
   void fitSize(const SbVec2s size);
   // FIXME: I guess these should really be part of the common
