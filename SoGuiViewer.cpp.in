@@ -2020,10 +2020,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation = camerarot * rot;
 
     if (quadstereo) {
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK_RIGHT);
-			else
-				glDrawBuffer(GL_FRONT_RIGHT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK_RIGHT);
+   else
+    glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else {
@@ -2038,10 +2038,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation.enableNotify(orientationstore);
     camera->enableNotify(notifystore);
     if (quadstereo) {
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK);
-			else
-				glDrawBuffer(GL_FRONT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK);
+   else
+    glDrawBuffer(GL_FRONT);
     }
     else {
       glColorMask(1,1,1,1); // restore GL color mask
@@ -2050,10 +2050,10 @@ So@Gui@Viewer::actualRedraw(void)
 
     if (!quadstereo) {
       SoCamera * camera = this->getCamera();
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK);
-			else
-				glDrawBuffer(GL_FRONT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK);
+   else
+    glDrawBuffer(GL_FRONT);
       glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
@@ -2069,24 +2069,24 @@ So@Gui@Viewer::actualRedraw(void)
     }
     else {
       SoCamera * camera = this->getCamera();
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK_LEFT);
-			else
-				glDrawBuffer(GL_FRONT_LEFT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK_LEFT);
+   else
+    glDrawBuffer(GL_FRONT_LEFT);
       camera->setStereoAdjustment(this->getStereoOffset());
       camera->setStereoMode(SoCamera::LEFT_VIEW);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::RIGHT_VIEW);
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK_RIGHT);
-			else
-				glDrawBuffer(GL_FRONT_RIGHT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK_RIGHT);
+   else
+    glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::MONOSCOPIC);
-			if (this->isDoubleBuffer())
-				glDrawBuffer(GL_BACK);
-			else
-				glDrawBuffer(GL_FRONT);
+   if (this->isDoubleBuffer())
+    glDrawBuffer(GL_BACK);
+   else
+    glDrawBuffer(GL_FRONT);
     }
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
@@ -2149,8 +2149,8 @@ So@Gui@Viewer::interactiveCountInc(void)
 void
 So@Gui@Viewer::interactiveCountDec(void)
 {
-	// FIXME: The UI toolkits may cause the interactionnesting to go below zero
-	// by triggering press and release events in different widgets. mariusbu 20010709.
+ // FIXME: The UI toolkits may cause the interactionnesting to go below zero
+ // by triggering press and release events in different widgets. mariusbu 20010709.
 #if SO@GUI@_DEBUG
   if (PRIVATE(this)->interactionnesting <= 0) {
     SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
