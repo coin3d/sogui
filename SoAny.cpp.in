@@ -135,6 +135,11 @@ SoAny::~SoAny()
   }
 }
 
+// This little hack used to make the OSF1/cxx compiler accept the
+// argument to the atexit() call below. Problem reported by Guy
+// Barrand.
+extern "C" { typedef void(*SoAny_C_func)(void); }
+
 /*!
   Returns pointer to the single instance of this class (implemented
   according to the singleton design pattern).
@@ -144,7 +149,7 @@ SoAny::si(void)
 {
   if (single_instance == NULL) {
     single_instance = new SoAny;
-    atexit(cleanup_si);
+    (void)atexit((SoAny_C_func)cleanup_si);
   }
   return single_instance;
 }
@@ -356,7 +361,7 @@ envlist_append(struct envvar_data * item)
   if (envlist_head == NULL) {
     envlist_head = item;
     envlist_tail = item;
-    (void)atexit(envlist_cleanup);
+    (void)atexit((SoAny_C_func)envlist_cleanup);
   }
   else {
     envlist_tail->next = item;
