@@ -83,6 +83,10 @@
 #include <Inventor/nodes/SoOrthographicCamera.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
 // ************************************************************************
 
 #define PRIVATE(o) (o->pimpl)
@@ -936,6 +940,9 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
       { "sorted_object_sorted_triangle_add", _("sorted object sorted triangle add"), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
       { "sorted_object_sorted_triangle_blend", _("sorted object sorted triangle blend"), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
 #endif // __COIN__
+#ifdef HAVE_SORTED_LAYERS_BLEND
+      , { "sorted_layers_blend", _("sorted layers blend"), SORTED_LAYERS_BLEND_ITEM }
+#endif // HAVE_SORTED_LAYERS_BLEND
     };
 
     int nritems = sizeof(items) / sizeof(struct menutransparencyitem);
@@ -1052,6 +1059,11 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
     menu->setMenuItemMarked(SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
 #endif // __COIN__
+#ifdef HAVE_SORTED_LAYERS_BLEND
+  case SoGLRenderAction::SORTED_LAYERS_BLEND:
+    menu->setMenuItemMarked(SORTED_LAYERS_BLEND_ITEM, TRUE);
+    break;
+#endif // HAVE_SORTED_LAYERS_BLEND
   default:
 #if SO@GUI@_DEBUG
     SoDebugError::postInfo("SoGuiFullViewerP::prepareMenu",
@@ -1158,6 +1170,7 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
+  case SORTED_LAYERS_BLEND_ITEM: // define test is not needed. This enum is always defined
     this->drawstyleActivated(menuitemid);
     PUBLIC(this)->scheduleRedraw();
     break;
@@ -1345,6 +1358,11 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
     PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
     return;
 #endif // __COIN__
+#ifdef HAVE_SORTED_LAYERS_BLEND
+  case SORTED_LAYERS_BLEND_ITEM:
+    PUBLIC(this)->setTransparencyType(SoGLRenderAction::SORTED_LAYERS_BLEND);
+    return;
+#endif // HAVE_SORTED_LAYERS_BLEND
   default:
 #if SO@GUI@_DEBUG
     SoDebugError::postInfo("SoGuiFullViewerP::drawStyleActivated",
