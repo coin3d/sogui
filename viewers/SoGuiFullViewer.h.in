@@ -220,16 +220,6 @@ protected:
 
 #ifdef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 public:
-  enum ButtonId {
-    VIEWERBUTTON_PICK,
-    VIEWERBUTTON_VIEW,
-    VIEWERBUTTON_HELP,
-    VIEWERBUTTON_HOME,
-    VIEWERBUTTON_SET_HOME,
-    VIEWERBUTTON_VIEW_ALL,
-    VIEWERBUTTON_SEEK
-  };
-
   static void setDoButtonBar(SbBool enable);
   static SbBool isDoButtonBar(void);
 
@@ -246,6 +236,7 @@ public:
   virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
 
+
   class SoFieldSensor * zoomSensor;
 
   class SoWinThumbWheel * rightWheel;
@@ -255,26 +246,16 @@ public:
   SbVec2f zoomrange;
   class SoWinViewerPrefSheet * prefsheet;
 
-  SbPList * viewerButtonList;
-  SbPList * appButtonList;
-
   HWND viewerWidget;
   HWND renderAreaWidget;
-
-protected:
-  void showDecorationWidgets(SbBool onOff);
-
-private:
-  HWND buildLeftWheel(HWND parent);
-  HWND buildBottomWheel(HWND parent);
-  HWND buildRightWheel(HWND parent);
-
-  float getCameraZoom(void);
-  void setCameraZoom(float zoom);
 
   // FIXME: quick hack done while merging all the header file
   // definitions for So*FullViewer. 20020111 mortene.
   friend class SoWinViewerPrefSheet;
+
+protected:
+  SbPList * viewerButtonList;
+  SbPList * appButtonList;
 #endif // __COIN_SOWIN__
 };
 
