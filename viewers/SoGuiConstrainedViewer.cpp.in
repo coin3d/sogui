@@ -44,6 +44,14 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoCamera.h>
 #include <so@gui@defs.h>
 
+/*!
+  \var SbVec3f So@Gui@ConstrainedViewer::upVector
+  The camera's "up" vector is contrained to be in this direction.
+*/
+/*!
+  \var float So@Gui@ConstrainedViewer::sceneHeight
+  FIXME: doc
+*/
 
 // ************************************************************************
 
