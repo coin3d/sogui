@@ -279,9 +279,8 @@ ColorEditor::editorscene[] = {
   "  objectSize 400 340 0",
   //   Calculate positions
   "  SoGuiPosition {",
-  "    position 0 0 0",
-  "    = DEF windowgeometry Calculator {",
-  "      A 0 0 0 = USE pane.objectSize",
+  "    position = DEF windowgeometry Calculator {",
+  "      A = USE pane.objectSize",
   "      B 120 120 0",                               // colorwheel size
   "      C 140 30 0",                                // clickcounter size
   "      a 2",                                       // width of frame
@@ -310,7 +309,7 @@ ColorEditor::editorscene[] = {
   "      scaleFactor 2 2 2",
   "    }",
   "    DEF sliderlabel SoGuiLabel {",
-  "      which 0 = USE switcher.value",
+  "      which = USE switcher.value",
   "      text [",
   "        \"?\"",
   "        \"NONE\"",
@@ -323,7 +322,7 @@ ColorEditor::editorscene[] = {
   "    }",
   "  }",
   //   Create a frame around the color wheel
-  "  SoGuiPosition { position 0 0 0 = USE windowgeometry.oB }",
+  "  SoGuiPosition { position = USE windowgeometry.oB }",
   "  SoGuiFrame {",
   "    size = USE windowgeometry.B",
   "    design EMBOSS",
@@ -336,8 +335,7 @@ ColorEditor::editorscene[] = {
   "  }",
   //   Position the sliders
   "  SoGuiPosition {",
-  "    position 0 0 0",
-  "    = DEF slidergeometry Calculator {",
+  "    position = DEF slidergeometry Calculator {",
   "      A = USE pane.objectSize",
   "      B = USE windowgeometry.B",                    // color wheel size
   "      a = USE windowgeometry.a",                    // width of frame
@@ -357,20 +355,20 @@ ColorEditor::editorscene[] = {
   "  Switch {",
   "    whichChild = USE switcher.value",
   "    Group {", // never to be rendered...
-  "      DEF slider_r SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_g SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_b SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_h SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_s SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_v SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
-  "      DEF slider_translation SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }",
+  "      DEF slider_r SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_g SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_b SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_h SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_s SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_v SoGuiSlider1 { size = USE slidergeometry.oA }",
+  "      DEF slider_translation SoGuiTranslation { translation = USE slidergeometry.oC }",
   "      DEF slider_frame SoGuiFrame {",
-  "        size 0 0 0 = USE slidergeometry.oA ",
+  "        size = USE slidergeometry.oA ",
   "        design EMBOSS",
   "        width 2",
   "        complement TRUE",
   "      }",
-  "      DEF label_translation SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oD }",
+  "      DEF label_translation SoGuiTranslation { translation = USE slidergeometry.oD }",
   "      DEF label_scale Scale { scaleFactor 2 2 2 }",
   "      DEF label_r Separator {",
   "        USE label_translation",
