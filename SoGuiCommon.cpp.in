@@ -28,7 +28,9 @@
   This is the "application-wide" class with solely static methods
   handling initialization and event processing tasks. You must use
   this class in any application built on top of the So@Gui@
-  library. Typical usage is as follows (complete application code):
+  library.
+
+  Typical usage is as follows (complete application code):
 
   \code
 #include <Inventor/@Gui@/So@Gui@.h>
@@ -36,9 +38,9 @@
 #include <Inventor/nodes/SoCube.h>
 
 int
-main(int argc, char **argv)
+main(int argc, char ** argv)
 {
-  // Initialize So@Gui@ and Open Inventor libraries. This returns a main
+  // Initialize So@Gui@ and Inventor API libraries. This returns a main
   // window to use.
   @WIDGET@ mainwin = So@Gui@::init(argv[0]);
 
@@ -325,6 +327,9 @@ So@Gui@::abort(So@Gui@ABIError error)
 // *************************************************************************
 
 /*!
+  \fn void So@Gui@::createSimpleErrorDialog(@WIDGET@ widget, const char * title, const char * string1, const char * string2)
+
+
   This is a convenient way for the application programmer to throw up
   an obtrusive application-global error dialog.
 
