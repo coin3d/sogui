@@ -30,6 +30,7 @@
 
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/nodes/SoSubNode.h>
+#include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/SoLists.h>
 
 class SoPath;
@@ -58,6 +59,7 @@ private:
   
   static void fieldsensor_cb(void * data, SoSensor * sensor);
   static void pathsensor_cb(void * data, SoSensor * sensor);
+  static void set_bind_cb(void * data, SoSensor * sensor);
 
   void updateCamera(void);
   void updateViewpoint(void);
@@ -71,7 +73,20 @@ private:
   SoFieldSensor * orientationsensor;
   SoFieldSensor * heightanglesensor;
   SoGetMatrixAction * gmaction;
+
+  void truncateLists(void);
+  
   SoNodeList nodelist;
+  SbPList set_bind_sensorlist;
+  SoSearchAction sa;
+  SoNode * scenegraph;
+
+  void attachSetBindSensors(void);
+  void detachSetBindSensors(void);
+
+  void sendBindEvents(SoNode * node, const SbBool onoff);
+  void bindTopOfStack(void);
+
 };
 
 #endif //  COIN_SOGUIVIEWPOINTWRAPPER_H
