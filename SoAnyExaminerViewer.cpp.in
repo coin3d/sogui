@@ -478,45 +478,24 @@ SoAnyExaminerViewer::drawAxisCross(
   {
     glLineWidth(2.0);
 
-    // FIXME: the code which makes sure we render in the correct order
-    // (which we have to do, as Z-buffering is dysfunctional at this
-    // stage) is _really_ lousy. A virtual beer to the first hacker
-    // who improves this code. 19990424 mortene.
+    enum { XAXIS, YAXIS, ZAXIS };
+    int idx[3] = { XAXIS, YAXIS, ZAXIS };
+    float val[3] = { xpos[2], ypos[2], zpos[2] };
 
     // Bubble sort.. :-}
-    float minval = xpos[2];
-    float midval = ypos[2];
-    float maxval = zpos[2];
-    if (minval > midval) So@Gui@Swap(minval, midval);
-    if (midval > maxval) So@Gui@Swap(midval, maxval);
-    if (minval > midval) So@Gui@Swap(minval, midval);
-    assert((minval <= midval) && (midval <= maxval)); // Just checking..
-    // Find the order of rendering. Furthest away should render first,
-    // so we sort in back-to-front order.
-    int xturn = (xpos[2] == minval) ? 2 : ((xpos[2] == midval) ? 1 : 0);
-    int yturn = (ypos[2] == minval) ? 2 : ((ypos[2] == midval) ? 1 : 0);
-    int zturn = (zpos[2] == minval) ? 2 : ((zpos[2] == midval) ? 1 : 0);
-
-    // In case any of the three planes defined by the axes were
-    // parallel with the viewing plane.
-    if (yturn == xturn) yturn++;
-    if (zturn == xturn) zturn++;
-    if (zturn == yturn) zturn++;
-
-    // The code is uglier than Valgerd Svarstad Haugland, but it'd
-    // be even more embarrassing if it didn't work correctly.
-    assert(xturn != yturn);
-    assert(xturn != zturn);
-    assert(yturn != zturn);
+    if (val[0] < val[1]) { So@Gui@Swap(val[0], val[1]); So@Gui@Swap(idx[0], idx[1]); }
+    if (val[1] < val[2]) { So@Gui@Swap(val[1], val[2]); So@Gui@Swap(idx[1], idx[2]); }
+    if (val[0] < val[1]) { So@Gui@Swap(val[0], val[1]); So@Gui@Swap(idx[0], idx[1]); }
+    assert((val[0] >= val[1]) && (val[1] >= val[2])); // Just checking..
 
     for (int i=0; i < 3; i++) {
       glPushMatrix();
-      if (xturn == i) {                       // X axis.
+      if (idx[i] == XAXIS) {                       // X axis.
         glColor3f(0.500f, 0.125f, 0.125f);
-      } else if (yturn == i) {                // Y axis.
+      } else if (idx[i] == YAXIS) {                // Y axis.
         glRotatef(90, 0, 0, 1);
         glColor3f(0.125f, 0.500f, 0.125f);
-      } else {                                // Z axis.
+      } else {                                     // Z axis.
         glRotatef(-90, 0, 1, 0);
         glColor3f(0.125f, 0.125f, 0.500f);
       }
