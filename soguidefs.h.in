@@ -24,6 +24,12 @@
 
 /* ********************************************************************** */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+/* ********************************************************************** */
+
 #ifdef __FILE__
 #define SO@GUI@_STUB_FILE __FILE__
 #else
@@ -44,13 +50,16 @@
 #if HAVE_VAR___FUNCTION__
 #define SO@GUI@_STUB_FUNC __FUNCTION__
 #else
+#if HAVE_VAR___func__
+#define SO@GUI@_STUB_FUNC __func__
+#else
 #define SO@GUI@_STUB_FUNC ((char *)0L)
+#endif
 #endif
 #endif
 
 #if SO@GUI@_DEBUG
 
-#include <stdio.h> // sprintf()
 #include <Inventor/errors/SoDebugError.h>
 
 /*
@@ -60,6 +69,16 @@
 
 inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
 
+
+/* Collects common code from SO@GUI@_STUB(), SO@GUI@_STUB()_ONCE and
+   SO@GUI@_OBSOLETED(). */
+
+#define SO@GUI@_FUNCTIONIDENTIFIER(SO@GUI@STR) \
+    SbString SO@GUI@STR(so@gui@_not_null(SO@GUI@_STUB_FILE) ? SO@GUI@_STUB_FILE : ""); \
+    if (SO@GUI@STR.getLength() > 0) { SO@GUI@STR += ':'; } \
+    SO@GUI@STR += SbString((int)SO@GUI@_STUB_LINE); SO@GUI@STR += ':'; \
+    SO@GUI@STR += so@gui@_not_null(SO@GUI@_STUB_FUNC) ? SO@GUI@_STUB_FUNC : ""
+
 /*
   SO@GUI@_STUB(): a macro that prints out stub information.
   Used where there is functionality missing.
@@ -67,12 +86,8 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
 
 #define SO@GUI@_STUB() \
   do { \
-    char identifier[80]; \
-    sprintf(identifier, "%s:%u [%s]", \
-      so@gui@_not_null(SO@GUI@_STUB_FILE) ? SO@GUI@_STUB_FILE : "", \
-      so@gui@_not_null((void *)SO@GUI@_STUB_LINE) ? SO@GUI@_STUB_LINE : 0, \
-      so@gui@_not_null(SO@GUI@_STUB_FUNC) ? SO@GUI@_STUB_FUNC : ""); \
-    SoDebugError::postWarning(identifier, \
+    SO@GUI@_FUNCTIONIDENTIFIER(s); \
+    SoDebugError::postWarning(s.getString(), \
                               "STUB: functionality not yet completed"); \
   } while (0)
 
@@ -86,13 +101,9 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
   do { \
     static int first = 1; \
     if ( first ) { \
-      char identifier[80]; \
       first = 0; \
-      sprintf(identifier, "%s:%u [%s]", \
-        so@gui@_not_null(SO@GUI@_STUB_FILE) ? SO@GUI@_STUB_FILE : "", \
-        so@gui@_not_null((void *)SO@GUI@_STUB_LINE) ? SO@GUI@_STUB_LINE : 0, \
-        so@gui@_not_null(SO@GUI@_STUB_FUNC) ? SO@GUI@_STUB_FUNC : ""); \
-      SoDebugError::postWarning(identifier, \
+      SO@GUI@_FUNCTIONIDENTIFIER(s); \
+      SoDebugError::postWarning(s.getString(), \
                                 "STUB: functionality not yet completed " \
                                 "(first and last warning)"); \
     } \
@@ -105,12 +116,8 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
 
 #define SO@GUI@_OBSOLETED() \
   do { \
-    char identifier[80]; \
-    sprintf(identifier, "%s:%u [%s]", \
-      so@gui@_not_null(SO@GUI@_STUB_FILE) ? SO@GUI@_STUB_FILE : "", \
-      so@gui@_not_null((void *)SO@GUI@_STUB_LINE) ? SO@GUI@_STUB_LINE : 0, \
-      so@gui@_not_null(SO@GUI@_STUB_FUNC) ? SO@GUI@_STUB_FUNC : ""); \
-    SoDebugError::post(identifier, \
+    SO@GUI@_FUNCTIONIDENTIFIER(s); \
+    SoDebugError::post(s.getString(), \
                        "OBSOLETED: functionality no longer supported"); \
   } while (0)
 
