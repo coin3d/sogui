@@ -182,20 +182,17 @@ So@Gui@ExaminerViewer::rotYWheelMotion(
   Decide if it should be possible to start a spin animation of the model in
   the viewer by releasing the mouse button while dragging.
 
-  If the \c on flag is \c FALSE and we're currently animating, the spin
-  will be stopped.
+  If the \a enable flag is \c FALSE and we're currently animating, the
+  spin will be stopped.
 
   \sa isAnimationEnabled
 */
-
 void
-So@Gui@ExaminerViewer::setGenericAnimationEnabled(
-  const SbBool enable)
+So@Gui@ExaminerViewer::setGenericAnimationEnabled(const SbBool enable)
 {
   this->spinanimatingallowed = enable;
-  if (! enable && this->isAnimating())
-    this->stopAnimating();
-} // setAnimationEnabled()
+  if (! enable && this->isAnimating()) { this->stopAnimating(); }
+}
 
 // *************************************************************************
 
@@ -794,9 +791,9 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   // it's an ESC press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
     
-  // Events during seeks are ignored, except those which influence the
-  // seek mode itself -- these are handled further up the inheritance
-  // hierarchy.
+  // Events when in "ready-to-seek" mode are ignored, except those
+  // which influence the seek mode itself -- these are handled further
+  // up the inheritance hierarchy.
   if (this->isSeekMode()) { return inherited::processSoEvent(ev); }
 
   this->canvas = this->getGLSize();
