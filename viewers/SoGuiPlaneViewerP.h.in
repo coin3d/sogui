@@ -40,8 +40,7 @@ public:
 
   void commonConstructor(void);
 
-  void translateX(const float delta) const;
-  void translateY(const float delta) const;
+  void pan(const SbVec2f & thispos, const SbVec2f & prevpos);
   void rotateZ(const float angle) const;
 
   void viewPlaneX(void) const;
@@ -88,6 +87,8 @@ public:
   SbBool button1down;
   SbBool button2down;
   SbBool button3down;
+
+  SbPlane panningplane;
 
 protected:
   SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ);

@@ -232,16 +232,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       }
 
       if (currentmode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
-        if ((posn[0] != prevn[0]) || (posn[1] != prevn[1])) {
-          float dx = (posn[0] - prevn[0]) * 2.5f;
-          float dy = (posn[1] - prevn[1]) * 2.5f;
-          float yvalue = this->getLeftWheelValue() - dy;
-          float xvalue = this->getBottomWheelValue() + dx;
-          this->leftWheelMotion(yvalue);
-          this->setLeftWheelValue(yvalue);
-          this->bottomWheelMotion(xvalue);
-          this->setBottomWheelValue(xvalue);
-        }
+        if (posn != prevn) { PRIVATE(this)->pan(posn, prevn); }
         break;
       }
 
@@ -386,13 +377,37 @@ So@Gui@PlaneViewer::getDefaultIconTitle(void) const
 
 // Documented in superclass.
 void
+So@Gui@PlaneViewer::bottomWheelStart(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::TRANSLATE_MODE);
+}
+
+// Documented in superclass.
+void
 So@Gui@PlaneViewer::bottomWheelMotion(float value)
 {
   // This method set up the bottom wheel to control camera translation
   // in the horizontal direction.
 
-  PRIVATE(this)->translateX(value - this->getBottomWheelValue());
+  if (value != this->getBottomWheelValue()) {
+    PRIVATE(this)->pan(SbVec2f(value, 0), SbVec2f(this->getBottomWheelValue(), 0));
+  }
   inherited::bottomWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::bottomWheelFinish(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::IDLE_MODE);
+}
+
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::leftWheelStart(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::TRANSLATE_MODE);
 }
 
 // Documented in superclass.
@@ -402,8 +417,25 @@ So@Gui@PlaneViewer::leftWheelMotion(float value)
   // This method set up the left wheel to control camera translation
   // in the vertical direction.
 
-  PRIVATE(this)->translateY(value - this->getLeftWheelValue());
+  if (value != this->getLeftWheelValue()) {
+    PRIVATE(this)->pan(SbVec2f(0, this->getLeftWheelValue()), SbVec2f(0, value));
+  }
+
   inherited::leftWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::leftWheelFinish(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::IDLE_MODE);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::rightWheelStart(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::DOLLY_MODE);
 }
 
 // Documented in superclass.
@@ -415,6 +447,23 @@ So@Gui@PlaneViewer::rightWheelMotion(float value)
 
   PRIVATE(this)->zoom(this->getRightWheelValue() - value);
   inherited::rightWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::rightWheelFinish(void)
+{
+  PRIVATE(this)->changeMode(SoGuiPlaneViewerP::IDLE_MODE);
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::afterRealizeHook(void)
+{
+  PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+  inherited::afterRealizeHook();
 }
 
 // *************************************************************************
@@ -447,30 +496,6 @@ SoGuiPlaneViewerP::commonConstructor(void)
   this->button1down = FALSE;
   this->button2down = FALSE;
   this->button3down = FALSE;
-}
-
-void
-SoGuiPlaneViewerP::translateX(const float delta) const
-{
-  SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (! camera) return; // probably a scene-less viewer
-
-  SbVec3f dir;
-  camera->orientation.getValue().multVec(SbVec3f(1, 0, 0), dir);
-  camera->position = camera->position.getValue() - dir * delta *
-    camera->focalDistance.getValue() / 2.5f;
-}
-
-void
-SoGuiPlaneViewerP::translateY(const float delta) const
-{
-  SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (! camera) return; // probably a scene-less viewer
-
-  SbVec3f dir;
-  camera->orientation.getValue().multVec(SbVec3f(0, 1, 0), dir);
-  camera->position = camera->position.getValue() + dir * delta *
-    camera->focalDistance.getValue() / 2.5f;
 }
 
 void
@@ -686,12 +711,10 @@ SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
 
   switch (mode) {
   case SoGuiPlaneViewerP::IDLE_MODE:
-  case SoGuiPlaneViewerP::ROTZ_WAIT_MODE:
-    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
-    break ;
   case SoGuiPlaneViewerP::DOLLY_MODE:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
     break;
+  case SoGuiPlaneViewerP::ROTZ_WAIT_MODE:
   case SoGuiPlaneViewerP::ROTZ_MODE:
     PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getRotateCursor());
     break;
@@ -738,8 +761,57 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
     break;
   }
 
+  if (newmode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
+    // The plane we're projecting the mouse coordinates to get 3D
+    // coordinates should stay the same during the whole pan
+    // operation, so we should calculate this value here.
+    SoCamera * cam = PUBLIC(this)->getCamera();
+    if (cam == NULL) { // can happen for empty scenegraph
+      this->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
+    }
+    else {
+      SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
+      this->panningplane = vv.getPlane(cam->focalDistance.getValue());
+    }
+  }
+
   this->setCursorRepresentation(newmode);
   this->mode = newmode;
+}
+
+// FIXME: this method is cut'n'pasted from SoGuiExaminerViewer --
+// should collect them in a common place. 20020512 mortene.
+void
+SoGuiPlaneViewerP::pan(const SbVec2f & thispos, const SbVec2f & prevpos)
+{
+  SoCamera * cam = PUBLIC(this)->getCamera();
+  if (cam == NULL) return; // can happen for empty scenegraph
+  if (thispos == prevpos) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("So@Gui@PlaneViewerP::pan", "useless invokation");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo("So@Gui@PlaneViewerP::pan",
+                         "was(%.3g, %.3g) -> now(%.3g, %.3g)",
+                         prevpos[0], prevpos[1], thispos[0], thispos[1]);
+#endif // SO@GUI@_DEBUG
+
+  // Find projection points for the last and current mouse coordinates.
+  SbViewVolume vv = cam->getViewVolume(PUBLIC(this)->getGLAspectRatio());
+  SbLine line;
+  vv.projectPointToLine(thispos, line);
+  SbVec3f current_planept;
+  this->panningplane.intersect(line, current_planept);
+  vv.projectPointToLine(prevpos, line);
+  SbVec3f old_planept;
+  this->panningplane.intersect(line, old_planept);
+
+  // Reposition camera according to the vector difference between the
+  // projected points.
+  cam->position = cam->position.getValue() - (current_planept - old_planept);
 }
 
 // *************************************************************************
