@@ -151,10 +151,11 @@ private:
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
 {
-  if (this->searcher)
+  if ( this->searcher != NULL )
     delete this->searcher;
-  if (this->lastrender)
+  if ( this->lastrender != NULL )
     delete this->lastrender;
+  // superimposition unrefed in other destructor
 }
 
 #define PRIVATE(o) (o->pimpl)
