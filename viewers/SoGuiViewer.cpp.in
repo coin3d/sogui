@@ -2471,29 +2471,27 @@ So@Gui@Viewer::isStereoViewing(
 
 /*!
   Set the offset between the two viewpoints when in stereo mode.
+  Default value is 0.1.
 
   NOTE: In the original InventorXt API, this method was not virtual.
 
   \sa getStereoOffset()
 */
-
 void
-So@Gui@Viewer::setStereoOffset(// virtual
-  const float dist)
+So@Gui@Viewer::setStereoOffset(const float dist)
 {
   PRIVATE(this)->stereooffset = dist;
   this->scheduleRedraw();
 }
 
 /*!
-  Return the offset distance between the two viewpoints when in stereo mode.
+  Return the offset distance between the two viewpoints when in stereo
+  mode.
 
   \sa setStereoOffset()
 */
-
 float
-So@Gui@Viewer::getStereoOffset(
-  void) const
+So@Gui@Viewer::getStereoOffset(void) const
 {
   return PRIVATE(this)->stereooffset;
 }
