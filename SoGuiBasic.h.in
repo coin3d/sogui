@@ -50,17 +50,29 @@
  */
 
 template <class Type>
-inline Type So@Gui@Min(Type a, Type b) { return (b < a) ? b : a; }
+inline Type So@Gui@Abs(Type Val) {
+  return (Val < 0) ? -Val : Val;
+}
 
 template <class Type>
-inline Type So@Gui@Max(Type a, Type b) { return (b > a) ? b : a; }
+inline Type So@Gui@Min(Type a, Type b) {
+  return (b < a) ? b : a;
+}
 
 template <class Type>
-inline Type So@Gui@Clamp(Type val, Type min, Type max)
-  { return So@Gui@Max(min, So@Gui@Min(max, val)); }
+inline Type So@Gui@Max(Type a, Type b) {
+  return (b > a) ? b : a;
+}
 
 template <class Type>
-inline void So@Gui@Swap(Type & a, Type & b) { Type t = a; a = b; b = t; }
+inline Type So@Gui@Clamp(Type val, Type min, Type max) {
+  return So@Gui@Max(min, So@Gui@Min(max, val));
+}
+
+template <class Type>
+inline void So@Gui@Swap(Type & a, Type & b) {
+  Type t = a; a = b; b = t;
+}
 
 // *************************************************************************
 
