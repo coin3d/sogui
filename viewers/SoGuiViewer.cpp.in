@@ -112,6 +112,7 @@
 
 /*!
   \enum So@Gui@Viewer::AutoClippingStrategy
+
   Enum for auto clipping strategy.
   
   \sa setAutoClippingStrategy()
@@ -599,7 +600,14 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
   // Recalculate near/far planes. Must be done in reallyRedraw() --
   // not actualRedraw() -- so the clipping planes are correct even
   // when rendering multiple times with different camera settings.
-  if (PUBLIC(this)->isAutoClipping()) { this->setClippingPlanes(); }
+  if (this->camera && PUBLIC(this)->isAutoClipping()) {
+    // Temporarily turn off notification when changing near and far
+    // clipping planes, to avoid latency.
+    const SbBool notif = this->camera->isNotifyEnabled();
+    this->camera->enableNotify(FALSE);
+    this->setClippingPlanes();
+    this->camera->enableNotify(notif);
+  }
 
   if (this->drawAsHiddenLine()) {
 
@@ -2301,6 +2309,15 @@ So@Gui@Viewer::isCursorEnabled(void) const
   possible to use the So@Gui@Viewer::setAutoClippingStrategy() method
   to fine-tune the near/far clipping plane settings.
 
+  On a minor note, be aware that notifications will be temporarily
+  turned off for the scene's SoCamera when changing the near and far
+  clipping planes (which is done right before each redraw). This is
+  done to avoid notifications being sent through the scene graph right
+  before rendering, as that causes some latency. It is mentioned here
+  in case you have any client code which for some reason needs to
+  sense all changes to the scene camera. This is however unlikely, so
+  you can very probably ignore this.
+
   \sa getAutoClipping()
 */
 
@@ -2905,12 +2922,9 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   if (!root) return;
 
   PRIVATE(this)->usersceneroot->addChild(PRIVATE(this)->scenegraph);
-  // old: PRIVATE(this)->sceneroot->addChild(PRIVATE(this)->scenegraph);
 
   // Search for a camera in the user-supplied scenegraph.
-  // SoSearchAction search;
-  // search.setType(SoCamera::getClassTypeId());
-  // search.apply(PRIVATE(this)->scenegraph);
+
   SbBool oldsearch = SoBaseKit::isSearchingChildren();
   SoBaseKit::setSearchingChildren(TRUE);
 
