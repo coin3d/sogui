@@ -150,10 +150,11 @@ So@Gui@RenderArea::constructor( // private
   SbBool build )
 {
   this->normalManager = new SoSceneManager;
-  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
   this->normalManager->activate();
 
   this->overlayManager = new SoSceneManager;
+  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
   this->overlayManager->activate();
 
   this->normalColormap = NULL;
@@ -456,6 +457,7 @@ So@Gui@RenderArea::setTransparencyType(
 {
   assert( this->normalManager != NULL );
   this->normalManager->getGLRenderAction()->setTransparencyType( type );
+  this->overlayManager->getGLRenderAction()->setTransparencyType( type );
 } // setTransparencyType()
 
 /*!
@@ -483,6 +485,7 @@ So@Gui@RenderArea::setAntialiasing(
 {
   assert( this->normalManager != NULL );
   this->normalManager->setAntialiasing( smoothing, numPasses );
+  this->overlayManager->setAntialiasing( smoothing, numPasses );
 } // setAntialiasing()
 
 /*!
@@ -568,10 +571,14 @@ void
 So@Gui@RenderArea::setAutoRedraw(
   SbBool enable )
 {
-  if ( enable )
-    this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-  else
+  if ( enable ) {
+    this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
+    this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
+  }
+  else {
     this->normalManager->setRenderCallback( NULL, NULL );
+    this->overlayManager->setRenderCallback( NULL, NULL );
+  }
 
   // We can not use the render callback ptr as a flag, as the render
   // callback pointer will be set upon expose events and forced
@@ -673,7 +680,13 @@ So@Gui@RenderArea::renderOverlay(
   void )
 {
   assert( this->overlayManager != NULL );
-  this->overlayManager->render( this->clearOverlay, this->clearZBuffer );
+
+  if ( !this->isVisible() || this->waitForExpose )
+    return;
+
+  this->glLock(); // this makes the GL context "current"
+  this->redrawOverlay();
+  this->glUnlock();
 } // renderOverlay()
 
 /*!
@@ -693,7 +706,7 @@ So@Gui@RenderArea::scheduleRedraw(
   assert( this->normalManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  this->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->normalManager );
   this->normalManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleRedraw()
 
@@ -705,10 +718,11 @@ void
 So@Gui@RenderArea::scheduleOverlayRedraw(
   void )
 {
-  assert( this->normalManager != NULL );
   assert( this->overlayManager != NULL );
-  this->normalManager->scheduleRedraw(); // FIXME - from old code
-  this->overlayManager->scheduleRedraw();
+  // In case autoRedraw is OFF. The callback pointer will be reset to
+  // NULL in renderCB() if autoRedraw is OFF.
+  this->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this->overlayManager );
+  this->overlayManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleOverlayRedraw()
 
 
@@ -1017,16 +1031,21 @@ So@Gui@RenderArea::widgetChanged( // virtual, protected
   @WIDGET@ widget )
 {
   this->normalManager->reinitialize();
+  this->overlayManager->reinitialize();
   // FIXME: colorindex mode not supported yet, so this has no
   // effect. 20001121 mortene.
 #if 0
   this->normalManager->setRGBMode(this->isRGBMode());
+  this->overlayManager->setRGBMode(this->isRGBMode());
 #endif
     
   // FIXME: this code needs to be enabled (and rewritten to work) to
   // handle display list caching. 20001121 mortene.
 #if 0
   SoGLRenderAction * ra = this->normalManager->getGLRenderAction();
+  ra->setCacheContext(XXX);
+  ra->setRenderingIsRemote(XXX);
+  ra = this->overlayManager->getGLRenderAction();
   ra->setCacheContext(XXX);
   ra->setRenderingIsRemote(XXX);
 #endif
@@ -1128,10 +1147,14 @@ So@Gui@RenderArea::renderCB( // static
   SoSceneManager * manager )
 {
   So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) user;
-  thisptr->render();
+  if ( manager == thisptr->normalManager )
+    thisptr->render();
+  else if ( manager == thisptr->overlayManager )
+    thisptr->renderOverlay();
+  else assert(0);
 
   if ( !thisptr->isAutoRedraw() )
-    thisptr->normalManager->setRenderCallback( NULL, NULL );
+    manager->setRenderCallback( NULL, NULL );
 } // renderCB()
 
 // *************************************************************************
@@ -1167,6 +1190,7 @@ So@Gui@RenderArea::glReshape( // virtual, derived
   this->glUnlock();
 
   this->actualRedraw();
+  this->actualOverlayRedraw();
 } // glReshape()
 
 /*!
@@ -1181,6 +1205,7 @@ So@Gui@RenderArea::glRender( // virtual, derived
   // series of them coming along and it would be wasteful and stupid
   // to re-render on all of them.
   this->scheduleRedraw();
+  this->scheduleOverlayRedraw();
 } // glRender()
 
 /*!
@@ -1222,7 +1247,7 @@ So@Gui@RenderArea::processEvent( // virtual, protected
   if ( this->invokeAppCB( event ) )
     return;
 
-  const SoEvent * soevent = getSoEvent( event );
+  const SoEvent * soevent = this->getSoEvent( event );
 
   if ( soevent != NULL ) {
     SbBool processed = this->processSoEvent(soevent);
