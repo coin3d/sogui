@@ -31,8 +31,12 @@ class SoAnyPopupMenu;
 class So@Gui@FullViewer;
 
 enum SoAnyFullViewerPopupMenuItem {
+  // FIXME: there's code in (some of) the popupmenu widgets which
+  // assumes the root id is equal to 0.  Yup, lousy design. :-/
+  // Anyway, don't change it until those cases are fixed.
+  // 20010810 mortene.
   ROOT_MENU = 0,
-  MENUTITLE_ITEM,
+  ROOT_MENU_TITLE,
 
   FUNCTIONS_MENU,
   HELP_ITEM,

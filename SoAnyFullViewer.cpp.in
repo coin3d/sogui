@@ -92,7 +92,14 @@ SoAnyFullViewer::setupStandardPopupMenu(
   SoAnyPopupMenu * menu = new So@Gui@PopupMenu;
 
   menu->newMenu( "rootmenu", ROOT_MENU );
-  menu->setMenuTitle( ROOT_MENU, this->popupmenutitle.getString() );
+
+  // Simple hack for a common / generic way of setting up a title for
+  // the popupmenu.
+  menu->newMenuItem( "rootmenutitle", ROOT_MENU_TITLE );
+  menu->setMenuItemTitle( ROOT_MENU_TITLE, this->popupmenutitle.getString() );
+  menu->setMenuItemEnabled( ROOT_MENU_TITLE, FALSE );
+  menu->addMenuItem( ROOT_MENU, ROOT_MENU_TITLE );
+
   menu->addSeparator( ROOT_MENU );
 
   menu->newMenu( "functionsmenu", FUNCTIONS_MENU );
