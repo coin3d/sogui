@@ -144,6 +144,4 @@ SoAnyFullViewer::buildStandardPopupMenu(
   return menu;
 } // buildPopupMenu()
 
-#endif // SOBE_DEBUG
-
 // ************************************************************************
