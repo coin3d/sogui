@@ -195,9 +195,6 @@ So@Gui@RenderAreaP::showToolkitInformation( void )
 #if SO@GUI@_MAKE_DLL
   info += "Built as MSWindows DLL.\n";
 #endif // !SO@GUI@_MAKE_DLL
-#if SO@GUI@_DEBUG
-  info += "Built with debug messages enabled.\n";
-#endif // !SO@GUI@_DEBUG
 
   // FIXME: include information about the underlying toolkit library,
   // if possible (ie Qt version, Gtk version, Motif implementation,
