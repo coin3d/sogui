@@ -26,6 +26,8 @@
 #endif // HAVE_CONFIG_H
 
 #include <Inventor/SbMatrix.h>
+#include <Inventor/SbPlane.h>
+#include <Inventor/SbLine.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/bundles/SoMaterialBundle.h>
 #include <Inventor/actions/SoGLRenderAction.h>
@@ -47,6 +49,8 @@ class Pane {
 public:
   SbMatrix modelmatrix;
   SbVec3f position;
+  SbVec2f raypickpos;
+
 };
 
 // *************************************************************************
@@ -79,17 +83,36 @@ SoGuiPane::~SoGuiPane(void)
 void
 SoGuiPane::doAction(SoAction * action)
 {
-  // SoDebugError::postInfo("SoGuiPane::doAction", "type %s", action->getTypeId().getName().getString());
-
   SoState * state = action->getState();
   state->push();
   if ( state->isElementEnabled(SoModelMatrixElement::getClassStackIndex()) ) {
     SbVec3f world = this->worldSize.getValue();
     SbVec3f object = this->objectSize.getValue();
-    SbVec3f scalefactor(world[0] / object[0], world[1] / object[1], 1.0f);
+    SbVec3f scalefactor(world[0] / object[0], world[1] / object[1], 1.0f); // scale z to 0?
     SoModelMatrixElement::scaleBy(state, this, scalefactor);
   }
+  if ( action->isOfType(SoRayPickAction::getClassTypeId()) ) {
+    SoRayPickAction * rpaction = (SoRayPickAction *) action;
+    rpaction->setObjectSpace();
+
+    SbPlane plane(SbVec3f(0.0f, 0.0f, 1.0f), 0.0f);
+    SbLine line(rpaction->getLine());
+    // find intersection with SbPlane
+    SbVec3f point;
+    PRIVATE(this)->raypickpos.setValue(-1.0f, -1.0f);
+    if ( plane.intersect(line, point) ) {
+      SbVec3f object = this->objectSize.getValue();
+      SbVec2f pos(point[0], point[1]);
+      if ( pos[0] < 0.0f || pos[1] < 0.0f || pos[0] > object[0] || pos[1] > object[1] ) {
+        goto culled;
+      } else {
+        PRIVATE(this)->raypickpos = pos;
+      }
+    }
+    else goto culled;
+  }
   inherited::doAction(action);
+culled:
   state->pop();
 }
 
@@ -215,6 +238,12 @@ SoGuiPane::getBoundingBox(SoGetBoundingBoxAction * action)
 {
   SoDebugError::postInfo("SoGuiPane::getBB", "invoked");
   this->doAction(action);
+}
+
+SbVec2f
+SoGuiPane::getRayPickIntersectionPoint(void) const
+{
+  return PRIVATE(this)->raypickpos;
 }
 
 void

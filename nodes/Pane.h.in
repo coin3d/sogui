@@ -28,6 +28,7 @@
 #error this is a private header file
 #endif /* !SO@GUI@_INTERNAL */
 
+#include <Inventor/SbVec2f.h>
 #include <Inventor/fields/SoSFVec3f.h>
 #include <Inventor/nodes/SoSeparator.h>
 
@@ -53,11 +54,13 @@ public:
   virtual void getMatrix(SoGetMatrixAction * action);
   virtual void getBoundingBox(SoGetBoundingBoxAction * action);
 
+  SbVec2f getRayPickIntersectionPoint(void) const;
+
 protected:
   friend class SoGuiPosition;
   friend class SoGuiTranslation;
 
-  ~SoGuiPane(void);
+  virtual ~SoGuiPane(void);
 
   void moveTo(SoState * state, SbVec3f position);
   void applyMoveTo(SoGetMatrixAction * action, SbVec3f position);
