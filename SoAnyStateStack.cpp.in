@@ -17,6 +17,11 @@
  *
  **************************************************************************/
 
+// @configure_input@
+
+static const char rcsid[] =
+  "$Id$";
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/SbPList.h>
 

@@ -17,6 +17,9 @@
  *
  **************************************************************************/
 
+//  @configure_input@
+//  $Id$
+
 #ifndef SOANY_STATESTACK_H
 #define SOANY_STATESTACK_H
 
