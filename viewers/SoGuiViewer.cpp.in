@@ -2322,13 +2322,25 @@ So@Gui@Viewer::isCursorEnabled(void) const
   the rasterization of close polygons upon lousy utilization of the
   z-buffer.
 
-  Automatic clipping is on as default.
+  Automatic calculations of near and far clip planes are on as
+  default.
 
   For better control over what happens in boundary conditions (for
   instance when the distance between near and far planes get very far,
   or if geometry gets very close to the camera position), it is
   possible to use the So@Gui@Viewer::setAutoClippingStrategy() method
   to fine-tune the near/far clipping plane settings.
+
+  On a major note, be aware that turning auto-updating of near and far
+  clip planes have a potentially serious detrimental effect on
+  performance, due to an important side effect: updating the near and
+  far clip planes triggers an SoGetBoundingBoxAction to traverse the
+  scene graph, which causes bounding boxes to be calculated and stored
+  in caches. The bounding box caches are then used by the
+  SoGLRenderAction traversal for view frustum culling operations. With
+  no bounding box caches, the rendering will not do culling, which can
+  cause much worse performance. Systems in Motion are working on
+  correcting this problem properly from within the Coin library.
 
   On a minor note, be aware that notifications will be temporarily
   turned off for the scene's SoCamera when changing the near and far
