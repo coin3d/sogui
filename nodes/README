@@ -16,13 +16,23 @@ NODEKITS
 
   SoGuiClickCounter - a button-like widget that reacts to mouse presses
 
+  SoGuiToggleButton - a button-like widget that can be turned on/off with the mouse
+
+  SoGuiRadioButton - a button-like widget that can be turned on with the mouse
+
   SoGuiSlider1 - an interactive slider for a one-dimensional value space
 
-  SoGuiSlider2 - an interative slider for a two-dimensional value space
+  SoGuiSlider2 - an interactive slider for a two-dimensional value space
 
   SoGuiColorEditor - the machinery of the color editor component
 
-  [SoGuiMaterialEditor] - the machinery of the material editor component
+  SoGuiMaterialEditor - the machinery of the material editor component
+
+ENGINES
+
+  SoGuiRadioGroup - an engine that will make sure only one SoSFBool is enabled
+
+  SoGuiFormat - a string formatting engine (very ad-hoc design for now)
 
 DRAGGERS
 
