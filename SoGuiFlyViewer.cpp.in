@@ -34,7 +34,8 @@ static const char rcsid[] =
   <ul>
 
   <li>"s" puts the viewer in seek mode. Click some geometry with the
-      left mouse button to start the seek zoom animation. </li>
+      left mouse button to start the seek zoom animation. (Hitting "s"
+      again before clicking will cancel the seek operation.)</li>
 
   </ul>
 
