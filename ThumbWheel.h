@@ -24,13 +24,18 @@
 
 // ************************************************************************
 
-#define THUMBWHEEL_ENABLED   0x01
-#define THUMBWHEEL_VERTICAL  0x02
-
 class ThumbWheel {
 public:
   ThumbWheel(void);
   ~ThumbWheel(void);
+
+  enum RenderDirection {
+    VERTICAL, HORIZONTAL
+  };
+
+  enum WheelState {
+    DISABLED, ENABLED
+  };
 
   void SetWheelSize( int diameter, int width );
   void GetWheelSize( int & diameter, int & width ) const;
@@ -41,9 +46,9 @@ public:
   void GetColorFactors( float & light, float & front, float & normal, float & shade );
 
   int BitmapsRequired(void) const;
-  void DrawBitmap( int number, void * bitmap, unsigned int flags );
+  void DrawBitmap( int number, void * bitmap, RenderDirection direction );
   float CalculateValue( float origValue, int origPosition, int deltaPosition );
-  int GetBitmapForValue( float value, unsigned int flags );
+  int GetBitmapForValue( float value, WheelState state );
 
   enum GraphicsByteOrder {
     ABGR,
@@ -94,9 +99,8 @@ private:
   int dirtyVariables;
   float squarelength, squarespacing, shadelength, unistep, numsquares;
 
-  void DrawDisabledWheel( int number, void * bitmap, unsigned int flags );
-  void DrawEnabledWheel( int number, void * bitmap, unsigned int flags );
-
+  void DrawDisabledWheel(int number, void * bitmap, RenderDirection direction );
+  void DrawEnabledWheel( int number, void * bitmap, RenderDirection direction );
 }; // class ThumbWheel
 
 // ************************************************************************

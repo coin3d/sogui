@@ -31,6 +31,7 @@ static const char rcsid[] =
 #define TRUE (!FALSE)
 #endif
 
+
 /*!
   \class ThumbWheel ThumbWheel.h
   \brief The ThumbWheel class is a helper class for managing thumb wheel
@@ -228,19 +229,20 @@ ThumbWheel::BitmapsRequired(
 // ************************************************************************
 
 /*!
-  This method draws thumb wheel bitmap number num.
+  This method draws thumb wheel bitmap \a number. \a direction decides
+  if it should be rendered in the vertical or horizontal position.
 */
 
 void
 ThumbWheel::DrawBitmap(
   int number,
   void * bitmap,
-  unsigned int flags )
+  RenderDirection direction )
 {
   if ( number == 0 ) {
-    DrawDisabledWheel( number, bitmap, flags );
+    DrawDisabledWheel( number, bitmap, direction );
   } else {
-    DrawEnabledWheel( number, bitmap, flags );
+    DrawEnabledWheel( number, bitmap, direction );
   }
 }
 
@@ -310,11 +312,11 @@ ThumbWheel::CalculateValue(
 int
 ThumbWheel::GetBitmapForValue(
   float value,
-  unsigned int flags )
+  WheelState state )
 {
   this->Validate();
 
-  if ( ! (flags & THUMBWHEEL_ENABLED) )
+  if ( state == DISABLED )
     return 0; // only one disabled bitmap in this implementation
 
   float squarerange = (2.0f * M_PI) / (float) numsquares;
@@ -407,9 +409,11 @@ void
 ThumbWheel::Validate( // private
   void )
 {
-  if ( this->dirtyTables != FALSE ) {
-    assert( this->dirtyVariables != FALSE );
-    for ( int i = 0; i < NUMTABLES; i++ ) {
+  int i;
+
+  if ( this->dirtyTables ) {
+    assert( this->dirtyVariables );
+    for ( i = 0; i < NUMTABLES; i++ ) {
       if ( this->tables[i] ) delete [] this->tables[i];
       this->tables[i] = new float [ this->diameter ];
     }
@@ -418,7 +422,7 @@ ThumbWheel::Validate( // private
     float range = 2.0f * M_PI;
     float acos0times2 = 2.0f*acos( 0.0f );
 
-    for ( int i = 0; i < this->diameter; i++ ) {
+    for ( i = 0; i < this->diameter; i++ ) {
       if ( (float) i <= radius ) {
         this->tables[COS][i] = (radius - (float) i) / radius;
         this->tables[RAD][i] = acos( this->tables[COS][i] );
@@ -432,7 +436,7 @@ ThumbWheel::Validate( // private
     this->dirtyTables = FALSE;
   }
 
-  if ( this->dirtyVariables != FALSE ) {
+  if ( this->dirtyVariables ) {
     assert( this->dirtyTables == FALSE );
     if ( (this->diameter % 2) == 0)
       this->unistep = this->tables[RAD][this->diameter/2] -
@@ -475,7 +479,7 @@ void
 ThumbWheel::DrawDisabledWheel( // private
   int number,
   void * bitmap,
-  unsigned int flags )
+  RenderDirection direction )
 {
   assert( number == 0 );
 
@@ -503,7 +507,7 @@ ThumbWheel::DrawDisabledWheel( // private
       shade  = swapWord(  shade );
     }
 
-    if ( flags & THUMBWHEEL_VERTICAL ) {
+    if ( direction == ThumbWheel::VERTICAL ) {
       buffer[j*this->width] = light;
       for ( int i = 1; i < (width - 1); i++ )
         buffer[(j*this->width)+i] = normal;
@@ -529,7 +533,7 @@ void
 ThumbWheel::DrawEnabledWheel(
   int number,
   void * bitmap,
-  unsigned int flags )
+  RenderDirection direction )
 {
   this->Validate();
 
@@ -539,7 +543,7 @@ ThumbWheel::DrawEnabledWheel(
   float modulo = (2.0f * M_PI) / numsquares;
   float radian = modulo - (((2.0f * M_PI) / (float) numsquares) * (((float) (number - 1)) / (float) numEnabledBitmaps));
 //  fprintf( stderr, "radoffset = %8.4f\n", radoffset );
-//  DrawDisabledWheel( 0, bitmap, vertical );
+//  DrawDisabledWheel( 0, bitmap, direction );
 
   int newsquare = TRUE;
   unsigned int * buffer = (unsigned int *) bitmap;
@@ -583,7 +587,7 @@ ThumbWheel::DrawEnabledWheel(
       }
     }
 
-    if ( flags & THUMBWHEEL_VERTICAL ) {
+    if ( direction == ThumbWheel::VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
       if ( flag == TRUE ) buffer[(this->width*j)+2] = front;
@@ -615,7 +619,7 @@ ThumbWheel::DrawEnabledWheel(
     if ( j < (this->diameter - 1) ) {
       radian += this->tables[RAD][j+1] - this->tables[RAD][j];
       if ( radian > modulo ) {
-        if ( flags & THUMBWHEEL_VERTICAL ) {
+        if ( direction == ThumbWheel::VERTICAL ) {
           int color = 0;
           if ( j > (this->diameter * 2 / 3) )
             color = light;
