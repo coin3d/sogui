@@ -20,6 +20,16 @@
 
 // @configure_input@
 
+/* For the Doxygen tool. */
+
+/*! \defgroup devices @Gui@ Device Classes */
+/*! \defgroup components @Gui@ Components */
+/*! \defgroup viewers @Gui@ Viewer Components */
+/*! \defgroup editors @Gui@ Editor Components */
+/*! \defgroup slidersets @Gui@ Slider Set Components */
+/*! \defgroup misc Miscellaneous Classes */
+
+
 /*!
   \class So@Gui@ So@Gui@.h Inventor/@Gui@/So@Gui@.h
   \brief The So@Gui@ class takes care of @Gui@ initialization and event dispatching.

@@ -26,20 +26,6 @@
 
 // *************************************************************************
 
-/* For the Doxygen tool. */
-/* FIXME: these Doxygen "tags" should be moved to an internal
-   headerfile. 20010810 mortene. */
-
-/*! \defgroup devices @Gui@ Device Classes */
-/*! \defgroup components @Gui@ Components */
-/*! \defgroup viewers @Gui@ Viewer Components */
-/*! \defgroup editors @Gui@ Editor Components */
-/*! \defgroup slidersets @Gui@ Slider Set Components */
-/*! \defgroup misc Miscellaneous Classes */
-/*! \defgroup common Common Code */
-
-// *************************************************************************
-
 /* Some useful inline template functions (instead of macros):
  *   So@Gui@Min(Val1, Val2)       - returns minimum value
  *   So@Gui@Max(Val1, Val2)       - returns maximum value
