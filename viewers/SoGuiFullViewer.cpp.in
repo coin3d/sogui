@@ -1473,6 +1473,7 @@ SoGuiFullViewerP::zoom(SoCamera * cam, const float diffvalue)
 {
   if (cam == NULL) return; // can happen for empty scenegraph
   SoType t = cam->getTypeId();
+  SbName tname = t.getName();
 
   // This will be in the range of <0, ->>.
   float multiplicator = float(exp(diffvalue));
@@ -1487,8 +1488,21 @@ SoGuiFullViewerP::zoom(SoCamera * cam, const float diffvalue)
     oc->height = oc->height.getValue() * multiplicator;
 
   }
-  else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-
+  else {
+    // FrustumCamera can be found in the SmallChange CVS module (it's
+    // a camera that lets you specify (for instance) an off-center
+    // frustum (similar to glFrustum())
+    if (!t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()) &&
+        tname != "FrustumCamera") {
+      static SbBool first = TRUE;
+      if (first) {
+        SoDebugError::postWarning("SoGuiFullViewerP::zoom",
+                                  "Unknown camera type, "
+                                  "will zoom by moving position, but this might not be correct.");
+        first = FALSE;
+      }
+    }
+    
     const float oldfocaldist = cam->focalDistance.getValue();
     const float newfocaldist = oldfocaldist * multiplicator;
 
@@ -1525,15 +1539,6 @@ SoGuiFullViewerP::zoom(SoCamera * cam, const float diffvalue)
     else {
       cam->position = newpos;
       cam->focalDistance = newfocaldist;
-    }
-  }
-  else {
-    static SbBool first = TRUE;
-    if (first) {
-      SoDebugError::postWarning("SoGuiFullViewerP::zoom",
-                                "unknown camera type, "
-                                "attempts to zoom will have no effect");
-      first = FALSE;
     }
   }
 }

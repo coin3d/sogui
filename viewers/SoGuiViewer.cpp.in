@@ -221,6 +221,7 @@ public:
   // Home position storage.
   SoOrthographicCamera * storedortho;
   SoPerspectiveCamera * storedperspective;
+  SoCamera * storedfrustum;
 
   SoDirectionalLight * headlight;
 
@@ -315,6 +316,13 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->storedortho->ref();
   this->storedperspective = new SoPerspectiveCamera;
   this->storedperspective->ref();
+  
+  this->storedfrustum = NULL;
+  SoType frustumtype = SoType::fromName("FrustumCamera");
+  if (!frustumtype.isBad()) {
+    this->storedfrustum = (SoCamera*) frustumtype.createInstance();
+    this->storedfrustum->ref();
+  }
 
   // initialize auto clipping parameters
   this->autoclipstrategy = So@Gui@Viewer::VARIABLE_NEAR_PLANE;
@@ -337,6 +345,9 @@ So@Gui@ViewerP::~So@Gui@ViewerP()
 
   this->storedortho->unref();
   this->storedperspective->unref();
+  if (this->storedfrustum) {
+    this->storedfrustum->unref();
+  }
 }
 
 SoSeparator *
@@ -1008,7 +1019,6 @@ So@Gui@ViewerP::setClippingPlanes(void)
       farval = nearfar[1]; 
     }
   }
-
   // Some slack around the bounding box, in case the scene fits
   // exactly inside it. This is done to minimize the chance of
   // artifacts caused by the limitation of the z-buffer
@@ -1017,9 +1027,22 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // rotated.
   const float SLACK = 0.001f;
 
-  this->camera->nearDistance = nearval * (1.0f - SLACK);
-  this->camera->farDistance = farval * (1.0f + SLACK);
-
+  // FrustumCamera can be found in the SmallChange CVS module. We
+  // should not change the nearDistance for this camera, as this will
+  // modify the frustum.
+  if (this->camera->getTypeId().getName() == "FrustumCamera") {
+    nearval = this->camera->nearDistance.getValue();
+    farval = farval * (1.0f + SLACK); 
+    if (farval <= nearval) {
+      // nothing is visible, so just set farval to som value > nearval.
+      farval = nearval + 10.0f;
+    }
+    this->camera->farDistance = farval;
+  }
+  else {
+    this->camera->nearDistance = nearval * (1.0f - SLACK);
+    this->camera->farDistance = farval * (1.0f + SLACK);
+  }
 
   // FIXME: there's a possible optimization to take advantage of here,
   // since we are able to sometimes know for sure that all geometry is
@@ -1808,6 +1831,17 @@ So@Gui@Viewer::getCamera(void) const
 void
 So@Gui@Viewer::setCameraType(SoType t)
 {
+  if (PRIVATE(this)->camera && 
+      !PRIVATE(this)->camera->isOfType(SoPerspectiveCamera::getClassTypeId()) &&
+      !PRIVATE(this)->camera->isOfType(SoOrthographicCamera::getClassTypeId())) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@Viewer::setCameraType",
+                              "Only SoPerspectiveCamera and SoOrthographicCamera is supported.");
+#endif // SO@GUI_DEBUG 
+    return;
+  }
+
+
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
   SbBool oldisperspective = PRIVATE(this)->cameratype.isDerivedFrom(perspectivetype);
@@ -1858,10 +1892,18 @@ So@Gui@Viewer::setCameraType(SoType t)
     // by setCamera().
     SoOrthographicCamera * homeo = new SoOrthographicCamera;
     SoPerspectiveCamera * homep = new SoPerspectiveCamera;
+    SoCamera * homef = NULL;
     homeo->ref();
     homep->ref();
     homeo->copyContents(PRIVATE(this)->storedortho, FALSE);
     homep->copyContents(PRIVATE(this)->storedperspective, FALSE);
+
+    SoType frustumtype = SoType::fromName("FrustumCamera");
+    if (!frustumtype.isBad() && PRIVATE(this)->storedfrustum) {
+      homef = (SoCamera*) frustumtype.createInstance();
+      homef->ref();
+      homef->copyContents(PRIVATE(this)->storedfrustum, FALSE);
+    }
 
     this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
 
@@ -1871,6 +1913,10 @@ So@Gui@Viewer::setCameraType(SoType t)
     homeo->unref();
     homep->unref();
 
+    if (homef) {
+      PRIVATE(this)->storedfrustum->copyContents(homef, FALSE);
+      homef->unref();
+    }
     PRIVATE(this)->deletecamera = TRUE;
     if (oldcamera) { cameraparent->removeChild(oldcamera); }
   }
@@ -1947,6 +1993,9 @@ So@Gui@Viewer::saveHomePosition(void)
     So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)PRIVATE(this)->camera,
                                              PRIVATE(this)->storedortho);
   }
+  else if (t.getName() == "FrustumCamera" && PRIVATE(this)->storedfrustum) {
+    PRIVATE(this)->storedfrustum->copyContents(PRIVATE(this)->camera, FALSE);
+  }
   else {
 #if SO@GUI@_DEBUG
     SoDebugError::postWarning("So@Gui@Viewer::saveHomePosition",
@@ -1974,6 +2023,9 @@ So@Gui@Viewer::resetToHomePosition(void)
   }                                                                 
   else if (t == SoPerspectiveCamera::getClassTypeId()) {
     PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
+  }
+  else if (t.getName() == "FrustumCamera" && PRIVATE(this)->storedfrustum) {
+    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedfrustum, FALSE);
   }
 }
 
