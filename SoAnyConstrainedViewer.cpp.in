@@ -29,6 +29,7 @@ static const char rcsid[] =
 #include <assert.h>
 
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoCamera.h>
 
 #include <Inventor/@GUI@/viewers/SoAnyConstrainedViewer.h>
@@ -52,5 +53,37 @@ SoAnyConstrainedViewer::~SoAnyConstrainedViewer(
   void )
 {
 } // ~SoAnyConstrainedViewer()
+
+// *************************************************************************
+
+/*!
+  This method tilts the camera \a delta degrees closer to the up direction.
+*/
+
+void
+SoAnyConstrainedViewer::tiltCamera(
+  const float delta ) const
+{
+  SoCamera * const camera = viewer->getCamera();
+  assert( camera != NULL );
+  SbVec3f camdir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camdir );
+  camera->orientation = camera->orientation.getValue() *
+    SbRotation( viewer->getUpDirection().cross( camdir ), delta );
+} // tiltCamera()
+
+/*!
+  This method rotates the camera \a delta degrees around the up direction.
+*/
+
+void
+SoAnyConstrainedViewer::rotateCamera(
+  const float delta ) const
+{
+  SoCamera * const camera = viewer->getCamera();
+  assert( camera != NULL );
+  camera->orientation = camera->orientation.getValue() *
+                        SbRotation( viewer->getUpDirection(), -delta );
+} // rotateCamera()
 
 // *************************************************************************

@@ -24,7 +24,6 @@
 
 #include <Inventor/SbLinear.h>
 
-class SoCamera;
 class So@GUI@ConstrainedViewer;
 
 // ************************************************************************
@@ -33,6 +32,9 @@ class SoAnyConstrainedViewer {
 public:
   SoAnyConstrainedViewer( So@GUI@ConstrainedViewer * const viewer );
   ~SoAnyConstrainedViewer(void);
+
+  void tiltCamera( const float delta ) const;
+  void rotateCamera( const float delta ) const;
 
 private:
   So@GUI@ConstrainedViewer * const viewer;
