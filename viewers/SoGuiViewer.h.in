@@ -38,7 +38,9 @@
  *  
 \**************************************************************************/
 
-// Workaround for OIV problem on Linux in SbBasic.h.
+// Include this first, as a workaround for building on top of SGI and
+// TGS Inventor on some Linux distributions. (The bug is in SGI/TGS
+// Inventor.)
 #include <math.h>
 
 #include <Inventor/SbTime.h>
@@ -66,12 +68,9 @@ class SoTimerSensor;
 
 class So@Gui@Viewer;
 
-typedef void So@Gui@ViewerCB(
-                 void * data, So@Gui@Viewer * viewer);
-typedef void So@Gui@ViewerFPSCB(
-                 float fps, void * data, So@Gui@Viewer * viewer);
-typedef void So@Gui@ViewerDecimationPercentageCB(
-                 float percentage, void * data, So@Gui@Viewer * viewer);
+typedef void So@Gui@ViewerCB(void * data, So@Gui@Viewer * viewer);
+typedef void So@Gui@ViewerFPSCB(float fps, void * data, So@Gui@Viewer * viewer);
+typedef void So@Gui@ViewerDecimationPercentageCB(float percentage, void * data, So@Gui@Viewer * viewer);
 
 // *************************************************************************
 
@@ -199,20 +198,18 @@ public:
   void setWireframeOverlayColor(const SbColor & color);
   const SbColor & getWireframeOverlayColor(void) const;
 
-  // Overloaded from parent class.
   virtual void setDoubleBuffer(const SbBool enable);
 
   virtual void setSceneGraph(SoNode * root);
   virtual SoNode * getSceneGraph(void);
 
 protected:
-  So@Gui@Viewer(
-    @WIDGET@ parent,
-    const char * name,
-    SbBool embed,
-    Type type,
-    SbBool build);
-  ~So@Gui@Viewer(void);
+  So@Gui@Viewer(@WIDGET@ parent,
+                const char * name,
+                SbBool embed,
+                Type type,
+                SbBool build);
+  ~So@Gui@Viewer();
 
   virtual void sizeChanged(const SbVec2s & size);
   virtual void setSeekMode(SbBool enable);
@@ -256,7 +253,7 @@ private:
   class So@Gui@ViewerP * pimpl;
   friend class So@Gui@ViewerP;
 
-}; // class So@Gui@Viewer
+};
 
 // *************************************************************************
 
