@@ -1069,12 +1069,23 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // 20020117 mortene.
 
 
-  if (SO@GUI@_DEBUG && 0) { // debug
+  // Debug assistance, can be turned on without recompilation (just
+  // set the environment variable SO@GUI@_DEBUG_CLIPPLANES):
+
+#if SO@GUI@_DEBUG
+  static int debugoutputnearfar = -1;
+  if (debugoutputnearfar == -1) {
+    const char * env = SoAny::si()->getenv("SO@GUI@_DEBUG_CLIPPLANES");
+    debugoutputnearfar = (env && atoi(env) > 0) ? 1 : 0;
+  }
+
+  if (debugoutputnearfar == 1) { // debug
     SoDebugError::postInfo("So@Gui@Viewer::setClippingPlanes",
                            "near, far: %f (%f), %f (%f)",
                            nearval, this->camera->nearDistance.getValue(),
                            farval, this->camera->farDistance.getValue());
   }
+#endif // debug
 }
 
 // Translate camera a distance equal to the difference in projected,
