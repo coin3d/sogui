@@ -66,13 +66,14 @@ AMTAR = @AMTAR@
 AS = @AS@
 AWK = @AWK@
 CC = @CC@
-COMPONENTHEADER = @COMPONENTHEADER@
 CPP = @CPP@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
-EVENT = @EVENT@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_CONFIG = @GTK_CONFIG@
+GTK_LIBS = @GTK_LIBS@
 GUI = @GUI@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -85,18 +86,19 @@ MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
-SOXT_BINARY_AGE = @SOXT_BINARY_AGE@
-SOXT_INTERFACE_AGE = @SOXT_INTERFACE_AGE@
-SOXT_MAJOR_VERSION = @SOXT_MAJOR_VERSION@
-SOXT_MICRO_VERSION = @SOXT_MICRO_VERSION@
-SOXT_MINOR_VERSION = @SOXT_MINOR_VERSION@
-SOXT_VERSION = @SOXT_VERSION@
+SOGTK_BINARY_AGE = @SOGTK_BINARY_AGE@
+SOGTK_EXTRA_CPPFLAGS = @SOGTK_EXTRA_CPPFLAGS@
+SOGTK_EXTRA_LDFLAGS = @SOGTK_EXTRA_LDFLAGS@
+SOGTK_EXTRA_LIBS = @SOGTK_EXTRA_LIBS@
+SOGTK_INTERFACE_AGE = @SOGTK_INTERFACE_AGE@
+SOGTK_MAJOR_VERSION = @SOGTK_MAJOR_VERSION@
+SOGTK_MICRO_VERSION = @SOGTK_MICRO_VERSION@
+SOGTK_MINOR_VERSION = @SOGTK_MINOR_VERSION@
+SOGTK_VERSION = @SOGTK_VERSION@
 VERSION = @VERSION@
 WIDGET = @WIDGET@
 install_sh = @install_sh@
-lGUI = @lGUI@
 sim_ac_conf_cmd = @sim_ac_conf_cmd@
-uGUI = @uGUI@
 
 ############################################################################
 #
@@ -119,7 +121,7 @@ libSoCommon_la_SOURCES = \
 	ThumbWheel.cpp \
 	ThumbWheel.h
 
-subdir = src/Inventor/Xt/common
+subdir = src/Inventor/Gtk/common
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -166,7 +168,7 @@ all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .c .cpp .h .lo .o
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Inventor/Xt/common/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Inventor/Gtk/common/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
