@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 // This file contains the generic, "templatize-able" parts of the
 // So*WalkViewer sourcecode.
 

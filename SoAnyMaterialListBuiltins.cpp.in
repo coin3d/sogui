@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 /**************************************************************************
  * IMPORTANT NOTICE
  * Be aware that the file So@Gui@MaterialListBuiltins.cpp is generated from
@@ -1485,8 +1480,4 @@ SoAnyMaterialList::setupBuiltinMaterials(// private
 } // setupBuiltinMaterials()
 
 // *************************************************************************
-
-#if SO@GUI@_DEBUG
-static const char * getSoAnyMaterialListBuiltinsRCSId(void) { return rcsid; }
-#endif // SO@GUI@_DEBUG
 

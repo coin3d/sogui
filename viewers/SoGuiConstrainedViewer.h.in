@@ -22,7 +22,6 @@
 \**************************************************************************/
 
 // @configure_input@
-// $Id$
 
 #ifndef SO@GUI@_CONSTRAINEDVIEWER_H
 #define SO@GUI@_CONSTRAINEDVIEWER_H

@@ -22,7 +22,6 @@
 \**************************************************************************/
 
 // @configure_input@
-// $Id$
 
 #ifndef SOANY_MATERIALLIST_H
 #define SOANY_MATERIALLIST_H

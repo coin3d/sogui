@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 /*!
   \class So@Gui@FlyViewer Inventor/@Gui@/viewers/So@Gui@FlyViewer.h
   \brief The So@Gui@FlyViewer class implements controls for moving

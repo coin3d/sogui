@@ -22,7 +22,6 @@
 \**************************************************************************/
 
 // @configure_input@
-// $Id$
 
 #ifndef SOANY_THUMBWHEEL_H
 #define SOANY_THUMBWHEEL_H

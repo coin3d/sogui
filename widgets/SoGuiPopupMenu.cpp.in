@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 /*!
   \class So@Gui@PopupMenu Inventor/@Gui@/widgets/So@Gui@PopupMenu.h
   \brief The So@Gui@PopupMenu class implements a common interface for popup
@@ -383,9 +378,4 @@ So@Gui@PopupMenu::invokeMenuSelection(
 } // invokeMenuSelection()
 
 // *************************************************************************
-
-// silence some compilers
-#if SO@GUI@_DEBUG
-static const char * getSo@Gui@PopupMenuRCSId(void) { return rcsid; }
-#endif // SO@GUI@_DEBUG
 

@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 /*!
   \class So@Gui@ConstrainedViewer Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h
   \brief The So@Gui@ConstrainedViewer class is the superclass for viewers with constrains on the viewpoint.

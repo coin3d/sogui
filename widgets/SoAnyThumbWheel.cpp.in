@@ -23,11 +23,6 @@
 
 // @configure_input@
 
-#if SO@GUI@_DEBUG
-static const char rcsid[] =
-  "$Id$";
-#endif // SO@GUI@_DEBUG
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -652,7 +647,3 @@ SoAnyThumbWheel::drawEnabledWheel(
 } // drawEnabledWheel()
 
 // ************************************************************************
-
-#if SO@GUI@_DEBUG
-static const char * getSoAnyThumbWheelRCSId(void) { return rcsid; }
-#endif // SO@GUI@_DEBUG

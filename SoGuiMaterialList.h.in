@@ -21,8 +21,6 @@
  *
 \**************************************************************************/
 
-// $Id$
-
 #ifndef SO@GUI@_MATERIALLIST_H
 #define SO@GUI@_MATERIALLIST_H
 

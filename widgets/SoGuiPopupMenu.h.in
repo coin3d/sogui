@@ -22,7 +22,6 @@
 \**************************************************************************/
 
 // @configure_input@
-// $Id$
 
 #ifndef SO@GUI@_POPUPMENU_H
 #define SO@GUI@_POPUPMENU_H
