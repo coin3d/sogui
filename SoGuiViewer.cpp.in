@@ -473,6 +473,8 @@ So@Gui@Viewer::So@Gui@Viewer(
   this->sceneRoot->ref();
   this->sceneRoot->renderCaching.setValue(SoSeparator::OFF);
   this->sceneRoot->renderCulling.setValue(SoSeparator::OFF);
+  this->sceneRoot->pickCulling.setValue(SoSeparator::OFF);
+  this->sceneRoot->boundingBoxCaching.setValue(SoSeparator::OFF);
 
   // Drawstyle subgraph.
   {
