@@ -49,10 +49,8 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoMaterialBinding.h>
 #include <Inventor/nodes/SoOrthographicCamera.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
-#include <Inventor/nodes/SoRotation.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
-#include <Inventor/nodes/SoTransformSeparator.h>
 
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <Inventor/actions/SoSearchAction.h>
@@ -165,9 +163,7 @@ public:
   SbRotation storedorientation;
   float storedheightval;
 
-  // Headlight handling
-  SbBool lighton;
-  SoGroup * lightroot;
+  SoDirectionalLight * headlight;
 
   // Drawstyles
   So@Gui@Viewer::DrawStyle drawstyles[2];
@@ -485,6 +481,14 @@ So@Gui@Viewer::So@Gui@Viewer(
   this->sceneRoot->pickCulling.setValue(SoSeparator::OFF);
   this->sceneRoot->boundingBoxCaching.setValue(SoSeparator::OFF);
 
+  // Headlight. By inserting this before any scenegraph camera, the
+  // light will always be pointing in correct direction.
+  {
+    PRIVATE(this)->headlight = new SoDirectionalLight;
+    PRIVATE(this)->headlight->direction.setValue(1, -1, -10);
+    this->sceneRoot->addChild(PRIVATE(this)->headlight);
+  }
+
   // Drawstyle subgraph.
   {
     PRIVATE(this)->drawstyleroot = new SoSwitch;
@@ -541,9 +545,6 @@ So@Gui@Viewer::So@Gui@Viewer(
   PRIVATE(this)->drawstyles[STILL] = VIEW_AS_IS;
   PRIVATE(this)->drawstyles[INTERACTIVE] = VIEW_SAME_AS_STILL;
 
-  PRIVATE(this)->lighton = TRUE;
-  PRIVATE(this)->lightroot = NULL;
-
   this->addStartCallback(So@Gui@ViewerP::interactivestartCB);
   this->addFinishCallback(So@Gui@ViewerP::interactiveendCB);
 
@@ -579,7 +580,6 @@ So@Gui@Viewer::~So@Gui@Viewer(
   delete PRIVATE(this)->seeksensor;
 
   if ( this->sceneGraph ) this->setSceneGraph(NULL);
-  if ( PRIVATE(this)->lightroot ) PRIVATE(this)->lightroot->unref();
   this->sceneRoot->unref();
 
   delete PRIVATE(this);
@@ -588,9 +588,7 @@ So@Gui@Viewer::~So@Gui@Viewer(
 // *************************************************************************
 
 /*!
-  Set the camera we want to view the scene with. This will set it up
-  with the headlight and register it for later retrieval (from
-  getCamera()) and subsequent use.
+  Set the camera we want to view the scene with.
 
   The camera passed in as an argument to this method must be part of
   the viewer's scenegraph.
@@ -601,13 +599,7 @@ So@Gui@Viewer::~So@Gui@Viewer(
 void
 So@Gui@Viewer::setCamera(SoCamera * cam)
 {
-  // Store for re-enabling after camera is attached.
-  SbBool headlightflag = this->isHeadlight();
-
   if (this->camera) {
-    // Detach headlight.
-    if (this->isHeadlight()) this->setHeadlight(FALSE);
-
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (PRIVATE(this)->deletecamera) {
@@ -624,11 +616,7 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
   if (this->camera) {
     this->camera->ref();
     this->saveHomePosition();
-    if (headlightflag) this->setHeadlight(TRUE);
     PRIVATE(this)->cameratype = this->camera->getTypeId();
-  }
-  else {
-    PRIVATE(this)->lighton = headlightflag;
   }
 } // setCamera()
 
@@ -836,53 +824,7 @@ So@Gui@Viewer::resetToHomePosition(void)
 void
 So@Gui@Viewer::setHeadlight(SbBool on)
 {
-  if (on) {
-    if (!PRIVATE(this)->lightroot) {
-      PRIVATE(this)->lightroot = new SoTransformSeparator;
-
-      // disable notification so that the bounding box cache of the
-      // top separator is not blown every frame.  FIXME: we should
-      // recode the entire headlight and camera handling in the GUI
-      // toolkits. It is very ugly that we modify the user scene
-      // graph.  pederb, 2001-07-27
-      PRIVATE(this)->lightroot->enableNotify(FALSE);
-      PRIVATE(this)->lightroot->ref(); // Matched by an unref() in the destructor.
-      PRIVATE(this)->lightroot->addChild(new SoRotation);
-      SoDirectionalLight * dl = new SoDirectionalLight;
-      dl->direction.setValue(1, -1, -10);
-      PRIVATE(this)->lightroot->addChild(dl);
-    }
-
-    if (!this->camera) { // Headlight flag set early -- just store and return.
-      PRIVATE(this)->lighton = on;
-      return;
-    }
-
-    SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
-    int lidx = cameraparent->findChild(PRIVATE(this)->lightroot);
-    if (lidx == -1) {
-      int idx = cameraparent->findChild(this->camera);
-      // FIXME: inserting the lightsource node under the same group
-      // node as the camera is a terrible idea -- it will for instance
-      // f*ck up if the camera parent is a switch node. 20010815 mortene.
-      cameraparent->insertChild(PRIVATE(this)->lightroot, idx+1);
-
-      SoRotation * lorient = (SoRotation *) PRIVATE(this)->lightroot->getChild(0);
-      lorient->rotation.connectFrom(& this->camera->orientation);
-    }
-  }
-  else {
-    if (PRIVATE(this)->lightroot) {
-      SoGroup * lightparent = get_parent_of_node(this->sceneRoot,
-                                                 PRIVATE(this)->lightroot);
-      lightparent->removeChild(PRIVATE(this)->lightroot);
-
-      SoRotation * lorient = (SoRotation *) PRIVATE(this)->lightroot->getChild(0);
-      lorient->rotation.disconnect();
-    }
-  }
-
-  PRIVATE(this)->lighton = on;
+  PRIVATE(this)->headlight->on = on;
 } // setHeadlight()
 
 // *************************************************************************
@@ -890,17 +832,13 @@ So@Gui@Viewer::setHeadlight(SbBool on)
 /*!
   Returns status of the viewer headlight, whether it is on or off.
 
-  Note that the returned flag does not check the state of the \a on
-  field of the SoDirectionalLight headlight node, it only indicates
-  whether or not a headlight is part of the scene graph.
-
   \sa setHeadlight(), getHeadlight()
 */
 
 SbBool
 So@Gui@Viewer::isHeadlight(void) const
 {
-  return PRIVATE(this)->lighton;
+  return PRIVATE(this)->headlight->on.getValue();
 } // isheadlight()
 
 // *************************************************************************
@@ -917,12 +855,7 @@ So@Gui@Viewer::isHeadlight(void) const
 SoDirectionalLight *
 So@Gui@Viewer::getHeadlight(void) const
 {
-  if (!PRIVATE(this)->lightroot) return NULL;
-
-  SoDirectionalLight * dl =
-    (SoDirectionalLight *) PRIVATE(this)->lightroot->getChild(1);
-  assert(dl->isOfType(SoDirectionalLight::getClassTypeId()));
-  return dl;
+  return PRIVATE(this)->headlight;
 } // getHeadlight()
 
 // *************************************************************************
@@ -1750,7 +1683,6 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     scenecamera->viewAll(this->sceneGraph, this->getViewportRegion());
   }
 
-  // This will set up the headlight
   this->setCamera(scenecamera);
 } // setSceneGraph()
 
