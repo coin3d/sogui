@@ -1001,15 +1001,30 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
   this->setDevicesWindowSize( glsize );
 } // sizeChanged()
 
-/*!
-  This method is invoked when a widget is changed in the component.
-*/
-
+// Documented in superclass.
 void
 So@Gui@RenderArea::widgetChanged( // virtual, protected
   @WIDGET@ widget )
 {
-  SO@GUI@_STUB();
+  this->normalManager->reinitialize();
+  // FIXME: colorindex mode not supported yet, so this has no
+  // effect. 20001121 mortene.
+#if 0
+  this->normalManager->setRGBMode(this->isRGBMode());
+#endif
+    
+  // FIXME: this code needs to be enabled (and rewritten to work) to
+  // handle display list caching. 20001121 mortene.
+#if 0
+  SoGLRenderAction * ra = this->normalManager->getGLRenderAction();
+  ra->setCacheContext(XXX);
+  ra->setRenderingIsRemote(XXX);
+#endif
+
+  // FIXME: should also walk through all registered devices and do a
+  // disable() on the old widget and enable() on the new one.
+  // 20001121 mortene.
+
 } // widgetChanged()
 
 /*!
@@ -1139,7 +1154,7 @@ So@Gui@RenderArea::glReshape( // virtual, derived
 
   this->setDevicesWindowSize( glsize );
   this->glUnlock();
-  // call widgetChanged() or something?
+
   this->actualRedraw();
 } // glReshape()
 
@@ -1209,8 +1224,8 @@ So@Gui@RenderArea::processEvent( // virtual, protected
 // *************************************************************************
 
 /*!
-  This method returns an SoEvent * corresponding to the given \a event, or
-  NULL if there are none.
+  This method returns an SoEvent * corresponding to the given \a
+  event, or \c NULL if there are none.
 */
 
 const SoEvent *
