@@ -25,20 +25,23 @@
 
 #include <Inventor/SbLinear.h>
 
-class So@GUI@ConstrainedViewer;
+class SoEvent;
+class So@Gui@ConstrainedViewer;
 
 // ************************************************************************
 
 class SoAnyConstrainedViewer {
 public:
-  SoAnyConstrainedViewer( So@GUI@ConstrainedViewer * const viewer );
+  SoAnyConstrainedViewer( So@Gui@ConstrainedViewer * const viewer );
   ~SoAnyConstrainedViewer(void);
 
   void tiltCamera( const float delta ) const;
   void rotateCamera( const float delta ) const;
 
+  SbBool processSoEvent( SoEvent * const event );
+
 private:
-  So@GUI@ConstrainedViewer * const viewer;
+  So@Gui@ConstrainedViewer * const viewer;
 
 }; // class SoAnyConstrainedViewer
 

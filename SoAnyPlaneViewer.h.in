@@ -26,13 +26,15 @@
 #include <Inventor/SbLinear.h>
 
 class SoCamera;
-class So@GUI@PlaneViewer;
+class SoEvent;
+
+class So@Gui@PlaneViewer;
 
 // ************************************************************************
 
 class SoAnyPlaneViewer {
 public:
-  SoAnyPlaneViewer( So@GUI@PlaneViewer * const viewer );
+  SoAnyPlaneViewer( So@Gui@PlaneViewer * const viewer );
   ~SoAnyPlaneViewer(void);
 
   void translateX( const float delta ) const;
@@ -52,20 +54,14 @@ public:
 
   void drawRotateGraphics(void) const;
 
-  // old interface
-  float transYWheelMotion( const float value, const float oldvalue,
-    SoCamera * const camera );
-  float transXWheelMotion( const float value, const float oldvalue,
-    SoCamera * const camera );
-  void rotZ( SbVec2f position, SbVec2f oldposition, float aspectratio,
-    SoCamera * const camera );
-
   void viewPlaneX( SoCamera * const camera );
   void viewPlaneY( SoCamera * const camera );
   void viewPlaneZ( SoCamera * const camera );
 
+  SbBool processSoEvent( SoEvent * const event );
+
 private:
-  So@GUI@PlaneViewer * const viewer;
+  So@Gui@PlaneViewer * const viewer;
 
   struct pointerdata {
     SbVec2s now;

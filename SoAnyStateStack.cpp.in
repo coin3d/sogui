@@ -19,15 +19,17 @@
 
 // @configure_input@
 
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@GUI@_DEBUG
 
 #include <assert.h>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/SbPList.h>
 
-#include <Inventor/@GUI@/widgets/SoAnyStateStack.h>
+#include <Inventor/@Gui@/widgets/SoAnyStateStack.h>
 
 #define SOANY_ANYSTATE      -1
 
@@ -255,5 +257,7 @@ SoAnyStateStack::invokeTransitionCallbacks(
 
 // *************************************************************************
 
+#if SO@GUI@_DEBUG
 static const char * getSoAnyStateStackRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 

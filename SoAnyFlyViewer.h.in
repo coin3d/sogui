@@ -23,19 +23,22 @@
 #ifndef SOANY_FLYVIEWER_H
 #define SOANY_FLYVIEWER_H
 
-class So@GUI@FlyViewer;
+class SoEvent;
+class So@Gui@FlyViewer;
 
 // ************************************************************************
 
 class SoAnyFlyViewer {
 public:
-  SoAnyFlyViewer( So@GUI@FlyViewer * const viewer );
+  SoAnyFlyViewer( So@Gui@FlyViewer * const viewer );
   ~SoAnyFlyViewer(void);
 
   void dolly( const float delta ) const;
 
+  SbBool processSoEvent( SoEvent * const event );
+
 private:
-  So@GUI@FlyViewer * const viewer;
+  So@Gui@FlyViewer * const viewer;
 
 }; // class SoAnyFlyViewer
 

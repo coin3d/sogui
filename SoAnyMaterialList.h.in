@@ -20,31 +20,31 @@
 #ifndef SOANY_MATERIALLIST_H
 #define SOANY_MATERIALLIST_H
 
-#include <Inventor/@GUI@/So@GUI@MaterialList.h>
+#include <Inventor/@Gui@/So@Gui@MaterialList.h>
 
 class SbPList;
 class SoMaterial;
 
 // *************************************************************************
 
-#define SO@uGUI@_BUILTIN_MATERIALS 0x0001
+#define SO@GUI@_BUILTIN_MATERIALS 0x0001
 
-struct So@GUI@Material {
+struct So@Gui@Material {
   const char * name;
   const char * data;
 };
 
-struct So@GUI@MaterialGroup {
+struct So@Gui@MaterialGroup {
   const char * name;
   short numMaterials;
-  So@GUI@Material ** materials;
+  So@Gui@Material ** materials;
   @WIDGET@ menuitem;
 };
 
-struct So@GUI@MaterialDirectory {
+struct So@Gui@MaterialDirectory {
   short flags;
   short numGroups;
-  So@GUI@MaterialGroup ** groups;
+  So@Gui@MaterialGroup ** groups;
   short current;
 };
 
@@ -56,16 +56,16 @@ public:
   ~SoAnyMaterialList(void);
 
   void addCallback(
-    So@GUI@MaterialListCB * const callback, void * const closure );
+    So@Gui@MaterialListCB * const callback, void * const closure );
   void removeCallback(
-    So@GUI@MaterialListCB * const callback, void * const closure );
+    So@Gui@MaterialListCB * const callback, void * const closure );
   void invokeCallbacks( SoMaterial * material );
 
   const char * getMaterialDirectoryPath(void) const;
-  So@GUI@MaterialDirectory * getMaterialDirectory(void);
+  So@Gui@MaterialDirectory * getMaterialDirectory(void);
 
 private:
-  void setupBuiltinMaterials( So@GUI@MaterialDirectory * const index ) const;
+  void setupBuiltinMaterials( So@Gui@MaterialDirectory * const index ) const;
   void freeMaterialDirectory(void);
 
   static char ** getNonemptySubdirs( const char * const path );
@@ -76,7 +76,7 @@ private:
 private:
   SbPList * callbacks;
   char * dirpath;
-  So@GUI@MaterialDirectory * directory;
+  So@Gui@MaterialDirectory * directory;
 
 }; // class SoAnyMaterialList
 

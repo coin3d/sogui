@@ -25,7 +25,7 @@ static const char rcsid[] =
 #include <stdio.h>
 #include <assert.h>
 
-#include <Inventor/@GUI@/widgets/SoAnyThumbWheel.h>
+#include <Inventor/@Gui@/widgets/SoAnyThumbWheel.h>
 
 #ifndef FALSE
 #define FALSE  0

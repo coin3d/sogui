@@ -19,13 +19,16 @@
 
 // @configure_input@
 
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@GUI@_DEBUG
 
 /*!
   \class SoAnyWalkViewer SoAnyWalkViewer.h
   \brief The SoAnyWalkViewer class is a collection of common functions
   for all the WalkViewer components for Coin.
+  \ingroup common
 */
 
 #include <assert.h>
@@ -34,8 +37,8 @@ static const char rcsid[] =
 #include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoCamera.h>
 
-#include <Inventor/@GUI@/viewers/SoAnyWalkViewer.h>
-#include <Inventor/@GUI@/viewers/So@GUI@WalkViewer.h>
+#include <Inventor/@Gui@/viewers/SoAnyWalkViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@WalkViewer.h>
 
 // ************************************************************************
 
@@ -43,7 +46,7 @@ static const char rcsid[] =
 */
 
 SoAnyWalkViewer::SoAnyWalkViewer(
-  So@GUI@WalkViewer * const _viewer )
+  So@Gui@WalkViewer * const _viewer )
 : viewer( _viewer )
 {
   assert( _viewer != NULL );
@@ -100,5 +103,16 @@ SoAnyWalkViewer::elevateCamera(
 
 // *************************************************************************
 
+SbBool
+SoAnyWalkViewer::processSoEvent(
+  SoEvent * const event )
+{
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+#if SO@GUI@_DEBUG
 static const char * getSoAnyWalkViewerRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 

@@ -25,7 +25,7 @@
 
 #include <Inventor/SbBasic.h>
 
-#include <Inventor/@GUI@/So@GUI@Component.h>
+#include <Inventor/@Gui@/So@Gui@Component.h>
 
 class SbIntList;
 class SbPList;

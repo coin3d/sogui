@@ -23,10 +23,11 @@
 #ifndef SOANY_FULLVIEWER_H
 #define SOANY_FULLVIEWER_H
 
-#include <Inventor/@GUI@/viewers/So@GUI@Viewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
+class SoEvent;
 class SoAnyPopupMenu;
-class So@GUI@FullViewer;
+class So@Gui@FullViewer;
 
 enum SoAnyFullViewerPopupMenuItem {
   ROOT_MENU = 0,
@@ -92,22 +93,24 @@ enum SoViewerPopupMenuRadioGroup {
 
 class SoAnyFullViewer {
 public:
-  SoAnyFullViewer( So@GUI@FullViewer * const viewer );
+  SoAnyFullViewer( So@Gui@FullViewer * const viewer );
   ~SoAnyFullViewer(void);
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);
 
   void setDrawStyleMenuActivation(
-    So@GUI@Viewer::DrawType type,
-    So@GUI@Viewer::DrawStyle value );
+    So@Gui@Viewer::DrawType type,
+    So@Gui@Viewer::DrawStyle value );
 
   void drawstyleActivated( int menuitemid );
 
   void menuSelection( int menuitemid );
   static void menuSelectionCallback( int menuitemid, void * userdata );
 
+  SbBool processSoEvent( SoEvent * const event );
+
 private:
-  So@GUI@FullViewer * const viewer;
+  So@Gui@FullViewer * const viewer;
 
 }; // class SoAnyFullViewer
 

@@ -27,16 +27,17 @@ class SoCamera;
 class SoTimerSensor;
 class SbRotation;
 class SbSphereSheetProjector;
+class SoEvent;
 
-class So@GUI@ExaminerViewer;
+class So@Gui@ExaminerViewer;
 
 // ************************************************************************
 
 class SoAnyExaminerViewer {
-  friend class So@GUI@ExaminerViewer;
+  friend class So@Gui@ExaminerViewer;
 
 public:
-  SoAnyExaminerViewer( So@GUI@ExaminerViewer * const viewer );
+  SoAnyExaminerViewer( So@Gui@ExaminerViewer * const viewer );
   ~SoAnyExaminerViewer(void);
 
   void setAnimationEnabled( const SbBool enable );
@@ -50,6 +51,8 @@ public:
 
   void setFeedbackSize( const int size );
   int getFeedbackSize(void) const;
+
+  SbBool processSoEvent( SoEvent * const event );
 
 protected:
   float rotXWheelMotion( float value, float old );
@@ -82,7 +85,7 @@ protected:
   static void drawArrow(void);
 
 private:
-  So@GUI@ExaminerViewer * const viewer;
+  So@Gui@ExaminerViewer * const viewer;
 
 }; // class SoAnyExaminerViewer
 

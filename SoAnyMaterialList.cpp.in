@@ -18,10 +18,10 @@
  **************************************************************************/
 //  @configure_input@
 
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 
 #include <assert.h>
 #include <string.h>
@@ -34,16 +34,16 @@ static const char rcsid[] =
 #include <Inventor/SbPList.h>
 #include <Inventor/errors/SoDebugError.h>
 
-#include <so@lGUI@defs.h>
-#include <Inventor/@GUI@/SoAnyMaterialList.h>
+#include <so@gui@defs.h>
+#include <Inventor/@Gui@/SoAnyMaterialList.h>
 
-struct So@GUI@MaterialListCallbackInfo {
-  So@GUI@MaterialListCB * callback;
+struct So@Gui@MaterialListCallbackInfo {
+  So@Gui@MaterialListCB * callback;
   void * closure;
 };
 
 /*!
-  \class SoAnyMaterialList Inventor/@GUI@/SoAnyMaterialList.h
+  \class SoAnyMaterialList Inventor/@Gui@/SoAnyMaterialList.h
   \brief The SoAnyMaterialList class is the common code for the MaterialList
   component classes.
 */
@@ -72,7 +72,7 @@ SoAnyMaterialList::~SoAnyMaterialList(
   if ( this->callbacks != NULL ) {
     const int num = this->callbacks->getLength();
     for ( int i = 0; i < num; i++ )
-      delete (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+      delete (So@Gui@MaterialListCallbackInfo *) (*this->callbacks)[i];
     delete this->callbacks;
   }
   if ( this->dirpath )
@@ -88,13 +88,13 @@ SoAnyMaterialList::~SoAnyMaterialList(
 
 void
 SoAnyMaterialList::addCallback(
-  So@GUI@MaterialListCB * const callback,
+  So@Gui@MaterialListCB * const callback,
   void * const closure )
 {
   if ( this->callbacks == NULL )
     this->callbacks = new SbPList;
-  So@GUI@MaterialListCallbackInfo * info =
-    new So@GUI@MaterialListCallbackInfo;
+  So@Gui@MaterialListCallbackInfo * info =
+    new So@Gui@MaterialListCallbackInfo;
   info->callback = callback;
   info->closure = closure;
   this->callbacks->append( info );
@@ -105,21 +105,21 @@ SoAnyMaterialList::addCallback(
 
 void
 SoAnyMaterialList::removeCallback(
-  So@GUI@MaterialListCB * const callback,
+  So@Gui@MaterialListCB * const callback,
   void * const closure )
 {
   if ( ! this->callbacks ) {
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
     SoDebugError::postInfo( "SoAnyMaterialList::removeCallback",
       "component has zero callbacks set." );
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
     return;
   }
 
   const int numcallbacks = this->callbacks->getLength();
   for ( int i = 0; i < numcallbacks; i++ ) {
-    So@GUI@MaterialListCallbackInfo * info =
-      (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+    So@Gui@MaterialListCallbackInfo * info =
+      (So@Gui@MaterialListCallbackInfo *) (*this->callbacks)[i];
     if ( info->callback == callback && info->closure == closure ) {
       this->callbacks->remove(i);
       delete info;
@@ -127,10 +127,10 @@ SoAnyMaterialList::removeCallback(
     }
   }
 
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
   SoDebugError::postInfo( "SoAnyMaterialList::removeCallback",
     "callback was not set for component." );
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 } // removeCallback()
 
 /*!
@@ -143,8 +143,8 @@ SoAnyMaterialList::invokeCallbacks(
   if ( this->callbacks ) {
     const int numCallbacks = this->callbacks->getLength();
     for ( int i = 0; i < numCallbacks; i++ ) {
-      So@GUI@MaterialListCallbackInfo * info =
-        (So@GUI@MaterialListCallbackInfo *) (*this->callbacks)[i];
+      So@Gui@MaterialListCallbackInfo * info =
+        (So@Gui@MaterialListCallbackInfo *) (*this->callbacks)[i];
       info->callback( info->closure, (SoMaterial *) material );
     }
   }
@@ -165,7 +165,7 @@ SoAnyMaterialList::freeMaterialDirectory(
   if ( this->directory == NULL )
     return;
   int i, j;
-  if ( (this->directory->flags & SO@uGUI@_BUILTIN_MATERIALS) == 0 ) {
+  if ( (this->directory->flags & SO@GUI@_BUILTIN_MATERIALS) == 0 ) {
     // all data is allocated
     for ( i = 0; i < this->directory->numGroups; i++ ) {
       for ( j = 0; j < this->directory->groups[i]->numMaterials; j++ ) {
@@ -334,14 +334,14 @@ SoAnyMaterialList::qsort_comparator( // static, private
   const void * itemA,
   const void * itemB )
 {
-  SO@uGUI@_STUB();
+  SO@GUI@_STUB();
   return 0;
 } // qsort_comparator()
 
 /*!
 */
 
-So@GUI@MaterialDirectory *
+So@Gui@MaterialDirectory *
 SoAnyMaterialList::getMaterialDirectory(
   void )
 {
@@ -372,23 +372,23 @@ SoAnyMaterialList::getMaterialDirectory(
     }
   }
 
-  this->directory = new So@GUI@MaterialDirectory;
+  this->directory = new So@Gui@MaterialDirectory;
   this->directory->flags = 0;
   this->directory->current = 0;
 
   if ( path != NULL ) {
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
     SoDebugError::postInfo( "SoAnyMaterialList::getMaterialDirectory",
       "scanning '%s'", path );
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
     char ** subdirs = getNonemptySubdirs( path );
     if ( subdirs ) {
       int numsubdirs;
       for ( numsubdirs = 0; subdirs[numsubdirs] != NULL; numsubdirs++ ) { }
       this->directory->numGroups = numsubdirs;
-      this->directory->groups = new So@GUI@MaterialGroup * [ numsubdirs ];
+      this->directory->groups = new So@Gui@MaterialGroup * [ numsubdirs ];
       for ( int subdir = 0; subdir < numsubdirs; subdir++ ) {
-        this->directory->groups[subdir] = new So@GUI@MaterialGroup;
+        this->directory->groups[subdir] = new So@Gui@MaterialGroup;
         this->directory->groups[subdir]->name = subdirs[subdir];
         char * subdirname =
           new char [strlen(path) + strlen(subdirs[subdir]) + 2];
@@ -399,10 +399,10 @@ SoAnyMaterialList::getMaterialDirectory(
         for ( numfiles = 0; files[numfiles] != NULL; numfiles++ ) { }
         this->directory->groups[subdir]->numMaterials = numfiles;
         this->directory->groups[subdir]->materials =
-          new So@GUI@Material * [ numfiles ];
+          new So@Gui@Material * [ numfiles ];
         for ( int file = 0; file < numfiles; file++ ) {
           this->directory->groups[subdir]->materials[file] =
-            new So@GUI@Material;
+            new So@Gui@Material;
           this->directory->groups[subdir]->materials[file]->name =
             files[file];
           char * buf = new char [strlen(subdirname) + strlen(files[file]) + 2];
@@ -428,6 +428,7 @@ SoAnyMaterialList::getMaterialDirectory(
 
 // *************************************************************************
 
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
 static const char * getSoAnyMaterialListRCSId(void) { return rcsid; }
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
+

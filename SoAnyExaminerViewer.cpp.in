@@ -19,8 +19,10 @@
 
 // @configure_input@
 
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@GUI@_DEBUG
 
 /*!
   \class SoAnyExaminerViewer SoAnyExaminerViewer.h
@@ -41,10 +43,14 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/sensors/SoTimerSensor.h>
 #include <Inventor/projectors/SbSphereSheetProjector.h>
+#include <Inventor/events/SoKeyboardEvent.h>
+#include <Inventor/events/SoMouseButtonEvent.h>
+#include <Inventor/events/SoLocation2Event.h>
+#include <Inventor/events/SoMotion3Event.h>
 
-#include <Inventor/@GUI@/So@GUI@Basic.h>
-#include <Inventor/@GUI@/viewers/So@GUI@ExaminerViewer.h>
-#include <Inventor/@GUI@/viewers/SoAnyExaminerViewer.h>
+#include <Inventor/@Gui@/So@Gui@Basic.h>
+#include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+#include <Inventor/@Gui@/viewers/SoAnyExaminerViewer.h>
 
 // Bitmap representations of an "X", a "Y" and a "Z" for the axis cross.
 static GLubyte xbmp[] = { 0x11,0x11,0x0a,0x04,0x0a,0x11,0x11 };
@@ -61,7 +67,7 @@ static GLubyte zbmp[] = { 0x1f,0x10,0x08,0x04,0x02,0x01,0x1f };
 */
 
 SoAnyExaminerViewer::SoAnyExaminerViewer(
-  So@GUI@ExaminerViewer * const container )
+  So@Gui@ExaminerViewer * const container )
 : viewer( container )
 {
   assert( container != NULL );
@@ -212,11 +218,11 @@ SoAnyExaminerViewer::stopAnimating(
     this->spintimertrigger->unschedule();
     viewer->interactiveCountDec();
   }
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
   else
-    SoDebugError::postWarning( "So@GUI@ExaminerViewer::stopAnimating",
+    SoDebugError::postWarning( "So@Gui@ExaminerViewer::stopAnimating",
       "not animating" );
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 } // stopAnimating()
 
 // *************************************************************************
@@ -246,10 +252,10 @@ SoAnyExaminerViewer::setFeedbackVisibility(
   const SbBool enable )
 {
   if ( enable == this->axiscrossEnabled ) {
-#if SO@uGUI@_DEBUG
-    SoDebugError::postWarning( "So@GUI@ExaminerViewer::setFeedbackVisibility",
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning( "So@Gui@ExaminerViewer::setFeedbackVisibility",
       "feedback visibility already set to %s", enable ? "TRUE" : "FALSE" );
-#endif // SO$uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
     return;
   }
   this->axiscrossEnabled = enable;
@@ -284,13 +290,13 @@ void
 SoAnyExaminerViewer::setFeedbackSize(
   const int size )
 {
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
   if ( size < 1 ) {
-    SoDebugError::postWarning( "So@GUI@ExaminerViewer::setFeedbackSize",
+    SoDebugError::postWarning( "So@Gui@ExaminerViewer::setFeedbackSize",
       "the size setting should be larger than 0" );
     return;
   }
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 
   this->axiscrossSize = size;
 
@@ -339,7 +345,7 @@ SoAnyExaminerViewer::drawAxisCross(
   // as a percentage of the total canvas size.
   SbVec2s view = viewer->getGLSize();
   const int pixelarea =
-    int(float(this->axiscrossSize)/100.0f * So@GUI@Min(view[0], view[1]));
+    int(float(this->axiscrossSize)/100.0f * So@Gui@Min(view[0], view[1]));
 #if 0 // middle of canvas
   SbVec2s origin(view[0]/2 - pixelarea/2, view[1]/2 - pixelarea/2);
 #endif // middle of canvas
@@ -402,9 +408,9 @@ SoAnyExaminerViewer::drawAxisCross(
     float minval = xpos[2];
     float midval = ypos[2];
     float maxval = zpos[2];
-    if (minval > midval) So@GUI@Swap( minval, midval );
-    if (midval > maxval) So@GUI@Swap( midval, maxval );
-    if (minval > midval) So@GUI@Swap( minval, midval );
+    if (minval > midval) So@Gui@Swap( minval, midval );
+    if (midval > maxval) So@Gui@Swap( midval, maxval );
+    if (minval > midval) So@Gui@Swap( minval, midval );
     assert((minval <= midval) && (midval <= maxval)); // Just checking..
     // Find the order of rendering. Furthest away should render first,
     // so we sort in back-to-front order.
@@ -518,10 +524,10 @@ void
 SoAnyExaminerViewer::spintimertriggeredCallback(
   SoSensor * )
 {
-#if SO@uGUI@_DEBUG && 0
-  SoDebugError::postInfo( "So@GUI@ExaminerViewer::spintimertriggeredCB",
+#if SO@GUI@_DEBUG && 0
+  SoDebugError::postInfo( "So@Gui@ExaminerViewer::spintimertriggeredCB",
     "spin samples: %d", this->spinsamplecounter );
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 
   if ( this->spinsamplecounter < 2 ) {
     // FIXME: won't the first check here always equal TRUE? 990501
@@ -724,5 +730,33 @@ SoAnyExaminerViewer::zoomByCursor(
 
 // *************************************************************************
 
+/*!
+  This method processes SoEvents instead of native GUI toolkit events, so
+  the code can be shared between all the SoGUI libraries.
+*/
+
+SbBool
+SoAnyExaminerViewer::processSoEvent(
+  SoEvent * const event )
+{
+  const SoType type( event->getTypeId() );
+
+  if ( type.isDerivedFrom( SoLocation2Event::getClassTypeId() ) ) {
+    if ( ! viewer->isViewing() )
+      return FALSE;
+    // rotate/spin
+    return TRUE;
+  } else if ( type.isDerivedFrom( SoMouseButtonEvent::getClassTypeId() ) ) {
+  } else if ( type.isDerivedFrom( SoKeyboardEvent::getClassTypeId() ) ) {
+  } else if ( type.isDerivedFrom( SoMotion3Event::getClassTypeId() ) ) {
+  }
+
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+#if SO@GUI@_DEBUG
 static const char * getSoAnyExaminerViewerRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 

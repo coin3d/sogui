@@ -19,15 +19,15 @@
 
 //  @configure_input@
 
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 
 /**************************************************************************
  * IMPORTANT NOTICE
- * Be aware that the file So@GUI@MaterialListBuiltins.cpp is generated from
- * the file So@GUI@MaterialListBuiltins.cpp.m4, so changes has to be done in
+ * Be aware that the file So@Gui@MaterialListBuiltins.cpp is generated from
+ * the file So@Gui@MaterialListBuiltins.cpp.m4, so changes has to be done in
  * the source file with the m4 macros.  The generation is done manually,
  * since it is no point in making this project depend on the user having
  * m4 installed.
@@ -36,7 +36,7 @@ static const char rcsid[] =
 #include <assert.h>
 #include <string.h>
 
-#include <Inventor/@GUI@/SoAnyMaterialList.h>
+#include <Inventor/@Gui@/SoAnyMaterialList.h>
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -77,28 +77,28 @@ define([matnum], m4_eval(matnum+1))dnl
 /*!
   \internal
 
-  This method fills in the So@GUI@MaterialDirectory structure with the builtin
+  This method fills in the So@Gui@MaterialDirectory structure with the builtin
   material data.
 */
 
 void
 SoAnyMaterialList::setupBuiltinMaterials( // private
-  So@GUI@MaterialDirectory * const index ) const
+  So@Gui@MaterialDirectory * const index ) const
 {
   assert( index != NULL );
   index->numGroups = 0;
   index->groups = NULL;
 #ifdef WITH_STATIC_DEFAULTS
 changequote(,)dnl
-  index->flags |= SO@uGUI@_BUILTIN_MATERIALS;
+  index->flags |= SO@GUI@_BUILTIN_MATERIALS;
   index->numGroups = SOANY_BUILTIN_MATERIAL_GROUPS;
-  index->groups = new So@GUI@MaterialGroup * [ SOANY_BUILTIN_MATERIAL_GROUPS ];
+  index->groups = new So@Gui@MaterialGroup * [ SOANY_BUILTIN_MATERIAL_GROUPS ];
   for ( int i = 0; i < index->numGroups; i++ ) {
-    index->groups[i] = new So@GUI@MaterialGroup;
+    index->groups[i] = new So@Gui@MaterialGroup;
     index->groups[i]->numMaterials = SOANY_BUILTIN_MATERIAL_GROUP_SIZE;
-    index->groups[i]->materials = new So@GUI@Material * [ SOANY_BUILTIN_MATERIAL_GROUP_SIZE ];
+    index->groups[i]->materials = new So@Gui@Material * [ SOANY_BUILTIN_MATERIAL_GROUP_SIZE ];
     for ( int j = 0; j < SOANY_BUILTIN_MATERIAL_GROUP_SIZE; j++ ) {
-      index->groups[i]->materials[j] = new So@GUI@Material;
+      index->groups[i]->materials[j] = new So@Gui@Material;
     }
   }
 
@@ -122,7 +122,7 @@ define([matnum], m4_eval(matnum+1))dnl
 
 // *************************************************************************
 
-#if SO@uGUI@_DEBUG
+#if SO@GUI@_DEBUG
 static const char * getSoAnyMaterialListBuiltinsRCSId(void) { return rcsid; }
-#endif // SO@uGUI@_DEBUG
+#endif // SO@GUI@_DEBUG
 

@@ -19,13 +19,16 @@
 
 // @configure_input@
 
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@GUI@_DEBUG
 
 /*!
   \class SoAnyPlaneViewer SoAnyPlaneViewer.h
   \brief The SoAnyPlaneViewer class is a collection of common functions for
   all the PlaneViewer components for Coin.
+  \ingroup common
 */
 
 #include <assert.h>
@@ -39,8 +42,8 @@ static const char rcsid[] =
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 
-#include <Inventor/@GUI@/viewers/SoAnyPlaneViewer.h>
-#include <Inventor/@GUI@/viewers/So@GUI@PlaneViewer.h>
+#include <Inventor/@Gui@/viewers/SoAnyPlaneViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h>
 
 #ifndef M_PI
 #define M_PI 3.1415926535f
@@ -52,7 +55,7 @@ static const char rcsid[] =
 */
 
 SoAnyPlaneViewer::SoAnyPlaneViewer(
-  So@GUI@PlaneViewer * const _viewer )
+  So@Gui@PlaneViewer * const _viewer )
 : viewer( _viewer )
 {
   assert( viewer != NULL );
@@ -173,61 +176,6 @@ SoAnyPlaneViewer::viewPlaneZ(
 } // viewPlaneZ()
 
 // *************************************************************************
-
-/*!
-  old
-*/
-
-float
-SoAnyPlaneViewer::transYWheelMotion(
-  const float value,
-  const float oldvalue,
-  SoCamera * const camera )
-{
-  // FIXME: GLX aspect ratio needs to be factored in
-  assert( camera != NULL );
-  SbVec3f dir;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 1, 0 ), dir );
-  camera->position = camera->position.getValue() + (dir * (value - oldvalue)) *
-    camera->focalDistance.getValue() / 2.5f;
-  return value;
-} // transYWheelMotion()
-
-/*!
-  old
-*/
-
-float
-SoAnyPlaneViewer::transXWheelMotion(
-  const float value,
-  const float oldvalue,
-  SoCamera * const camera )
-{
-  // FIXME: GLX aspect ratio needs to be factored in
-  assert( camera != NULL );
-  SbVec3f dir;
-  camera->orientation.getValue().multVec( SbVec3f( 1, 0, 0 ), dir );
-  camera->position = camera->position.getValue() + (dir * (oldvalue - value)) *
-    camera->focalDistance.getValue() / 2.5f;
-  return value;
-} // transXWheelMotion()
-
-/*!
-  old
-*/
-
-void
-SoAnyPlaneViewer::rotZ(
-  SbVec2f position,
-  SbVec2f oldposition,
-  float aspectratio,
-  SoCamera * const camera )
-{
-  assert( camera != NULL );
-  SoDebugError::postInfo( "SoAnyPlaneViewer::rotZ", "hello Z" );
-} // rotZ()
-
-// ************************************************************************
 
 /*!
   old
@@ -408,5 +356,16 @@ SoAnyPlaneViewer::drawRotateGraphics(
 
 // ************************************************************************
 
+SbBool
+SoAnyPlaneViewer::processSoEvent(
+  SoEvent * const event )
+{
+  return FALSE;
+} // processSoEvent()
+
+// ************************************************************************
+
+#if SO@GUI@_DEBUG
 static const char * getSoAnyPlaneViewerRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 

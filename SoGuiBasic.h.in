@@ -20,8 +20,8 @@
 //  @configure_input@
 //  $Id$
 
-#ifndef SO@uGUI@_BASIC_H
-#define SO@uGUI@_BASIC_H
+#ifndef SO@GUI@_BASIC_H
+#define SO@GUI@_BASIC_H
 
 /*!
   \defgroup devices @Gui@ Device Classes
@@ -47,40 +47,44 @@
   \defgroup misc Miscellaneous Classes
 */
 
-// *************************************************************************
-
-template <class Type>
-inline Type So@GUI@Max( Type a, Type b ) { return (b > a) ? b : a; }
-
-template <class Type>
-inline Type So@GUI@Min( Type a, Type b ) { return (b < a) ? b : a; }
-
-template <class Type>
-inline void So@GUI@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
+/*!
+  \defgroup common Common Code
+*/
 
 // *************************************************************************
 
-#define __COIN_SO@uGUI@__
+template <class Type>
+inline Type So@Gui@Max( Type a, Type b ) { return (b > a) ? b : a; }
 
-#if ! defined(SO@uGUI@_MAJOR_VERSION)
-#undef SO@uGUI@_MAJOR_VERSION
-#endif /* ! SO@uGUI@_MAJOR_VERSION */
-#if ! defined(SO@uGUI@_MINOR_VERSION)
-#undef SO@uGUI@_MINOR_VERSION
-#endif /* ! SO@uGUI@_MINOR_VERSION */
-#if ! defined(SO@uGUI@_MICRO_VERSION)
-#undef SO@uGUI@_MICRO_VERSION
-#endif /* ! SO@uGUI@_MICRO_VERSION */
-#if ! defined(SO@uGUI@_VERSION)
-#undef SO@uGUI@_VERSION
-#endif /* ! SO@uGUI@_VERSION */
+template <class Type>
+inline Type So@Gui@Min( Type a, Type b ) { return (b < a) ? b : a; }
 
-#ifdef SO@uGUI@_MAKE_DLL
-#define SO@uGUI@_DLL_EXPORT __declspec(dllexport)
+template <class Type>
+inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
+
+// *************************************************************************
+
+#define __COIN_SO@GUI@__
+
+#if ! defined(SO@GUI@_MAJOR_VERSION)
+#undef SO@GUI@_MAJOR_VERSION
+#endif /* ! SO@GUI@_MAJOR_VERSION */
+#if ! defined(SO@GUI@_MINOR_VERSION)
+#undef SO@GUI@_MINOR_VERSION
+#endif /* ! SO@GUI@_MINOR_VERSION */
+#if ! defined(SO@GUI@_MICRO_VERSION)
+#undef SO@GUI@_MICRO_VERSION
+#endif /* ! SO@GUI@_MICRO_VERSION */
+#if ! defined(SO@GUI@_VERSION)
+#undef SO@GUI@_VERSION
+#endif /* ! SO@GUI@_VERSION */
+
+#ifdef SO@GUI@_MAKE_DLL
+#define SO@GUI@_DLL_EXPORT __declspec(dllexport)
 #else
-#define SO@uGUI@_DLL_EXPORT
+#define SO@GUI@_DLL_EXPORT
 #endif
 
 // *************************************************************************
 
-#endif // ! SO@uGUI@_BASIC_H
+#endif // ! SO@GUI@_BASIC_H

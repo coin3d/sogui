@@ -19,8 +19,10 @@
 
 // @configure_input@
 
+#if SO@GUI@_DEBUG
 static const char rcsid[] =
   "$Id$";
+#endif // SO@GUI@_DEBUG
 
 /*!
   \class SoAnyConstrainedViewer SoAnyConstrainedViewer.h
@@ -28,14 +30,15 @@ static const char rcsid[] =
   for all the ConstrainedViewer components for Coin.
 */
 
+
 #include <assert.h>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoCamera.h>
 
-#include <Inventor/@GUI@/viewers/SoAnyConstrainedViewer.h>
-#include <Inventor/@GUI@/viewers/So@GUI@ConstrainedViewer.h>
+#include <Inventor/@Gui@/viewers/SoAnyConstrainedViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
 
 // ************************************************************************
 
@@ -43,7 +46,7 @@ static const char rcsid[] =
 */
 
 SoAnyConstrainedViewer::SoAnyConstrainedViewer(
-  So@GUI@ConstrainedViewer * const _viewer )
+  So@Gui@ConstrainedViewer * const _viewer )
 : viewer( _viewer )
 {
   assert( _viewer != NULL );
@@ -91,5 +94,19 @@ SoAnyConstrainedViewer::rotateCamera(
 
 // *************************************************************************
 
+/*!
+*/
+
+SbBool
+SoAnyConstrainedViewer::processSoEvent(
+  SoEvent * const event )
+{
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+#if SO@GUI@_DEBUG
 static const char * getSoAnyConstrainedViewerRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 

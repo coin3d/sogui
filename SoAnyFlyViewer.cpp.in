@@ -31,8 +31,8 @@ static const char rcsid[] =
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
 
-#include <Inventor/@GUI@/viewers/SoAnyFlyViewer.h>
-#include <Inventor/@GUI@/viewers/So@GUI@FlyViewer.h>
+#include <Inventor/@Gui@/viewers/SoAnyFlyViewer.h>
+#include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
 
 // ************************************************************************
 
@@ -40,7 +40,7 @@ static const char rcsid[] =
 */
 
 SoAnyFlyViewer::SoAnyFlyViewer(
-  So@GUI@FlyViewer * const _viewer )
+  So@Gui@FlyViewer * const _viewer )
 : viewer( _viewer )
 {
   assert( _viewer != NULL );
@@ -82,5 +82,16 @@ SoAnyFlyViewer::dolly(
 
 // *************************************************************************
 
+SbBool
+SoAnyFlyViewer::processSoEvent(
+  SoEvent * const event )
+{
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+#if SO@GUI@_DEBUG
 static const char * getSoAnyFlyViewerRCSId(void) { return rcsid; }
+#endif // SO@GUI@_DEBUG
 
