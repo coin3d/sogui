@@ -53,8 +53,6 @@ class So@Gui@Device;
 class So@Gui@Keyboard;
 class So@Gui@Mouse;
 
-#define SO_GL_DEFAULT_MODE (SO_GL_RGB | SO_GL_ZBUFFER | SO_GL_DOUBLE)
-
 // *************************************************************************
 
 typedef SbBool So@Gui@RenderAreaEventCB( void * user, @EVENT@ event );
