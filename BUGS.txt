@@ -144,4 +144,7 @@ NOTE: see also So@Gui@/BUGS.txt.
 
     20041021 mortene.
 
+    Update 20041103 larsa: Fixed, but not for SIM Voleon and
+    SmallChange.  WIll fix for those and remove this item RSN.
+
 =====================================================================
