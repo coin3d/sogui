@@ -59,11 +59,7 @@ public:
   virtual ~So@Gui@Spaceball();
 
   virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler,
-                      void * closure
-#ifdef __COIN_SOXT__ // FIXME: get rid of this abominable #ifdef. 20011229 mortene.
-                      , Window window = NULL
-#endif // __COIN_SOXT__
-                      );
+                      void * closure);
   virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler,
                        void * closure);
 
