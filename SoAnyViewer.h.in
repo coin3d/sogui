@@ -19,8 +19,8 @@
 
 //  $Id$
 
-#ifndef __SOGUI_VIEWER_H__
-#define __SOGUI_VIEWER_H__
+#ifndef SO@uGUI@_VIEWER_H
+#define SO@uGUI@_VIEWER_H
 
 /**************************************************************************\
  * 
@@ -294,4 +294,4 @@ private:
 
 // *************************************************************************
 
-#endif // ! __SOGUI_VIEWER_H__
+#endif // ! SO@uGUI@_VIEWER_H
