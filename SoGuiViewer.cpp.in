@@ -337,7 +337,7 @@ So@GUI@Viewer::So@GUI@Viewer(
   this->addFinishCallback(So@GUI@Viewer::interactiveendCB);
 
   this->adjustclipplanes = TRUE;
-  this->autoclipbox = NULL;
+  this->autoClipBboxAction = NULL;
 
   if ( build ) {
     this->setClassName( "So@GUI@Viewer" );
@@ -355,7 +355,7 @@ So@GUI@Viewer::So@GUI@Viewer(
 So@GUI@Viewer::~So@GUI@Viewer(
   void )
 {
-  delete this->autoclipbox;
+  delete this->autoClipBboxAction;
 
   delete this->interactionstartCallbacks;
   delete this->interactionendCallbacks;
@@ -2098,14 +2098,15 @@ So@GUI@Viewer::setClippingPlanes(
   // graph specified by the user.
   if ( this->camera == NULL ) return;
 
-  if ( this->autoclipbox == NULL )
-    this->autoclipbox = new SoGetBoundingBoxAction( this->getViewportRegion() );
+  if ( this->autoClipBboxAction == NULL )
+    this->autoClipBboxAction =
+      new SoGetBoundingBoxAction( this->getViewportRegion() );
   else
-    this->autoclipbox->setViewportRegion( this->getViewportRegion() );
+    this->autoClipBboxAction->setViewportRegion( this->getViewportRegion() );
 
-  this->autoclipbox->apply(this->viewerroot);
+  this->autoClipBboxAction->apply( this->viewerroot );
 
-  SbXfBox3f xbox = this->autoclipbox->getXfBoundingBox();
+  SbXfBox3f xbox = this->autoClipBboxAction->getXfBoundingBox();
   SbMatrix mat;
   mat.setTranslate(- this->camera->position.getValue());
   xbox.transform(mat);

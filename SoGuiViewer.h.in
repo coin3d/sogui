@@ -240,6 +240,7 @@ protected:
   So@GUI@Viewer::Type type;
   SbBool viewingFlag;
   SbBool altSwitchBack;
+  SoGetBoundingBoxAction * autoClipBboxAction;
 
 private:
   // Seek functionality
@@ -279,7 +280,6 @@ private:
   // Automatic setting of clipping planes
   SbBool adjustclipplanes;
   void setClippingPlanes(void);
-  SoGetBoundingBoxAction * autoclipbox;
 
   // Misc
   SoType cameratype;
