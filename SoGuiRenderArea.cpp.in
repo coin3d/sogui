@@ -753,7 +753,11 @@ So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
   PRIVATE(this)->devicelist->append(device);
   @WIDGET@ w = this->getGLWidget();
   if (w != NULL) {
+#ifdef __COIN_SOXT__
+    device->enable(w, (SoXtEventHandler *) &So@Gui@GLWidget::eventHandler, (void *)this);
+#else
     device->enable(w, &So@Gui@GLWidgetP::eventHandler, (void *)this);
+#endif
     device->setWindowSize(this->getGLSize());
   }
 }
@@ -1847,8 +1851,14 @@ So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
     const int num = PRIVATE(this)->devicelist->getLength();
     for (int i = 0; i < num; i++) {
       So@Gui@Device * device = (So@Gui@Device *) (*PRIVATE(this)->devicelist)[i];
+#ifdef __COIN_SOXT__
+      device->enable(this->getGLWidget(),
+                     (SoXtEventHandler *) &So@Gui@GLWidget::eventHandler,
+                     (void *) this);
+#else
       device->enable(this->getGLWidget(),
                      &So@Gui@GLWidgetP::eventHandler, (void *) this);
+#endif
     }
   }
 

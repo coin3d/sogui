@@ -194,6 +194,8 @@ public:
   XVisualInfo * getOverlayVisual(void);
 
 protected:
+  static void eventHandler(Widget, SoXtGLWidget *, XAnyEvent *, Boolean *);
+
   int getDisplayListShareGroup(GLXContext context);
   Widget getGlxMgrWidget(void);
 #endif // __COIN_SOXT__
