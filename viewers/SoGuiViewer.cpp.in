@@ -206,7 +206,6 @@ public:
   ~So@Gui@ViewerP(void);
 
   SoSeparator * createSuperScene(void);
-  SoSeparator * createFPSSuperimposition(void);
 
   static void convertOrtho2Perspective(const SoOrthographicCamera * in,
                                        SoPerspectiveCamera * out);
@@ -254,8 +253,6 @@ public:
 #endif // HAVE_SOPOLYGONOFFSET
   // Automatic setting of clipping planes
   SbBool adjustclipplanes;
-
-  SoSeparator * fpsRoot;
 
   // Keep track of the frames-per-second counter.
   // Const value trick for old compilers.
@@ -475,53 +472,6 @@ So@Gui@ViewerP::createSuperScene(void)
   this->searchaction->reset();
 
   root->unrefNoDelete();
-  return (SoSeparator *) root;
-}
-
-// FIXME: this method is unnecessary robust, and generally
-// weird. 20020522 mortene.
-SoSeparator *
-So@Gui@ViewerP::createFPSSuperimposition(void)
-{
-  static const char * fpsSceneGraph[] =
-  {
-    "#Inventor V2.1 ascii",
-    "",
-    "Separator {",
-    "  renderCaching OFF",
-    "  renderCulling OFF",
-    "  pickCulling OFF",
-    "  boundingBoxCaching OFF",
-    "}",
-    NULL
-  };
-
-  int i, bufsize;
-  for (i = bufsize = 0; fpsSceneGraph[i]; i++)
-    bufsize += strlen(fpsSceneGraph[i]) + 1;
-  char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; fpsSceneGraph[i]; i++) {
-    strcpy(buf + bufsize, fpsSceneGraph[i]);
-    bufsize += strlen(fpsSceneGraph[i]);
-    buf[bufsize] = '\n';
-    bufsize++;
-  }
-  SoInput * input = new SoInput;
-  input->setBuffer(buf, bufsize);
-  SoNode * root = NULL;
-  SbBool ok = SoDB::read(input, root);
-  delete input;
-  delete [] buf;
-  if (!ok) {
-    SoDebugError::post("So@Gui@ViewerP::createFPSSuperimposition",
-		       "couldn't create viewer superscene");
-    return NULL;
-  }
-  assert(root->isOfType(SoSeparator::getClassTypeId()));
-  root->ref();
-
-  root->unrefNoDelete();
-  return NULL;
   return (SoSeparator *) root;
 }
 
@@ -1757,11 +1707,6 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
     this->setBaseWidget(widget);
   }
 
-  PRIVATE(this)->fpsRoot = PRIVATE(this)->createFPSSuperimposition();
-  if (PRIVATE(this)->fpsRoot) {
-    this->addSuperimposition(PRIVATE(this)->fpsRoot);
-    this->setSuperimpositionEnabled(PRIVATE(this)->fpsRoot, FALSE);
-  }
   PRIVATE(this)->resetFrameCounter();
 }
 
