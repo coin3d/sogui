@@ -1,7 +1,7 @@
 /**************************************************************************
  *
  *  This file is part of the Coin GUI binding libraries.
- *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *  Copyright (C) 2000-2001 by Systems in Motion.  All rights reserved.
  *
  *  The libraries this file is part of is free software; you can
  *  redistribute them and/or modify them under the terms of the GNU
@@ -84,6 +84,7 @@ static const char rcsid[] =
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/SoPickedPoint.h>
+#include <Inventor/SoLists.h>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@.h>
@@ -137,6 +138,8 @@ public:
   SoDrawStyle * sodrawstyle;
   SoLightModel * solightmodel;
   SoMaterialBinding * somaterialbinding;
+  SoSeparator * usersceneroot;
+  SoSwitch * superimpositionroot;
 #if HAVE_SOPOLYGONOFFSET
   SoPolygonOffset * sopolygonoffset;
 #endif // HAVE_SOPOLYGONOFFSET
@@ -187,7 +190,8 @@ public:
   void moveCameraScreen( const SbVec2f & screenpos );
 
   SoSearchAction * searchaction;
-
+  SbPList * superimpositions;
+  SbIntList * superimpositionsenabled;
   So@Gui@Viewer * pub;
 };
 
@@ -196,10 +200,17 @@ So@Gui@ViewerP::So@Gui@ViewerP(
 {
   this->pub = publ;
   this->searchaction = new SoSearchAction;
+  this->superimpositions = NULL;
+  this->superimpositionsenabled = NULL;
 } // So@Gui@ViewerP()
 
 So@Gui@ViewerP::~So@Gui@ViewerP(void)
 {
+  if ( this->superimpositions ) {
+    delete this->superimpositions;
+    delete this->superimpositionsenabled;
+    this->superimpositions = NULL;
+  }
   delete this->searchaction;
 }
 
@@ -250,23 +261,25 @@ So@Gui@ViewerP::createSuperScene(void)
     } \
   } while ( FALSE )
 
-  LOCATE_NODE(this->headlight, SoDirectionalLight, "headlight");
-  LOCATE_NODE(this->drawstyleroot, SoSwitch, "drawstyleroot");
-  LOCATE_NODE(this->hiddenlineroot, SoSwitch, "hiddenlineroot");
-  LOCATE_NODE(this->polygonoffsetparent, SoSwitch, "polygonoffsetparent");
+  LOCATE_NODE(this->headlight, SoDirectionalLight, "so@gui@->headlight");
+  LOCATE_NODE(this->drawstyleroot, SoSwitch, "so@gui@->drawstyleroot");
+  LOCATE_NODE(this->hiddenlineroot, SoSwitch, "so@gui@->hiddenlineroot");
+  LOCATE_NODE(this->polygonoffsetparent, SoSwitch,
+	      "so@gui@->polygonoffsetparent");
+  LOCATE_NODE(this->usersceneroot, SoSeparator, "so@gui@->userscenegraphroot");
 
-  LOCATE_NODE(this->sobasecolor, SoBaseColor, "sobasecolor");
-  LOCATE_NODE(this->socomplexity, SoComplexity, "socomplexity");
-  LOCATE_NODE(this->sodrawstyle, SoDrawStyle, "sodrawstyle");
-  LOCATE_NODE(this->solightmodel, SoLightModel, "solightmodel");
-  LOCATE_NODE(this->somaterialbinding, SoMaterialBinding, "somaterialbinding");
+  LOCATE_NODE(this->sobasecolor, SoBaseColor, "so@gui@->basecolor");
+  LOCATE_NODE(this->socomplexity, SoComplexity, "so@gui@->complexity");
+  LOCATE_NODE(this->sodrawstyle, SoDrawStyle, "so@gui@->drawstyle");
+  LOCATE_NODE(this->solightmodel, SoLightModel, "so@gui@->lightmodel");
+  LOCATE_NODE(this->somaterialbinding, SoMaterialBinding, "so@gui@->materialbinding");
   if ( this->sobasecolor ) this->sobasecolor->setOverride(TRUE);
   if ( this->socomplexity ) this->socomplexity->setOverride(TRUE);
   if ( this->sodrawstyle ) this->sodrawstyle->setOverride(TRUE);
   if ( this->solightmodel ) this->solightmodel->setOverride(TRUE);
   if ( this->somaterialbinding ) this->somaterialbinding->setOverride(TRUE);
 #ifdef HAVE_POLYGONOFFSET
-  LOCATE_NODE(this->sopolygonoffset, SoPolygonOffset, "sopolygonoffset");
+  LOCATE_NODE(this->sopolygonoffset, SoPolygonOffset, "so@gui@->polygonoffset");
   if ( this->sopolygonoffset ) this->sopolygonoffset->setOverride(TRUE);
 #endif
 
@@ -289,48 +302,38 @@ const char * So@Gui@ViewerP::superSceneGraph[] =
 
   // Headlight. By inserting this before any scenegraph camera, the
   // light will always be pointing in the correct direction.
-  "  DEF headlight DirectionalLight {",
+  "  DEF so@gui@->headlight DirectionalLight {",
   "    direction 1 -1 -10",
   "  }",
-  "  DEF drawstyleroot Switch {",
+  "  DEF so@gui@->drawstyleroot Switch {",
   "    whichChild -1",
-  "    DEF solightmodel LightModel {",
+  "    DEF so@gui@->lightmodel LightModel {",
   "      model BASE_COLOR",
   "    }",
-  "    DEF sodrawstyle DrawStyle {",
+  "    DEF so@gui@->drawstyle DrawStyle {",
   "      pointSize ~",
   "      lineWidth ~",
   "      linePattern ~",
   "    }",
-  "    DEF socomplexity Complexity {",
+  "    DEF so@gui@->complexity Complexity {",
   "      textureQuality 0.0",
   "      value 0.1",
   "    }",
   "  }",
-  "  DEF hiddenlineroot Switch {",
+  "  DEF so@gui@->hiddenlineroot Switch {",
   "    whichChild -1",
-  "    DEF sobasecolor BaseColor { }",
-  "    DEF somaterialbinding MaterialBinding {",
+  "    DEF so@gui@->basecolor BaseColor { }",
+  "    DEF so@gui@->materialbinding MaterialBinding {",
   "      value OVERALL",
   "    }",
-  "    DEF polygonoffsetparent Switch {",
+  "    DEF so@gui@->polygonoffsetparent Switch {",
   "      whichChild -1",
 #if HAVE_SOPOLYGONOFFSET
-  "      DEF sopolygonoffset PolygonOffset { }",
+  "      DEF so@gui@->polygonoffset PolygonOffset { }",
 #endif // HAVE_SOPOLYGONOFFSET
   "    }",
   "  }",
-
-  "", // ...
-  // can identifiers start with _?  need something "reserved"...
-  "  DEF _userscene Switch {",
-  // to be switched off when searching only viewer supergraph.
-  // need to toggle whichChild without notification happening, and
-  // schedule notification if subscene changes when whichChild is
-  // -1
-  "  }",
-  // ortho subgraph for viewer to use for scene/view superimposition
-  "  DEF _superimpose Separator {",
+  "  DEF so@gui@->userscenegraphroot Separator {",
   "  }",
   "}",
   NULL
@@ -365,7 +368,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::EDITOR
 
-  If a user-supplied scenegraph passed into the setSceneGraph()
+  If a user-supplied scenegraph passed into the setSceneGraph)
   function does not contain a camera, setting the viewer type to
   EDITOR will make the viewer in that case automatically set up a
   camera \e in the user-supplied scene.
@@ -534,18 +537,30 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 */
 
 static SoGroup *
-get_parent_of_node(SoNode * root, SoNode * node)
+get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
 {
   assert(node && root && "get_parent_of_node() called with null argument");
-
-  SoSearchAction search;
-  search.setSearchingAll(TRUE);
-  search.setNode(node);
-  search.apply(root);
-  assert(search.getPath() && "node not found in scenegraph");
-  SoNode * parent = ((SoFullPath *)search.getPath())->getNodeFromTail(1);
-  assert(parent && "couldn't find parent");
-  return (SoGroup *)parent;
+  if ( pimpl == NULL ) {
+    SoSearchAction search;
+    search.setSearchingAll(TRUE);
+    search.setNode(node);
+    search.apply(root);
+    assert(search.getPath() && "node not found in scenegraph");
+    SoNode * parent = ((SoFullPath *)search.getPath())->getNodeFromTail(1);
+    assert(parent && "couldn't find parent");
+    return (SoGroup *)parent;
+  } else {
+    pimpl->searchaction->reset();
+    pimpl->searchaction->setSearchingAll(TRUE);
+    pimpl->searchaction->setNode(node);
+    pimpl->searchaction->apply(root);
+    assert(pimpl->searchaction->getPath() && "node not found in scenegraph");
+    SoNode * parent =
+      ((SoFullPath *) pimpl->searchaction->getPath())->getNodeFromTail(1);
+    assert(parent && "couldn't find parent");
+    pimpl->searchaction->reset();
+    return (SoGroup *)parent;
+  }
 }
 
 // *************************************************************************
@@ -645,7 +660,12 @@ So@Gui@Viewer::~So@Gui@Viewer(
 
   if ( this->sceneGraph ) this->setSceneGraph(NULL);
   this->sceneRoot->unref();
-
+  if ( PRIVATE(this)->superimpositions != NULL ) {
+    for ( int i = PRIVATE(this)->superimpositions->getLength() - 1; i >= 0; i-- ) {
+      SoNode * node = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
+      node->unref();
+    }
+  }
   delete PRIVATE(this);
 } // ~So@Gui@Viewer()
 
@@ -667,7 +687,8 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
     if (PRIVATE(this)->deletecamera) {
-      SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
+      SoGroup * cameraparent =
+	get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
       cameraparent->removeChild(this->camera);
       PRIVATE(this)->deletecamera = FALSE;
     }
@@ -786,7 +807,8 @@ So@Gui@Viewer::setCameraType(SoType t)
         2 * focaldist * tan(oldpcam->heightAngle.getValue() / 2.0f);
     }
 
-    SoGroup * cameraparent = get_parent_of_node(this->sceneRoot, this->camera);
+    SoGroup * cameraparent =
+      get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
     cameraparent->insertChild( newcamera,
                                cameraparent->findChild( this->camera ) );
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
@@ -1668,26 +1690,36 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   // If the So@Gui@RenderArea hasn't yet set up its pointer to the
   // So@Gui@Viewer "viewer root" (i.e. the viewer-generated root above
   // the user-supplied root), do that first.
-  if (!inherited::getSceneGraph()) { inherited::setSceneGraph(this->sceneRoot); }
+  if (!inherited::getSceneGraph())
+    inherited::setSceneGraph(this->sceneRoot);
 
   if ( this->sceneGraph ) {
-    if (this->getCamera()) { this->setCamera(NULL); }
+    if (this->getCamera())
+      this->setCamera(NULL);
     // Release the old user-supplied graph.
-    this->sceneRoot->removeChild(this->sceneGraph);
+    PRIVATE(this)->usersceneroot->removeChild(this->sceneGraph);
+    // old: this->sceneRoot->removeChild(this->sceneGraph);
   }
 
   this->sceneGraph = root;
   if (!root) return;
 
-  this->sceneRoot->addChild(this->sceneGraph);
+  PRIVATE(this)->usersceneroot->addChild(this->sceneGraph);
+  // old: this->sceneRoot->addChild(this->sceneGraph);
 
   // Search for a camera in the user-supplied scenegraph.
-  SoSearchAction search;
-  search.setType(SoCamera::getClassTypeId());
-  search.apply(this->sceneGraph);
-  SoFullPath * fullpath = (SoFullPath *)search.getPath();
+  // SoSearchAction search;
+  // search.setType(SoCamera::getClassTypeId());
+  // search.apply(this->sceneGraph);
+  PRIVATE(this)->searchaction->reset();
+  PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
+  PRIVATE(this)->searchaction->apply(this->sceneGraph);
   SoCamera * scenecamera = NULL;
-  if (fullpath) { scenecamera = (SoCamera *)fullpath->getTail(); }
+  if ( PRIVATE(this)->searchaction->isFound() ) {
+    SoFullPath * fullpath =
+      (SoFullPath *) PRIVATE(this)->searchaction->getPath();
+    scenecamera = (SoCamera *)fullpath->getTail();
+  }
 
 #if 0 // debug
   SoDebugError::postInfo("So@Gui@Viewer::setSceneGraph",
@@ -1697,7 +1729,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
 
   // Make our own camera if none was available.
   if (!scenecamera) {
-    scenecamera = (SoCamera *)PRIVATE(this)->cameratype.createInstance();
+    scenecamera = (SoCamera *) PRIVATE(this)->cameratype.createInstance();
     PRIVATE(this)->deletecamera = TRUE;
 
     // If type==BROWSER, camera should be inserted in the private
@@ -1718,8 +1750,8 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
         SoGroup * g = new SoGroup;
         g->addChild(scenecamera);
         g->addChild(this->sceneGraph);
-        this->sceneRoot->removeChild(this->sceneGraph);
-        this->sceneRoot->addChild(g);
+        PRIVATE(this)->usersceneroot->removeChild(this->sceneGraph);
+        PRIVATE(this)->usersceneroot->addChild(g);
         this->sceneGraph = g;
       }
     }
@@ -2073,6 +2105,31 @@ So@Gui@Viewer::actualRedraw(void)
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
   else PRIVATE(this)->reallyRedraw(clearcol);
+
+  if ( PRIVATE(this)->superimpositions != NULL ) {
+    SoGLRenderAction * raaction = this->getSceneManager()->getGLRenderAction();
+    SbBool first = TRUE;
+    SbBool zenabled = FALSE;
+    GLfloat depthrange[2];
+    for ( int i = 0; i < PRIVATE(this)->superimpositions->getLength(); i++ ) {
+      if ( (*PRIVATE(this)->superimpositionsenabled)[i] != FALSE ) {
+	if ( first ) {
+	  // save Z buffer state and disable
+	  glGetFloatv(GL_DEPTH_RANGE, depthrange);
+	  glDepthFunc(GL_ALWAYS);
+	  glDepthMask(GL_TRUE);
+	  glDepthRange(0, 0);
+	  glEnable(GL_DEPTH_TEST);
+	}
+	SoNode * scene = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
+	raaction->apply(scene);
+      }
+    }
+    if ( ! first ) {
+      // restore Z buffer state
+      glDepthRange(depthrange[0], depthrange[1]);
+    }
+  }
 
   if ( this->getInteractiveCount() > 0 )
     PRIVATE(this)->recordFPS();
@@ -3080,11 +3137,127 @@ SbBool
 So@Gui@Viewer::processCommonEvents(
   @EVENT@ event )
 {
-  if ( this->invokeAppCB( event ) )
-    return TRUE;
-
+  if ( this->invokeAppCB(event) ) return TRUE;
   return FALSE;
 } // processCommonEvents()
+
+// *************************************************************************
+
+/*!
+  This method is for setting up a superimposed scene graph on top
+  of the viewer scene graph.  It will be used for adding spin-rotation
+  coordinate systems, fly-viewer speed indicators and similar things.
+
+  This method is not part of the original InventorXt API.
+*/
+
+void
+So@Gui@Viewer::addSuperimposition( // protected
+  SoNode * scene )
+{
+  if ( PRIVATE(this)->superimpositions == NULL ) {
+    PRIVATE(this)->superimpositions = new SbPList;
+    PRIVATE(this)->superimpositionsenabled = new SbIntList;
+  }
+  PRIVATE(this)->searchaction->reset();
+  PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
+  PRIVATE(this)->searchaction->setInterest(SoSearchAction::FIRST);
+  PRIVATE(this)->searchaction->apply(scene);
+  if ( !PRIVATE(this)->searchaction->isFound() ) {
+    // FIXME: set up default environment if there is no camera in the
+    // superimposition scene
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("So@Gui@Viewer::addSuperimposition",
+                           "cameraless superimpositions are not supported yet");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+  scene->ref();
+  PRIVATE(this)->superimpositions->append(scene);
+  PRIVATE(this)->superimpositionsenabled->append(TRUE);
+} // setSuperimposedSceneGraph()
+
+// *************************************************************************
+
+/*!
+  This method is not part of the original InventorXt API.
+*/
+
+void
+So@Gui@Viewer::removeSuperimposition( // protected
+  SoNode * scene )
+{
+  assert(scene);
+  int idx = -1;
+  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  idx = PRIVATE(this)->superimpositions->find(scene);
+  if ( idx == -1 ) goto error;
+  assert(PRIVATE(this)->superimpositionsenabled != NULL);
+  PRIVATE(this)->superimpositions->remove(idx);
+  PRIVATE(this)->superimpositionsenabled->remove(idx);
+  scene->unref();
+  return;
+
+ error:
+#if SO@GUI@_DEBUG
+  SoDebugError::post("So@Gui@Viewer::removeSuperimposition",
+		     "no such superimposition");
+#endif // SO@GUI@_DEBUG
+} // getSuperimposedSceneGraph()
+
+// *************************************************************************
+
+/*!
+  This method sets whether the superimposed scene graph should be traversed
+  or not.
+
+  This method is not part of the original InventorXt API.
+*/
+
+void
+So@Gui@Viewer::setSuperimpositionEnabled( // protected
+  SoNode * scene,
+  const SbBool enable )
+{
+  int idx = -1;
+  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  idx = PRIVATE(this)->superimpositions->find(scene);
+  if ( idx == -1 ) goto error;
+  (*PRIVATE(this)->superimpositionsenabled)[idx] = enable;
+  return;
+
+ error:
+#if SO@GUI@_DEBUG
+  SoDebugError::post("So@Gui@Viewer::setSuperimpositionEnabled",
+		     "no such superimposition");
+#endif // SO@GUI@_DEBUG
+} // setSuperimposition()
+
+// *************************************************************************
+
+/*!
+  This method returns whether the superimposed scene is rendered or not.
+
+  This method is not part of the original InventorXt API.
+*/
+
+SbBool
+So@Gui@Viewer::getSuperimpositionEnabled( // protected
+  SoNode * scene ) const
+{
+  int idx = -1;
+  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  idx = PRIVATE(this)->superimpositions->find(scene);
+  if ( idx == -1 ) goto error;
+  return (*PRIVATE(this)->superimpositionsenabled)[idx];
+
+ error:
+#if SO@GUI@_DEBUG
+  SoDebugError::post("So@Gui@Viewer::getSuperimpositionEnabled",
+		     "no such superimposition");
+#endif // SO@GUI@_DEBUG
+  return FALSE;
+} // getSuperimposition()
 
 // *************************************************************************
 

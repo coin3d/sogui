@@ -228,6 +228,11 @@ protected:
   virtual void toggleCameraType(void);
   virtual void changeCameraValues( SoCamera * camera );
 
+  void addSuperimposition(SoNode * scene);
+  void removeSuperimposition(SoNode * scene);
+  void setSuperimpositionEnabled(SoNode * scene, const SbBool enable);
+  SbBool getSuperimpositionEnabled(SoNode * scene) const;
+
   SoCamera * camera;
   So@Gui@Viewer::Type type;
   SbBool viewingFlag;
