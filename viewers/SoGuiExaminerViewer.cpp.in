@@ -556,7 +556,17 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
     newmode = SoGuiExaminerViewerP::ZOOMING;
     break;
+
+    // There are many cases we don't handle that just falls through to
+    // the default case, like SHIFTDOWN, CTRLDOWN, CTRLDOWN|SHIFTDOWN,
+    // SHIFTDOWN|BUTTON3DOWN, SHIFTDOWN|CTRLDOWN|BUTTON3DOWN, etc.
+    // This is a feature, not a bug. :-)
+    //
+    // mortene.
+
   default:
+    // The default will make a spin stop and otherwise not do
+    // anything.
     if ((currentmode != SoGuiExaminerViewerP::SEEK_WAIT_MODE) &&
         (currentmode != SoGuiExaminerViewerP::SEEK_MODE)) {
       newmode = SoGuiExaminerViewerP::IDLE;
@@ -761,7 +771,7 @@ SoGuiExaminerViewerP::genericConstructor(void)
   // FIXME: use a smaller sphere than the default one to have a larger
   // area close to the borders that gives us "z-axis rotation"?
   // 19990425 mortene.
-  this->spinprojector = new SbSphereSheetProjector;
+  this->spinprojector = new SbSphereSheetProjector(SbSphere(SbVec3f(0, 0, 0), 0.8f));
   SbViewVolume volume;
   volume.ortho(-1, 1, -1, 1, -1, 1);
   this->spinprojector->setViewVolume(volume);
