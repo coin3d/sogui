@@ -75,6 +75,54 @@ protected:
   virtual void openViewerHelpCard(void);
   virtual void computeSeekFinalOrientation(void);
 
+private:
+  void commonConstructor(void);
+
+  void translateX(const float delta) const;
+  void translateY(const float delta) const;
+  void rotateZ(const float angle) const;
+
+  void viewPlaneX(void) const;
+  void viewPlaneY(void) const;
+  void viewPlaneZ(void) const;
+
+  void zoom(const float difference) const;
+
+  void setCanvasSize(const SbVec2s size);
+  void setPointerLocation(const SbVec2s location);
+  int getPointerXMotion(void) const;
+  int getPointerYMotion(void) const;
+  float getPointerOrigoAngle(void) const;
+  float getPointerOrigoMotionAngle(void) const;
+
+  void drawRotateGraphics(void) const;
+
+  SbBool processGenericSoEvent(const SoEvent * const event);
+
+  enum PlaneViewerMode {
+    IDLE_MODE,
+
+    DOLLY_MODE,
+    TRANSLATE_MODE,
+
+    ROTZ_WAIT_MODE,
+    ROTZ_MODE,
+
+    SEEK_WAIT_MODE,
+    SEEK_MODE
+  } mode;
+
+  struct pointerdata {
+    SbVec2s now;
+    SbVec2s then;
+  } pointer;
+  SbVec2s canvas;
+
+  SbBool controldown;
+  SbBool button1down;
+  SbBool button2down;
+  SbBool button3down;
+
 
 //// FIXME!: merge the So*PlaneViewer definitions. 20020111 mortene. ////
 
@@ -143,7 +191,6 @@ private:
     Pixmap perspective, perspective_ins;
   } pixmaps;
 
-  SoAnyPlaneViewer * const common;
 #endif // ! __COIN_SOXT__
 
 #ifdef __COIN_SOGTK__
