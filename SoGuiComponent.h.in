@@ -61,8 +61,8 @@ public:
   virtual void show(void);
   virtual void hide(void);
 
-  void setComponentCursor(const So@Gui@Cursor & cursor);
-  const So@Gui@Cursor & getComponentCursor(void) const;
+  virtual void setComponentCursor(const So@Gui@Cursor & cursor);
+  static void setWidgetCursor(@WIDGET@ w, const So@Gui@Cursor & cursor);
 
   SbBool isFullScreen(void) const;
   SbBool setFullScreen(const SbBool onoff);
