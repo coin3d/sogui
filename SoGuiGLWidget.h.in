@@ -148,13 +148,8 @@ private:
   friend class So@Gui@GLWidgetP;
 #endif // DOXYGEN_SKIP_THIS
 
-  // FIXME: get rid of toolkit-specific stuff below? 20011012 mortene.
+  // FIXME: get rid of toolkit-specific stuff below. 20020613 mortene.
 
-#ifdef __COIN_SOQT__
-public:
-  const QGLContext * getNormalContext(void);
-  const QGLContext * getOverlayContext(void);
-#endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
 public:
   Window getNormalWindow(void);
