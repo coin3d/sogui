@@ -21,8 +21,13 @@
  *
 \**************************************************************************/
 
+#include <assert.h>
+
+#include <Inventor/nodes/SoMaterial.h>
+
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
+#include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
 #include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
 
 // *************************************************************************
@@ -33,6 +38,7 @@ public:
 
   SoGuiMaterialEditor * api;
 
+  static const char * texturescene[];
   static const char * editorscene[];
 };
 
@@ -72,10 +78,24 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   assert(scene->isOfType(SoGuiPane::getClassTypeId()));
   scene->ref();
 
+  SoGuiSceneTexture2 * spheretexture =
+    (SoGuiSceneTexture2 *) SoAny::scanSceneForName(scene, "spheretexture");
+  assert(spheretexture != NULL);
+
   // initialize sliders
 
   scene->unrefNoDelete();
   this->setAnyPart("root", scene);
+
+  SoNode * texturescene = SoAny::loadSceneGraph(MaterialEditor::texturescene);
+  assert(texturescene != NULL);
+  texturescene->ref();
+  SoMaterial * material = (SoMaterial *) SoAny::scanSceneForName(texturescene, "material");
+  assert(material);
+
+  spheretexture->scene.setValue(texturescene);
+
+  texturescene->unrefNoDelete();
 
   // sensors
 }
@@ -94,6 +114,79 @@ SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
 
 #define PUBLIC(obj) (((MaterialEditor *) obj)->api)
 
+// +--------------------------------------------------------------------+
+// |                   |  o x  Ambient    |======================| 0.00 |
+// |                   |  o x  Diffuse    |======================| 0.00 |
+// |                   |  o x  Specular   |======================| 0.00 |
+// |                   |  o x  Emissive   |======================| 0.00 |
+// |                   |                                                |
+// |                   |       Shininess  |======================| 0.00 |
+// |                   |       Transp     |======================| 0.00 |
+// +--------------------------------------------------------------------+
+
+const char *
+MaterialEditor::texturescene[] =
+{
+  "#Inventor V2.1 ascii",
+  "",
+  "Separator {",
+  "  OrthographicCamera {",
+  "    position 0 0 2",
+  "    nearDistance 1",
+  "    farDistance 3",
+  "    height 2",
+  "  }",
+  "  LightModel {",
+  "    model BASE_COLOR",
+  "  }",
+  "  BaseColor {",
+  "    rgb [",
+  "      0.3 0.3 0.3,",
+  "      0.6 0.6 0.6,",
+  "      0.6 0.6 0.6,",
+  "      0.3 0.3 0.3",
+  "    ]",
+  "  }",
+  "  MaterialBinding {",
+  "    value PER_FACE",
+  "  }",
+  "  Coordinate3 {",
+  "    point [",
+  "      -3  3  0,",
+  "       0  3  0,",
+  "       3  3  0,",
+  "      -3  0  0,",
+  "       0  0  0,",
+  "       3  0  0,",
+  "      -3 -3  0,",
+  "       0 -3  0,",
+  "       3 -3  0",
+  "    ]",
+  "  }",
+  "  QuadMesh {",
+  "    verticesPerColumn 3",
+  "    verticesPerRow 3",
+  "  }",
+  "  LightModel {",
+  "    model PHONG",
+  "  }",
+  "  DirectionalLight {",
+  "    direction 0.556 -0.623 -0.551",
+  "  }",
+  "  DirectionalLight {",
+  "    direction -0.556 -0.623 -0.551",
+  "  }",
+  "  DEF material Material { }",
+  "  Complexity {",
+  "    value 0.8",
+  "  }",
+  "  Sphere {",
+  "    radius 0.85",
+  "  }",
+  "}",
+  NULL
+};
+
 const char *
 MaterialEditor::editorscene[] =
 {
@@ -102,8 +195,34 @@ MaterialEditor::editorscene[] =
   "DEF pane SoGuiPane {",
   "  worldSize 1 1 0",
   "  objectSize 400 300 0",
+  "  Separator {",
+  "    DEF spheretexture SoGuiSceneTexture2 { }",
+  "    Coordinate3 {",
+  "      point [",
+  "         10  10 0,",
+  "        290  10 0,",
+  "        290 290 0,",
+  "         10 290 0",
+  "      ]",
+  "    }",
+  "    TextureCoordinate2 {",
+  "      point [",
+  "        0 0, 1 0, 1 1, 0 1",
+  "      ]",
+  "    }",
+  "    IndexedFaceSet {",
+  "      coordIndex [",
+  "        0 1 2 -1",
+  "        0 2 3 -1",
+  "      ]",
+  "      textureCoordIndex [",
+  "        0 1 2 -1",
+  "        0 2 3 -1",
+  "      ]",
+  "    }",
+  "  }", // 
   "  SoGuiPosition {",
-  "    position 10 10 0",
+  "    position 300 10 0",
   "  }",
   "  DEF button1 SoGuiRadioButton {",
   "    size 10 10 0",
@@ -118,13 +237,13 @@ MaterialEditor::editorscene[] =
   "    size 0 0 0 = USE button1.size",
   "    complement FALSE = USE button1.on",
   "  }",
-  "  SoGuiPosition { position 10 30 0 }",
+  "  SoGuiPosition { position 300 30 0 }",
   "  USE button2",
   "  SoGuiFrame {",
   "    size 0 0 0 = USE button2.size",
   "    complement FALSE = USE button2.on",
   "  }",
-  "  SoGuiPosition { position 10 50 0 }",
+  "  SoGuiPosition { position 300 50 0 }",
   "  USE button3",
   "  SoGuiFrame {",
   "    size 0 0 0 = USE button3.size",
