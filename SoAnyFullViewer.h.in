@@ -28,7 +28,7 @@
 class SoAnyPopupMenu;
 class So@GUI@FullViewer;
 
-enum SoViewerPopupMenuItem {
+enum SoAnyFullViewerPopupMenuItem {
   ROOT_MENU = 0,
   MENUTITLE_ITEM,
 
