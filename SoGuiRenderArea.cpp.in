@@ -190,23 +190,28 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
   if (exts.getLength() > 0) { info += "\n   "; info += exts; }
   info += "\"\n";
 
-  // Limits.
+  // Misc implementation info
   {
     SbVec2f range;
     float granularity;
     PUBLIC(this)->getPointSizeLimits(range, granularity);
 
-    SbString limits;
-    limits.sprintf("glPointSize(): range=[%f, %f], granularity=%f\n",
-                   range[0], range[1], granularity);
-    info += limits;
+    SbString s;
+    s.sprintf("glPointSize(): range=[%f, %f], granularity=%f\n",
+              range[0], range[1], granularity);
+    info += s;
 
 
     PUBLIC(this)->getLineWidthLimits(range, granularity);
 
-    limits.sprintf("glLineWidth(): range=[%f, %f], granularity=%f\n",
-                   range[0], range[1], granularity);
-    info += limits;
+    s.sprintf("glLineWidth(): range=[%f, %f], granularity=%f\n",
+              range[0], range[1], granularity);
+    info += s;
+
+    GLint depthbits[1];
+    glGetIntegerv(GL_DEPTH_BITS, depthbits);
+    s.sprintf("GL_DEPTH_BITS==%d\n", depthbits[0]);
+    info += s;
   }
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
