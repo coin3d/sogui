@@ -24,7 +24,6 @@
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 
 #ifdef __COIN_SOQT__
-#include <qevent.h>
 #include <qobject.h>
 #endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
@@ -186,11 +185,10 @@ protected:
 
 #ifdef __COIN_SOQT__
 public:
-  enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
   static class QApplication * getApplication(void);
 
 protected:
-  bool eventFilter(QObject *, QEvent *);
+  bool eventFilter(QObject *, class QEvent *);
 
 private slots:
   void slot_timedOutSensor(void);
