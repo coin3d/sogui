@@ -161,7 +161,10 @@ enum So@Gui@ABIError {
 
 // FIXME: use an "is-this-a-DLL-capable-platform" configure check
 // and remove the system "#if defined" tests below. 20011203 mortene.
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+// FIXME: I disabled this because it wasn't inlined in the client app
+// but compiled into the library by MSVC++ and with SOWIN_DLL undefined,
+// the ABI test always tried the LIB_ABI path.  20020126 larsa
+#if 0 && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
 #define SO@GUI@_SANITY_CHECK(forward_call)                  \
   if (So@Gui@::isDebugLibrary() &&                       \
        SoDB::isInitialized())                          \
