@@ -36,6 +36,7 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/widgets/SoAnyPopupMenu.h>
+#include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 
 /*!
   \class SoAnyPopupMenu
@@ -49,8 +50,23 @@ static const char rcsid[] =
 // *************************************************************************
 
 /*!
-*/
+  Instantiation method.
 
+  SoAnyPopupMenu is implemented with this "factory" method instead of
+  a public constructor to provide a completely generic interface on
+  top of the toolkit's native popup menu implementation.
+*/
+SoAnyPopupMenu *
+SoAnyPopupMenu::createInstance(void)
+{
+  return new So@Gui@PopupMenu();
+}
+
+
+/*!
+  The class constructor is protected, as SoAnyPopupMenu uses a factory
+  instantiation method.
+*/
 SoAnyPopupMenu::SoAnyPopupMenu(
   void)
 : callbacks(NULL)
@@ -62,10 +78,9 @@ SoAnyPopupMenu::SoAnyPopupMenu(
 } // SoAnyPopupMenu()
 
 /*!
+  Destructor.
 */
-
-SoAnyPopupMenu::~SoAnyPopupMenu(
-  void)
+SoAnyPopupMenu::~SoAnyPopupMenu()
 {
   delete this->menuitems;
   delete this->radiogroups;

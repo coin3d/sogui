@@ -89,7 +89,7 @@ SoAnyPopupMenu *
 SoAnyFullViewer::setupStandardPopupMenu(
   void)
 {
-  SoAnyPopupMenu * menu = new So@Gui@PopupMenu;
+  SoAnyPopupMenu * menu = SoAnyPopupMenu::createInstance();
 
   menu->newMenu("rootmenu", ROOT_MENU);
   // FIXME: none of the So*-toolkits so far uses the rootmenu title to

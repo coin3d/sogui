@@ -37,8 +37,8 @@ typedef void SoAnyMenuSelectionCallback(int itemid, void * user);
 
 class SoAnyPopupMenu { // abstract interface class
 public:
-  SoAnyPopupMenu(void);
-  virtual ~SoAnyPopupMenu(void);
+  static SoAnyPopupMenu * createInstance(void);
+  virtual ~SoAnyPopupMenu();
 
   virtual int newMenu(const char * name, int menuid = -1) = 0;
   virtual int getMenu(const char * name) = 0;
@@ -77,6 +77,8 @@ public:
     SoAnyMenuSelectionCallback * callback, void * data);
 
 protected:
+  SoAnyPopupMenu(void);
+
   virtual void _setMenuItemMarked(int itemid, SbBool marked) = 0;
 
   void invokeMenuSelection(int itemid);
