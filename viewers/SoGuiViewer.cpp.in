@@ -566,7 +566,7 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
   }
   else {
     // 45° is the default value of this field in SoPerspectiveCamera.
-    out->heightAngle = M_PI / 4.0f;
+    out->heightAngle = (float)(M_PI / 4.0);
   }
 }
 
@@ -650,8 +650,6 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     this->socomplexity->textureQuality.setIgnored(FALSE);
 
     PUBLIC(this)->getSceneManager()->render(FALSE, FALSE);
-
-    SbBool oldnot;
 
     // disable override nodes
     (void) this->sobasecolor->rgb.enableNotify(FALSE);

@@ -771,8 +771,7 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
   if (this->currentspeed == 0.0f)
     this->lastrender->setValue(thisrender.getValue() - 0.01);
 
-  t = (thisrender.getValue() - 
-       this->lastrender->getValue()) * 10.0f;
+  t = float(thisrender.getValue() - this->lastrender->getValue()) * 10.0f;
 
   if (t >= 1.0f) 
     t = 1.0f;
@@ -888,7 +887,7 @@ void So@Gui@FlyViewerP::updateMaxSpeed()
 
   this->maxspeed = 
     this->max_speed_factor 
-    * pow( SO@GUI@_INC_FACTOR, abs( this->max_speed_factor ) )
+    * float(pow( SO@GUI@_INC_FACTOR, abs( this->max_speed_factor ) ))
     * this->speed_scaling_factor;
 
   if( this->maxspeed > SO@GUI@_MAX_SPEED )
@@ -1212,8 +1211,8 @@ So@Gui@FlyViewer::actualRedraw(void)
       thisrender.setToTimeOfDay();
 
       if (PRIVATE(this)->currentspeed != 0.0f) {
-        float t = (thisrender.getValue() 
-                   - PRIVATE(this)->lastrender->getValue()) * 2.0f;
+        float t = float(thisrender.getValue() -
+                        PRIVATE(this)->lastrender->getValue()) * 2.0f;
         if (t > 0.0f) {
           SoCamera * camera = this->getCamera();
 
