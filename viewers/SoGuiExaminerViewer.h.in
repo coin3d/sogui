@@ -104,12 +104,6 @@ protected:
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
 #endif // ! __COIN_SOWIN__
-
-
-#ifdef __COIN_SOGTK__
-private:
-  void constructor(const SbBool build);
-#endif // ! __COIN_SOGTK__
 };
 
 #endif // ! SO@GUI@_EXAMINERVIEWER_H
