@@ -1052,7 +1052,12 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
     menu->setMenuItemMarked(SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
 #endif // __COIN__
-  default: assert(FALSE && "unknown transparency type");
+  default:
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("SoGuiFullViewerP::prepareMenu",
+                           "Unknown transparency type");
+#endif // SO@GUI@_DEBUG
+    break;
   }
 
   //// Stereo viewing. ////////////////////////////////////////////////
@@ -1341,6 +1346,10 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
     return;
 #endif // __COIN__
   default:
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("SoGuiFullViewerP::drawStyleActivated",
+                           "Unknown transparency type");
+#endif // SO@GUI@_DEBUG
     break;
   }
 
