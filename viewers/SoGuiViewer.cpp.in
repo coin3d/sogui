@@ -3349,24 +3349,25 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 void
 So@Gui@Viewer::addSuperimposition(SoNode * scene)
 {
-  if (PRIVATE(this)->superimpositions == NULL) {
+  if (PRIVATE(this)->superimpositions == NULL)
     PRIVATE(this)->superimpositions = new SbPList;
-  }
+  assert(scene != NULL);
+  scene->ref();
   PRIVATE(this)->searchaction->reset();
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
   PRIVATE(this)->searchaction->setInterest(SoSearchAction::FIRST);
   PRIVATE(this)->searchaction->apply(scene);
-  if (!PRIVATE(this)->searchaction->isFound()) {
+  if (!PRIVATE(this)->searchaction->getPath()) {
     // FIXME: set up default environment if there is no camera in the
-    // superimposition scene
+    // superimposition scene - or not...
     if (SO@GUI@_DEBUG) {
       SoDebugError::postInfo("So@Gui@Viewer::addSuperimposition",
                              "cameraless superimpositions are not "
-                             "supported yet");
+                             "supported");
     }
+    scene->unrefNoDelete();
     return;
   }
-  scene->ref();
   PRIVATE(this)->superimpositions->append(scene);
   PRIVATE(this)->superimpositionsenabled.append(TRUE);
 }
