@@ -2193,6 +2193,18 @@ So@Gui@Viewer::isSeekValuePercentage(void) const
   return PRIVATE(this)->seekdistanceabs ? FALSE : TRUE;
 } // isSeekValuePercentage()
 
+// ************************************************************************
+
+/*!
+  This method is obsoleted in Coin So@Gui@.
+ */
+void
+So@Gui@Viewer::computeSeekFinalOrientation( // virtual, protected
+  void )
+{
+  SO@GUI@_OBSOLETED();
+}
+
 // *************************************************************************
 
 /*!

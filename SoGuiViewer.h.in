@@ -210,6 +210,7 @@ protected:
   virtual void setSeekMode( SbBool enable );
   SbBool isSeekMode(void) const;
   SbBool seekToPoint( const SbVec2s screenpos );
+  virtual void computeSeekFinalOrientation( void );
 
   virtual void actualRedraw(void);
   virtual SbBool processSoEvent( const SoEvent * const event );
