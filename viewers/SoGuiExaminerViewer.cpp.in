@@ -195,8 +195,8 @@ SoGuiExaminerViewerP::rotYWheelMotion(float value, float oldvalue)
 // ************************************************************************
 
 /*!
-  Decide if it should be possible to start a spin animation of the model in
-  the viewer by releasing the mouse button while dragging.
+  Decide if it should be possible to start a spin animation of the
+  model in the viewer by releasing the mouse button while dragging.
 
   If the \a enable flag is \c FALSE and we're currently animating, the
   spin will be stopped.
@@ -204,10 +204,10 @@ SoGuiExaminerViewerP::rotYWheelMotion(float value, float oldvalue)
   \sa isAnimationEnabled
 */
 void
-SoGuiExaminerViewerP::setGenericAnimationEnabled(const SbBool enable)
+SoGuiExaminerViewer::setAnimationEnabled(const SbBool enable)
 {
-  this->spinanimatingallowed = enable;
-  if (!enable && PUBLIC(this)->isAnimating()) { PUBLIC(this)->stopAnimating(); }
+  PRIVATE(this)->spinanimatingallowed = enable;
+  if (!enable && this->isAnimating()) { this->stopAnimating(); }
 }
 
 // *************************************************************************
@@ -345,26 +345,26 @@ So@Gui@ExaminerViewer::isFeedbackVisible(void) const
 
 /*!
   Set the size of the feedback axiscross.  The value is interpreted as
-  an approximate percentage chunk of the dimensions of the total canvas.
+  an approximate percentage chunk of the dimensions of the total
+  canvas.
 
   \sa getFeedbackSize, isFeedbackVisible, setFeedbackVisibility
 */
-
 void
-SoGuiExaminerViewerP::setGenericFeedbackSize(const int size)
+SoGuiExaminerViewer::setFeedbackSize(const int size)
 {
 #if SO@GUI@_DEBUG
   if (size < 1) {
-    SoDebugError::postWarning("SoGuiExaminerViewerP::setFeedbackSize",
+    SoDebugError::postWarning("SoGuiExaminerViewer::setFeedbackSize",
                               "the size setting should be larger than 0");
     return;
   }
 #endif // SO@GUI@_DEBUG
 
-  this->axiscrossSize = size;
+  PRIVATE(this)->axiscrossSize = size;
 
-  if (PUBLIC(this)->isFeedbackVisible() && PUBLIC(this)->isViewing()) {
-    PUBLIC(this)->scheduleRedraw();
+  if (this->isFeedbackVisible() && this->isViewing()) {
+    this->scheduleRedraw();
   }
 }
 
