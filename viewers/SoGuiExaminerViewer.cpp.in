@@ -146,7 +146,7 @@
   The initial position of the camera is placed such that all of the
   scenegraph's geometry fits within it's view.
 
-  \sa So@Gui@WalkViewer, So@Gui@FlyViewer, So@Gui@PlaneViewer
+  \sa So@Gui@FlyViewer, So@Gui@PlaneViewer
 */
 
 // *************************************************************************

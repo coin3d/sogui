@@ -339,10 +339,7 @@ INPUT                  = @sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Basic.h \
                          @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
                          @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
                          @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h \
-                         @sogui_src_dir@/src/Inventor/@Gui@/viewers/WalkViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.cpp \
-                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h
+                         @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
