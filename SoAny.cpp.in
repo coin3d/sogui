@@ -40,13 +40,22 @@
 #include <windows.h> /* GetEnvironmentVariable() */
 #endif /* HAVE_WINDOWS_H */
 
-#include <Inventor/@Gui@/SoAny.h>
-#include <Inventor/elements/SoGLCacheContextElement.h>
-#include <Inventor/errors/SoDebugError.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/elements/SoGLCacheContextElement.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/actions/SoSearchAction.h>
+#include <Inventor/SoInput.h>
+#include <Inventor/SoDB.h>
+
+#include <Inventor/@Gui@/SoAny.h>
+
 static SoAny * single_instance = NULL;
+
+SoSearchAction * SoAny::finder = NULL;
 
 #ifndef DOXYGEN_SKIP_THIS
 
@@ -161,6 +170,10 @@ SoAny::cleanup_si(void)
 {
   delete single_instance;
   single_instance = NULL;
+  if ( SoAny::finder ) {
+    delete finder;
+    finder = NULL;
+  }
 }
 
 /*!  
@@ -556,5 +569,69 @@ SoAny::listWin32ProcessModules(void)
 }
 
 #endif // !HAVE_WIN32_LOADLIBRARY || !HAVE_TLHELP32_H
+
+/**************************************************************************/
+
+char *
+SoAny::strconcat(const char ** stringlist, const char * glue, SbBool glueend) // static
+{
+  int i, gluelen, buflen;
+  char * buffer, * ptr;
+  assert(stringlist);
+  gluelen = 0;
+  buflen = 1; // The Terminator (1982)
+  if ( glue ) gluelen = strlen(glue);
+  for ( i = 0; stringlist[i] != NULL; i++ )
+    buflen += strlen(stringlist[i]) + gluelen;
+  if ( !glueend ) buflen -= gluelen;
+  buffer = new char [buflen];
+  assert(buffer);
+  ptr = buffer;
+  for ( i = 0; stringlist[i] != NULL; i++ ) {
+    int len;
+    len = strlen(stringlist[i]);
+    memcpy(ptr, stringlist[i], len);
+    ptr += len;
+    if ( gluelen && ((stringlist[i+1] != NULL) || glueend) ) {
+      memcpy(ptr, glue, gluelen);
+      ptr += gluelen;
+    }
+  }
+  *ptr = '\0';
+  return buffer;
+}
+
+SoNode *
+SoAny::loadSceneGraph(const char ** stringlist) // static
+{
+  char * buffer = SoAny::strconcat(stringlist, "\n");
+  SoNode * root = SoAny::loadSceneGraph(buffer);
+  delete [] buffer;
+  return root;
+}
+
+SoNode *
+SoAny::loadSceneGraph(char * buffer, unsigned int bufsize) // static
+{
+  SoSeparator * root;
+  SoInput in;
+  in.setBuffer(buffer, bufsize ? bufsize : strlen(buffer));
+  root = SoDB::readAll(&in);
+  return root;
+}
+
+SoNode *
+SoAny::scanSceneForName(SoNode * scene, const char * name)
+{
+  SoPath * path;
+  if ( SoAny::finder == NULL )
+    SoAny::finder = new SoSearchAction;
+  SoAny::finder->reset();
+  SoAny::finder->setName(SbName(name));
+  SoAny::finder->setInterest(SoSearchAction::FIRST);
+  SoAny::finder->apply(scene);
+  path = SoAny::finder->getPath();
+  return path ? path->getTail() : NULL;
+}
 
 /**************************************************************************/

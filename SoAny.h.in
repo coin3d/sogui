@@ -36,7 +36,11 @@
 // ************************************************************************
 
 #include <Inventor/SbPList.h>
+
 #include <Inventor/@Gui@/So@Gui@.h>
+
+class SoNode;
+class SoSearchAction;
 
 // ************************************************************************
 
@@ -60,6 +64,11 @@ public:
   void addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
                                     void * ud);
 
+  static char * strconcat(const char ** stringlist, const char * glue = NULL, SbBool glueend = TRUE);
+  static SoNode * loadSceneGraph(const char ** stringlist);
+  static SoNode * loadSceneGraph(char * buffer, unsigned int bufsize = 0);
+  static SoNode * scanSceneForName(SoNode * scene, const char * name);
+
 private:
   SoAny(void);
   ~SoAny();
@@ -72,6 +81,8 @@ private:
 
   So@Gui@::FatalErrorCB * fatalcb;
   void * userdata;
+
+  static SoSearchAction * finder;
 }; // class SoAny
 
 // ************************************************************************
