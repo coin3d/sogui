@@ -228,6 +228,13 @@ private slots:
 #endif // __COIN_SOQT__
 
 private:
+  // Since the class consists solely of static functions, hide the
+  // default constructor and the destructor so nobody can instantiate
+  // it.
+  So@Gui@(void);
+  ~So@Gui@();
+  friend class So@Gui@P; // SoQtP needs this to set up an object for the slots.
+
   static void sensorQueueChanged(void * cbdata);
 
 #ifdef __COIN_SOXT__

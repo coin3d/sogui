@@ -68,6 +68,12 @@ main(int argc, char **argv)
 #include <Inventor/@Gui@/SoAny.h>
 
 
+// Default constructor and the destructor is private (So@Gui@ class
+// consists of solely static functions).
+So@Gui@::So@Gui@(void) { }
+So@Gui@::~So@Gui@() { }
+
+
 /*!
   \typedef void So@Gui@::FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode, void * userdata)
 
