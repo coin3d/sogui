@@ -337,7 +337,21 @@ INPUT                  = \
  \
  @sogui_src_dir@/src/Inventor/@Gui@/viewers/PlaneViewer.cpp \
  @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.cpp \
- @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h \
+ \
+ @sogui_src_dir@/src/Inventor/@Gui@/viewers/ExaminerViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h \
+ \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
+ \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@FlyViewer.h \
+ \
+ @sogui_src_dir@/src/Inventor/@Gui@/viewers/WalkViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.cpp \
+ @sogui_build_dir@/src/Inventor/@Gui@/viewers/So@Gui@WalkViewer.h
 
 
 # If the value of the INPUT tag contains directories, you can use the 
