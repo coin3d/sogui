@@ -52,7 +52,7 @@ main(int argc, char ** argv)
 {
   // Initialize So@Gui@ and Inventor API libraries. This returns a main
   // window to use.
-  @WIDGET@ mainwin = So@Gui@::init(argv[0]);
+  @WIDGET@ mainwin = So@Gui@::init(argc, argv, argv[0]);
 
    // Make a dead simple scene graph, only containing a single cube.
   SoCube * cube = new SoCube;
@@ -90,7 +90,9 @@ So@Gui@::~So@Gui@() { }
 /*!
   \fn @WIDGET@ So@Gui@::init(const char * appname, const char * classname)
 
-  This function initializes the So@Gui@ library.
+  This function initializes the So@Gui@ library, as well as the
+  Inventor API. The latter is done by calling \a SoDB::init(), \a
+  SoNodeKit::init() and \a SoInteraction::init().
 
   The returned @WIDGET@ is a toplevel shell widget for the
   application, which can be used as a shell for the main component.
@@ -115,6 +117,31 @@ So@Gui@::internal_init(const char * appname, const char * classname)
   int argc = (buf != NULL) ? 1 : 0;
   return So@Gui@::init(argc, array, appname, classname);
 }
+
+/*!
+  \fn @WIDGET@ So@Gui@::init(int argc, char ** argv, const char * appname, const char * classname)
+
+  This function initializes the So@Gui@ library, as well as the
+  Inventor API. The latter is done by calling \a SoDB::init(), \a
+  SoNodeKit::init() and \a SoInteraction::init().
+
+  Creates an application framework and constructs and returns a main
+  widget for you.
+
+  The returned @WIDGET@ is a toplevel shell widget for the
+  application, which can be used as a shell for the main component.
+*/
+
+/*!
+  \fn void So@Gui@::init(@WIDGET@ toplevelwidget)
+
+  This function initializes the So@Gui@ library, as well as the
+  Inventor API. The latter is done by calling \a SoDB::init(), \a
+  SoNodeKit::init() and \a SoInteraction::init().
+
+  Assumes you are creating your own application framework and main
+  widget.  \a toplevelwidget should be your application's main widget.
+*/
 
 // *************************************************************************
 
