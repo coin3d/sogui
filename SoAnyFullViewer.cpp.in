@@ -95,6 +95,10 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->setMenuItemTitle( DECORATION_ITEM, _( "Decorations" ) );
   menu->newMenuItem( "headlight", HEADLIGHT_ITEM );
   menu->setMenuItemTitle( HEADLIGHT_ITEM, _( "Headlight" ) );
+#ifdef HAVE_SOGUI_GOFULLSCREEN
+  menu->newMenuItem( "fullscreen", FULLSCREEN_ITEM );
+  menu->setMenuItemTitle( FULLSCREEN_ITEM, _( "Fullscreen" ) );
+#endif /* HAVE_SOGUI_GOFULLSCREEN */
   menu->newMenuItem( "preferences", PREFERENCES_ITEM );
   menu->setMenuItemTitle( PREFERENCES_ITEM, _( "Preferences..." ) );
 
@@ -104,6 +108,9 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addMenuItem( ROOT_MENU, EXAMINING_ITEM );
   menu->addMenuItem( ROOT_MENU, DECORATION_ITEM );
   menu->addMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
+#ifdef HAVE_SOGUI_GOFULLSCREEN
+  menu->addMenuItem( ROOT_MENU, FULLSCREEN_ITEM );
+#endif /* HAVE_SOGUI_GOFULLSCREEN */
   menu->addSeparator( ROOT_MENU );
   menu->addMenuItem( ROOT_MENU, PREFERENCES_ITEM );
 
@@ -303,6 +310,10 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addRadioGroupItem( toggle, DECORATION_ITEM );
   toggle = menu->newRadioGroup();
   menu->addRadioGroupItem( toggle, HEADLIGHT_ITEM );
+#ifdef HAVE_SOGUI_GOFULLSCREEN
+  toggle = menu->newRadioGroup();
+  menu->addRadioGroupItem( toggle, FULLSCREEN_ITEM );
+#endif /* HAVE_SOGUI_GOFULLSCREEN */
 
   menu->addMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
     (void *) this );
@@ -320,6 +331,9 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
   menu->setMenuItemMarked( DECORATION_ITEM, this->viewer->isDecoration() );
   menu->setMenuItemMarked( EXAMINING_ITEM, this->viewer->isViewing() );
   menu->setMenuItemMarked( HEADLIGHT_ITEM, this->viewer->isHeadlight() );
+#ifdef HAVE_SOGUI_GOFULLSCREEN
+  menu->setMenuItemMarked( FULLSCREEN_ITEM, this->viewer->isFullScreen() );
+#endif /* HAVE_SOGUI_GOFULLSCREEN */
 
   //// Basic drawstyles. //////////////////////////////////////////////
   this->setDrawStyleMenuActivation(So@Gui@FullViewer::STILL,
@@ -401,6 +415,11 @@ SoAnyFullViewer::menuSelection( // virtual
   case HEADLIGHT_ITEM:
     viewer->setHeadlight( viewer->isHeadlight() ? FALSE : TRUE );
     break;
+#ifdef HAVE_SOGUI_GOFULLSCREEN
+  case FULLSCREEN_ITEM:
+    viewer->goFullScreen( viewer->isFullScreen() ? FALSE : TRUE );
+    break;
+#endif /* HAVE_SOGUI_GOFULLSCREEN */
   case PREFERENCES_ITEM:
     viewer->selectedPrefs();
     break;
