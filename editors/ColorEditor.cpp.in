@@ -1,0 +1,705 @@
+
+#include <Inventor/SbPList.h>
+#include <Inventor/SoSceneManager.h>
+#include <Inventor/fields/SoSFColor.h>
+#include <Inventor/fields/SoMFColor.h>
+#include <Inventor/fields/SoMFUInt32.h>
+#include <Inventor/sensors/SoFieldSensor.h>
+#include <Inventor/actions/SoGLRenderAction.h>
+
+#include <Inventor/@Gui@/SoAny.h>
+
+#include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+
+#include <Inventor/@Gui@/editors/So@Gui@ColorEditor.h>
+
+/*!
+  \class So@Gui@ColorEditor Inventor/@Gui@/editors/So@Gui@ColorEditor.h
+  \brief The So@Gui@ColorEditor class is a GUI component for interactively
+  editing color fields.
+*/
+
+/*!
+  \enum So@Gui@ColorEditor::Sliders
+*/
+
+/*!
+  \val So@Gui@ColorEditor::NONE
+*/
+
+/*!
+  \val So@Gui@ColorEditor::INTENSITY
+*/
+
+/*!
+  \val So@Gui@ColorEditor::RGB
+*/
+
+/*!
+  \val So@Gui@ColorEditor::HSV
+*/
+
+/*!
+  \val So@Gui@ColorEditor::RGB_V
+*/
+
+/*!
+  \val So@Gui@ColorEditor::RGB_HSV
+*/
+
+/*!
+  \enum So@Gui@ColorEditor::UpdateFrequency
+*/
+
+/*!
+  \val So@Gui@ColorEditor::CONTINUOUS
+*/
+
+/*!
+  \val So@Gui@ColorEditor::AFTER_ACCEPT
+*/
+
+// *************************************************************************
+
+static const SbBool SGI_ATTACHMENT_REF_COMPATIBILITY = TRUE;
+
+enum Attachment {
+  DETACHED,
+  SFCOLOR,
+  MFCOLOR,
+  MFUINT32
+};
+
+class ColorEditor {
+public:
+  So@Gui@ColorEditor * api;
+
+  SbPList callbacks;
+
+  SbColor color;
+  SbBool wysiwyg;
+  So@Gui@ColorEditor::Sliders sliders;
+  So@Gui@ColorEditor::UpdateFrequency update;
+
+  // attachment is redundant - the existence of the field sensor, and the
+  // field type it is attached to is all the info needed really
+  Attachment attachment;
+  // the field pointers can actually be dropped since the sensor will have
+  // that info
+  SoSFColor * sfcolor;
+  SoMFColor * mfcolor;
+  SoMFUInt32 * mfuint32;
+  int mfindex;
+  SoFieldSensor * sensor;
+
+  void attachedToColor(const SbColor & color);
+  void colorChange(void);
+  static void update_cb(void * closure, SoSensor * sensor);
+  static void delete_cb(void * closure, SoSensor * sensor);
+
+  SbBool updating;
+  SoFieldSensor * sensor_r;
+  SoFieldSensor * sensor_g;
+  SoFieldSensor * sensor_b;
+  SoFieldSensor * sensor_h;
+  SoFieldSensor * sensor_s;
+  SoFieldSensor * sensor_v;
+
+  static void update_r_cb(void * closure, SoSensor * sensor);
+  static void update_g_cb(void * closure, SoSensor * sensor);
+  static void update_b_cb(void * closure, SoSensor * sensor);
+  static void update_h_cb(void * closure, SoSensor * sensor);
+  static void update_s_cb(void * closure, SoSensor * sensor);
+  static void update_v_cb(void * closure, SoSensor * sensor);
+
+  SoGuiSlider1 * slider_r; // red
+  SoGuiSlider1 * slider_g; // green
+  SoGuiSlider1 * slider_b; // blue
+  SoGuiSlider1 * slider_h; // hue
+  SoGuiSlider1 * slider_s; // saturation
+  SoGuiSlider1 * slider_v; // value
+
+  static const char * scenegraph[];
+};
+
+const char *
+ColorEditor::scenegraph[] = {
+  "#Inventor V2.1 ascii",
+  "",
+  "Separator {",
+  "  DirectionalLight { direction 0 0 -1 color 1 1 1 intensity 0.8 }",
+  "  OrthographicCamera { }",
+  "  DEF viewportfix SoGuiViewportFix { }",
+  "  Material { ambientColor 0.8 0.8 0.8 }",
+  "  DEF pane SoGuiPane {",
+  "    worldSize 1 1 0",
+  "    objectSize 0 0 0 = USE viewportfix.viewportSize",
+  "    SoGuiPosition {",
+  "      position 0 0 0",
+  "      = DEF slidergeometry Calculator {",
+  "        A 0 0 0 = USE viewportfix.viewportSize",
+  "        expression [", // hehe :)
+  "          \"ta = floor(A[1] / 14)\"",                    // slider height
+  "          \"tb = floor(((A[1] / 2) - (4 * ta)) / 5)\"",  // inter-slider height
+  "          \"oA = vec3f(A[0] - (tb * 2), ta, 0)\"",       // slider size
+  "          \"oB = vec3f(tb, tb, 0)\"",                    // slider pos
+  "          \"oC = vec3f(0, ta + tb, 0)\"",                // slider translation
+  "        ]",
+  "      } . oB",
+  "    }",
+  // FIXME: this only takes care of RGBI, not the rest of the options
+  // frames before sliders, since knobs need to paint over frames (we're not in 3D anymore)
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliderh SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliders SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliderv SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliderb SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliderg SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "    SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
+  "    SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "    DEF sliderr SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
+  "  }",
+  "}",
+  NULL
+};
+
+// *************************************************************************
+
+#define PRIVATE(obj) ((ColorEditor *) ((So@Gui@ColorEditor *) obj)->internals)
+#define PUBLIC(obj) (((ColorEditor *) obj)->api)
+
+So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool embed)
+  : inherited(parent, name, embed)
+{
+  this->internals = (void *) new ColorEditor;
+  PRIVATE(this)->api = this;
+  PRIVATE(this)->wysiwyg = FALSE;
+  PRIVATE(this)->color = SbColor(0, 0, 0);
+  PRIVATE(this)->sliders = RGB;
+  PRIVATE(this)->update = AFTER_ACCEPT;
+
+  PRIVATE(this)->attachment = DETACHED;
+  PRIVATE(this)->sensor = NULL;
+  PRIVATE(this)->sfcolor = NULL;
+  PRIVATE(this)->sfcolor = NULL;
+  PRIVATE(this)->mfcolor = NULL;
+  PRIVATE(this)->mfuint32 = NULL;
+  PRIVATE(this)->mfindex = 0;
+
+  PRIVATE(this)->updating = FALSE;
+  PRIVATE(this)->sensor_r = NULL;
+  PRIVATE(this)->sensor_g = NULL;
+  PRIVATE(this)->sensor_b = NULL;
+  PRIVATE(this)->sensor_h = NULL;
+  PRIVATE(this)->sensor_s = NULL;
+  PRIVATE(this)->sensor_v = NULL;
+
+  this->setSize(SbVec2s(320, 256));
+
+  SoNode * root = SoAny::loadSceneGraph(ColorEditor::scenegraph);
+  if ( root ) {
+    root->ref();
+    PRIVATE(this)->slider_r = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderr");
+    PRIVATE(this)->slider_g = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderg");
+    PRIVATE(this)->slider_b = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderb");
+    PRIVATE(this)->slider_h = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderh");
+    PRIVATE(this)->slider_s = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliders");
+    PRIVATE(this)->slider_v = (SoGuiSlider1 *) SoAny::scanSceneForName(root, "sliderv");
+    if ( PRIVATE(this)->slider_r ) {
+      PRIVATE(this)->slider_r->ref();
+      PRIVATE(this)->slider_r->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 0, 0));
+      PRIVATE(this)->sensor_r = new SoFieldSensor(ColorEditor::update_r_cb, PRIVATE(this));
+      // priority 0 is a must for the this->updating test to be able to break loops
+      PRIVATE(this)->sensor_r->setPriority(0);
+      PRIVATE(this)->sensor_r->attach(&(PRIVATE(this)->slider_r->value));
+    }
+    if ( PRIVATE(this)->slider_g ) {
+      PRIVATE(this)->slider_g->ref();
+      PRIVATE(this)->slider_g->setSurfaceColor(SbColor(0, 0, 0), SbColor(0, 1, 0));
+      PRIVATE(this)->sensor_g = new SoFieldSensor(ColorEditor::update_g_cb, PRIVATE(this));
+      PRIVATE(this)->sensor_g->setPriority(0);
+      PRIVATE(this)->sensor_g->attach(&(PRIVATE(this)->slider_g->value));
+    }
+    if ( PRIVATE(this)->slider_b ) {
+      PRIVATE(this)->slider_b->ref();
+      PRIVATE(this)->slider_b->setSurfaceColor(SbColor(0, 0, 0), SbColor(0, 0, 1));
+      PRIVATE(this)->sensor_b = new SoFieldSensor(ColorEditor::update_b_cb, PRIVATE(this));
+      PRIVATE(this)->sensor_b->setPriority(0);
+      PRIVATE(this)->sensor_b->attach(&(PRIVATE(this)->slider_b->value));
+    }
+    if ( PRIVATE(this)->slider_h ) {
+      PRIVATE(this)->slider_h->ref();
+      PRIVATE(this)->slider_h->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
+      PRIVATE(this)->sensor_h = new SoFieldSensor(ColorEditor::update_h_cb, PRIVATE(this));
+      PRIVATE(this)->sensor_h->setPriority(0);
+      PRIVATE(this)->sensor_h->attach(&(PRIVATE(this)->slider_h->value));
+    }
+    if ( PRIVATE(this)->slider_s ) {
+      PRIVATE(this)->slider_s->ref();
+      PRIVATE(this)->slider_s->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
+      PRIVATE(this)->sensor_s = new SoFieldSensor(ColorEditor::update_s_cb, PRIVATE(this));
+      PRIVATE(this)->sensor_s->setPriority(0);
+      PRIVATE(this)->sensor_s->attach(&(PRIVATE(this)->slider_s->value));
+    }
+    if ( PRIVATE(this)->slider_v ) {
+      PRIVATE(this)->slider_v->ref();
+      PRIVATE(this)->slider_v->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
+      PRIVATE(this)->sensor_v = new SoFieldSensor(ColorEditor::update_v_cb, PRIVATE(this));
+      PRIVATE(this)->sensor_v->setPriority(0);
+      PRIVATE(this)->sensor_v->attach(&(PRIVATE(this)->slider_v->value));
+    }
+    this->setSceneGraph(root);
+    root->unref();
+  }
+  if ( !root ) {
+    SoDebugError::postInfo("So@Gui@ColorEditor::So@Gui@ColorEditor",
+      "problem creating internal scene graph");
+  }
+}
+
+So@Gui@ColorEditor::~So@Gui@ColorEditor(void)
+{
+  this->setSceneGraph(NULL);
+  this->detach();
+  ColorEditor * instance = PRIVATE(this);
+  delete instance;
+}
+
+/*!
+  Attach the editor to a color single field.  Any existing attachments are
+  detached.
+
+  The node argument defaults to NULL and is ignored.  It is part of the
+  argument list for compatibility reasons.
+*/
+
+void
+So@Gui@ColorEditor::attach(SoSFColor * color, SoBase * node)
+{
+  if ( PRIVATE(this)->attachment != DETACHED )
+    this->detach();
+  if ( color != NULL ) {
+    if ( SGI_ATTACHMENT_REF_COMPATIBILITY ) {
+      SoFieldContainer * container = color->getContainer();
+      if ( container != NULL ) container->ref();
+    }
+    PRIVATE(this)->attachment = SFCOLOR;
+    PRIVATE(this)->sfcolor = color;
+    assert(PRIVATE(this)->sensor == NULL);
+    PRIVATE(this)->sensor = new SoFieldSensor(ColorEditor::update_cb, PRIVATE(this));
+    PRIVATE(this)->sensor->setDeleteCallback(ColorEditor::delete_cb, PRIVATE(this));
+    // FIXME: sensor priority?
+    PRIVATE(this)->sensor->attach(color);
+    PRIVATE(this)->attachedToColor(color->getValue());
+  }
+}
+
+/*!
+  Attach the editor to an element in a color multi field.  Any existing attachments are
+  detached.
+  
+  The node argument defaults to NULL and is ignored.  It is part of the
+  argument list for compatibility reasons.
+*/
+
+void
+So@Gui@ColorEditor::attach(SoMFColor * color, int idx, SoBase * node)
+{
+  if ( PRIVATE(this)->attachment != DETACHED )
+    this->detach();
+  if ( color != NULL ) {
+    if ( SGI_ATTACHMENT_REF_COMPATIBILITY ) {
+      SoFieldContainer * container = color->getContainer();
+      if ( container != NULL ) container->ref();
+    }
+    PRIVATE(this)->attachment = MFCOLOR;
+    PRIVATE(this)->mfcolor = color;
+    PRIVATE(this)->mfindex = idx;
+    assert(PRIVATE(this)->sensor == NULL);
+    PRIVATE(this)->sensor = new SoFieldSensor(ColorEditor::update_cb, PRIVATE(this));
+    PRIVATE(this)->sensor->setDeleteCallback(ColorEditor::delete_cb, PRIVATE(this));
+    // FIXME: sensor priority?
+    PRIVATE(this)->sensor->attach(color);
+    PRIVATE(this)->attachedToColor(color->operator[](idx));
+  }
+}
+
+/*!
+  Attach the editor to an element in an uint32 multi field.  The field
+  is assumed to be of the RGBA packed color format.  Any existing attachments are
+  detached.
+  
+  The node argument defaults to NULL and is ignored.  It is part of the
+  argument list for compatibility reasons.
+*/
+
+void
+So@Gui@ColorEditor::attach(SoMFUInt32 * color, int idx, SoBase * node)
+{
+  if ( PRIVATE(this)->attachment != DETACHED )
+    this->detach();
+  if ( color != NULL ) {
+    if ( SGI_ATTACHMENT_REF_COMPATIBILITY ) {
+      SoFieldContainer * container = color->getContainer();
+      if ( container != NULL ) container->ref();
+    }
+    PRIVATE(this)->attachment = MFUINT32;
+    PRIVATE(this)->mfuint32 = color;
+    PRIVATE(this)->mfindex = idx;
+    assert(PRIVATE(this)->sensor == NULL);
+    PRIVATE(this)->sensor = new SoFieldSensor(ColorEditor::update_cb, PRIVATE(this));
+    PRIVATE(this)->sensor->setDeleteCallback(ColorEditor::delete_cb, PRIVATE(this));
+    // FIXME: sensor priority?
+    PRIVATE(this)->sensor->attach(color);
+    SbColor col;
+    float transparency;
+    col.setPackedValue(color->operator[](idx), transparency);
+    PRIVATE(this)->attachedToColor(col);
+  }
+}
+
+/*!
+  Detach the editor from the field it is attached to.
+*/
+
+void
+So@Gui@ColorEditor::detach(void)
+{
+  if ( PRIVATE(this)->attachment != DETACHED ) {
+    SoField * field = NULL;
+    switch ( PRIVATE(this)->attachment ) {
+    case SFCOLOR:
+      field = PRIVATE(this)->sfcolor;
+      break;
+    case MFCOLOR:
+      field = PRIVATE(this)->mfcolor;
+      break;
+    case MFUINT32:
+      field = PRIVATE(this)->mfuint32;
+      break;
+    case DETACHED:
+      assert(0 && "DETACHED impossible");
+      break;
+    }
+    assert(field != NULL);
+    if ( field != NULL ) {
+      assert(PRIVATE(this)->sensor != NULL);
+      PRIVATE(this)->sensor->detach();
+      delete PRIVATE(this)->sensor;
+      PRIVATE(this)->sensor = NULL;
+      if ( SGI_ATTACHMENT_REF_COMPATIBILITY ) {
+        SoFieldContainer * container = field->getContainer();
+        if ( container != NULL ) container->ref();
+      }
+    }
+    PRIVATE(this)->attachment = DETACHED;
+  }
+}
+
+/*!
+  This method returns whether or not the editor is currently attached to a field.
+*/
+
+SbBool
+So@Gui@ColorEditor::isAttached(void) const
+{
+  return (PRIVATE(this)->attachment != DETACHED) ? TRUE : FALSE;
+}
+
+/*
+  Add a callback to be triggered when the color value is changed.
+
+  \sa So@Gui@ColorEditor::setUpdateFrequency
+*/
+
+void
+So@Gui@ColorEditor::addColorChangedCallback(So@Gui@ColorEditorCB * callback, void * closure)
+{
+  PRIVATE(this)->callbacks.append((void *) callback);
+  PRIVATE(this)->callbacks.append(closure);
+}
+
+/*!
+  Remove all color change callbacks matching the given arguments.
+*/
+
+void
+So@Gui@ColorEditor::removeColorChangedCallback(So@Gui@ColorEditorCB * callback, void * closure)
+{
+  const int len = PRIVATE(this)->callbacks.getLength();
+  int i;
+  for ( i = 0; i < len; i += 2 ) {
+    So@Gui@ColorEditorCB * cb =
+      (So@Gui@ColorEditorCB *) PRIVATE(this)->callbacks[i];
+    if ( (callback == cb) && (closure == PRIVATE(this)->callbacks[i+1]) ) {
+      PRIVATE(this)->callbacks.remove(i+1);
+      PRIVATE(this)->callbacks.remove(i);
+      i -= 2;
+    }
+  }
+}
+
+/*!
+  Set a new color value.
+
+  If the field value gets updated, the color change callbacks will be triggered.
+*/
+
+void
+So@Gui@ColorEditor::setColor(const SbColor & color)
+{
+  // callbacks are triggered on the sensor rebound...
+  switch ( PRIVATE(this)->attachment ) {
+  case DETACHED:
+    break;
+  case SFCOLOR:
+    assert(PRIVATE(this)->sfcolor != NULL);
+    if ( PRIVATE(this)->sfcolor->getValue() != color ) {
+      PRIVATE(this)->sfcolor->setValue(color);
+      PRIVATE(this)->color = color;
+    }
+    break;
+  case MFCOLOR:
+    assert(PRIVATE(this)->mfcolor != NULL);
+    if ( PRIVATE(this)->mfcolor->operator[](PRIVATE(this)->mfindex) != color ) {
+      PRIVATE(this)->mfcolor->set1Value(PRIVATE(this)->mfindex, color);
+      PRIVATE(this)->color = color;
+    }
+    break;
+  case MFUINT32:
+    assert(PRIVATE(this)->mfuint32 != NULL);
+    if ( PRIVATE(this)->mfuint32->operator[](PRIVATE(this)->mfindex) != color.getPackedValue() ) {
+      PRIVATE(this)->mfuint32->set1Value(PRIVATE(this)->mfindex, color.getPackedValue());
+      PRIVATE(this)->color = color;
+    }
+    break;
+  }
+}
+
+/*!
+  Get the current color value.
+*/
+
+const SbColor &
+So@Gui@ColorEditor::getColor(void) const
+{
+  // FIXME: update color object?
+  return PRIVATE(this)->color;
+}
+
+/*!
+  Not implemented yet.
+
+  Sets whether or not the color sliders should be in WYSIWYG mode.
+  When enabled, the color backgrounds in the sliders will be updated to
+  reflect what the color will be, taken all color components into account.
+  When disabled, the color backgrounds only reflect the component the slider
+  controls.
+*/
+
+void
+So@Gui@ColorEditor::setWYSIWYG(SbBool enable)
+{
+  PRIVATE(this)->wysiwyg = enable;
+}
+
+/*!
+  Returns whether or not the editor sliders are in WYSIWYG mode.
+*/
+
+SbBool
+So@Gui@ColorEditor::isWYSIWYG(void) const
+{
+  return PRIVATE(this)->wysiwyg;
+}
+
+/*!
+  Sets which if the slider sets is to be used.
+
+  \sa So@Gui@ColorEditor::Sliders
+*/
+
+void
+So@Gui@ColorEditor::setCurrentSliders(So@Gui@ColorEditor::Sliders which)
+{
+  PRIVATE(this)->sliders = which;
+  // FIXME: update scene graph
+}
+
+/*!
+  Returns which slider sets is being used.
+
+  \sa So@Gui@ColorEditor::Sliders
+*/
+
+So@Gui@ColorEditor::Sliders
+So@Gui@ColorEditor::getCurrentSliders(void) const
+{
+  return PRIVATE(this)->sliders;
+}
+
+/*!
+  Sets the update-frequency setting, which affects when color change callbacks
+  will be triggered.
+
+  \sa So@Gui@ColorEditor::UpdateFrequency
+*/
+
+void
+So@Gui@ColorEditor::setUpdateFrequency(So@Gui@ColorEditor::UpdateFrequency freq)
+{
+  PRIVATE(this)->update = freq;
+}
+
+/*!
+  Returns the update-frequency setting.
+
+  \sa So@Gui@ColorEditor::UpdateFrequency
+*/
+
+So@Gui@ColorEditor::UpdateFrequency
+So@Gui@ColorEditor::getUpdateFrequency(void) const
+{
+  return PRIVATE(this)->update;
+}
+
+// *************************************************************************
+
+void
+ColorEditor::attachedToColor(const SbColor & color)
+{
+  float r, g, b, h, s, v;
+  color.getValue(r, g, b);
+  color.getHSVValue(h, s, v);
+  this->updating = TRUE;
+  this->slider_r->value.setValue(r);
+  this->slider_g->value.setValue(g);
+  this->slider_b->value.setValue(b);
+  this->slider_h->value.setValue(h);
+  this->slider_s->value.setValue(s);
+  this->slider_v->value.setValue(v);
+  this->updating = FALSE;
+}
+
+// *************************************************************************
+
+void
+ColorEditor::colorChange(void)
+{
+  this->attachedToColor(PUBLIC(this)->getColor());
+  if ( this->update == So@Gui@ColorEditor::CONTINUOUS ) {
+    int i;
+    for ( i = 0; i < this->callbacks.getLength(); i += 2 ) {
+      So@Gui@ColorEditorCB * callback = (So@Gui@ColorEditorCB *) this->callbacks[i];
+      void * closure = this->callbacks[i+1];
+      callback(closure, &(this->color));
+    }
+  }
+}
+
+void
+ColorEditor::update_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure != NULL);
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  me->colorChange();
+}
+
+void
+ColorEditor::delete_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure != NULL);
+  PUBLIC(closure)->detach();
+}
+
+// *************************************************************************
+
+void
+ColorEditor::update_r_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float r, g, b;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getValue(r, g, b);
+  r = me->slider_r->value.getValue();
+  color.setValue(r, g, b);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_g_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float r, g, b;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getValue(r, g, b);
+  g = me->slider_g->value.getValue();
+  color.setValue(r, g, b);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_b_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float r, g, b;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getValue(r, g, b);
+  b = me->slider_b->value.getValue();
+  color.setValue(r, g, b);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_h_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float h, s, v;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getHSVValue(h, s, v);
+  h = me->slider_h->value.getValue();
+  color.setHSVValue(h, s, v);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_s_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float h, s, v;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getHSVValue(h, s, v);
+  s = me->slider_s->value.getValue();
+  color.setHSVValue(h, s, v);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_v_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  float h, s, v;
+  SbColor color = PUBLIC(me)->getColor();
+  color.getHSVValue(h, s, v);
+  v = me->slider_v->value.getValue();
+  color.setHSVValue(h, s, v);
+  PUBLIC(me)->setColor(color);
+}
+
+// *************************************************************************

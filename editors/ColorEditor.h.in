@@ -1,0 +1,60 @@
+#ifndef COIN_@GUI@COLOREDITOR_H
+#define COIN_@GUI@COLOREDITOR_H
+
+#include <Inventor/@Gui@/So@Gui@RenderArea.h>
+
+typedef void So@Gui@ColorEditorCB(void * closure, const SbColor * color);
+        
+class SbColor;
+class SoSFColor;
+class SoMFColor;
+class SoMFUInt32;
+
+class So@Gui@ColorEditor : public So@Gui@RenderArea {
+  typedef So@Gui@RenderArea inherited;
+
+public:
+  So@Gui@ColorEditor(@WIDGET@ parent = NULL, const char * name = NULL, SbBool embed = TRUE);
+  ~So@Gui@ColorEditor(void);
+
+  enum Sliders {
+    NONE, 
+    INTENSITY,
+    RGB, 
+    HSV, 
+    RGB_V, 
+    RGB_HSV
+  };
+  
+  enum UpdateFrequency {
+    CONTINUOUS,
+    AFTER_ACCEPT
+  };
+  
+  void attach(SoSFColor * color, SoBase * node = NULL);
+  void attach(SoMFColor * color, int idx = 0, SoBase * node = NULL);
+  void attach(SoMFUInt32 * color, int idx = 0, SoBase * node = NULL);
+  void detach(void);
+  SbBool isAttached(void) const;
+  
+  void addColorChangedCallback(So@Gui@ColorEditorCB * cb, void * closure = NULL);
+  void removeColorChangedCallback(So@Gui@ColorEditorCB * cb, void * closure = NULL);
+  
+  void setColor(const SbColor & color);
+  const SbColor & getColor(void) const;
+  
+  void setWYSIWYG(SbBool enable);
+  SbBool isWYSIWYG(void) const;
+  
+  void setCurrentSliders(Sliders which);
+  Sliders getCurrentSliders(void) const;
+  
+  void setUpdateFrequency(UpdateFrequency freq);
+  UpdateFrequency getUpdateFrequency(void) const;
+  
+private:
+  void * internals;
+
+};
+
+#endif // !COIN_@GUI@COLOREDITOR_H
