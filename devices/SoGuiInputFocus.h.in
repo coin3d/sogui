@@ -27,8 +27,11 @@
 
 // *************************************************************************
 
-#define so@gui@EnterWindowMask 0x01
-#define so@gui@LeaveWindowMask 0x02
+// FIXME: I'm not sure if the X11 enum value matching here is
+// necessary or not. Should investigate. 20011211 mortene.
+#define so@gui@EnterWindowMask 0x01 // Matches X11 EnterWindowMask
+#define so@gui@LeaveWindowMask 0x02 // Matches X11 LeaveWindowMask
+
 
 #define SO_@GUI@_ALL_FOCUS_EVENTS So@Gui@InputFocus::ALL_EVENTS;
 
@@ -38,9 +41,9 @@ class SO@GUI@_DLL_API So@Gui@InputFocus : public So@Gui@Device {
 
 public:
   enum Events {
-    ENTER_WINDOW = 0x01,
-    LEAVE_WINDOW = 0x02,
-    ALL_EVENTS   = 0x03
+    ENTER_WINDOW = so@gui@EnterWindowMask,
+    LEAVE_WINDOW = so@gui@LeaveWindowMask,
+    ALL_EVENTS   = so@gui@EnterWindowMask | so@gui@LeaveWindowMask
   };
 
   So@Gui@InputFocus(int mask = ALL_EVENTS);
