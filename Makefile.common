@@ -278,6 +278,18 @@ $(top_builddir)/src/Inventor/@Gui@/common/gl.h: $(top_srcdir)/src/Inventor/@Gui@
 
 ## src/Inventor/@Gui@/devices/
 
+$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h: $(top_srcdir)/src/Inventor/@Gui@/common/devices/SoGuiInputFocus.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h:src/Inventor/@Gui@/common/devices/SoGuiInputFocus.h.in )
+
+$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h: $(top_srcdir)/src/Inventor/@Gui@/common/devices/SoGuiKeyboard.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h:src/Inventor/@Gui@/common/devices/SoGuiKeyboard.h.in )
+
+$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h: $(top_srcdir)/src/Inventor/@Gui@/common/devices/SoGuiMouse.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h:src/Inventor/@Gui@/common/devices/SoGuiMouse.h.in )
+
+$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h: $(top_srcdir)/src/Inventor/@Gui@/common/devices/SoGuiSpaceball.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=$(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h:src/Inventor/@Gui@/common/devices/SoGuiSpaceball.h.in )
+
 $(top_builddir)/src/Inventor/@Gui@/devices/spwinput.h: $(top_srcdir)/src/Inventor/@Gui@/common/spwinput.h.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/devices/spwinput.h:src/Inventor/@Gui@/common/spwinput.h.in )
 
@@ -410,25 +422,25 @@ $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Device.cpp: $(top
 	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Device.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Device.h`"; \
 	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Device.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Device.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp: $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h` )
+	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@InputFocus.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp: $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h` )
+	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Keyboard.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp: $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h` )
+	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Mouse.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Mouse.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp: $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h` )
+	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp `$(UNIX2WINPATH) $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h` )
 
 $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystick.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
