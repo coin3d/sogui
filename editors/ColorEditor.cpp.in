@@ -150,6 +150,7 @@ public:
   static const char * scenegraph[];
 };
 
+// FIXME: inser ClickCounter, and connect it to the switch
 const char *
 ColorEditor::scenegraph[] = {
   "#Inventor V2.1 ascii",
@@ -163,11 +164,26 @@ ColorEditor::scenegraph[] = {
   "  DEF pane SoGuiPane {",
   "    worldSize 1 1 0",
   "    objectSize 0 0 0 = USE viewportfix.viewportSize",
+  "    SoGuiPosition {",
+  "      position 0 0 0",
+  "      = DEF windowgeometry Calculator {",
+  "        A 0 0 0 = USE pane.objectSize",
+  "        expression [",
+  "          \"oB = vec3f(10, A[1] - 30, 0)\"",
+  "        ]",
+  "      } . oB",
+  "    }",
+  "    DEF switcher SoGuiClickCounter {",
+  "      size 50 20 0",
+  "      first 2",
+  "      last 6",
+  "      value 3",
+  "    }",
   //   the initial bottom-left positioning is done right here (position = [...] . oB)
   "    SoGuiPosition {",
   "      position 0 0 0",
   "      = DEF slidergeometry Calculator {",
-  "        A 0 0 0 = USE viewportfix.viewportSize",
+  "        A 0 0 0 = USE pane.objectSize",
   "        expression [", // hehe :)
   "          \"ta = floor(A[1] / 14)\"",                    // slider height
   "          \"tb = floor(((A[1] / 2) - (4 * ta)) / 5)\"",  // inter-slider height
@@ -178,7 +194,7 @@ ColorEditor::scenegraph[] = {
   "      } . oB",
   "    }",
   "    DEF layouts Switch {",
-  "      whichChild -1",
+  "      whichChild -1 = USE switcher.value",
   "      DEF instances Group {", // never to be rendered...
   "        DEF slider_r SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "        DEF slider_g SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
@@ -225,8 +241,8 @@ ColorEditor::scenegraph[] = {
   "        USE slider_translation",
   "        USE sliders_RGB",
   "      }",
-  "    }",
-  "  }",
+  "    } # Switch layouts",
+  "  } # Pane pane",
   "}",
   NULL
 };
