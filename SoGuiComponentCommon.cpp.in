@@ -409,3 +409,23 @@ So@Gui@Component::getDefaultIconTitle(void) const
 
   Note: not part of the original SGI InventorXt API.
 */
+
+/*!
+  \fn void So@Gui@Component::afterRealizeHook(void)
+
+  A function "hook" / callback invoked just after the window for the
+  component has been realized.
+
+  Override this if you need specific initialization for your own
+  component or viewer class to happen right after it has been made
+  visible, but remember to call upwards in the inheritance hierarchy:
+
+  \code
+  void
+  MyLittleViewer::afterRealizeHook(void)
+  {
+    <superclass>::afterRealizeHook();
+    // [own initialization here]
+  }
+  \endcode
+*/
