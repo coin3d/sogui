@@ -3,7 +3,7 @@
 
 moduledir=${0%/[^/]*}
 module=${moduledir##*/}
-cvs2cl=$HOME/store/cvs/cvs2cl/cvs2cl.pl
+cvs2cl=$HOME/bin/cvs2cl.pl
 headerfile=/tmp/$module.header
 
 cd $moduledir
@@ -33,7 +33,7 @@ cvs log | $cvs2cl --stdin --header $headerfile --separate-header --prune \
   --ignore '(ltconfig|ltmain\.sh|missing|mkinstalldirs|stamp-h.*|install-sh)$' \
   --ignore 'config\.h\.in$' 
 
-rm ChangeLog.bak $headerfile
+rm -f ChangeLog.bak $headerfile
 
 cvs commit -m "Automatic ChangeLog generation" ChangeLog
 
