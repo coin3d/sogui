@@ -34,6 +34,8 @@ class So@Gui@PlaneViewer;
 // ************************************************************************
 
 class SoAnyPlaneViewer {
+  friend class So@Gui@PlaneViewer;
+
 public:
   SoAnyPlaneViewer( So@Gui@PlaneViewer * const viewer );
   ~SoAnyPlaneViewer(void);
