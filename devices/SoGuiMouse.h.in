@@ -54,10 +54,8 @@ public:
 
 private:
   class So@Gui@MouseP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@MouseP;
   friend class SoGuiMouseP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

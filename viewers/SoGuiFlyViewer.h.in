@@ -70,9 +70,7 @@ protected:
 
 private:
   class So@Gui@FlyViewerP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@FlyViewerP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 // ************************************************************************

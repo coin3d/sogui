@@ -52,10 +52,8 @@ public:
 
 private:
   class So@Gui@KeyboardP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@KeyboardP;
   friend class SoGuiKeyboardP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

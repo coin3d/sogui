@@ -87,9 +87,7 @@ protected:
 
 private:
   class So@Gui@DeviceP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@DeviceP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

@@ -140,9 +140,7 @@ protected:
 
 private:
   class So@Gui@RenderAreaP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@RenderAreaP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 // *************************************************************************

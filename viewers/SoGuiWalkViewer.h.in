@@ -66,10 +66,8 @@ protected:
 
 private:
   class So@Gui@WalkViewerP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiWalkViewerP;
   friend class So@Gui@WalkViewerP;
-#endif // DOXYGEN_SKIP_THIS
 
 /// FIXME!: merge the So*WalkViewer.h parts in properly. 20020109 mortene. ////
 

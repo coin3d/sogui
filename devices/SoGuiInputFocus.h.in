@@ -48,10 +48,8 @@ public:
 
 private:
   class So@Gui@InputFocusP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
   friend class SoGuiInputFocusP;
   friend class So@Gui@InputFocusP;
-#endif // DOXYGEN_SKIP_THIS
 };
 
 #define SO_@GUI@_ALL_FOCUS_EVENTS So@Gui@InputFocus::ALL_EVENTS;
