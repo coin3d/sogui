@@ -97,7 +97,7 @@ public:
   void setMode(ViewerMode newmode);
   int getMode(void) { return this->viewermode; }
 
-#define SO@GUI@_MIN_STEP     0.3f
+#define SO@GUI@_MIN_STEP     0.2f
 #define SO@GUI@_INC_FACTOR   1.6f
 #define SO@GUI@_MAX_SPEED   20.0f
 
@@ -111,20 +111,37 @@ public:
 
   void updateCamera( SoCamera * camera, float dt );
 
+  
+  // Speed
   void incrementMaxSpeed();
   void decrementMaxSpeed();
 
-  SbBool button1down, button3down;
-  int lctrldown, rctrldown;
-  SbBool lshiftdown, rshiftdown;
+  float getCurrentSpeed()
+  { return currentspeed; }
+
+  // Current keyboard state.
+  SbBool button1down;
+  SbBool button3down;
+  int lctrldown;
+  int rctrldown;
+  SbBool lshiftdown;
+  SbBool rshiftdown;
 
   SoSearchAction * searcher;
 
   SoNode * superimposition;
   SoCoordinate3 * sgeometry;
-  SoScale * sscale, * crossscale;
-  SoTranslation * stranslation, * crossposition;
-  SoSwitch * smaxspeedswitch, * scurrentspeedswitch, * crossswitch;
+
+  SoScale * sscale;
+  SoScale * crossscale;
+
+  SoTranslation * stranslation;
+  SoTranslation * crossposition;
+
+  SoSwitch * smaxspeedswitch; 
+  SoSwitch * scurrentspeedswitch;
+  SoSwitch * crossswitch;
+
   void superimpositionevent(SoAction * action);
   static void superimposition_cb(void * closure, SoAction * action);
 
@@ -139,7 +156,7 @@ public:
   SbBool processLocation2Event( const SoLocation2Event * const levt );
 private:
   So@Gui@FlyViewer * publ;
-  int viewermode;
+  ViewerMode viewermode;
 }; // So@Gui@FlyViewerP
 
 So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
@@ -308,6 +325,7 @@ So@Gui@FlyViewerP::constructor(SbBool build)
   delete input;
   delete [] buf;
   this->superimposition->ref();
+
 
   this->sscale = (SoScale *)
     this->getSuperimpositionNode("so@gui@->scale");
@@ -621,6 +639,7 @@ SbBool
 So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
 {
   if (this->getMode() == So@Gui@FlyViewerP::TILTING) {
+
     SbVec2s newpos = lev->getPosition();
     float dx = newpos[0] - this->tiltpos[0];
     float dy = newpos[1] - this->tiltpos[1];
@@ -643,7 +662,6 @@ So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
       newOrientation *= tilt;
       newOrientation *= SbRotation(newup, -dx / 100.0f);
       camera->orientation.setValue(newOrientation);
-      PUBLIC(this)->setUpDirection(newup);
     }
   }
 
@@ -748,6 +766,7 @@ void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
     float(mid[0] - this->mouseloc[0]) / float(mid[0]);
   float yfrac =
     float(mid[1] - this->mouseloc[1]) / float(mid[1]);
+
   float factor = xfrac * xfrac + yfrac * yfrac;
   
   if (factor > 0.99f) {
@@ -771,35 +790,32 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
 {
   assert( camera != NULL );
 
-  SbVec2s glsize( PUBLIC(this)->getGLSize() );
-  SbVec2s mid( glsize[0]/2, glsize[1]/2 );
+  SbRotation orientation = camera->orientation.getValue();
 
-  
-  float xfrac =
-    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
-  float yfrac =
-    float(mid[1] - this->mouseloc[1]) / float(mid[1]);
-  
-  SbVec3f up( PUBLIC(this)->getUpDirection() );
   SbVec3f dir;
-
-  SbRotation orientation(camera->orientation.getValue());
   orientation.multVec(SbVec3f(0.0f,0.0f,-1.0f), dir);
-
+  dir.normalize();
   camera->position.setValue(camera->position.getValue() +
                             dir * (this->currentspeed 
                                    * dt
                                    * this->speedfactor));
+
+  SbVec2s glsize( PUBLIC(this)->getGLSize() );
+  SbVec2s mid( glsize[0]/2, glsize[1]/2 );  
+  float xfrac =
+    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
+  float yfrac =
+    float(mid[1] - this->mouseloc[1]) / float(mid[1]);
   float xfactor = xfrac * xfrac / 2.0f;
-  SbVec3f horizon(dir.cross(up));
-  horizon.normalize();
-            
-  // FIXME: roll instead of turn if either shift button is
-  // down if it seems like a good idea
   if (xfrac < 0.0f) 
     xfactor = -xfactor;
 
-  orientation *= SbRotation(PUBLIC(this)->getUpDirection(), xfactor * dt);
+  SbVec3f up = PUBLIC(this)->getUpDirection();
+  up.normalize();
+  SbVec3f horizon = dir.cross(up);
+  horizon.normalize();
+            
+  orientation *= SbRotation(up, xfactor * dt);
             
   // set tilt
   SbRotation tilt = SbRotation(horizon, yfrac * yfrac * 0.002f);
@@ -807,11 +823,7 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
     tilt.invert();
 
   orientation *= tilt;
-  SbVec3f newUp;
-  tilt.multVec(up, newUp);
-  PUBLIC(this)->setUpDirection(newUp);
   camera->orientation.setValue(orientation);
-  
 }
 
 void
@@ -1175,8 +1187,7 @@ So@Gui@FlyViewer::actualRedraw(void)
 
   switch (PRIVATE(this)->getMode()) {
   case So@Gui@FlyViewerP::FLYING:
-    do {
-
+    {
       float dt = PRIVATE(this)->calculateChangeInTime();
       PRIVATE(this)->updateCurrentSpeed( dt );
 
@@ -1203,7 +1214,7 @@ So@Gui@FlyViewer::actualRedraw(void)
       if (PRIVATE(this)->currentspeed != 0.0f ||
           PRIVATE(this)->maxspeed != 0.0f)
         this->scheduleRedraw();
-    } while (FALSE);
+    }
     break;
   default:
     inherited::actualRedraw();
