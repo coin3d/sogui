@@ -58,7 +58,7 @@ class So@GUI@RenderArea : public So@GUI@GLWidget {
   @COMPONENTHEADER@
 
 public:
-  So@GUI@RenderArea( Widget parent = NULL, const char * name = NULL,
+  So@GUI@RenderArea( @WIDGET@ parent = NULL, const char * name = NULL,
       SbBool inParent = TRUE, SbBool mouseInput = TRUE,
       SbBool keyboardInput = TRUE );
   ~So@GUI@RenderArea(void);
@@ -77,13 +77,13 @@ public:
   int getOverlayBackgroundIndex(void) const;
   void setColorMap( int start, int num, const SbColor * colors );
   void setOverlayColorMap( int start, int num, const SbColor * colors );
-  void setViewportRegion( const SbViewportRegion &newRegion );
+  void setViewportRegion( const SbViewportRegion & newRegion );
   const SbViewportRegion & getViewportRegion(void) const;
   void setTransparencyType( SoGLRenderAction::TransparencyType type );
   SoGLRenderAction::TransparencyType getTransparencyType(void) const;
-  void setAntialiasing( SbBool smoothing, int numPasses);
-  void getAntialiasing( SbBool & smoothing, int & numPasses) const;
-  void setClearBeforeRender( SbBool trueOrFalse, SbBool zbTrueOrFalse = TRUE );
+  void setAntialiasing( SbBool smoothing, int numPasses );
+  void getAntialiasing( SbBool & smoothing, int & numPasses ) const;
+  void setClearBeforeRender( SbBool enable, SbBool zbEnable = TRUE );
   SbBool isClearBeforeRender(void) const;
   SbBool isClearZBufferBeforeRender(void) const;
   void setClearBeforeOverlayRender( SbBool enable );
@@ -110,7 +110,7 @@ public:
   SoGLRenderAction * getOverlayGLRenderAction(void) const;
 
 protected:
-  So@GUI@RenderArea( Widget parent, const char * name, SbBool inParent,
+  So@GUI@RenderArea( @WIDGET@ parent, const char * name, SbBool inParent,
       SbBool mouseInput, SbBool keyboardInput, SbBool build );
 
   virtual void redraw(void);
@@ -122,17 +122,21 @@ protected:
   virtual void initGraphic(void);
   virtual void initOverlayGraphic(void);
   virtual void sizeChanged( const SbVec2s size );
-  virtual void widgetChanged( Widget widget );
+  virtual void widgetChanged( @WIDGET@ widget );
 
-  Widget buildWidget( Widget parent );
+  @WIDGET@ buildWidget( @WIDGET@ parent );
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
   virtual const char * getDefaultIconTitle(void) const;
-  SbPList * deviceList;
-  So@GUI@RenderAreaEventCB * appEventHandler;
 
+  So@GUI@RenderAreaEventCB * appEventHandler;
   void * appEventHandlerData;
+
   SbBool invokeAppCB( @EVENT@ event );
+
+  virtual void glReshape( int width, int height );
+  virtual void glRender(void);
+  virtual void glInit(void);
 
 private:
   void constructor( SbBool mouseInput, SbBool keyboardInput );
@@ -162,7 +166,6 @@ private:
 
   SoSelection * normalSelection;
   SoSelection * overlaySelection;
-
 
 }; // class So@GUI@RenderArea
 
