@@ -45,6 +45,13 @@ static const char rcsid[] =
 
 // *************************************************************************
 
+// Metadon doc:
+/*¡
+  FIXME: the overlay support is not in place yet. 20000319 mortene.
+ */
+
+// *************************************************************************
+
 /*!
 */
 
@@ -436,6 +443,15 @@ void
 So@GUI@RenderArea::setAutoRedraw(
   SbBool enable )
 {
+  if ( enable )
+    this->normalManager->setRenderCallback( So@GUI@RenderArea::renderCB, this );
+  else
+    this->normalManager->setRenderCallback( NULL, NULL );
+
+  // We can not use the render callback ptr as a flag, as the render
+  // callback pointer will be set upon expose events and forced
+  // redraws -- and autoRedraw is then used to remember that the
+  // pointer should be set back to NULL again after redraw.
   this->autoRedraw = enable;
 } // setAutoRedraw()
 
@@ -535,6 +551,10 @@ So@GUI@RenderArea::scheduleRedraw(
   void )
 {
   assert( this->normalManager != NULL );
+  // In case autoRedraw is OFF. The callback pointer will be reset to
+  // NULL in renderCB() if autoRedraw is OFF.
+  this->normalManager->setRenderCallback( So@GUI@RenderArea::renderCB, this );
+  // Redraw when idle.
   this->normalManager->scheduleRedraw();
 } // scheduleRedraw()
 
@@ -839,7 +859,11 @@ So@GUI@RenderArea::renderCB( // static
   void * user,
   SoSceneManager * manager )
 {
-  ((So@GUI@RenderArea *)user)->render();
+  So@GUI@RenderArea * thisptr = (So@GUI@RenderArea *) user;
+  thisptr->render();
+
+  if ( !thisptr->isAutoRedraw() )
+    thisptr->normalManager->setRenderCallback( NULL, NULL );
 } // renderCB()
 
 // *************************************************************************
@@ -867,19 +891,10 @@ void
 So@GUI@RenderArea::glRender( // virtual, derived
   void )
 {
-#if 0 // OBSOLETED: seems like the completely wrong thing to do for paintevents. 20000318 mortene.
-  inherited::glRender();
-
-  this->glLock();
-  this->redraw();
-  if ( this->isDoubleBuffer() )
-    this->glSwapBuffers();
-  else
-    this->glFlushBuffer();
-  this->glUnlock();
-#else
+  // Do not do immediate redraw on expose events, as there might be a
+  // series of them coming along and it would be wasteful and stupid
+  // to re-render on all of them.
   this->scheduleRedraw();
-#endif
 } // glRender()
 
 /*!
