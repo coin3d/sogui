@@ -534,7 +534,10 @@ So@Gui@RenderArea::setAntialiasing(
   // SoSceneManager::setAntialiasing(), we duplicate the code found in
   // that function. The reason for this is that we want to work around
   // a bug found in SGI Inventor, where they define the
-  // setAntialiasing() method, but doesn't actually implement it.
+  // setAntialiasing() method, but doesn't actually implement it.  So
+  // we don't use it to avoid a linker error for those compiling So*
+  // libraries on top of the older SGI Inventor versions with this
+  // bug.
   //
   // We should perhaps throw in a configure check for the
   // SoSceneManager::setAntialiasing() method and only activate this
@@ -788,10 +791,11 @@ So@Gui@RenderArea::redrawOnSelectionChange(
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation. 20001002 mortene.
 
-  if ( PRIVATE(this)->normalSelection )
+  if ( PRIVATE(this)->normalSelection ) {
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
     PRIVATE(this)->normalSelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
+  }
 
   PRIVATE(this)->normalSelection = selection;
 
@@ -816,10 +820,11 @@ So@Gui@RenderArea::redrawOverlayOnSelectionChange(
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
 
-  if ( PRIVATE(this)->overlaySelection )
+  if ( PRIVATE(this)->overlaySelection ) {
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
     PRIVATE(this)->overlaySelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
+  }
 
   PRIVATE(this)->overlaySelection = selection;
 
@@ -966,11 +971,8 @@ So@Gui@RenderArea::redraw( // virtual, protected
 
   this->actualRedraw();
 
-  if ( !drawfront )
-    this->glSwapBuffers();
-  else {
-    this->glFlushBuffer();
-  }
+  if ( !drawfront ) { this->glSwapBuffers(); }
+  else { this->glFlushBuffer(); }
   this->glUnlockNormal();
 
 #if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
