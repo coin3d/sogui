@@ -236,7 +236,7 @@ ColorEditor::scenegraph[] = {
 #define PRIVATE(obj) ((ColorEditor *) ((So@Gui@ColorEditor *) obj)->internals)
 #define PUBLIC(obj) (((ColorEditor *) obj)->api)
 
-So@Gui@ColorEditor::So@Gui@ColorEditor(Widget parent, const char * name, SbBool embed)
+So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBool embed)
   : inherited(parent, name, embed)
 {
   this->internals = (void *) new ColorEditor;
