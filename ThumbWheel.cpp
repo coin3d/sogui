@@ -54,7 +54,7 @@ ThumbWheel::ThumbWheel(
 ThumbWheel::~ThumbWheel(
   void )
 {
-  if ( this->sines != NULL ) delete [] this->sines;
+  if (  this->sines != NULL  ) delete [] this->sines;
   if ( this->cosines != NULL ) delete [] this->cosines;
   if ( this->radians != NULL ) delete [] this->radians;
   if ( this->metrics != NULL ) delete [] this->metrics;
@@ -63,7 +63,7 @@ ThumbWheel::~ThumbWheel(
 // ************************************************************************
 
 void
-GUIThumbwheel::SetWheelSize(
+ThumbWheel::SetWheelSize(
   int diameter,
   int width )
 {
@@ -75,7 +75,7 @@ GUIThumbwheel::SetWheelSize(
 } // SetWheelSize()
 
 void
-GUIThumbwheel::GetWheelSize(
+ThumbWheel::GetWheelSize(
   int & diameter,
   int & width ) const
 {
@@ -84,21 +84,21 @@ GUIThumbwheel::GetWheelSize(
 } // GetWheelSize()
 
 int
-GUIThumbwheel::GetDiameter(
+ThumbWheel::GetDiameter(
   void ) const
 {
   return this->diameter;
 } // GetDiameter()
 
 int
-GUIThumbwheel::GetWidth(
+ThumbWheel::GetWidth(
   void ) const
 {
   return this->width;
 } // GetWidth()
 
 void
-GUIThumbwheel::SetColor(
+ThumbWheel::SetColor(
   int red,
   int green,
   int blue )
@@ -109,7 +109,7 @@ GUIThumbwheel::SetColor(
 } // SetColor()
 
 void
-GUIThumbwheel::GetColor(
+ThumbWheel::GetColor(
   int & red,
   int & green,
   int & blue ) const
@@ -120,7 +120,7 @@ GUIThumbwheel::GetColor(
 } // GetColor()
 
 void
-GUIThumbwheel::SetFactors(
+ThumbWheel::SetFactors(
   float light,
   float front,
   float normal,
@@ -133,7 +133,7 @@ GUIThumbwheel::SetFactors(
 } // SetFactors()
 
 void
-GUIThumbwheel::GetFactors(
+ThumbWheel::GetFactors(
   float & light,
   float & front,
   float & normal,
@@ -159,15 +159,16 @@ inline int int8c( float f ) {
   Can also optimize the drawing to use less computing power...
 */
 
+/*
 void
-GUIThumbwheel::Draw(
+ThumbWheel::Draw(
   GUIPencil * const pencil )
 {
   Draw( pencil, this->val );
 } // Draw()
 
 void
-GUIThumbwheel::Draw(
+ThumbWheel::Draw(
   GUIPencil * const pencil,
   float value )
 {
@@ -231,11 +232,12 @@ GUIThumbwheel::Draw(
   }
   pencil->Restore();
 } // Draw()
+*/
 
 // ************************************************************************
 
 void
-GUIThumbwheel::SetRange(
+ThumbWheel::SetRange(
   float min,
   float max )
 {
@@ -247,7 +249,7 @@ GUIThumbwheel::SetRange(
 } // SetRange()
 
 void
-GUIThumbwheel::GetRange(
+ThumbWheel::GetRange(
   float & min,
   float & max ) const
 {
@@ -256,56 +258,56 @@ GUIThumbwheel::GetRange(
 } // GetRange()
 
 float
-GUIThumbwheel::GetRangeMin(
+ThumbWheel::GetRangeMin(
   void ) const
 {
   return this->min;
 } // GetRangeMin()
 
 float
-GUIThumbwheel::GetRangeMax(
+ThumbWheel::GetRangeMax(
   void ) const
 {
   return this->max;
 } // GetRangeMax()
 
 void
-GUIThumbwheel::SetValue(
+ThumbWheel::SetValue(
   float val )
 {
   this->val = val;
 } // SetValue()
 
 float
-GUIThumbwheel::GetValue(
+ThumbWheel::GetValue(
   void ) const
 {
   return this->val;
 } // GetValue()
 
 void
-GUIThumbwheel::SetModulate(
+ThumbWheel::SetModulate(
   bool modulate )
 {
   this->modulate = modulate;
 } // SetModulate()
 
 bool
-GUIThumbwheel::GetModulate(
+ThumbWheel::GetModulate(
   void ) const
 {
   return this->modulate;
 } // GetModulate()
 
 void
-GUIThumbwheel::SetAuthentic(
+ThumbWheel::SetAuthentic(
   bool authentic )
 {
   this->authentic = authentic;
 } // SetAuthentic()
 
 bool
-GUIThumbwheel::GetAuthentic(
+ThumbWheel::GetAuthentic(
   void ) const
 {
   return this->authentic;
@@ -326,7 +328,7 @@ GUIThumbwheel::GetAuthentic(
 */
 
 float
-GUIThumbwheel::Adjust(
+ThumbWheel::Adjust(
   int origpos,
   float origval,
   int deltapos )
@@ -354,7 +356,7 @@ GUIThumbwheel::Adjust(
 // ************************************************************************
 
 void
-GUIThumbwheel::precalc(
+ThumbWheel::precalc(
   void )
 {
   if ( this->invalid == true ) {
@@ -400,7 +402,7 @@ GUIThumbwheel::precalc(
 // ************************************************************************
 
 void
-GUIThumbwheel::dump(
+ThumbWheel::dump(
   void )
 {
   precalc();
@@ -411,7 +413,7 @@ GUIThumbwheel::dump(
     printf( "%03i\t%f\t%f\t%f\t%f\n", i, this->cosines[i], this->sines[i],
             this->radians[i], this->metrics[i] );
   printf( "unistep:  %f\nsquarelength:  %f  spacing: %f\n",
-    unistep, squarelength, squarespacing );
+    this->unistep, this->squarelength, this->squarespacing );
 } // dump()
 
 // ************************************************************************

@@ -42,10 +42,10 @@ public:
 //  void Draw(GUIPencil * const pencil);
 
 // operational
-//  void SetRange(float min, float max);
-//  void GetRange(float & min, float & max) const;
-//  float GetRangeMin(void) const;
-//  float GetRangeMax(void) const;
+  void SetRange(float min, float max);
+  void GetRange(float & min, float & max) const;
+  float GetRangeMin(void) const;
+  float GetRangeMax(void) const;
   void SetValue(float val);
   float GetValue(void) const;
 
