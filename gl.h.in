@@ -40,7 +40,7 @@
 #else
 #ifdef HAVE_OPENGL_GL_H
 /* how Mac OS X organizes things - should we now stuff Coin header in
-   OpenInventor/?  (that *was* ironi) */
+   OpenInventor/?  (that *was* irony) */
 #include <OpenGL/gl.h>
 #else
 #error "don't know how to include gl.h header"
@@ -56,9 +56,9 @@
 #endif
 
 /*
-  MS Windows often has very old gl.h files, so we just define these
-  value here if not defined. Run-time checks are used to determine
-  which feature to use.
+  At least MS Windows often has very old gl.h files, so we just define
+  these values here if not defined already. Run-time checks are used
+  to determine which feature to use.
 */
 
 #ifndef GL_CLAMP_TO_EDGE
