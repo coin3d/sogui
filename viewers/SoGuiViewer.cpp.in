@@ -45,6 +45,28 @@
 
 // *************************************************************************
 
+
+/*!
+  \enum So@Gui@Viewer::AutoClippingStrategy
+  Enum for auto clipping strategy.
+  
+  \sa setAutoClippingStrategy()
+*/
+
+/*!
+  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::CONSTANT_NEAR_PLANE,
+  Constant near plane auto clipping strategy.
+  
+  \sa setAutoClippingStrategy()
+*/
+
+/*!
+  \var So@Gui@Viewer::AutoClippingStrategy So@Gui@Viewer::VARIABLE_NEAR_PLANE,
+  Variable near plane auto clipping strategy.
+
+  \sa setAutoClippingStrategy()
+*/
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
@@ -217,6 +239,12 @@ public:
   SbPList * superimpositions;
   SbIntList * superimpositionsenabled;
   So@Gui@Viewer * pub;
+
+  // auto clipping parameters
+  So@Gui@Viewer::AutoClippingStrategy autoclipstrategy;
+  float autoclipvalue;
+  So@Gui@AutoClippingCB * autoclipcb;
+  void * autoclipuserdata;
 };
 
 #define PRIVATE(ptr) (ptr->pimpl)
@@ -235,6 +263,11 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->storedortho->ref();
   this->storedperspective = new SoPerspectiveCamera;
   this->storedperspective->ref();
+
+  // initialize auto clipping parameters
+  this->autoclipstrategy = So@Gui@Viewer::VARIABLE_NEAR_PLANE;
+  this->autoclipvalue = 0.6f;
+  this->autoclipcb = NULL;
 }
 
 So@Gui@ViewerP::~So@Gui@ViewerP()
@@ -870,22 +903,54 @@ So@Gui@ViewerP::setClippingPlanes(void)
   if (farval <= 0.0f) { return; }
 
   if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
-    // Disallow negative near clipping plane distance.
-    if (nearval <= 0.0f) {
-      // Set to a short distance, but make sure we're still well below
-      // the far clipping plane distance (in case that is also very
-      // short).
-      nearval = So@Gui@Min(0.1f, farval / 5000.0f);
+    // Disallow negative and small near clipping plane distance.
+    
+    float nearlimit; // the smallest value allowed for nearval
+    if (this->autoclipstrategy == So@Gui@Viewer::CONSTANT_NEAR_PLANE) {
+      nearlimit = this->autoclipvalue;
+    }
+    else {
+      assert(this->autoclipstrategy == So@Gui@Viewer::VARIABLE_NEAR_PLANE);
+      // From glFrustum() documentation: Depth-buffer precision is
+      // affected by the values specified for znear and zfar. The
+      // greater the ratio of zfar to znear is, the less effective the
+      // depth buffer will be at distinguishing between surfaces that
+      // are near each other. If r = far/near, roughly log (2) r bits
+      // of depth buffer precision are lost. Because r approaches
+      // infinity as znear approaches zero, you should never set znear
+      // to zero.
+
+      GLint depthbits[1];
+      glGetIntegerv(GL_DEPTH_BITS, depthbits);
+      
+      int use_bits = (int) (float(depthbits[0]) * (1.0f-this->autoclipvalue)); 
+      float r = (float) pow(2.0, (double) use_bits);
+      nearlimit = farval / r;
+    }
+    
+    if (nearlimit >= farval) {
       // (The "5000" magic constant was found by fiddling around a bit
       // on an OpenGL implementation with a 16-bit depth-buffer
       // resolution, adjusting to find something that would work well
       // with both a very "stretched" / deep scene and a more compact
       // single-model one.)
-
-      // FIXME: we're seeing bugs here on some OpenGL drivers if there
-      // are SoPolygonOffset nodes in the scenegraph, pushing z-buffer
-      // values so they overflow. Don't know how to fix yet, or even
-      // if it's "fixable" here at all. 20020318 mortene.
+      nearlimit = farval / 5000.0f;
+    }
+    
+    // adjust the near plane if the the value is too small.
+    if (nearval < nearlimit) {
+      nearval = nearlimit;
+    }
+    
+    if (this->autoclipcb) {
+      SbVec2f nearfar;
+      nearfar[0] = nearval;
+      nearfar[1] = farval;
+      
+      nearfar = this->autoclipcb(this->autoclipuserdata, nearfar);
+      
+      nearval = nearfar[0];
+      farval = nearfar[1]; 
     }
   }
 
@@ -2055,6 +2120,57 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
 
   PRIVATE(this)->adjustclipplanes = enable;
   if (enable) { this->scheduleRedraw(); }
+}
+
+/*!
+  Set the auto clipping strategy used for auto clipping.
+
+  When auto clipping is enabled, the near plane distance is calculated
+  so that it is just in front of the scene bounding box. If this near
+  plane is behind or very close to the projection point, one of the
+  following strategies will be used to calculate the new clipping
+  plane.
+
+  The VARIABLE_NEAR_PLANE strategy considers the number of z buffer
+  bits available for the current OpenGL context, and uses \a value to
+  calculate the number of bits that is lost because of the far/near
+  ratio. \a value should be in the range [0.0, 1.0]. A higher \a value
+  will increase the z-buffer precision, but also push the near plane
+  further away from the projection point.
+  
+  The CONSTANT_NEAR_PLANE strategy simply sets the near plane to 
+  \a value. If \a value at some point approaches the far clipping
+  plane distance, the near plane distance will be set to far plane 
+  distance divided by 5000.0.
+
+  \since 2002-06-06
+
+  \sa setAutoClipping() 
+*/
+void 
+So@Gui@Viewer::setAutoClippingStrategy(const AutoClippingStrategy strategy,
+                                       const float value,
+                                       So@Gui@AutoClippingCB * cb,
+                                       void * cbuserdata)
+{
+  PRIVATE(this)->autoclipstrategy = strategy;
+  PRIVATE(this)->autoclipvalue = value;
+  PRIVATE(this)->autoclipcb = cb;
+  PRIVATE(this)->autoclipuserdata = cbuserdata;
+
+  if (PRIVATE(this)->autoclipstrategy == VARIABLE_NEAR_PLANE) {
+    // normalize the value so that the near plane isn't too near or
+    // too far from the projection point.  FIXME: calibrate this
+    // normalization, pederb, 2002-04-25
+    float v = So@Gui@Clamp(value, 0.0f, 1.0f); // just in case
+    v *= 0.8f;
+    v += 0.1f; // v will be in range [0.1, 0.9]
+
+    PRIVATE(this)->autoclipvalue = v;
+  }
+  if (PRIVATE(this)->adjustclipplanes) {
+    this->scheduleRedraw();
+  }
 }
 
 // *************************************************************************

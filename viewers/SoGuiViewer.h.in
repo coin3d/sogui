@@ -70,6 +70,8 @@ class So@Gui@Viewer;
 typedef void So@Gui@ViewerCB(void * data, So@Gui@Viewer * viewer);
 typedef void So@Gui@ViewerFPSCB(float fps, void * data, So@Gui@Viewer * viewer);
 
+typedef SbVec2f So@Gui@AutoClippingCB(void * data, const SbVec2f & nearfar);
+
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@Viewer : public So@Gui@RenderArea {
@@ -106,6 +108,11 @@ public:
     BUFFER_INTERACTIVE
   };
 
+  enum AutoClippingStrategy {
+    VARIABLE_NEAR_PLANE,
+    CONSTANT_NEAR_PLANE
+  };
+
   virtual void setCamera(SoCamera * camera);
   SoCamera * getCamera(void) const;
 
@@ -137,6 +144,11 @@ public:
 
   void setAutoClipping(SbBool enable);
   SbBool isAutoClipping(void) const;
+
+  void setAutoClippingStrategy(const AutoClippingStrategy strategy,
+                               const float value = 0.6f,
+                               So@Gui@AutoClippingCB * cb = NULL,
+                               void * cbuserdata = NULL);
 
   virtual void setStereoViewing(SbBool enable);
   SbBool isStereoViewing(void) const;
