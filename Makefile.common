@@ -155,7 +155,7 @@ SoGuiCommonDistFiles = \
   LICENSE.GPL \
   HACKING \
   BUGS.txt \
-  src/Inventor/@Gui@/BUGS.txt \
+  src/Inventor/@Gui@/common/BUGS.txt \
   \
   cfg/m4/errors.txt \
   cfg/m4/doxy4win.pl \
