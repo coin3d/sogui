@@ -30,6 +30,9 @@
 #ifdef __COIN_SOQT__
 #include <qgl.h>
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+#include <GL/glx.h>
+#endif // __COIN_SOXT__
 
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
@@ -66,6 +69,20 @@ public:
   const QGLContext * getNormalContext(void);
   const QGLContext * getOverlayContext(void);
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+  Window getNormalWindow(void);
+  Window getOverlayWindow(void);
+  GLXContext getNormalContext(void);
+  GLXContext getOverlayContext(void);
+
+  int getOverlayColorMapSize(void);
+  int getColorMapSize(void);
+
+  virtual void setNormalVisual(XVisualInfo * visual);
+  XVisualInfo * getNormalVisual(void);
+  virtual void setOverlayVisual(XVisualInfo * visual);
+  XVisualInfo * getOverlayVisual(void);
+#endif // __COIN_SOXT__
 
   SbBool hasOverlayGLArea(void) const;
   SbBool hasNormalGLArea(void) const;
@@ -84,6 +101,7 @@ protected:
 
   @WIDGET@ buildWidget(@WIDGET@ parent);
 
+  // FIXME: this was public in SoXtGLWidget. 20011012 mortene.
   @WIDGET@ getGLWidget(void) const;
 
   virtual void redraw(void) = 0;
@@ -116,6 +134,11 @@ protected:
   virtual bool eventFilter(QObject * obj, QEvent * e);
   static void eventHandler(QWidget *, void *, QEvent *, bool *);
 #endif // __COIN_SOQT__
+#ifdef __COIN_SOXT__
+  static void eventHandler(Widget, void *, XEvent *, Boolean *);
+  int getDisplayListShareGroup(GLXContext context);
+  Widget getGlxMgrWidget(void);
+#endif // __COIN_SOXT__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
