@@ -36,6 +36,9 @@
 #include <Inventor/SbColor.h>
 #include <Inventor/SbViewportRegion.h>
 #include <Inventor/actions/SoGLRenderAction.h>
+// This include is present for compliance with the original Open
+// Inventor.
+#include <Inventor/SoSceneManager.h>
 
 #include <Inventor/@GUI@/So@GUI@GLWidget.h>
 
