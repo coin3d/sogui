@@ -1266,6 +1266,8 @@ So@Gui@RenderArea::invokeAppCB( // protected
   This is a virtual method, and is overloaded in it's subclasses to
   catch events of particular interest to the viewer classes, for
   instance.
+
+  \c TRUE is returned if the event was handled, otherwise \c FALSE.
 */
 SbBool
 So@Gui@RenderArea::processSoEvent( // virtual
