@@ -127,7 +127,8 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   }
 
   SbBool processed = FALSE;
-  SoGuiPlaneViewerP::PlaneViewerMode previousmode = PRIVATE(this)->mode;
+  const SoGuiPlaneViewerP::PlaneViewerMode currentmode = PRIVATE(this)->mode;
+  SoGuiPlaneViewerP::PlaneViewerMode newmode = currentmode;
 
   const SoType type(ev->getTypeId());
 
@@ -152,8 +153,8 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       case SoMouseButtonEvent::BUTTON1:
         PRIVATE(this)->button1down = press;
 
-        if (press && (previousmode == SoGuiPlaneViewerP::SEEK_WAIT_MODE)) {
-          PRIVATE(this)->mode = SoGuiPlaneViewerP::SEEK_MODE;
+        if (press && (currentmode == SoGuiPlaneViewerP::SEEK_WAIT_MODE)) {
+          newmode = SoGuiPlaneViewerP::SEEK_MODE;
           this->seekToPoint(pos); // implicitly calls interactiveCountInc()
         }
         break;
@@ -184,6 +185,13 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
     const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
     const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
+
+#if SO@GUI@_DEBUG && 0 // debug
+    SoDebugError::postInfo("So@Gui@PlaneViewer::processSoEvent",
+                           "keyboard %s: \"%c\"",
+                           press ? "press" : "release",
+                           event->getPrintableCharacter());
+#endif // debug
 
     switch (event->getKey()) {
     case SoKeyboardEvent::LEFT_CONTROL:
@@ -218,12 +226,12 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
                         (float) PRIVATE(this)->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1));
 
     do {
-      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::ROTZ_MODE) {
+      if (currentmode == SoGuiPlaneViewerP::ROTZ_MODE) {
         PRIVATE(this)->rotateZ(PRIVATE(this)->getPointerOrigoMotionAngle());
         break;
       }
 
-      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
+      if (currentmode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
         if ((posn[0] != prevn[0]) || (posn[1] != prevn[1])) {
           float dx = (posn[0] - prevn[0]) * 2.5f;
           float dy = (posn[1] - prevn[1]) * 2.5f;
@@ -237,7 +245,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
         break;
       }
 
-      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::DOLLY_MODE) {
+      if (currentmode == SoGuiPlaneViewerP::DOLLY_MODE) {
         if (posn[1] != prevn[1]) {
           float value = this->getRightWheelValue() + (prevn[1] - posn[1]) * 10.0f;
           this->rightWheelMotion(value);
@@ -278,56 +286,37 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   switch (combo) {
   case BUTTON1DOWN:
   case BUTTON1DOWN|BUTTON3DOWN:
-    PRIVATE(this)->mode = SoGuiPlaneViewerP::DOLLY_MODE;
+    newmode = SoGuiPlaneViewerP::DOLLY_MODE;
     break;
   case BUTTON3DOWN:
   case CTRLDOWN|BUTTON1DOWN:
   case SHIFTDOWN|BUTTON1DOWN:
-    PRIVATE(this)->mode = SoGuiPlaneViewerP::TRANSLATE_MODE;
+    newmode = SoGuiPlaneViewerP::TRANSLATE_MODE;
     break;
   case CTRLDOWN|BUTTON3DOWN:
   case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
-    PRIVATE(this)->mode = SoGuiPlaneViewerP::ROTZ_MODE;
+    newmode = SoGuiPlaneViewerP::ROTZ_MODE;
     break;
   case CTRLDOWN:
   case CTRLDOWN|SHIFTDOWN:
-    PRIVATE(this)->mode = SoGuiPlaneViewerP::ROTZ_WAIT_MODE;
+    newmode = SoGuiPlaneViewerP::ROTZ_WAIT_MODE;
     break;
   default:
-    PRIVATE(this)->mode = SoGuiPlaneViewerP::IDLE_MODE;
+    if ((currentmode != SoGuiPlaneViewerP::SEEK_WAIT_MODE) &&
+        (currentmode != SoGuiPlaneViewerP::SEEK_MODE)) {
+      newmode = SoGuiPlaneViewerP::IDLE_MODE;
+    }
     break;
   }
 
-  if (previousmode != PRIVATE(this)->mode) {
-    switch (PRIVATE(this)->mode) {
-    case SoGuiPlaneViewerP::TRANSLATE_MODE:
-    case SoGuiPlaneViewerP::DOLLY_MODE:
-      this->interactiveCountInc();
-      break;
+  if (newmode != currentmode) {
+    PRIVATE(this)->changeMode(newmode);
 
-    case SoGuiPlaneViewerP::ROTZ_MODE:
-      this->interactiveCountInc();
+    if (newmode == SoGuiPlaneViewerP::ROTZ_MODE) {
       PRIVATE(this)->setCanvasSize(size);
       PRIVATE(this)->setPointerLocation(pos);
       PRIVATE(this)->setPointerLocation(pos);
-      this->scheduleRedraw();
-      break;
-
-    default:
-      break;
     }
-
-    switch (previousmode) {
-    case SoGuiPlaneViewerP::TRANSLATE_MODE:
-    case SoGuiPlaneViewerP::ROTZ_MODE:
-    case SoGuiPlaneViewerP::DOLLY_MODE:
-      this->interactiveCountDec();
-      break;
-    default:
-      break;
-    }
-
-    PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
   }
 
   // If not handled in this class, pass on upwards in the inheritance
@@ -354,11 +343,10 @@ So@Gui@PlaneViewer::setSeekMode(SbBool on)
 #endif // SO@GUI@_DEBUG
 
   inherited::setSeekMode(on);
-  PRIVATE(this)->mode = on ?
-    SoGuiPlaneViewerP::SEEK_WAIT_MODE :
-    SoGuiPlaneViewerP::IDLE_MODE;
 
-  PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+  PRIVATE(this)->changeMode(on ?
+                            SoGuiPlaneViewerP::SEEK_WAIT_MODE :
+                            SoGuiPlaneViewerP::IDLE_MODE);
 }
 
 // ************************************************************************
@@ -718,6 +706,40 @@ SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
     assert(0 && "unknown PlaneViewer mode");
     break;
   }
+}
+
+void
+SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
+{
+  if (newmode == this->mode) { return; }
+
+  switch (newmode) {
+  case SoGuiPlaneViewerP::TRANSLATE_MODE:
+  case SoGuiPlaneViewerP::DOLLY_MODE:
+    PUBLIC(this)->interactiveCountInc();
+    break;
+
+  case SoGuiPlaneViewerP::ROTZ_MODE:
+    PUBLIC(this)->interactiveCountInc();
+    PUBLIC(this)->scheduleRedraw();
+    break;
+
+  default:
+    break;
+  }
+
+  switch (this->mode) {
+  case SoGuiPlaneViewerP::TRANSLATE_MODE:
+  case SoGuiPlaneViewerP::ROTZ_MODE:
+  case SoGuiPlaneViewerP::DOLLY_MODE:
+    PUBLIC(this)->interactiveCountDec();
+    break;
+  default:
+    break;
+  }
+
+  this->setCursorRepresentation(newmode);
+  this->mode = newmode;
 }
 
 // *************************************************************************

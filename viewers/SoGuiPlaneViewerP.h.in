@@ -72,6 +72,7 @@ public:
     SEEK_MODE
   } mode;
 
+  void changeMode(PlaneViewerMode newmode);
   void setCursorRepresentation(PlaneViewerMode mode);
 
   struct pointerdata {
