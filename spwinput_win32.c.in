@@ -73,6 +73,83 @@ static enum InitResult gInitStatus = NOT_LOADED;
 HINSTANCE ghDll;
 enum SpwRetVal SpwErrorVal;
 
+/* Device handle */
+SiHdl Spw_DeviceHandle = SI_NO_HANDLE;
+
+SiHdl SPW_getDeviceHandle()
+{
+  return Spw_DeviceHandle;
+}
+
+int SPW_SpaceBallExists()
+{
+  return Spw_DeviceHandle != SI_NO_HANDLE;
+}
+
+/* checks if can detect a spaceball, and open a handle to it */
+int SPW_CheckForSpaceballWin32(void * win)
+{
+  if (Spw_DeviceHandle == SI_NO_HANDLE) {
+    SiOpenData oData;
+    SiOpenWinInit(&oData, (HWND)win);
+    Spw_DeviceHandle = SiOpen("", SI_ANY_DEVICE, SI_NO_MASK, SI_EVENT, &oData);
+    if (Spw_DeviceHandle != SI_NO_HANDLE) {
+      SiSetUiMode(Spw_DeviceHandle, SI_UI_ALL_CONTROLS);
+      return TRUE;
+    }
+    else {
+      SiTerminate();
+      return FALSE;
+    }
+  }
+  return TRUE;
+  
+}
+
+/* translates a Win32 event to a SPW_InputEvent. This makes the implementation
+   of spaceball support for SoQt on windows very simple */
+int SPW_TranslateEventWin32(void * display, MSG * msg, SPW_InputEvent * sbEvent)
+{
+  SiGetEventData eventdata;
+  SiSpwEvent spwEvent;
+
+  if (Spw_DeviceHandle != SI_NO_HANDLE) {
+
+    SiGetEventWinInit (&eventdata, msg->message, msg->wParam, msg->lParam);
+    if (SiGetEvent (Spw_DeviceHandle, 0, &eventdata, &spwEvent) == SI_IS_EVENT) {
+
+      sbEvent->sData[0] = (short)spwEvent.u.spwData.mData[0];
+      sbEvent->sData[1] = (short)spwEvent.u.spwData.mData[1];
+      sbEvent->sData[2] = (short)spwEvent.u.spwData.mData[2];
+      sbEvent->sData[3] = (short)spwEvent.u.spwData.mData[3];
+      sbEvent->sData[4] = (short)spwEvent.u.spwData.mData[4];
+      sbEvent->sData[5] = (short)spwEvent.u.spwData.mData[5];
+
+      if (spwEvent.type == SI_MOTION_EVENT) {
+        sbEvent->type = SPW_InputMotionEvent;
+      }
+
+      if (spwEvent.type == SI_BUTTON_EVENT) {
+        sbEvent->type = SPW_InputButtonPressEvent;
+      }
+
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/* terminate the spaceball */
+void SPW_closeSpaceBall()
+{
+  if (Spw_DeviceHandle != SI_NO_HANDLE) {
+      SiClose(Spw_DeviceHandle);
+      SiTerminate();
+      Spw_DeviceHandle = SI_NO_HANDLE;
+    }
+}
+
+
 /*-----------------------------------------------------------------------------
  *
  *  void __SiAppInitialize(void)
@@ -88,7 +165,6 @@ enum SpwRetVal SpwErrorVal;
  *  function pointer table with exported UAPI functions contained in the DLL.
  *
  *---------------------------------------------------------------------------*/
-
 int __SiAppInitialize(void)
 {
    enum InitResult nResult;      /* intialization result code */
@@ -291,6 +367,7 @@ int __SiAppInitialize(void)
   
    return nErrorCode;
 }
+
 
 /*-----------------------------------------------------------------------------
  *

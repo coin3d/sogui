@@ -15,13 +15,15 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <Inventor/@Gui@/devices/spwinput.h>
+
 #ifndef HAVE_WIN32_API
 #error "Do not include this file unless HAVE_WIN32_API is set."
 #endif /* !HAVE_WIN32_API */
 
 #include <tchar.h>
-/* some enumerated types used in spwinput_win32.cpp */
 
+/* some enumerated types used in spwinput_win32.cpp */
 enum InitResult 
    {
    NOT_LOADED, 
@@ -355,7 +357,9 @@ typedef struct                /* SpaceWare event handlers */
    SiEventHandler exception;  /* Exception event handler */
    } SiSpwHandlers;
 
+
 enum SpwRetVal SiAndTypeMask (SiTypeMask *pTMaskA, SiTypeMask *pTMaskB);
+
 
 enum SpwRetVal             /* Error return values.                           */
    {
@@ -383,6 +387,9 @@ enum SpwRetVal             /* Error return values.                           */
 typedef enum SpwRetVal SpwReturnValue;
 
 /* interface specifications define parameter passing to DLL functions */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum SpwRetVal (WINAPI *PFNSI_INIT) (void);
 typedef void (WINAPI *PFNSI_TERMINATE) (void);
@@ -413,7 +420,6 @@ typedef enum SpwRetVal (WINAPI *PFNSI_GETDEVICEINFO) (SiHdl hdl, SiDevInfo *pInf
 typedef (WINAPI *PFNSPW_ERRORSTRING) (enum SpwRetVal val);
 typedef SiDevID (WINAPI *PFNSI_DEVICEINDEX) (int idx);
 
-
 /* function pointers to functions in DLL */
 
 PFNSI_INIT              pfnSiInit;
@@ -442,12 +448,8 @@ PFNSI_GETLIBRARYINFO    pfnSiGetLibraryInfo;
 PFNSI_GETDEVICEINFO     pfnSiGetDeviceInfo;
 PFNSPW_ERRORSTRING      pfnSpwErrorString;
 
+
 /* externally used functions */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int SiGetPortList (SiDevPort **ppPort);
 void SiFreePortList (SiDevPort *pPort);
 void SiTune2003 (SiSpwEvent *pEvent);
@@ -481,11 +483,16 @@ void           SiGetLibraryInfo (SiVerInfo *pInfo);
 enum           SpwRetVal SiGetDeviceInfo (SiHdl hdl, SiDevInfo *pInfo);
 char * SpwErrorString (enum SpwRetVal val);
 
+
+int SPW_CheckForSpaceballWin32(void * win);
+int SPW_TranslateEventWin32(void * display, void * msg, SPW_InputEvent * sbEvent);
+SiHdl SPW_getDeviceHandle();
+void SPW_closeSpaceBall();
+int SPW_SpaceBallExists();
+
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif /* #ifndef SIAPP_H */
 
