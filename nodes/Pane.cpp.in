@@ -90,6 +90,7 @@ void
 SoGuiPane::doAction(SoAction * action)
 {
   SoState * state = action->getState();
+
   state->push();
 
   if ( state->isElementEnabled(SoModelMatrixElement::getClassStackIndex()) ) {
@@ -98,6 +99,26 @@ SoGuiPane::doAction(SoAction * action)
     SbVec3f scalefactor(world[0] / object[0], world[1] / object[1], ZSCALE);
     SoModelMatrixElement::scaleBy(state, this, scalefactor);
     PRIVATE(this)->modelmatrix = SoModelMatrixElement::get(state);
+  }
+
+  SbBool backface = FALSE;
+  if ( state->isElementEnabled(SoViewVolumeElement::getClassStackIndex()) ) {
+    SbVec3f normal(0.0f, 0.0f, 1.0f);
+    PRIVATE(this)->modelmatrix.multDirMatrix(normal, normal);
+    normal.normalize();
+    SbVec3f campos = SoViewVolumeElement::get(state).getProjectionPoint();
+    SbVec3f center = (SbVec3f(0.0f, 0.0f, 0.0f) + this->objectSize.getValue()) / 2.0f;
+    PRIVATE(this)->modelmatrix.multVecMatrix(center, center);
+    SbVec3f camdir = camdir = center - campos;
+    camdir.normalize();
+    backface = (normal.dot(camdir) >= 0.0f) ? TRUE : FALSE;
+  }
+
+  if ( action->isOfType(SoHandleEventAction::getClassTypeId()) ) {
+    if ( backface ) {
+      // we don't react to events when facing away
+      goto culled;
+    }
   }
 
   if ( action->isOfType(SoRayPickAction::getClassTypeId()) ) {
