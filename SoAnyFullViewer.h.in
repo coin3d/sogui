@@ -23,6 +23,8 @@
 #ifndef SOANY_FULLVIEWER_H
 #define SOANY_FULLVIEWER_H
 
+#include <Inventor/@GUI@/viewers/So@GUI@Viewer.h>
+
 class SoAnyPopupMenu;
 class So@GUI@FullViewer;
 
@@ -74,11 +76,17 @@ enum SoViewerPopupMenuRadioGroup {
 // ************************************************************************
 
 class SoAnyFullViewer {
-public:
+protected:
   SoAnyFullViewer( So@GUI@FullViewer * container );
   ~SoAnyFullViewer(void);
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);
+
+  void setDrawStyleMenuActivation(
+    So@GUI@Viewer::DrawType type,
+    So@GUI@Viewer::DrawStyle value );
+
+  void drawstyleActivated( int menuitemid );
 
   void menuSelection( int menuitemid );
   static void menuSelectionCallback( int menuitemid, void * userdata );

@@ -45,6 +45,7 @@ SoAnyFullViewer::SoAnyFullViewer(
   So@GUI@FullViewer * container )
 : viewer( container )
 {
+  assert( container != NULL );
 } // SoAnyFullViewer()
 
 /*!
@@ -272,7 +273,7 @@ SoAnyFullViewer::menuSelection( // virtual
   case WIREFRAME_ITEM:
   case POINTS_ITEM:
   case BOUNDING_BOX_ITEM:
-    viewer->drawstyleActivated( menuitemid );
+    this->drawstyleActivated( menuitemid );
     break;
 
   case MOVE_SAME_AS_STILL_ITEM:
@@ -283,13 +284,13 @@ SoAnyFullViewer::menuSelection( // virtual
   case MOVE_POINTS_ITEM:
   case MOVE_LOW_RES_POINTS_ITEM:
   case MOVE_BOUNDING_BOX_ITEM:
-    viewer->drawstyleActivated( menuitemid );
+    this->drawstyleActivated( menuitemid );
     break;
 
   case SINGLE_BUFFER_ITEM:
   case DOUBLE_BUFFER_ITEM:
   case INTERACTIVE_BUFFER_ITEM:
-    viewer->drawstyleActivated( menuitemid );
+    this->drawstyleActivated( menuitemid );
     break;
 
   default:
@@ -310,6 +311,197 @@ SoAnyFullViewer::menuSelectionCallback( // static
   SoAnyFullViewer * viewer = (SoAnyFullViewer *) userdata;
   viewer->menuSelection( menuitemid );
 } // menuSelectionCallback()
+
+// ************************************************************************
+
+/*!
+ \internal
+*/
+
+void
+SoAnyFullViewer::setDrawStyleMenuActivation(
+  So@GUI@Viewer::DrawType type,
+  So@GUI@Viewer::DrawStyle value )
+{
+  assert( viewer->prefmenu != NULL );
+
+  switch ( type ) {
+  case So@GUI@Viewer::STILL:
+    switch ( value ) {
+    case So@GUI@Viewer::VIEW_AS_IS:
+      viewer->prefmenu->SetMenuItemMarked( AS_IS_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_HIDDEN_LINE:
+      viewer->prefmenu->SetMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_NO_TEXTURE:
+      viewer->prefmenu->SetMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LOW_COMPLEXITY:
+      viewer->prefmenu->SetMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LINE:
+      viewer->prefmenu->SetMenuItemMarked( WIREFRAME_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_POINT:
+      viewer->prefmenu->SetMenuItemMarked( POINTS_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_BBOX:
+      viewer->prefmenu->SetMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
+      break;
+    default:
+      assert( 0 && "unsupported default switch-case" );
+      break;
+    } // switch ( value )
+    break;
+
+  case So@GUI@Viewer::INTERACTIVE:
+    switch ( value ) {
+    case So@GUI@Viewer::VIEW_SAME_AS_STILL:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_NO_TEXTURE:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LOW_COMPLEXITY:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LINE:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LOW_RES_LINE:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_POINT:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_LOW_RES_POINT:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
+      break;
+    case So@GUI@Viewer::VIEW_BBOX:
+      viewer->prefmenu->SetMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
+      break;
+    default:
+      assert( 0 && "unsupported default switch-case" );
+      break;
+    } // switch ( value )
+    break;
+
+  default:
+    assert( 0 && "unsupported default switch-case" );
+    break;
+  } // switch ( type )
+} // setDrawStyleMenuActivation()
+
+// ************************************************************************
+
+/*!
+  \internal
+*/
+
+void
+SoAnyFullViewer::drawstyleActivated(
+  int menuitemid )
+{
+  switch ( menuitemid ) {
+  case SINGLE_BUFFER_ITEM:
+    viewer->setBufferingType( So@GUI@Viewer::BUFFER_SINGLE );
+    return;
+  case DOUBLE_BUFFER_ITEM:
+    viewer->setBufferingType( So@GUI@Viewer::BUFFER_DOUBLE );
+    return;
+  case INTERACTIVE_BUFFER_ITEM:
+    viewer->setBufferingType( So@GUI@Viewer::BUFFER_INTERACTIVE );
+    return;
+  default:
+    break;
+  } // switch ( menuitemid )
+
+  So@GUI@Viewer::DrawStyle val = So@GUI@Viewer::VIEW_AS_IS;
+  switch ( menuitemid ) {
+  case AS_IS_ITEM:
+    val = So@GUI@Viewer::VIEW_AS_IS;
+    break;
+  case HIDDEN_LINE_ITEM:
+    val = So@GUI@Viewer::VIEW_HIDDEN_LINE;
+    break;
+  case NO_TEXTURE_ITEM:
+    val = So@GUI@Viewer::VIEW_NO_TEXTURE;
+    break;
+  case LOW_RESOLUTION_ITEM:
+    val = So@GUI@Viewer::VIEW_LOW_COMPLEXITY;
+    break;
+  case WIREFRAME_ITEM:
+    val = So@GUI@Viewer::VIEW_LINE;
+    break;
+  case POINTS_ITEM:
+    val = So@GUI@Viewer::VIEW_POINT;
+    break;
+  case BOUNDING_BOX_ITEM:
+    val = So@GUI@Viewer::VIEW_BBOX;
+    break;
+
+  case MOVE_SAME_AS_STILL_ITEM:
+    val = So@GUI@Viewer::VIEW_SAME_AS_STILL;
+    break;
+  case MOVE_NO_TEXTURE_ITEM:
+    val = So@GUI@Viewer::VIEW_NO_TEXTURE;
+    break;
+  case MOVE_LOW_RES_ITEM:
+    val = So@GUI@Viewer::VIEW_LOW_COMPLEXITY;
+    break;
+  case MOVE_WIREFRAME_ITEM:
+    val = So@GUI@Viewer::VIEW_LINE;
+    break;
+  case MOVE_LOW_RES_WIREFRAME_ITEM:
+    val = So@GUI@Viewer::VIEW_LOW_RES_LINE;
+    break;
+  case MOVE_POINTS_ITEM:
+    val = So@GUI@Viewer::VIEW_POINT;
+    break;
+  case MOVE_LOW_RES_POINTS_ITEM:
+    val = So@GUI@Viewer::VIEW_LOW_RES_POINT;
+    break;
+  case MOVE_BOUNDING_BOX_ITEM:
+    val = So@GUI@Viewer::VIEW_BBOX;
+    break;
+
+  default:
+    assert( 0 );
+    break;
+  } // switch ( menuitemid )
+
+  So@GUI@Viewer::DrawType type = So@GUI@Viewer::STILL;
+
+  switch ( menuitemid ) {
+  case AS_IS_ITEM:
+  case HIDDEN_LINE_ITEM:
+  case NO_TEXTURE_ITEM:
+  case LOW_RESOLUTION_ITEM:
+  case WIREFRAME_ITEM:
+  case POINTS_ITEM:
+  case BOUNDING_BOX_ITEM:
+    type = So@GUI@Viewer::STILL;
+    break;
+
+  case MOVE_SAME_AS_STILL_ITEM:
+  case MOVE_NO_TEXTURE_ITEM:
+  case MOVE_LOW_RES_ITEM:
+  case MOVE_WIREFRAME_ITEM:
+  case MOVE_LOW_RES_WIREFRAME_ITEM:
+  case MOVE_POINTS_ITEM:
+  case MOVE_LOW_RES_POINTS_ITEM:
+  case MOVE_BOUNDING_BOX_ITEM:
+    type = So@GUI@Viewer::INTERACTIVE;
+    break;
+
+  default:
+    assert( 0 );
+    break;
+  } // switch ( menuitemid )
+
+  viewer->setDrawStyle( type, val );
+} // drawstyleActivated()
 
 // ************************************************************************
 
