@@ -130,9 +130,11 @@ public:
   void stopMoving();
 
   void updateSpeedIndicator(void);
-  void updateCamera( SoCamera * camera, float dt );
-  void updateCamera( SoCamera * camera, float d_tilt, float d_pan, float dt );
-
+  void updateCameraPosition( SoCamera * camera, float speed, float dt ); 
+  void updateCameraOrientation( SoCamera * camera, 
+                                float d_tilt, 
+                                float d_pan, 
+                                float dt );
   float calculateChangeInTime();
   void  updateCurrentSpeed( float dt );
 
@@ -657,34 +659,33 @@ So@Gui@FlyViewerP::processMouseButtonEvent( const SoMouseButtonEvent * const me 
 
 SbBool
 So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
-{
+{  
+  this->mouseloc = lev->getPosition();
+
   if (this->getMode() == So@Gui@FlyViewerP::TILTING) {
 
-    SbVec2s newpos = lev->getPosition();
-    float pan = (this->lastpos[0] - newpos[0])/100.0f;
-    float tilt = (this->lastpos[1] - newpos[1])/100.0f;
-
-    if (pan != 0.0f || tilt!= 0.0f) {
-      SoCamera * camera = PUBLIC(this)->getCamera();
-      if (camera == NULL) 
-        return TRUE; // probably sceneless
-
-      this->updateCamera( camera, tilt, pan, 0.0f );
-      this->lastpos = newpos;
-    }
+    float pan = (this->lastpos[0] - this->mouseloc[0])/100.0f;
+    float tilt = (this->lastpos[1] - this->mouseloc[1])/100.0f;
+    
+    SoCamera * camera = PUBLIC(this)->getCamera();
+    if (camera == NULL) 
+      return TRUE; // probably sceneless
+    
+    this->updateCameraOrientation( camera, tilt, pan, 1.0f );
+    this->lastpos = this->mouseloc;
   }
 
   // FIXME: The size of the glcanvas only changes when the viewer is
   // resized. The GLSize should be set from the FlyViewer, to remove
   // the dependency on the PUBLIC(this) class. 20021021 rolvs
-  this->mouseloc = lev->getPosition();
   SbVec2s glsize( PUBLIC(this)->getGLSize() );
 
-  SbVec2s mid( glsize[0]/2, glsize[1]/2 );  
-  this->pan_increment = 0.002f *
-    float(mid[0] - this->mouseloc[0]) / float(mid[0]);
-  this->tilt_increment =
-    (float(mid[1] - this->mouseloc[1]) / float(mid[1])) * 0.002f;
+  // NOTE: The values are normalized, so that the FlyViewer behaves
+  // the same way no matter the screen-size. The old way to do it made
+  // the possible range of pan and tilt increment depend on the canvas
+  // size. 20021022 rolvs.
+  this->pan_increment = 0.5f - float(this->mouseloc[0])/glsize[0]; 
+  this->tilt_increment = 0.5f - float(this->mouseloc[1])/glsize[1];
 
   return TRUE;
 }
@@ -779,55 +780,49 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
 
 void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
 {
-  float factor = this->pan_increment * this->pan_increment 
-    + this->tilt_increment * this->tilt_increment;
-  
-  if (factor > 0.99f) {
-    factor = 0.01f;
-  } else {
-    factor = 1.0f - factor;
-  }
+  float curveSpeedReductionFactor = 
+    1.0f - (this->pan_increment * this->pan_increment 
+            + this->tilt_increment * this->tilt_increment);  
+
+  // NOTE: I don't believe that this boundary condition could ever
+  // happen. 20021022 rolvs
+  if( curveSpeedReductionFactor < 0 )
+    curveSpeedReductionFactor = 0;
 
   this->currentspeed +=
     (((this->currentspeed +
-      this->maxspeed * factor) / 2.0f)- this->currentspeed) * dt;
+      this->maxspeed * curveSpeedReductionFactor) / 2.0f) - 
+     this->currentspeed) * dt;
 }
 
-
-void
-So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
-{
-  assert( camera != NULL );
-  this->updateCamera( camera, this->tilt_increment, this->pan_increment, dt );
-}
-
-void So@Gui@FlyViewerP::updateCamera( SoCamera * camera, 
-                                      float tilt_increment,
-                                      float pan_increment, 
-                                      float dt )
+void So@Gui@FlyViewerP::updateCameraPosition( SoCamera * camera, 
+                                              float current_speed,
+                                              float dt )
 {
   assert( camera != NULL );
 
-  // FIXME: Camera position movement and changes in orientation is
-  // general behaviour that could be factored out for re-use. 
-  // 20021017 rolvs
   SbRotation orientation = camera->orientation.getValue();
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f(0,0,-1), dir );
   dir.normalize();
   camera->position.setValue(camera->position.getValue() +
-                            dir * (this->currentspeed 
-                                   * dt
-                                   * this->speed_scaling_factor));
-
+                            dir * (current_speed * dt ));
+}
+ 
+void So@Gui@FlyViewerP::updateCameraOrientation( SoCamera * camera, 
+                                                 float d_tilt, 
+                                                 float d_pan, 
+                                                 float dt )
+{
+  assert( camera != NULL );
   // FIXME: Make sure that the angle between direction and up-vector
   // stays larger than zero, or else it gets 'locked' in an undefined
   // state and starts to act weird. This should probably be done in
   // parent class. 20021017 rolvs
-  PUBLIC( this )->tiltCamera( tilt_increment );
+  PUBLIC( this )->tiltCamera( d_tilt*dt );
 
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( PUBLIC(this)->getUpDirection(), pan_increment );
+    SbRotation( PUBLIC(this)->getUpDirection(), d_pan*dt );
 }
 
 void
@@ -1221,8 +1216,18 @@ So@Gui@FlyViewer::actualRedraw(void)
         if (t > 0.0f) {
           SoCamera * camera = this->getCamera();
 
-          if (camera) // could be a sceneless viewer
-            PRIVATE(this)->updateCamera( camera, t );
+          if (camera){ // could be a sceneless viewer
+            PRIVATE(this)->updateCameraPosition
+              ( camera,
+                PRIVATE(this)->currentspeed*
+                PRIVATE(this)->speed_scaling_factor,
+                t );
+            PRIVATE(this)->updateCameraOrientation
+              ( camera, 
+                PRIVATE(this)->tilt_increment, 
+                PRIVATE(this)->pan_increment, 
+                t );
+          }
         }
       }
       
