@@ -39,7 +39,7 @@ static const char rcsid[] =
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/SoSceneManager.h>
 
-#include <Inventor/@GUI@/common/soguidefs.h>
+#include <Inventor/@GUI@/So@GUI@Basic.h>
 #include <Inventor/@GUI@/devices/So@GUI@Mouse.h>
 #include <Inventor/@GUI@/devices/So@GUI@Keyboard.h>
 
@@ -741,7 +741,7 @@ void
 So@GUI@RenderArea::initGraphic( // virtual, protected
   void )
 {
-  SOGUI_STUB();
+  SO@uGUI@_STUB();
 } // initGraphic()
 
 /*!
@@ -751,7 +751,7 @@ void
 So@GUI@RenderArea::initOverlayGraphic( // virtual, protected
   void )
 {
-  SOGUI_STUB();
+  SO@uGUI@_STUB();
 } // initOverlayGraphic()
 
 /*!
@@ -791,7 +791,7 @@ void
 So@GUI@RenderArea::widgetChanged( // virtual, protected
   @WIDGET@ widget )
 {
-  SOGUI_STUB();
+  SO@uGUI@_STUB();
 } // widgetChanged()
 
 /*!

@@ -44,12 +44,12 @@ static const char rcsid[] =
 */
 
 /*!
-  \var int ThumbWheel::dirtyTables
+  \var int SoAnyThumbWheel::dirtyTables
   If this flag is set, the internal tables needs to be recalculated.
 */
 
 /*!
-  \var int ThumbWheel::dirtyVariables
+  \var int SoAnyThumbWheel::dirtyVariables
   If this flag is set, the internal variables that are calculated from the
   tables and wheel settings need to be recalculated.
 */
@@ -69,7 +69,7 @@ int8clamp( float f ) {
   Constructor.
 */
 
-ThumbWheel::ThumbWheel(
+SoAnyThumbWheel::SoAnyThumbWheel(
   void )
 : diameter( 0 )
 , width( 0 )
@@ -97,7 +97,7 @@ ThumbWheel::ThumbWheel(
   for ( int i = 0; i < NUMTABLES; i++ )
     this->tables[i] = NULL;
 
-} // ThumbWheel()
+} // SoAnyThumbWheel()
 
 // ************************************************************************
 
@@ -105,7 +105,7 @@ ThumbWheel::ThumbWheel(
   Destructor.
 */
 
-ThumbWheel::~ThumbWheel(
+SoAnyThumbWheel::~SoAnyThumbWheel(
   void )
 {
   for ( int i = 0; i < NUMTABLES; i++ )
@@ -118,7 +118,7 @@ ThumbWheel::~ThumbWheel(
 */
 
 void
-ThumbWheel::SetWheelSize(
+SoAnyThumbWheel::SetWheelSize(
   int diameter,
   int width )
 {
@@ -140,7 +140,7 @@ ThumbWheel::SetWheelSize(
 */
 
 void
-ThumbWheel::GetWheelSize(
+SoAnyThumbWheel::GetWheelSize(
   int & diameter,
   int & width ) const
 {
@@ -154,7 +154,7 @@ ThumbWheel::GetWheelSize(
 */
 
 void
-ThumbWheel::SetColor(
+SoAnyThumbWheel::SetColor(
   int red,
   int green,
   int blue )
@@ -170,7 +170,7 @@ ThumbWheel::SetColor(
 */
 
 void
-ThumbWheel::GetColor(
+SoAnyThumbWheel::GetColor(
   int & red,
   int & green,
   int & blue ) const
@@ -186,7 +186,7 @@ ThumbWheel::GetColor(
 */
 
 void
-ThumbWheel::SetColorFactors(
+SoAnyThumbWheel::SetColorFactors(
   float light,
   float front,
   float normal,
@@ -204,7 +204,7 @@ ThumbWheel::SetColorFactors(
 */
 
 void
-ThumbWheel::GetColorFactors(
+SoAnyThumbWheel::GetColorFactors(
   float & light,
   float & front,
   float & normal,
@@ -224,7 +224,7 @@ ThumbWheel::GetColorFactors(
 */
 
 int
-ThumbWheel::BitmapsRequired(
+SoAnyThumbWheel::BitmapsRequired(
   void ) const
 {
   return this->width - 4 + 2 + 1;
@@ -238,7 +238,7 @@ ThumbWheel::BitmapsRequired(
 */
 
 void
-ThumbWheel::DrawBitmap(
+SoAnyThumbWheel::DrawBitmap(
   int number,
   void * bitmap,
   RenderDirection direction )
@@ -267,7 +267,7 @@ ThumbWheel::DrawBitmap(
 */
 
 float
-ThumbWheel::CalculateValue(
+SoAnyThumbWheel::CalculateValue(
   float origval,
   int origpos,
   int deltapos )
@@ -314,7 +314,7 @@ ThumbWheel::CalculateValue(
 */
 
 int
-ThumbWheel::GetBitmapForValue(
+SoAnyThumbWheel::GetBitmapForValue(
   float value,
   WheelState state )
 {
@@ -338,7 +338,7 @@ ThumbWheel::GetBitmapForValue(
 */
 
 void
-ThumbWheel::SetGraphicsByteOrder(
+SoAnyThumbWheel::SetGraphicsByteOrder(
   const GraphicsByteOrder byteorder )
 {
   this->byteorder = byteorder;
@@ -349,8 +349,8 @@ ThumbWheel::SetGraphicsByteOrder(
 /*!
 */
 
-ThumbWheel::GraphicsByteOrder
-ThumbWheel::GetGraphicsByteOrder(
+SoAnyThumbWheel::GraphicsByteOrder
+SoAnyThumbWheel::GetGraphicsByteOrder(
   void ) const
 {
   return this->byteorder;
@@ -362,7 +362,7 @@ ThumbWheel::GetGraphicsByteOrder(
 */
 
 void
-ThumbWheel::SetWheelMotionMethod(
+SoAnyThumbWheel::SetWheelMotionMethod(
   const WheelMotionMethod method )
 {
   this->method = method;
@@ -373,8 +373,8 @@ ThumbWheel::SetWheelMotionMethod(
 /*!
 */
 
-ThumbWheel::WheelMotionMethod
-ThumbWheel::GetWheelMotionMethod(
+SoAnyThumbWheel::WheelMotionMethod
+SoAnyThumbWheel::GetWheelMotionMethod(
   void ) const
 {
   return this->method;
@@ -383,7 +383,7 @@ ThumbWheel::GetWheelMotionMethod(
 // ************************************************************************
 
 void
-ThumbWheel::SetWheelRangeBoundaryHandling(
+SoAnyThumbWheel::SetWheelRangeBoundaryHandling(
   const WheelRangeBoundaryHandling handling )
 {
   this->handling = handling;
@@ -394,8 +394,8 @@ ThumbWheel::SetWheelRangeBoundaryHandling(
 /*!
 */
 
-ThumbWheel::WheelRangeBoundaryHandling
-ThumbWheel::GetWheelRangeBoundaryHandling(
+SoAnyThumbWheel::WheelRangeBoundaryHandling
+SoAnyThumbWheel::GetWheelRangeBoundaryHandling(
   void ) const
 {
   return this->handling;
@@ -410,7 +410,7 @@ ThumbWheel::GetWheelRangeBoundaryHandling(
 */
 
 void
-ThumbWheel::Validate( // private
+SoAnyThumbWheel::Validate( // private
   void )
 {
   int i;
@@ -480,7 +480,7 @@ swapWord(
 */
 
 void
-ThumbWheel::DrawDisabledWheel( // private
+SoAnyThumbWheel::DrawDisabledWheel( // private
   int number,
   void * bitmap,
   RenderDirection direction )
@@ -511,7 +511,7 @@ ThumbWheel::DrawDisabledWheel( // private
       shade  = swapWord(  shade );
     }
 
-    if ( direction == ThumbWheel::VERTICAL ) {
+    if ( direction == SoAnyThumbWheel::VERTICAL ) {
       buffer[j*this->width] = light;
       for ( int i = 1; i < (width - 1); i++ )
         buffer[(j*this->width)+i] = normal;
@@ -534,7 +534,7 @@ ThumbWheel::DrawDisabledWheel( // private
 */
 
 void
-ThumbWheel::DrawEnabledWheel(
+SoAnyThumbWheel::DrawEnabledWheel(
   int number,
   void * bitmap,
   RenderDirection direction )
@@ -591,7 +591,7 @@ ThumbWheel::DrawEnabledWheel(
       }
     }
 
-    if ( direction == ThumbWheel::VERTICAL ) {
+    if ( direction == SoAnyThumbWheel::VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
       if ( flag == TRUE ) buffer[(this->width*j)+2] = front;
@@ -623,7 +623,7 @@ ThumbWheel::DrawEnabledWheel(
     if ( j < (this->diameter - 1) ) {
       radian += this->tables[RAD][j+1] - this->tables[RAD][j];
       if ( radian > modulo ) {
-        if ( direction == ThumbWheel::VERTICAL ) {
+        if ( direction == SoAnyThumbWheel::VERTICAL ) {
           int color = 0;
           if ( j > (this->diameter * 2 / 3) )
             color = light;

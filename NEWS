@@ -1,9 +1,11 @@
 NEWS
 ====
 
+2000-03-31 larsa:
+	* removed all obsolete files (and files to be obsoleted).
+
 2000-03-16 larsa:
-	* added SoAnyPopupMenu interface.  code is only used in uncommmit'ed
-	  SoBe code at the moment.
+	* added SoAnyPopupMenu interface.
 
 2000-03-08 larsa:
 	* removed Makefile.am/in and built these sources into the other

@@ -20,15 +20,15 @@
 //  @configure_input@
 //  $Id$
 
-#ifndef THUMBWHEEL_H
-#define THUMBWHEEL_H
+#ifndef SOANY_THUMBWHEEL_H
+#define SOANY_THUMBWHEEL_H
 
 // ************************************************************************
 
-class ThumbWheel {
+class SoAnyThumbWheel {
 public:
-  ThumbWheel(void);
-  ~ThumbWheel(void);
+  SoAnyThumbWheel(void);
+  ~SoAnyThumbWheel(void);
 
   enum RenderDirection {
     VERTICAL, HORIZONTAL
@@ -99,8 +99,8 @@ private:
 
   void DrawDisabledWheel(int number, void * bitmap, RenderDirection direction );
   void DrawEnabledWheel( int number, void * bitmap, RenderDirection direction );
-}; // class ThumbWheel
+}; // class SoAnyThumbWheel
 
 // ************************************************************************
 
-#endif // ! THUMBWHEEL_H
+#endif // ! SOANY_THUMBWHEEL_H

@@ -1,0 +1,95 @@
+/**************************************************************************\
+ *
+ *  Copyright (C) 1998-2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This file is part of the Coin library.
+ *
+ *  This file may be distributed under the terms of the Q Public License
+ *  as defined by Troll Tech AS of Norway and appearing in the file
+ *  LICENSE.QPL included in the packaging of this file.
+ *
+ *  If you want to use Coin in applications not covered by licenses
+ *  compatible with the QPL, you can contact SIM to aquire a
+ *  Professional Edition license for Coin.
+ *
+ *  Systems in Motion AS, Prof. Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ sales@sim.no Voice: +47 22114160 Fax: +47 67172912
+ *
+\**************************************************************************/
+
+//  @configure_input@
+//  $Id$
+
+#ifndef SO@uGUI@_BASIC_H
+#define SO@uGUI@_BASIC_H
+
+// *************************************************************************
+
+template <class Type>
+inline Type So@GUI@Max( Type a, Type b ) { return (b > a) ? b : a; }
+
+template <class Type>
+inline Type So@GUI@Min( Type a, Type b ) { return (b < a) ? b : a; }
+
+// *************************************************************************
+
+#ifdef __FILE__
+#define SO@uGUI@_STUB_FILE __FILE__
+#else
+#define SO@uGUI@_STUB_FILE ((char *)0L)
+#endif
+
+#ifdef __LINE__
+#define SO@uGUI@_STUB_LINE __LINE__
+#else
+#define SO@uGUI@_STUB_LINE 0
+#endif
+
+#ifdef __PRETTY_FUNCTION__
+#define SO@uGUI@_STUB_FUNC __PRETTY_FUNCTION__
+#else
+#define SO@uGUI@_STUB_FUNC ((char *)0L)
+#endif
+
+// SO@uGUI@_STUB(): this is the method which prints out stub
+// information. Used where there is functionality missing.
+
+#include <stdio.h> // fprintf()
+
+// This stupid thing is here to silence some compilers that complain on
+// constant if-expressions.
+inline int _not_null( const void * arg ) { return (! arg) ? 0 : 1; }
+
+#define SO@uGUI@_STUB() \
+  do { \
+    (void)fprintf(stderr, "STUB: functionality not yet completed"); \
+    if ( _not_null(SO@uGUI@_STUB_FILE) ) { \
+      (void)fprintf(stderr, " at %s", SO@uGUI@_STUB_FILE); \
+      if ( _not_null((void *)SO@uGUI@_STUB_LINE) ) \
+        (void)fprintf(stderr, ":line %u", SO@uGUI@_STUB_LINE); \
+      if ( _not_null(SO@uGUI@_STUB_FUNC) ) \
+        (void)fprintf(stderr, ":[%s]", SO@uGUI@_STUB_FUNC); \
+    } \
+    (void)fprintf(stderr, "\n"); \
+  } while (0)
+
+// *************************************************************************
+
+#define __SOXT__
+
+#if ! defined(SOXT_MAJOR_VERSION)
+#undef SOXT_MAJOR_VERSION
+#endif /* ! SOXT_MAJOR_VERSION */
+#if ! defined(SOXT_MINOR_VERSION)
+#undef SOXT_MINOR_VERSION
+#endif /* ! SOXT_MINOR_VERSION */
+#if ! defined(SOXT_MICRO_VERSION)
+#undef SOXT_MICRO_VERSION
+#endif /* ! SOXT_MICRO_VERSION */
+#if ! defined(SOXT_VERSION)
+#undef SOXT_VERSION
+#endif /* ! SOXT_VERSION */
+
+// *************************************************************************
+
+#endif // ! SO@uGUI@_BASIC_H
