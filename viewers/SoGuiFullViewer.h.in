@@ -22,182 +22,15 @@
 #ifndef SO@GUI@_FULLVIEWER_H
 #define SO@GUI@_FULLVIEWER_H
 
-// FIXME: just a tmp thing to get hold of __COIN_SO*__
-// define. 20020109 mortene.
-#include <Inventor/@Gui@/So@Gui@Basic.h>
+#include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
-// FIXME!: merge SoWinFullViewer.h in properly with the other
-// toolkits' So*FullViewer.h. 20020109 mortene.
+// FIXME: get rid of non-templatized code. 20020108 mortene.
 #ifdef __COIN_SOWIN__
-
-#include <Inventor/Win/viewers/SoWinViewer.h>
-#include <Inventor/SbPList.h>
-#include <Inventor/lists/SoCallbackList.h>
-
-class SoFieldSensor;
-class SoWinBitmapButton;
-class SoWinThumbWheel;
-class SoWinViewerPrefSheet;
-class SoWinFullViewerP;
-class SoWinPopupMenu;
-
 typedef void AppPushButtonCB(HWND hwnd, int id, void * buttonData, void * userData);
 typedef void RedrawAppPushButtonCB(LPDRAWITEMSTRUCT lpdis, void * userData);
 typedef void CreateAppPushButtonCB(LPMEASUREITEMSTRUCT lpmis, void * userData);
+#endif // ! __COIN_SOWIN__
 
-class SOWIN_DLL_API SoWinFullViewer : public SoWinViewer {
-
-  SOWIN_OBJECT_ABSTRACT_HEADER(SoWinFullViewer, SoWinViewer);
-
-  friend class SoAnyFullViewer;
-  friend class SoWinViewerPrefSheet;
-  friend class SoWinThumbWheel;
-  friend class SoWinFullViewerP;
-
-public:
-
-  enum BuildFlag {
-    BUILD_NONE          = 0x00,
-    BUILD_DECORATION    = 0x01,
-    BUILD_POPUP         = 0x02,
-    BUILD_ALL           = 0xff,
-  };
-
-  enum ButtonId {
-    VIEWERBUTTON_PICK,
-    VIEWERBUTTON_VIEW,
-    VIEWERBUTTON_HELP,
-    VIEWERBUTTON_HOME,
-    VIEWERBUTTON_SET_HOME,
-    VIEWERBUTTON_VIEW_ALL,
-    VIEWERBUTTON_SEEK
-  };
-
-  void setDecoration(SbBool enable);
-  SbBool isDecoration(void);
-
-  void setPopupMenuEnabled(SbBool enable);
-  SbBool isPopupMenuEnabled(void);
-
-  static void setDoButtonBar(SbBool enable);
-  static SbBool isDoButtonBar(void);
-
-  HWND getAppPushButtonParent(void) const;
-  void addAppPushButton(HWND newButton);
-  void insertAppPushButton(HWND newButton, int index);
-  void removeAppPushButton(HWND oldButton);
-  int findAppPushButton(HWND oldButton);
-  int lengthAppPushButton(void);
-  void addAppPushButtonCallback(AppPushButtonCB * callback,
-                                 void * data = NULL);
-  void addRedrawAppPushButtonCallback(RedrawAppPushButtonCB * callback,
-                                       void * data = NULL);
-  void addCreateAppPushButtonCallback(CreateAppPushButtonCB * callback,
-                                       void * data = NULL);
-
-  HWND getRenderAreaWidget(void);
-
-  virtual void setViewing(SbBool enable);
-  virtual void setCamera(SoCamera * newCamera);
-  virtual void hide(void);
-
-  virtual void setComponentCursor(const SoWinCursor & cursor);
-
-protected:
-
-  SoWinFullViewer(HWND parent,
-                   const char * name,
-                   SbBool embedded,
-                   BuildFlag flag,
-                   SoWinViewer::Type type,
-                   SbBool buildNow);
-
-  ~SoWinFullViewer(void);
-
-  HWND buildWidget(HWND parent);
-  virtual void sizeChanged(const SbVec2s & size);
-  virtual void buildDecoration(HWND parent);
-  virtual HWND buildLeftWheel(HWND parent);
-  virtual HWND buildBottomWheel(HWND parent);
-  virtual HWND buildRightWheel(HWND parent);
-  virtual void buildViewerButtons(HWND parent);
-  virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
-  virtual void buildPopupMenu(void);
-  virtual void setPopupMenuString(const char * title);
-  virtual void openPopupMenu(const SbVec2s position);
-  virtual void destroyPopupMenu(void);
-  virtual int displayPopupMenu(int x, int y, HWND owner);
-
-  void showDecorationWidgets(SbBool enable);
-
-  void setPrefSheetString(const char * name);
-  virtual void createPrefSheet(void);
-
-  float getLeftWheelValue(void) const;
-  void setLeftWheelValue(const float value);
-
-  float getBottomWheelValue(void) const;
-  void setBottomWheelValue(const float value);
-
-  float getRightWheelValue(void) const;
-  void setRightWheelValue(const float value);
-
-  virtual void rightWheelMotion(float);
-  virtual void bottomWheelMotion(float);
-  virtual void leftWheelMotion(float);
-
-  virtual void rightWheelStart(void);
-  virtual void bottomWheelStart(void);
-  virtual void leftWheelStart(void);
-
-  virtual void rightWheelFinish(void);
-  virtual void bottomWheelFinish(void);
-  virtual void leftWheelFinish(void);
-
-  void setBottomWheelString(const char * name);
-  void setLeftWheelString(const char * name);
-  void setRightWheelString(const char * name);
-
-  virtual void openViewerHelpCard(void);
-  virtual void afterRealizeHook(void);
-
-  void setCameraZoom(float val);
-  float getCameraZoom(void);
-
-  virtual void selectedPrefs(void);
-
-  virtual SbBool processSoEvent(const SoEvent * const event);
-  virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-
-  void seekbuttonClicked(void);
-
-  SoFieldSensor * zoomSensor;
-
-  SoWinThumbWheel * rightWheel;
-  SoWinThumbWheel * bottomWheel;
-  SoWinThumbWheel * leftWheel;
-
-  SbVec2f zoomrange;
-  SoWinViewerPrefSheet * prefsheet;
-
-  SbPList * viewerButtonList;
-  SbPList * appButtonList;
-
-  HWND viewerWidget;
-  HWND renderAreaWidget;
-
-private:
-  SoWinFullViewerP * pimpl;
-  SoAnyFullViewer * common;
-  SoWinPopupMenu * prefmenu;
-};
-
-
-#else // ! __COIN_SOWIN__
-
-#include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
 class So@Gui@PopupMenu;
 class SoAnyFullViewer;
@@ -299,17 +132,14 @@ protected:
   @WIDGET@ rightDecoration;
   @WIDGET@ bottomDecoration;
 
-  @WIDGET@ leftWheel;
   @WIDGET@ leftWheelLabel;
   char * leftWheelStr;
   float leftWheelVal;
 
-  @WIDGET@ rightWheel;
   @WIDGET@ rightWheelLabel;
   char * rightWheelStr;
   float rightWheelVal;
 
-  @WIDGET@ bottomWheel;
   @WIDGET@ bottomWheelLabel;
   char * bottomWheelStr;
   float bottomWheelVal;
@@ -331,6 +161,10 @@ private:
 
 #ifdef __COIN_SOQT__
 protected:
+  @WIDGET@ leftWheel;
+  @WIDGET@ rightWheel;
+  @WIDGET@ bottomWheel;
+
   virtual bool eventFilter(QObject * obj, QEvent * e);
   virtual void afterRealizeHook(void);
   virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
@@ -409,6 +243,10 @@ private slots:
 
 #ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 protected:
+  @WIDGET@ leftWheel;
+  @WIDGET@ rightWheel;
+  @WIDGET@ bottomWheel;
+
   Widget buildAppButtonsForm(Widget parent);
 
   Widget buildFunctionsSubmenu(Widget popup);
@@ -584,6 +422,10 @@ private:
 
 #ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 protected:
+  @WIDGET@ leftWheel;
+  @WIDGET@ rightWheel;
+  @WIDGET@ bottomWheel;
+
   virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
   virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
 
@@ -607,10 +449,74 @@ private:
   void viewallbuttonClicked(void);
   void seekbuttonClicked(void);
 #endif // __COIN_SOGTK__
+
+#ifdef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+public:
+  enum ButtonId {
+    VIEWERBUTTON_PICK,
+    VIEWERBUTTON_VIEW,
+    VIEWERBUTTON_HELP,
+    VIEWERBUTTON_HOME,
+    VIEWERBUTTON_SET_HOME,
+    VIEWERBUTTON_VIEW_ALL,
+    VIEWERBUTTON_SEEK
+  };
+
+  static void setDoButtonBar(SbBool enable);
+  static SbBool isDoButtonBar(void);
+
+  void addAppPushButtonCallback(AppPushButtonCB * callback,
+                                 void * data = NULL);
+  void addRedrawAppPushButtonCallback(RedrawAppPushButtonCB * callback,
+                                       void * data = NULL);
+  void addCreateAppPushButtonCallback(CreateAppPushButtonCB * callback,
+                                       void * data = NULL);
+
+  virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
+  virtual void destroyPopupMenu(void);
+  virtual int displayPopupMenu(int x, int y, HWND owner);
+
+  virtual void selectedPrefs(void);
+
+  virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+
+  void seekbuttonClicked(void);
+
+  class SoFieldSensor * zoomSensor;
+
+  class SoWinThumbWheel * rightWheel;
+  class SoWinThumbWheel * bottomWheel;
+  class SoWinThumbWheel * leftWheel;
+
+  SbVec2f zoomrange;
+  class SoWinViewerPrefSheet * prefsheet;
+
+  SbPList * viewerButtonList;
+  SbPList * appButtonList;
+
+  HWND viewerWidget;
+  HWND renderAreaWidget;
+
+protected:
+  virtual void createPrefSheet(void);
+  void showDecorationWidgets(SbBool onOff);
+
+private:
+  HWND buildLeftWheel(HWND parent);
+  HWND buildBottomWheel(HWND parent);
+  HWND buildRightWheel(HWND parent);
+
+  float getCameraZoom(void);
+  void setCameraZoom(float zoom);
+
+  // FIXME: quick hack done while merging all the header file
+  // definitions for So*FullViewer. 20020111 mortene.
+  friend class SoWinViewerPrefSheet;
+#endif // __COIN_SOWIN__
 };
 
 // *************************************************************************
-
-#endif // ! __COIN_SOWIN__
 
 #endif // ! SO@GUI@_FULLVIEWER_H
