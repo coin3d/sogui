@@ -109,8 +109,8 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
       so@gui@_not_null(SO@GUI@_STUB_FILE) ? SO@GUI@_STUB_FILE : "", \
       so@gui@_not_null((void *)SO@GUI@_STUB_LINE) ? SO@GUI@_STUB_LINE : 0, \
       so@gui@_not_null(SO@GUI@_STUB_FUNC) ? SO@GUI@_STUB_FUNC : ""); \
-    SoDebugError::postError(identifier, \
-                            "OBSOLETED: functionality no longer supported"); \
+    SoDebugError::post(identifier, \
+                       "OBSOLETED: functionality no longer supported"); \
   } while (0)
 
 #else /* !SO@GUI@_DEBUG */
