@@ -1407,6 +1407,8 @@ So@Gui@RenderArea::invokeAppCB(@EVENT@ event) // protected
   passed on further up in the inheritance hierarchy by the caller.
   This last point is extremely important to take note of if you are
   expanding the toolkit with your own viewer class.
+
+  This method is not part of the original SGI InventorXt API.
 */
 SbBool
 So@Gui@RenderArea::processSoEvent(const SoEvent * const event)
