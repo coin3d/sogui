@@ -324,10 +324,7 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
 
 So@Gui@ViewerP::~So@Gui@ViewerP()
 {
-  if (this->superimpositions) {
-    delete this->superimpositions;
-    this->superimpositions = NULL;
-  }
+  if ( this->superimpositions != NULL ) delete this->superimpositions;
   delete this->searchaction;
   delete this->matrixaction;
 
@@ -421,7 +418,7 @@ So@Gui@ViewerP::createSuperScene(void)
     member = NULL; \
     this->searchaction->setName(SbName(name)); \
     this->searchaction->apply(root); \
-    if (this->searchaction->isFound()) { \
+    if (this->searchaction->getPath() != NULL) { \
       SoNode * node = this->searchaction->getPath()->getTail(); \
       assert(node != NULL); \
       if (node->isOfType(type::getClassTypeId())) \
@@ -1700,13 +1697,13 @@ So@Gui@Viewer::~So@Gui@Viewer()
   delete PRIVATE(this)->seeksensor;
 
   if (PRIVATE(this)->scenegraph) this->setSceneGraph(NULL);
-  PRIVATE(this)->sceneroot->unref();
   if (PRIVATE(this)->superimpositions != NULL) {
-    for (int i = PRIVATE(this)->superimpositions->getLength() - 1; i >= 0; i--) {
-      SoNode * node = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
-      node->unref();
+    while ( PRIVATE(this)->superimpositions->getLength() > 0 ) {
+      SoNode * node = (SoNode *) (*PRIVATE(this)->superimpositions)[0];
+      this->removeSuperimposition(node);
     }
   }
+  PRIVATE(this)->sceneroot->unref();
   delete PRIVATE(this);
 }
 
@@ -2660,7 +2657,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   SoBaseKit::setSearchingChildren(oldsearch);
 
   SoCamera * scenecamera = NULL;
-  if (PRIVATE(this)->searchaction->isFound()) {
+  if ( PRIVATE(this)->searchaction->getPath() != NULL ) {
     SoFullPath * fullpath =
       (SoFullPath *) PRIVATE(this)->searchaction->getPath();
     scenecamera = (SoCamera *)fullpath->getTail();
@@ -3357,7 +3354,7 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
   PRIVATE(this)->searchaction->setInterest(SoSearchAction::FIRST);
   PRIVATE(this)->searchaction->apply(scene);
-  if (!PRIVATE(this)->searchaction->getPath()) {
+  if (PRIVATE(this)->searchaction->getPath() == NULL) {
     // FIXME: set up default environment if there is no camera in the
     // superimposition scene - or not...
     if (SO@GUI@_DEBUG) {
