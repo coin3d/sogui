@@ -799,6 +799,11 @@ SoAnyExaminerViewer::processSoEvent(
   if (! viewer->isViewing()) // event is for scene graph
     return FALSE;
 
+  // Added 2001-11-01, pederb. Let SoAnyFullViewer handle events when
+  // in seek mode.
+  if (viewer->isSeekMode())
+    return FALSE;
+
   this->canvas = viewer->getGLSize();
 
   const SoType type(ev->getTypeId());
