@@ -23,6 +23,10 @@ static const char rcsid[] =
   "$Id$";
 #endif // SO@GUI@_DEBUG
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Cursors.h>
 

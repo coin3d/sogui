@@ -54,11 +54,11 @@ static const char rcsid[] =
 */
 
 
-#include <math.h>
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
+
+#include <math.h>
 
 #if HAVE_WINDOWS_H
 #include <windows.h> // gl.h needs this.
@@ -92,6 +92,7 @@ static const char rcsid[] =
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/SoPickedPoint.h>
 
+#include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 

@@ -34,14 +34,15 @@ static const char rcsid[] =
  * m4 installed.
  **************************************************************************/
 
-#include <assert.h>
-#include <string.h>
-
-#include <Inventor/@Gui@/SoAnyMaterialList.h>
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
+
+#include <assert.h>
+#include <string.h>
+
+#include <so@gui@defs.h>
+#include <Inventor/@Gui@/SoAnyMaterialList.h>
 
 #ifdef WITH_STATIC_DEFAULTS
 #include <materials/materials.h>

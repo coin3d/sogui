@@ -32,12 +32,17 @@ static const char rcsid[] =
   \ingroup common
 */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <assert.h>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/SbLinear.h>
 #include <Inventor/nodes/SoCamera.h>
 
+#include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/SoAnyWalkViewer.h>
 #include <Inventor/@Gui@/viewers/So@Gui@WalkViewer.h>
 

@@ -32,12 +32,12 @@ static const char rcsid[] =
   \ingroup common
 */
 
-#include <assert.h>
-#include <math.h>
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
+
+#include <assert.h>
+#include <math.h>
 
 #if HAVE_WINDOWS_H
 #include <windows.h> // gl.h needs this.
@@ -52,6 +52,7 @@ static const char rcsid[] =
 #include <Inventor/events/SoLocation2Event.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 
+#include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/SoAnyPlaneViewer.h>
 #include <Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h>
 

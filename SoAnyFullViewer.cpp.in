@@ -31,10 +31,15 @@ static const char rcsid[] =
   all the FullViewer components for Coin.
 */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 
+#include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Component.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 #include <Inventor/@Gui@/viewers/SoAnyFullViewer.h>

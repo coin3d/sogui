@@ -38,6 +38,8 @@ static const char rcsid[] =
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
+#include <so@gui@defs.h>
+
 #if HAVE_WINDOWS_H
 #include <windows.h> // gl.h needs this.
 #endif // HAVE_WINDOWS_H

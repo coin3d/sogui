@@ -25,11 +25,16 @@ static const char rcsid[] =
   "$Id$";
 #endif // SO@GUI@_DEBUG
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <assert.h>
 
 #include <Inventor/SoLists.h>
 #include <Inventor/errors/SoDebugError.h>
 
+#include <so@gui@defs.h>
 #include <Inventor/@Gui@/widgets/SoAnyPopupMenu.h>
 
 /*!
