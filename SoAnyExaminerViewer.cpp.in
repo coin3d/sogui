@@ -82,7 +82,6 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
 {
   assert( container != NULL );
 
-  this->firstevent = TRUE;
   this->currentmode = SoAnyExaminerViewer::EXAMINE;
 
   this->prevRedrawTime = SbTime::getTimeOfDay();
@@ -811,12 +810,6 @@ SbBool
 SoAnyExaminerViewer::processSoEvent(
   const SoEvent * const ev )
 {
-  // Upon first event detected, make sure the cursor is set correctly.
-  if ( this->firstevent ) {
-    this->viewer->setCursorRepresentation( this->currentmode );
-    this->firstevent = FALSE;
-  }
-
   // SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "[invoked]" );
   if ( ! viewer->isViewing() ) // event is for scene graph
     return FALSE;
