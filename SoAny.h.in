@@ -23,10 +23,29 @@
 #ifndef SOANY_H
 #define SOANY_H
 
+#include <Inventor/SbPList.h>
+
 // ************************************************************************
 
 class SoAny {
+  SoAny(void);
+  ~SoAny();
+  static void cleanup_si(void);
+
+public:
+  // single instance (Singelton design pattern)
+  static SoAny * si(void);
+
+public:
+
+  void * getSharedGLContext(void * display, void * screen);
+  void registerGLContext(void * context, void * display, void * screen);
+  void unregisterGLContext(void * context);
+  int getSharedCacheContextId(void * context);
   
+private:
+  // use SbPList to be able to compile for both Coin and SGI/TGS Inventor
+  SbPList cclist;
 }; // class SoAny
 
 // ************************************************************************

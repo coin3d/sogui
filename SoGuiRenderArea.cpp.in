@@ -60,6 +60,7 @@ static const char rcsid[] =
 #endif // HAVE_JOYSTICK_LINUX
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
+#include <Inventor/@Gui@/SoAny.h>
 
 #define RENDERAREA_DEBUG_REDRAWS 0
 
@@ -539,7 +540,7 @@ So@Gui@RenderArea::setAntialiasing(
   // SoSceneManager::setAntialiasing() method and only activate this
   // code when actually needed?
   //                                                   mortene@sim.no
-  const static int MGRS = 2;
+  enum { MGRS = 2 };
   SoSceneManager * mgrs[MGRS] = { PRIVATE(this)->normalManager,
                                   PRIVATE(this)->overlayManager };
   for (int i=0; i < MGRS; i++) {
@@ -1031,6 +1032,7 @@ So@Gui@RenderArea::initGraphic( // virtual, protected
   if (mgr) {
     mgr->reinitialize();
     mgr->setRGBMode(this->isRGBMode());
+    mgr->getGLRenderAction()->setCacheContext(SoAny::si()->getSharedCacheContextId((void*) this));  
   }
   // FIXME: should init cache context stuff,
   // FIXME: if not RGB mode, load colormap

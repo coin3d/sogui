@@ -26,4 +26,189 @@
   \ingroup common
 */
 
+#include <Inventor/@Gui@/SoAny.h>
+#include <Inventor/elements/SoGLCacheContextElement.h>
+#include <stdlib.h>
+#include <assert.h>
+
+#if SO@GUI@_DEBUG
+#include <Inventor/errors/SoDebugError.h>
+#endif // COIN_DEBUG
+
+static SoAny * single_instance = NULL;
+
+#ifndef DOXYGEN_SKIP_THIS
+
+class soany_cache_context {
+public:
+  soany_cache_context(void * display, void * screen)
+    : display(display), screen(screen), cacheid(-1) { } 
+  ~soany_cache_context() { }
+
+  SbBool isSameCacheContext(void * display, void * screen) const {
+    return (this->display == display && this->screen == screen);
+  }
+  SbBool findContext(void * context) const {
+    for (int i = 0; i < this->contextlist.getLength(); i++) {
+      if (this->contextlist[i] == context) return TRUE;
+    }
+    return FALSE;
+  }
+  void * getFirstContext(void) const {
+    assert(this->contextlist.getLength());
+    return this->contextlist[0];
+  }
+  void addContext(void * context) {
+    assert(!this->findContext(context));
+    this->contextlist.append(context);
+  }
+
+  SbBool tryRemoveContext(void * context) {
+    for (int i = 0; i < this->contextlist.getLength(); i++) {
+      if (this->contextlist[i] == context) {
+        this->contextlist.remove(i);
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+  SbBool isEmpty(void) const {
+    return this->contextlist.getLength() == 0;
+  }
+  int getCacheContextId(void) {
+    if (this->cacheid < 0) {
+#ifdef __COIN__
+      // Coin has a method for generating an unique cache context id.
+      // Unfortunately, this method does not exists for SGI/TGS Inventor.
+      this->cacheid = (int) SoGLCacheContextElement::getUniqueCacheContext();
+#else // ! __COIN__
+      this->cacheid = soany_cache_context::oiv_counter++;
+#endif // ! __COIN__
+    }
+    return this->cacheid;
+  }
+
+private:
+  void * display;
+  void * screen;
+  int cacheid;
+  SbPList contextlist;
+  static int oiv_counter;
+};
+
+int soany_cache_context::oiv_counter = 0;
+
+#endif // DOXYGEN_SKIP_THIS
+
+
+
+// private constructor
+SoAny::SoAny(void) 
+{
+}
+ 
+// private destructor
+SoAny::~SoAny()
+{
+  for (int i = 0; i < this->cclist.getLength(); i++) {
+    delete (soany_cache_context*) this->cclist[i];
+  }
+}
+
+/*!
+  Returns a Singelton pattern object.
+*/
+SoAny * 
+SoAny::si(void)
+{
+  if (single_instance == NULL) {
+    single_instance = new SoAny;
+    atexit(cleanup_si);
+  }
+  return single_instance;
+}
+
+
+//  Free memory/resources used by the Singelton object. Will be called
+//  automatically on exit.
+void 
+SoAny::cleanup_si(void)
+{
+  delete single_instance;
+  single_instance = NULL;
+}
+
+/*!  
+  Returns a pointer to any previous context with which GL sharing
+  is possible, or \e NULL if none found.  
+*/
+void * 
+SoAny::getSharedGLContext(void * display, void * screen)
+{
+  for (int i = 0; i < this->cclist.getLength(); i++) {
+    soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
+    if (cc->isSameCacheContext(display, screen)) {
+      return cc->getFirstContext();
+    }
+  }
+  return NULL;
+}
+
+/*!
+  Adds GL context information. Might be platform dependant what
+  the \a display and \a screen will be. Call this method once when
+  the context is created. In the Coin GUI toolkits, \a context will
+  be a pointer to a SoGuiGLWidget.
+*/
+void 
+SoAny::registerGLContext(void * context, void * display, void * screen)
+{
+  int i, n = this->cclist.getLength();
+  for (i = 0; i < n; i++) {
+    soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
+    if (cc->isSameCacheContext(display, screen)) break;
+  }
+  if (i == n) this->cclist.append(new soany_cache_context(display, screen));
+  soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
+  cc->addContext(context);
+}
+
+/*!
+  Removes a GL context from the list of contexts. Should be called
+  when the context/widget is destructed.
+*/
+void 
+SoAny::unregisterGLContext(void * context)
+{
+  for (int i = 0; i < this->cclist.getLength(); i++) {
+    soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
+    if (cc->tryRemoveContext(context)) {
+      if (cc->isEmpty()) {
+        delete cc;
+        this->cclist.remove(i);
+      }
+      return;
+    }
+  }
+  assert(0 && "should not get here!");
+}
+
+/*!
+  Returns a shared cache context id, to be used as argument
+  in SoGLRenderAction::setCacheContext().
+*/
+int 
+SoAny::getSharedCacheContextId(void * context)
+{
+  for (int i = 0; i < this->cclist.getLength(); i++) {
+    soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
+    if (cc->findContext(context)) return cc->getCacheContextId();
+  }
+#if SO@GUI@_DEBUG
+  SoDebugError::postWarning("SoAny::getSharedCacheContextId",
+                            "Shared context handling is not implemented for this toolkit.");
+#endif // COIN_DEBUG
+  return 0;
+}
+
 
