@@ -22,10 +22,14 @@
 #ifndef __SOANY_EXAMINERVIEWER_H__
 #define __SOANY_EXAMINERVIEWER_H__
 
+class SoCamera;
+
 // ************************************************************************
 
 class SoAnyExaminerViewer {
 public:
+  static float rotXWheelMotion( float value, float old, SoCamera * camera );
+  static float rotYWheelMotion( float value, float old, SoCamera * camera );
 
 }; // class SoAnyExaminerViewer
 

@@ -26,6 +26,68 @@ static const char rcsid[] =
   all the ExaminerViewer components for Coin.
 */
 
+#include <Inventor/nodes/SoCamera.h>
+
 #include "SoAnyExaminerViewer.h"
+
+// ************************************************************************
+
+/*!
+  The "rotX" wheel is the wheel on the left decoration on the examiner
+  viewer.  This function translates interaction with the "rotX" wheel into
+  camera movement.
+*/
+
+float
+SoAnyExaminerViewer::rotXWheelMotion(
+  float value,
+  float oldvalue,
+  SoCamera * camera )
+{
+  assert( camera != NULL );
+
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+
+  SbVec3f focalpoint = camera->position.getValue() +
+    camera->focalDistance.getValue() * dir;
+
+  camera->orientation = SbRotation( SbVec3f( 1, 0, 0 ), value - oldvalue ) *
+    camera->orientation.getValue();
+
+  camera->orientation.getValue().multVec( SbVec3f(0, 0, -1), dir );
+  camera->position = focalpoint - camera->focalDistance.getValue() * dir;
+
+  return value;
+} // rotXWheelMotion()
+
+/*!
+  The "rotY" wheel is the wheel on the bottom decoration on the examiner
+  viewer.  This function translates interaction with the "rotX" wheel into
+  camera movement.
+*/
+
+float
+SoAnyExaminerViewer::rotYWheelMotion(
+  float value,
+  float oldvalue,
+  SoCamera * camera )
+{
+  assert( camera != NULL );
+
+  SbVec3f dir;
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
+
+  SbVec3f focalpoint = camera->position.getValue() +
+    camera->focalDistance.getValue() * dir;
+
+  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), oldvalue - value ) *
+    camera->orientation.getValue();
+
+  camera->orientation.getValue().multVec( SbVec3f(0, 0, -1), dir );
+  camera->position = focalpoint - camera->focalDistance.getValue() * dir;
+
+  return value;
+} // rotYWheelMotion()
 
 // ************************************************************************

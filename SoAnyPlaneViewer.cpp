@@ -39,14 +39,11 @@ SoAnyPlaneViewer::transYWheelMotion( // static
   SoCamera * camera )
 {
   assert( camera != NULL );
-  const float diff = value - oldvalue;
-  SbVec3f direction;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 1, 0), direction );
-  camera->position = camera->position.getValue() + (direction * diff);
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 1, 0 ), dir );
+  camera->position = camera->position.getValue() + (dir * (value - oldvalue));
   return value;
 } // transYWheelMotion()
-
-// ************************************************************************
 
 float
 SoAnyPlaneViewer::transXWheelMotion( // static
@@ -55,10 +52,9 @@ SoAnyPlaneViewer::transXWheelMotion( // static
   SoCamera * camera )
 {
   assert( camera != NULL );
-  const float diff = value - oldvalue;
-  SbVec3f direction;
-  camera->orientation.getValue().multVec( SbVec3f( 1, 0, 0), direction );
-  camera->position = camera->position.getValue() + (direction * diff);
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 1, 0, 0 ), dir );
+  camera->position = camera->position.getValue() + (dir * (value - oldvalue));
   return value;
 } // transXWheelMotion()
 
