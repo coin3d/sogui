@@ -526,9 +526,19 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
       viewer->prefmenu->setMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
       break;
+    case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+#if SO@GUI@_DEBUG
+      SoDebugError::postWarning("SoAnyFullViewer::setDrawStyleMenuActivation",
+                                "Use VIEW_LINE, not VIEW_LOW_RES_LINE for the STILL drawstyle.");
+#endif // debug
     case So@Gui@Viewer::VIEW_LINE:
       viewer->prefmenu->setMenuItemMarked( WIREFRAME_ITEM, TRUE );
       break;
+    case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+#if SO@GUI@_DEBUG
+      SoDebugError::postWarning("SoAnyFullViewer::setDrawStyleMenuActivation",
+                                "Use VIEW_POINT, not VIEW_LOW_RES_POINT for the STILL drawstyle.");
+#endif // debug
     case So@Gui@Viewer::VIEW_POINT:
       viewer->prefmenu->setMenuItemMarked( POINTS_ITEM, TRUE );
       break;
