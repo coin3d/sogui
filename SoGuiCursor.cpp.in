@@ -50,6 +50,14 @@
 
 /*** Graphic data for the mouse pointer bitmaps. ***********************/
 
+// Dimensions can be up to <32, 32> pixels.
+//
+// B=1 and M=1 gives black.
+// B=0 and M=1 gives white.
+// B=0 and M=0 gives transparency.
+// B=1 and M=0 is undefined. (FIXME: clean up the data so this never
+//                                   happens. 20011123 mortene)
+
 static unsigned char zoom_bitmap[] =
 {
  0xff,0xff,0xfd,0xbc,0x7f,0xf8,0x3f,0xf0,0x9f,0xe4,0xcf,0xcc,0xff,0xfc,0xff,
