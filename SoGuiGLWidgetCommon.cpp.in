@@ -164,26 +164,64 @@
 */
 
 /*!
-  \fn void  So@Gui@GLWidget::setAccumulationBuffer(const SbBool enable)
+  \fn void So@Gui@GLWidget::setAccumulationBuffer(const SbBool enable)
 
   Enables/disables the OpenGL accumulation buffer.
+
+  For general information about accumulation buffers, confer with your
+  OpenGL reference documentation.
+
+  By default, the accumulation buffer will be attempted disabled.
+  Whether or not it will \e actually be disabled depends on what
+  OpenGL contexts are available on the system. It is perfectly
+  possible that the only usable contexts with regard to the other
+  settings (like double buffering and RGBA mode versus color index
+  mode) causes the context selection to choose an OpenGL format that
+  contains an accumulation buffer, even though it was not
+  requested.
+
+  Vice versa, one is not guaranteed to get accumulation buffers even
+  when requested through this function, either because they are not
+  available, or because they are only available in combination with
+  other OpenGL context settings that are not wanted (like single
+  buffers, non-accellerated rendering, etc).
 */
 
 /*!
-  \fn SbBool  So@Gui@GLWidget::getAccumulationBuffer(void) const
+  \fn SbBool So@Gui@GLWidget::getAccumulationBuffer(void) const
 
   Returns whether the OpenGL accumulation buffer is enabled.
+
+  The returned flag will indicate whether or not accumulation buffers
+  are \e actually present, and not just parrot the input value to
+  So@Gui@GLWidget::setAccumulationBuffer(). See documentation of that
+  function for more information.
 */
 
 /*!
-  \fn void  So@Gui@GLWidget::setStencilBuffer(const SbBool enable)
+  \fn void So@Gui@GLWidget::setStencilBuffer(const SbBool enable)
 
   Enables/disables the OpenGL stencil buffer.
+
+  For general information about stencil buffers, confer with your
+  OpenGL reference documentation.
+
+  By default, the stencil buffer will be attempted disabled, but the
+  same notes apply for stencil buffers as for accumulation
+  buffers. For an explanation on the issue of stencil and accumulation
+  buffer availability, see the function documentation of
+  So@Gui@GLWidget::setAccumulationBuffer().
 */
 
 /*!
-  \fn SbBool  So@Gui@GLWidget::getStencilBuffer(void) const
+  \fn SbBool So@Gui@GLWidget::getStencilBuffer(void) const
+
   Returns whether the OpenGL stencil buffer is enabled.
+
+  The returned flag will indicate whether or not stencil buffers are
+  \e actually present, in the same manner as for
+  So@Gui@GLWidget::getAccumulationBuffer(). See documentation of
+  So@Gui@GLWidget::setStencilBuffer().
 */
 
 /*!
