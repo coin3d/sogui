@@ -46,7 +46,9 @@ SoGui_src_Inventor_Gui_common_BuiltFiles = \
 
 SoGui_src_Inventor_Gui_devices_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/devices/spwinput.h \
+  $(top_builddir)/src/Inventor/@Gui@/devices/spwinput_win32.h \
   $(top_builddir)/src/Inventor/@Gui@/devices/spwinput_x11.cpp \
+  $(top_builddir)/src/Inventor/@Gui@/devices/spwinput_win32.c \
   $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@DeviceCommon.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/SoGuiDeviceP.h \
   $(top_builddir)/src/Inventor/@Gui@/devices/So@Gui@Device.h \
@@ -250,7 +252,9 @@ SoGuiCommonDistFiles = \
   src/Inventor/@Gui@/common/gl.h.in \
   src/Inventor/@Gui@/common/soguidefs.h.in \
   src/Inventor/@Gui@/common/spwinput.h.in \
+  src/Inventor/@Gui@/common/spwinput_win32.h.in \
   src/Inventor/@Gui@/common/spwinput_x11.cpp.in \
+  src/Inventor/@Gui@/common/spwinput_win32.c.in \
   src/Inventor/@Gui@/common/devices/SoGuiDevice.cpp.in \
   src/Inventor/@Gui@/common/devices/SoGuiDeviceP.h.in \
   src/Inventor/@Gui@/common/devices/SoGuiDevice.h.in \
@@ -489,8 +493,14 @@ $(top_builddir)/src/Inventor/@Gui@/devices/SoGuiSpaceballP.h: $(top_srcdir)/src/
 $(top_builddir)/src/Inventor/@Gui@/devices/spwinput.h: $(top_srcdir)/src/Inventor/@Gui@/common/spwinput.h.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/devices/spwinput.h:src/Inventor/@Gui@/common/spwinput.h.in )
 
+$(top_builddir)/src/Inventor/@Gui@/devices/spwinput_win32.h: $(top_srcdir)/src/Inventor/@Gui@/common/spwinput_win32.h.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/devices/spwinput_win32.h:src/Inventor/@Gui@/common/spwinput_win32.h.in )
+
 $(top_builddir)/src/Inventor/@Gui@/devices/spwinput_x11.cpp: $(top_srcdir)/src/Inventor/@Gui@/common/spwinput_x11.cpp.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/devices/spwinput_x11.cpp:src/Inventor/@Gui@/common/spwinput_x11.cpp.in )
+
+$(top_builddir)/src/Inventor/@Gui@/devices/spwinput_win32.c: $(top_srcdir)/src/Inventor/@Gui@/common/spwinput_win32.c.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=src/Inventor/@Gui@/devices/spwinput_win32.c:src/Inventor/@Gui@/common/spwinput_win32.c.in )
 
 ## src/Inventor/@Gui@/editors/
 
