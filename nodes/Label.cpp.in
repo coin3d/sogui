@@ -1,0 +1,110 @@
+/**************************************************************************\
+ *
+ *  This file is part of the Coin family of 3D visualization libraries.
+ *  Copyright (C) 1998-2002 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and / or
+ *  modify it under the terms of the GNU General Public License
+ *  version 2 as published by the Free Software Foundation.  See the
+ *  file LICENSE.GPL at the root directory of this source distribution
+ *  for more details.
+ *
+ *  If you desire to use this library in software that is incompatible
+ *  with the GNU GPL, and / or you would like to take advantage of the
+ *  additional benefits with regard to our support services, please
+ *  contact Systems in Motion about acquiring a Coin Professional
+ *  Edition License.  See <URL:http://www.coin3d.org> for more
+ *  information.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, 7030 Trondheim, NORWAY
+ *  <URL:http://www.sim.no>, <mailto:support@sim.no>
+ *
+\**************************************************************************/
+
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoAsciiText.h>
+
+#include <Inventor/@Gui@/SoAny.h>
+#include <Inventor/@Gui@/nodes/SoGuiLabel.h>
+
+// *************************************************************************
+
+class Label {
+public:
+  Label(void);
+
+  SoGuiLabel * api;
+
+  SoAsciiText * text;
+
+  static const char * scene[];
+};
+
+// *************************************************************************
+
+#define PRIVATE(obj) ((Label *)this->internals)
+
+void
+SoGuiLabel::initClass(void)
+{
+  SO_KIT_INIT_CLASS(SoGuiLabel, SoBaseKit, SoBaseKit);
+}
+
+SO_KIT_SOURCE(SoGuiLabel);
+
+SoGuiLabel::SoGuiLabel(void)
+{
+  this->internals = new Label;
+  PRIVATE(this)->api = this;
+
+  SO_KIT_CONSTRUCTOR(SoGuiLabel);
+  SO_KIT_ADD_FIELD(text, (""));
+
+  SO_KIT_ADD_CATALOG_ENTRY(scene, SoSeparator, FALSE, this, "", FALSE);
+
+  SO_KIT_INIT_INSTANCE();
+
+  SoNode * scene = SoAny::loadSceneGraph(Label::scene);
+  assert(scene);
+  scene->ref();
+
+  PRIVATE(this)->text = (SoAsciiText *) SoAny::scanSceneForName(scene, "text");
+  assert(PRIVATE(this)->text);
+  PRIVATE(this)->text->string.connectFrom(&(this->text));
+
+  scene->unrefNoDelete();
+  SbBool ok = this->setAnyPart("scene", scene);
+  assert(ok);
+}
+
+SoGuiLabel::~SoGuiLabel(void)
+{
+  Label * obj = PRIVATE(this);
+  delete obj;
+}
+
+#undef PRIVATE
+
+// *************************************************************************
+
+const char *
+Label::scene[] =
+{
+  "#Inventor V2.1 ascii",
+  "",
+  "Separator {",
+  "  SoGuiTranslation { translation 1 1 0 }",
+  "  Scale { scaleFactor 1.2 1.2 1 }",
+  "  BaseColor { rgb 0 0 0 }",
+  "  DEF text AsciiText { }",
+  "}",
+  NULL
+};
+
+Label::Label(void)
+{
+  this->api = NULL;
+}
+
+// *************************************************************************
