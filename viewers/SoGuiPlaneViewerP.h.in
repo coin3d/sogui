@@ -87,7 +87,6 @@ public:
   SbBool leftshiftdown;
   SbBool rightshiftdown;
   SbBool button1down;
-  SbBool button2down;
   SbBool button3down;
 
   SbPlane panningplane;
