@@ -806,7 +806,12 @@ SbBool
 SoAnyExaminerViewer::processSoEvent(
   const SoEvent * const ev )
 {
-  // SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "[invoked]" );
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent",
+                          "[invoked], event '%s'",
+                          ev->getTypeId().getName().getString() );
+#endif // debug
+
   if ( ! viewer->isViewing() ) // event is for scene graph
     return FALSE;
 
