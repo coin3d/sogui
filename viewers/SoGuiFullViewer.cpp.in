@@ -1364,10 +1364,7 @@ SoGuiFullViewerP::drawstyleActivated(int menuitemid)
     return;
 #endif // HAVE_SORTED_LAYERS_BLEND
   default:
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo("SoGuiFullViewerP::drawStyleActivated",
-                           "Unknown transparency type");
-#endif // SO@GUI@_DEBUG
+    // some other menu item, just continue
     break;
   }
 
