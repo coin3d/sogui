@@ -34,5 +34,6 @@ SoGuiNodes::initClasses(void)
   SoGuiClickCounter::initClass();
   SoGuiSlider1::initClass();
   SoGuiSlider2::initClass();
+  SoGuiColorEditor::initClass();
 }
 

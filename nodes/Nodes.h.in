@@ -1,5 +1,5 @@
-#ifndef COIN_GUINODES_H
-#define COIN_GUINODES_H
+#ifndef COIN_SOGUINODES_H
+#define COIN_SOGUINODES_H
 
 /**************************************************************************\
  *
@@ -36,6 +36,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
+#include <Inventor/@Gui@/nodes/SoGuiColorEditor.h>
 
 class SoGuiNodes {
 public:
@@ -43,4 +44,4 @@ public:
 
 };
 
-#endif // !COIN_GUINODES_H
+#endif // !COIN_SOGUINODES_H
