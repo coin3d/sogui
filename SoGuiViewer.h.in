@@ -143,9 +143,9 @@ public:
   SbBool isAutoClipping(void) const;
 
   virtual void setStereoViewing( SbBool enable );
-  virtual SbBool isStereoViewing(void) const;
+  SbBool isStereoViewing(void) const;
 
-  void setStereoOffset( const float dist );
+  virtual void setStereoOffset( const float dist );
   float getStereoOffset(void) const;
 
   void setDetailSeek( const SbBool enable );
@@ -297,6 +297,8 @@ private:
 
   void moveCameraScreen( const SbVec2f & screenpos );
 
+  SbBool stereoviewing;
+  float stereooffset;
 }; // class So@Gui@Viewer
 
 // *************************************************************************
