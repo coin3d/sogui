@@ -145,11 +145,6 @@ protected:
   void invokeWindowCloseCallbacks(void) const;
   virtual void windowCloseAction(void);
 
-  // FIXME: should this really be protected? Same goes for the other
-  // toolkits' eventHandler() functions. They also have nameclashes
-  // with the static So*GLWidget::eventHandler() function. 20011024 mortene.
-  virtual Boolean sysEventHandler(Widget widget, XEvent * event);
-
 private:
   // FIXME: get rid of this? 20011012 mortene.
   static void event_handler(Widget, XtPointer, XEvent *, Boolean *);
