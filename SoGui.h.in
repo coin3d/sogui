@@ -38,6 +38,9 @@
 class SoGtkComponent;
 class SbPList;
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+#include <windows.h>
+#endif // __COIN_SOWIN__
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
@@ -125,6 +128,15 @@ public:
 
   static int getComponents(SbPList & components);
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+  static void init(void);
+  static BOOL dispatchEvent(MSG * msg);
+  static SbBool nextEvent(int appContext, MSG * msg);
+  static void setInstance(HINSTANCE instance);
+  static HINSTANCE getInstance(void);
+    static void errorHandlerCB(const SoError * error, void * data);
+  static void doIdleTasks(void);
+#endif // __COIN_SOWIN__
 
 
 protected:
@@ -144,6 +156,17 @@ protected:
   static gint componentDestruction(SoGtkComponent * component);
   static gint componentChange(SoGtkComponent * component);
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+  static void registerWindowClass(const char * const className);
+  static void unRegisterWindowClass(const char * const className);
+
+  static HWND createWindow(char * title, char * className,
+                           SIZE size, HWND parent = NULL, HMENU menu = NULL);
+
+  static LRESULT CALLBACK eventHandler(HWND window, UINT message,
+                                       WPARAM wparam, LPARAM lparam);
+
+#endif // __COIN_SOWIN__
 
 
 #ifdef __COIN_SOQT__
