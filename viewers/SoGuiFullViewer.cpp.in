@@ -1075,12 +1075,12 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
   //// Stereo viewing. ////////////////////////////////////////////////
   SbBool stereo = PUBLIC(this)->isStereoViewing();
   SbBool quadbuffer = PUBLIC(this)->isQuadBufferStereo();
- if (!stereo)
-  menu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
- if (stereo && !quadbuffer)
-  menu->setMenuItemMarked(STEREO_ANAGLYPH_ITEM, TRUE);
- if (stereo && quadbuffer)
-  menu->setMenuItemMarked(STEREO_QUADBUFFER_ITEM, TRUE);
+  if (!stereo)
+    menu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
+  if (stereo && !quadbuffer)
+    menu->setMenuItemMarked(STEREO_ANAGLYPH_ITEM, TRUE);
+  if (stereo && quadbuffer)
+    menu->setMenuItemMarked(STEREO_QUADBUFFER_ITEM, TRUE);
 
   //// GL canvas settings. ////////////////////////////////////////////
   switch (PUBLIC(this)->getBufferingType()) {
@@ -1094,7 +1094,10 @@ SoGuiFullViewerP::prepareMenu(So@Gui@PopupMenu * menu)
     menu->setMenuItemMarked(INTERACTIVE_BUFFER_ITEM, TRUE);
     break;
   default:
-    assert(0 && "unsupported buffer type");
+#if SO@GUI@_DEBUG
+    SoDebugError::postInfo("SoGuiFullViewerP::prepareMenu",
+                           "Unknown buffer type");
+#endif // SO@GUI@_DEBUG
     break;
   }
 }
@@ -1194,7 +1197,7 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     PUBLIC(this)->setQuadBufferStereo(TRUE);
     if (!PUBLIC(this)->isQuadBufferStereo()) {
       PUBLIC(this)->setStereoViewing(FALSE);
-      PUBLIC(this)->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
+      // PUBLIC(this)->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
     }
     break;
 
@@ -1263,7 +1266,10 @@ SoGuiFullViewerP::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
       PUBLIC(this)->prefmenu->setMenuItemMarked(BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
-      assert(0 && "unsupported default switch-case");
+#if SO@GUI@_DEBUG
+      SoDebugError::postWarning("So@Gui@FullViewer::setDrawStyleMenuActivation",
+                                "Unsupporter still-drawstyle");
+#endif // debug
       break;
     }
     break;
@@ -1295,13 +1301,19 @@ SoGuiFullViewerP::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
       PUBLIC(this)->prefmenu->setMenuItemMarked(MOVE_BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
-      assert(0 && "unsupported default switch-case");
+#if SO@GUI@_DEBUG
+      SoDebugError::postWarning("So@Gui@FullViewer::setDrawStyleMenuActivation",
+                                "Unsupporter interactive drawstyle");
+#endif // debug
       break;
     }
     break;
 
   default:
-    assert(0 && "unsupported default switch-case");
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@FullViewer::setDrawStyleMenuActivation",
+                              "Unsupporter drawstyle type");
+#endif // debug
     break;
   }
 }
