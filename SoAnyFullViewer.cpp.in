@@ -152,7 +152,6 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, POINTS_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, BOUNDING_BOX_ITEM );
-  menu->setMenuItemMarked( AS_IS_ITEM, TRUE );
 
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, AS_IS_ITEM );
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM );
@@ -193,7 +192,6 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addRadioGroupItem( MOVE_GROUP, MOVE_POINTS_ITEM );
   menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_POINTS_ITEM );
   menu->addRadioGroupItem( MOVE_GROUP, MOVE_BOUNDING_BOX_ITEM );
-  menu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
 
   menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_SAME_AS_STILL_ITEM );
   menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_NO_TEXTURE_ITEM );
@@ -236,30 +234,6 @@ SoAnyFullViewer::setupStandardPopupMenu(
                            DELAYED_BLEND_TRANSPARENCY_ITEM );
   menu->addRadioGroupItem( TRANSPARENCY_GROUP,
                            SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM );
-  switch ( this->viewer->getTransparencyType() ) {
-  case SoGLRenderAction::SCREEN_DOOR:
-    menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::ADD:
-    menu->setMenuItemMarked( ADD_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::DELAYED_ADD:
-    menu->setMenuItemMarked( DELAYED_ADD_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::SORTED_OBJECT_ADD:
-    menu->setMenuItemMarked( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::BLEND:
-    menu->setMenuItemMarked( BLEND_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::DELAYED_BLEND:
-    menu->setMenuItemMarked( DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE );
-    break;
-  case SoGLRenderAction::SORTED_OBJECT_BLEND:
-    menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
-    break;
-  default: assert( FALSE && "unknown transparency type" );
-  } // switch ( this->viewer->getTransparencyType() )
 
   menu->addMenuItem( TRANSPARENCY_TYPE_MENU, SCREEN_DOOR_TRANSPARENCY_ITEM );
   menu->addMenuItem( TRANSPARENCY_TYPE_MENU, ADD_TRANSPARENCY_ITEM );
@@ -281,11 +255,6 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
   menu->addRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
 
-  if ( this->viewer->isStereoViewing() )
-    menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
-  else
-    menu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
-  
   menu->addMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
   menu->addMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
 
@@ -303,7 +272,6 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->addRadioGroupItem( BUFFER_GROUP, SINGLE_BUFFER_ITEM );
   menu->addRadioGroupItem( BUFFER_GROUP, DOUBLE_BUFFER_ITEM );
   menu->addRadioGroupItem( BUFFER_GROUP, INTERACTIVE_BUFFER_ITEM );
-  menu->setMenuItemMarked( DOUBLE_BUFFER_ITEM, TRUE );
 
   menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, SINGLE_BUFFER_ITEM );
   menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, DOUBLE_BUFFER_ITEM );
@@ -334,6 +302,18 @@ SoAnyFullViewer::setupStandardPopupMenu(
 void
 SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
 {
+  //// Misc. //////////////////////////////////////////////////////////
+  menu->setMenuItemMarked( DECORATION_ITEM, this->viewer->isDecoration() );
+  menu->setMenuItemMarked( EXAMINING_ITEM, this->viewer->isViewing() );
+  menu->setMenuItemMarked( HEADLIGHT_ITEM, this->viewer->isHeadlight() );
+
+  //// Basic drawstyles. //////////////////////////////////////////////
+  this->setDrawStyleMenuActivation(So@Gui@FullViewer::STILL,
+                                   this->viewer->getDrawStyle(So@Gui@FullViewer::STILL));
+  this->setDrawStyleMenuActivation(So@Gui@FullViewer::INTERACTIVE,
+                                   this->viewer->getDrawStyle(So@Gui@FullViewer::INTERACTIVE));
+
+  //// Transparency setting. //////////////////////////////////////////
   switch ( this->viewer->getTransparencyType() ) {
   case SoGLRenderAction::SCREEN_DOOR:
     menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
@@ -357,6 +337,27 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
     menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
     break;
   default: assert( FALSE && "unknown transparency type" );
+  }
+
+  //// Stereo viewing. ////////////////////////////////////////////////
+  SbBool stereo = this->viewer->isStereoViewing();
+  menu->setMenuItemMarked( STEREO_OFF_ITEM, !stereo );
+  menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, stereo );
+
+  //// GL canvas settings. ////////////////////////////////////////////
+  switch ( this->viewer->getBufferingType() ) {
+  case So@Gui@Viewer::BUFFER_SINGLE:
+    menu->setMenuItemMarked( SINGLE_BUFFER_ITEM, TRUE );
+    break;
+  case So@Gui@Viewer::BUFFER_DOUBLE:
+    menu->setMenuItemMarked( DOUBLE_BUFFER_ITEM, TRUE );
+    break;
+  case So@Gui@Viewer::BUFFER_INTERACTIVE:
+    menu->setMenuItemMarked( INTERACTIVE_BUFFER_ITEM, TRUE );
+    break;
+  default:
+    assert( 0 && "unsupported buffer type" );
+    break;
   }
 }
 
@@ -450,11 +451,9 @@ SoAnyFullViewer::menuSelection( // virtual
     break;
 
   case STEREO_OFF_ITEM:    
-    this->prefmenu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
     this->viewer->setStereoViewing(FALSE);
     break;
   case STEREO_ANAGLYPH_ITEM:
-    this->prefmenu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
     this->viewer->setStereoViewing(TRUE);
     break;
     
@@ -585,31 +584,24 @@ SoAnyFullViewer::drawstyleActivated(
   switch ( menuitemid ) {
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::SCREEN_DOOR );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case ADD_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::ADD );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case DELAYED_ADD_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_ADD );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_ADD );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case BLEND_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::BLEND );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case DELAYED_BLEND_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_BLEND );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
     this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
-    this->viewer->prefmenu->setMenuItemMarked( menuitemid, TRUE );
     return;
   default:
     break;
