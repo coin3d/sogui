@@ -115,7 +115,7 @@ SceneTexture2::scene_updated_cb(void * closure, SoSensor * sensor)
     if ( me->renderer == NULL ) {
       me->renderer = new SoOffscreenRenderer(SbViewportRegion(size));
       me->renderer->setComponents(SoOffscreenRenderer::RGB);
-      me->renderer->getGLRenderAction()->setTransparencyType(SoGLRenderAction::ADD);
+      me->renderer->getGLRenderAction()->setTransparencyType(SoGLRenderAction::BLEND);
       me->prevsize = size;
       PUBLIC(me)->image.setValue(size, 3, NULL);
     }
