@@ -21,8 +21,6 @@
  *
 \**************************************************************************/
 
-// $Id$
-
 #ifndef SO@GUI@_GLWIDGET_H
 #define SO@GUI@_GLWIDGET_H
 
@@ -41,11 +39,7 @@
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
 #include <windows.h>
-class SoWinGLArea;
 #endif // __COIN_SOWIN__
-#ifdef __COIN_SOMAC__
-// WORK-IN-PROGRESS
-#endif // __COIN_SOMAC__
 
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
@@ -122,9 +116,6 @@ public:
   virtual void setPixelFormat(int format);
   int getPixelFormat(void);
 #endif // __COIN_SOWIN__
-#ifdef __COIN_SOMAC__
-  // WORK-IN-PROGRESS
-#endif // __COIN_SOMAC__
 
   SbBool hasOverlayGLArea(void) const;
   SbBool hasNormalGLArea(void) const;
@@ -199,13 +190,7 @@ protected:
   HWND getManagerWidget(void);
   HWND parent;
   HWND toplevel;
-  SbBool makeNormalCurrent(void);
-  SbBool swapNormalBuffers(void);
-  SbBool swapOverlayBuffers(void);
 #endif // __COIN_SOWIN__
-#ifdef __COIN_SOMAC__
-  // WORK-IN-PROGRESS
-#endif // __COIN_SOMAC__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
@@ -231,7 +216,7 @@ private:
 
   void buildGLWidget(void); // FIXME: could we get rid of this? 20011012 mortene.
 
-}; // class So@Gui@GLWidget
+};
 
 // *************************************************************************
 
