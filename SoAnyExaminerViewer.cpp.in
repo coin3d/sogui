@@ -68,8 +68,9 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   this->lastspinposition = SbVec2f( 0.0f, 0.0f );
   this->spintimertrigger =
     new SoTimerSensor( SoAnyExaminerViewer::spintimertriggeredCB, this );
-  // FIXME: should set to vrefresh rate instead? 19990425 mortene.
-  this->spintimertrigger->setInterval( 1.0f / 30.0f );
+  // FIXME: should instead trigger a new redraw _immediately_ after a
+  // redraw has finished to always get the maximum framerate. 20000512 mortene.
+  this->spintimertrigger->setInterval( 1.0f / 90.0f );
 
   // FIXME: use a smaller sphere than the default one to have a larger
   // area close to the borders that gives us "z-axis rotation"?
