@@ -32,6 +32,9 @@ public:
     SoCamera * const camera );
   static float transXWheelMotion( const float value, const float oldvalue,
     SoCamera * const camera );
+  static void viewPlaneX( SoCamera * const camera );
+  static void viewPlaneY( SoCamera * const camera );
+  static void viewPlaneZ( SoCamera * const camera );
 
 }; // class SoAnyPlaneViewer
 

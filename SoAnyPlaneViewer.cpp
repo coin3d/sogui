@@ -69,3 +69,56 @@ SoAnyPlaneViewer::transXWheelMotion( // static
 } // transXWheelMotion()
 
 // ************************************************************************
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::viewPlaneX( // static
+  SoCamera * const camera )
+{
+  assert( camera != NULL );
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+  SbVec3f focalpoint = camera->position.getValue() +
+    camera->focalDistance.getValue() * dir;
+  camera->position = focalpoint +
+    camera->focalDistance.getValue() * SbVec3f( 1, 0, 0 );
+  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), SB_PI/2.0f );
+} // viewPlaneX()
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::viewPlaneY( // static
+  SoCamera * const camera )
+{
+  assert( camera != NULL );
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+  SbVec3f focalpoint = camera->position.getValue() +
+    camera->focalDistance.getValue() * dir;
+  camera->position = focalpoint +
+    camera->focalDistance.getValue() * SbVec3f( 0, 1, 0 );
+  camera->orientation = SbRotation( SbVec3f( 1, 0, 0 ), -SB_PI/2.0f );
+} // viewPlaneY()
+
+/*!
+*/
+
+void
+SoAnyPlaneViewer::viewPlaneZ( // static
+  SoCamera * const camera )
+{
+  assert( camera != NULL );
+  SbVec3f dir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+  SbVec3f focalpoint = camera->position.getValue() +
+    camera->focalDistance.getValue() * dir;
+  camera->position = focalpoint +
+    camera->focalDistance.getValue() * SbVec3f( 0, 0, 1 );
+  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), 0 );
+} // viewPlaneZ()
+
+// ************************************************************************
