@@ -164,7 +164,6 @@ public:
   // Keep track of the frames-per-second counter.
   // Const value trick for old compilers.
   enum Constants { FRAMESARRAY_SIZE = 100 };
-  double lasttimeofday;
   double frames[FRAMESARRAY_SIZE];
   double totalval;
   double currentframetime;
@@ -197,7 +196,7 @@ public:
   // Methods to keep track of frames-per-second value.
   void resetFrameCounter(void);
   void addFrametime(const double ft);
-  void recordFPS(void);
+  void recordFPS(const double rendertime);
 
   // Misc
   static void interactivestartCB(void *, So@Gui@Viewer * thisp);
@@ -2106,6 +2105,8 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 void
 So@Gui@Viewer::actualRedraw(void)
 {
+  SbTime redrawtime = SbTime::getTimeOfDay();
+
   // Recalculate near/far planes.
   if (this->isAutoClipping())
     PRIVATE(this)->setClippingPlanes();
@@ -2255,8 +2256,9 @@ So@Gui@Viewer::actualRedraw(void)
     if (!first && zWasEnabled) glEnable(GL_DEPTH_TEST);
   }
 
-  if (this->getInteractiveCount() > 0) { PRIVATE(this)->recordFPS(); }
-} // actualRedraw()
+  redrawtime = SbTime::getTimeOfDay() - redrawtime;
+  PRIVATE(this)->recordFPS(redrawtime.getValue());
+}
 
 // *************************************************************************
 
@@ -3000,7 +3002,6 @@ So@Gui@ViewerP::resetFrameCounter(void)
     this->frames[i] = 0.0;
   this->totalval = 0.0;
   this->currentframetime = 0.0;
-  this->lasttimeofday = 0.0;
 }
 
 /*!
@@ -3199,7 +3200,7 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
   \sa resetFrameCounter(), addFrametime()
 */
 void
-So@Gui@ViewerP::recordFPS(void)
+So@Gui@ViewerP::recordFPS(const double rendertime)
 {
   if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
     const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
@@ -3207,24 +3208,12 @@ So@Gui@ViewerP::recordFPS(void)
   }
 
   if (COIN_SHOW_FPS_COUNTER) {
-    double frametime, timeofday = SbTime::getTimeOfDay().getValue();
-    if((this->lasttimeofday == 0.0) ||
-       ((timeofday - this->lasttimeofday) > 1.0)) {
-      this->resetFrameCounter();
+    this->addFrametime(rendertime);
 
-      frametime = 0.0;
-      this->lasttimeofday = timeofday;
-    }
-    else {
-      frametime = timeofday - this->lasttimeofday;
-      this->lasttimeofday = timeofday;
-      this->addFrametime(frametime);
-
-      char buffer[64];
-      int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
-      assert(nr < 64);
-      Draw2DString(buffer, pub->getGLSize(), SbVec2f(10, 10));
-    }
+    char buffer[64];
+    int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
+    assert(nr < 64);
+    Draw2DString(buffer, pub->getGLSize(), SbVec2f(10, 10));
   }
 }
 
