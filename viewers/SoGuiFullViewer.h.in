@@ -232,8 +232,6 @@ public:
 
   @WIDGET@ getRenderAreaWidget(void) const;
 
-  // internal
-  // These are overloaded to update user interface components.
   virtual void setViewing(SbBool on);
   virtual void setCamera(SoCamera * cam);
   virtual void hide(void);
@@ -241,82 +239,13 @@ public:
   virtual void setComponentCursor(const So@Gui@Cursor & cursor);
 
 protected:
-  So@Gui@FullViewer(
-    @WIDGET@ parent,
-    const char * name,
-    SbBool embed,
-    BuildFlag flag,
-    Type type,
-    SbBool build);
-  ~So@Gui@FullViewer(void);
-
-#ifdef __COIN_SOQT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
-  virtual bool eventFilter(QObject * obj, QEvent * e);
-  virtual void afterRealizeHook(void);
-  virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
-#endif // __COIN_SOQT__
-
-#ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
-  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
-  virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
-#endif // __COIN_SOGTK__
-
-#ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
-  Widget buildAppButtonsForm(Widget parent);
-
-  Widget buildFunctionsSubmenu(Widget popup);
-  Widget buildDrawStyleSubmenu(Widget popup);
-
-  static void leftWheelStartCB(Widget, XtPointer, XtPointer);
-  static void leftWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void leftWheelFinishCB(Widget, XtPointer, XtPointer);
-
-  static void bottomWheelStartCB(Widget, XtPointer, XtPointer);
-  static void bottomWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void bottomWheelFinishCB(Widget, XtPointer, XtPointer);
-
-  static void rightWheelStartCB(Widget, XtPointer, XtPointer);
-  static void rightWheelMotionCB(Widget, XtPointer, XtPointer);
-  static void rightWheelFinishCB(Widget, XtPointer, XtPointer);
-
-  char * prefstring;
-  char * popupTitle;
-  SbBool popupEnabled;
-  SbPList * viewerButtonWidgets;
-
-  Pixmap createPixmapFromXpmData(Widget button, char ** xpm);
-  Pixmap createInsensitivePixmapFromXpmData(Widget button, char ** xpm);
-  Widget prefshell;
-  Widget prefsheet;
-
-  virtual void createPrefSheet(void);
-  void createPrefSheetShellAndForm(Widget & shell, Widget & form);
-  void createDefaultPrefSheetParts(Widget * widgets, int & num, Widget form);
-  void layoutPartsAndMapPrefSheet(Widget * widgets, int num, Widget form, Widget shell);
-
-  Widget createSeekPrefSheetGuts(Widget parent);
-  Widget createSeekDistPrefSheetGuts(Widget parent);
-  Widget createZoomPrefSheetGuts(Widget parent);
-  Widget createClippingPrefSheetGuts(Widget parent);
-  Widget createStereoPrefSheetGuts(Widget parent);
-  Widget createSpeedPrefSheetGuts(Widget parent);
-
-  Widget createFramedSeekPrefSheetGuts(Widget parent);
-  Widget createFramedSeekDistPrefSheetGuts(Widget parent);
-  Widget createFramedZoomPrefSheetGuts(Widget parent);
-  Widget createFramedClippingPrefSheetGuts(Widget parent);
-  Widget createFramedStereoPrefSheetGuts(Widget parent);
-  Widget createFramedSpeedPrefSheetGuts(Widget parent);
-
-  void prefSheetDestroy(void);
-  static void prefSheetDestroyCB(Widget, XtPointer, XtPointer);
-  void seekPrefSheetField(void);
-  static void seekPrefSheetFieldCB(Widget, XtPointer, XtPointer);
-  void seekPrefSheetToggle1(void);
-  static void seekPrefSheetToggle1CB(Widget, XtPointer, XtPointer);
-  void seekPrefSheetToggle2(void);
-  static void seekPrefSheetToggle2CB(Widget, XtPointer, XtPointer);
-#endif // __COIN_SOXT__
+  So@Gui@FullViewer(@WIDGET@ parent,
+                    const char * name,
+                    SbBool embed,
+                    BuildFlag flag,
+                    Type type,
+                    SbBool build);
+  ~So@Gui@FullViewer();
 
   virtual void sizeChanged(const SbVec2s & size);
 
@@ -387,8 +316,25 @@ protected:
 
   So@Gui@PopupMenu * prefmenu;
 
+private:
+  SoAnyFullViewer * common;
 
-#ifdef __COIN_SOQT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+  // Private class for implementation hiding. The idiom we're using is
+  // a variant of what is known as the "Cheshire Cat", and is also
+  // described as the "Bridge" pattern in «Design Patterns» by Gamma
+  // et al (aka The Gang Of Four).
+  class So@Gui@FullViewerP * pimpl;
+  friend class So@Gui@FullViewerP;
+
+
+// FIXME: get rid of non-templatized code. 20020108 mortene.
+
+#ifdef __COIN_SOQT__
+protected:
+  virtual bool eventFilter(QObject * obj, QEvent * e);
+  virtual void afterRealizeHook(void);
+  virtual @WIDGET@ makeSubPreferences(@WIDGET@ parent);
+
 private:
   @WIDGET@ makePreferencesWindow(void);
   @WIDGET@ makeSeekPreferences(@WIDGET@ parent);
@@ -462,6 +408,62 @@ private slots:
 #endif // __COIN_SOQT__
 
 #ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+protected:
+  Widget buildAppButtonsForm(Widget parent);
+
+  Widget buildFunctionsSubmenu(Widget popup);
+  Widget buildDrawStyleSubmenu(Widget popup);
+
+  static void leftWheelStartCB(Widget, XtPointer, XtPointer);
+  static void leftWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void leftWheelFinishCB(Widget, XtPointer, XtPointer);
+
+  static void bottomWheelStartCB(Widget, XtPointer, XtPointer);
+  static void bottomWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void bottomWheelFinishCB(Widget, XtPointer, XtPointer);
+
+  static void rightWheelStartCB(Widget, XtPointer, XtPointer);
+  static void rightWheelMotionCB(Widget, XtPointer, XtPointer);
+  static void rightWheelFinishCB(Widget, XtPointer, XtPointer);
+
+  char * prefstring;
+  char * popupTitle;
+  SbBool popupEnabled;
+  SbPList * viewerButtonWidgets;
+
+  Pixmap createPixmapFromXpmData(Widget button, char ** xpm);
+  Pixmap createInsensitivePixmapFromXpmData(Widget button, char ** xpm);
+  Widget prefshell;
+  Widget prefsheet;
+
+  virtual void createPrefSheet(void);
+  void createPrefSheetShellAndForm(Widget & shell, Widget & form);
+  void createDefaultPrefSheetParts(Widget * widgets, int & num, Widget form);
+  void layoutPartsAndMapPrefSheet(Widget * widgets, int num, Widget form, Widget shell);
+
+  Widget createSeekPrefSheetGuts(Widget parent);
+  Widget createSeekDistPrefSheetGuts(Widget parent);
+  Widget createZoomPrefSheetGuts(Widget parent);
+  Widget createClippingPrefSheetGuts(Widget parent);
+  Widget createStereoPrefSheetGuts(Widget parent);
+  Widget createSpeedPrefSheetGuts(Widget parent);
+
+  Widget createFramedSeekPrefSheetGuts(Widget parent);
+  Widget createFramedSeekDistPrefSheetGuts(Widget parent);
+  Widget createFramedZoomPrefSheetGuts(Widget parent);
+  Widget createFramedClippingPrefSheetGuts(Widget parent);
+  Widget createFramedStereoPrefSheetGuts(Widget parent);
+  Widget createFramedSpeedPrefSheetGuts(Widget parent);
+
+  void prefSheetDestroy(void);
+  static void prefSheetDestroyCB(Widget, XtPointer, XtPointer);
+  void seekPrefSheetField(void);
+  static void seekPrefSheetFieldCB(Widget, XtPointer, XtPointer);
+  void seekPrefSheetToggle1(void);
+  static void seekPrefSheetToggle1CB(Widget, XtPointer, XtPointer);
+  void seekPrefSheetToggle2(void);
+  static void seekPrefSheetToggle2CB(Widget, XtPointer, XtPointer);
+
 private:
   void selectedViewing(void);
   void selectedDecoration(void);
@@ -581,6 +583,10 @@ private:
 #endif // __COIN_SOXT__
 
 #ifdef __COIN_SOGTK__ // FIXME: get rid of non-templatized code. 20020108 mortene.
+protected:
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+  virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
+
 private:
   // hooks for SoAnyFullViewer
 
@@ -601,17 +607,6 @@ private:
   void viewallbuttonClicked(void);
   void seekbuttonClicked(void);
 #endif // __COIN_SOGTK__
-
-
-private:
-  SoAnyFullViewer * common;
-
-  // Private class for implementation hiding. The idiom we're using is
-  // a variant of what is known as the "Cheshire Cat", and is also
-  // described as the "Bridge" pattern in «Design Patterns» by Gamma
-  // et al (aka The Gang Of Four).
-  class So@Gui@FullViewerP * pimpl;
-  friend class So@Gui@FullViewerP;
 };
 
 // *************************************************************************
