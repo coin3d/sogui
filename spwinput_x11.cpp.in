@@ -25,6 +25,8 @@
 #define SPW_DEBUG 1
 #endif // debug
 
+#include "spwinput.h"
+
 #if X_DISPLAY_MISSING
 /* just provide empty methods if X is not available */
 SbBool 
@@ -77,8 +79,6 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 #if HAVE_X11_EXTENSIONS_XINPUT_H
 #include <X11/extensions/XInput.h>
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
-
-#include "spwinput.h"
 
 
 /* Callbacks for handling motion and button events */
