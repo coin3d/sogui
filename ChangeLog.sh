@@ -35,5 +35,5 @@ cvs log | $cvs2cl --stdin --header $headerfile --separate-header --prune \
 
 rm -f ChangeLog.bak $headerfile
 
-cvs commit -m "Automatic ChangeLog generation" ChangeLog
+#cvs commit -m "Automatic ChangeLog generation" ChangeLog
 

@@ -155,7 +155,7 @@ void
 So@Gui@ConstrainedViewer::setCamera(SoCamera * newcam)
 {
   inherited::setCamera(newcam);
-  this->checkForCameraUpConstrain();
+  if (newcam != NULL) { this->checkForCameraUpConstrain(); }
 }
 
 // ************************************************************************
