@@ -50,34 +50,34 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Keyboard);
 // *************************************************************************
 
 /*!
-  \enum SoQtKeyboard::Events
+  \enum So@Gui@Keyboard::Events
   Enumeration over supported event types.
 */
 
 /*!
-  \var SoQtKeyboard::Events SoQtKeyboard::KEY_PRESS
+  \var So@Gui@Keyboard::Events So@Gui@Keyboard::KEY_PRESS
   Maskbit for a keyboard button press event.
 */
 
 /*!
-  \var SoQtKeyboard::Events SoQtKeyboard::KEY_RELEASE
+  \var So@Gui@Keyboard::Events So@Gui@Keyboard::KEY_RELEASE
   Maskbit for a keyboard button release event.
 */
 
 /*!
-  \var SoQtKeyboard::Events SoQtKeyboard::ALL_EVENTS
+  \var So@Gui@Keyboard::Events So@Gui@Keyboard::ALL_EVENTS
   Combined bitmask for all possible events.
 */
 
 /*!
-  \fn SoQtKeyboard::SoQtKeyboard(int mask)
+  \fn So@Gui@Keyboard::So@Gui@Keyboard(int mask)
 
   Constructor. The \a mask specifies which keyboard-related events to
   handle. Others will just be ignored.
 */
 
 /*!
-  \fn SoQtKeyboard::~SoQtKeyboard()
+  \fn So@Gui@Keyboard::~So@Gui@Keyboard()
 
   Destructor.
 */
