@@ -147,6 +147,7 @@ public:
   SoFieldSensor * sensor_h;
   SoFieldSensor * sensor_s;
   SoFieldSensor * sensor_v;
+  SoFieldSensor * sensor_wheel;
 
   static void update_r_cb(void * closure, SoSensor * sensor);
   static void update_g_cb(void * closure, SoSensor * sensor);
@@ -154,6 +155,7 @@ public:
   static void update_h_cb(void * closure, SoSensor * sensor);
   static void update_s_cb(void * closure, SoSensor * sensor);
   static void update_v_cb(void * closure, SoSensor * sensor);
+  static void update_wheel_cb(void * closure, SoSensor * sensor);
 
   static const char * superscene[];
   static const char * editorscene[];
@@ -436,6 +438,11 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
   }
 
   if ( PRIVATE(this)->slider_wheel ) {
+    PRIVATE(this)->slider_wheel->ref();
+    PRIVATE(this)->sensor_wheel = new SoFieldSensor(ColorEditor::update_wheel_cb, PRIVATE(this));
+    PRIVATE(this)->sensor_wheel->setPriority(0);
+    PRIVATE(this)->sensor_wheel->attach(&(PRIVATE(this)->slider_wheel->value));
+
     SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_wheel, "surfaceTexture", SoTexture2);
     assert(texture);
     SbVec2s size(256, 256);
@@ -467,6 +474,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
       }
     }
     texture->image.finishEditing();
+
   }
   this->setSceneGraph(PRIVATE(this)->editor);
   PRIVATE(this)->editor->unref();
@@ -979,6 +987,31 @@ ColorEditor::update_v_cb(void * closure, SoSensor * sensor)
   SbColor color = PUBLIC(me)->getColor();
   color.getHSVValue(h, s, v);
   v = me->slider_v->value.getValue();
+  color.setHSVValue(h, s, v);
+  PUBLIC(me)->setColor(color);
+}
+
+void
+ColorEditor::update_wheel_cb(void * closure, SoSensor * sensor)
+{
+  ColorEditor * me = (ColorEditor *) closure;
+  if ( me->updating ) return;
+  SbVec2f value = me->slider_wheel->value.getValue();
+  value = value * 2.0f - SbVec2f(1.0f, 1.0f);
+  if ( value.length() > 1.0f ) {
+    value.normalize();
+    SbVec2f reverse = (value + SbVec2f(1.0f, 1.0f)) / 2.0f;
+    me->slider_wheel->value.setValue(reverse);
+  }
+  float h;
+  if ( value[0] == 0.0f ) h = ((value[1] < 0.0f) ? 3.0f : 1.0f) * M_PI / 2.0f;
+  else h = (float) atan(value[1] / value[0]);
+  if ( value[0] < 0.0f ) h += M_PI; 
+  if ( h < 0.0f ) h += (2.0 * M_PI);
+  h /= 2.0f * M_PI; 
+  float s = SbMax(value.length(), 1.0f); // float precision bugfix
+  float v = 1.0f;
+  SbColor color;
   color.setHSVValue(h, s, v);
   PUBLIC(me)->setColor(color);
 }
