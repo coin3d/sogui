@@ -64,6 +64,8 @@ public:
   const SoMaterial & getMaterial(void) const;
   SbBool isAttachedVRML(void);
 
+  SoGuiMaterialEditor * getEditor(void) const;
+
 protected:
   So@Gui@MaterialEditor(@WIDGET@ parent, const char * const name, SbBool embed, SbBool build);
 
