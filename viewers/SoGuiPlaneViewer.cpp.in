@@ -341,11 +341,11 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 void
 So@Gui@PlaneViewer::actualRedraw(void)
 {
-  inherited::actualRedraw();
-
   if (PRIVATE(this)->mode == SoGuiPlaneViewerP::ROTZ_MODE) {
-    PRIVATE(this)->drawRotateGraphics();
+    PRIVATE(this)->updateAnchorScenegraph();
   }
+
+  inherited::actualRedraw();
 }
 
 // ************************************************************************
@@ -774,9 +774,10 @@ SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
   return nowradval - thenradval;
 }
 
-// This method draws the rotate-"anchor".
+// This method updates the contents of the scenegraph which renders
+// the rotate-"anchor".
 void
-SoGuiPlaneViewerP::drawRotateGraphics(void) const
+SoGuiPlaneViewerP::updateAnchorScenegraph(void) const
 {
   static SbBool first = TRUE;
   if (first) {

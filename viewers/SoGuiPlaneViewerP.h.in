@@ -56,7 +56,7 @@ public:
   float getPointerOrigoAngle(void) const;
   float getPointerOrigoMotionAngle(void) const;
 
-  void drawRotateGraphics(void) const;
+  void updateAnchorScenegraph(void) const;
 
   enum PlaneViewerMode {
     SCENEGRAPH_INTERACT_MODE,
