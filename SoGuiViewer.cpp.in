@@ -182,8 +182,12 @@ public:
   SbBool adjustclipplanes;
 
   // Keep track of the frames-per-second counter.
-  enum { FRAMESARRAY_SIZE = 100 }; // Const value trick for old compilers.
-  double lasttimeofday, frames[FRAMESARRAY_SIZE], totalval, currentframetime;
+  // Const value trick for old compilers.
+  enum Constants { FRAMESARRAY_SIZE = 100 };
+  double lasttimeofday;
+  double frames[FRAMESARRAY_SIZE];
+  double totalval;
+  double currentframetime;
   int framecount;
 
   // Misc
