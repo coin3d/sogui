@@ -79,7 +79,7 @@ ThumbWheel::ThumbWheel(
   green = 180;
   blue = 220;
   
-  light = 1.6f;
+  light = 1.3f;
   front = 1.2f;
   normal = 1.0f;
   shade = 0.8f;
@@ -452,6 +452,18 @@ ThumbWheel::Validate( // private
 
 // ************************************************************************
 
+inline int
+swapWord(
+  int orig )
+{
+  int copy = 0;
+  copy |= (orig & 0x000000ff) << 24;
+  copy |= (orig & 0x0000ff00) << 8;
+  copy |= (orig & 0x00ff0000) >> 8;
+  copy |= (orig & 0xff000000) >> 24;
+  return copy;
+} // swapWord()
+
 /*!
   This method draws a wheel that has been disabled from being rotated.
 */
@@ -469,20 +481,25 @@ ThumbWheel::DrawDisabledWheel( // private
   unsigned int * buffer = (unsigned int *) bitmap;
 
   for ( int j = 0; j < this->diameter; j++ ) {
-    unsigned int light, normal, shade;
+    unsigned int light, front, normal, shade;
     light  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 1.15f) );
+    front = 0;
     normal = (unsigned int) floor(255.0f * this->tables[SIN][j]);
     shade  = (unsigned int) floor(255.0f * this->tables[SIN][j] * 0.85f);
+
+    // rgbx
+    light  =  (light << 24) |  (light << 16) |  (light << 8);
+    front  =  (front << 24) |  (front << 16) |  (front << 8);
+    normal = (normal << 24) | (normal << 16) | (normal << 8);
+    shade  =  (shade << 24) |  (shade << 16) |  (shade << 8);
+
     if ( this->byteorder == ABGR ) {
-      // FIXME: use disabledblue / disabledgreen / disabledred;
-      light  =  light |  (light << 8) |  (light << 16);
-      normal = normal | (normal << 8) | (normal << 16);
-      shade  =  shade |  (shade << 8) |  (shade << 16);
-    } else {
-      light  =  (light << 24) |  (light << 16) |  (light << 8);
-      normal = (normal << 24) | (normal << 16) | (normal << 8);
-      shade  =  (shade << 24) |  (shade << 16) |  (shade << 8);
+      light  = swapWord(  light );
+      front  = swapWord(  front );
+      normal = swapWord( normal );
+      shade  = swapWord(  shade );
     }
+
     if ( vertical == true ) {
       buffer[j*this->width] = light;
       for ( int i = 1; i < (width - 1); i++ )
@@ -524,94 +541,101 @@ ThumbWheel::DrawEnabledWheel(
   bool newsquare = true;
   unsigned int * buffer = (unsigned int *) bitmap;
   for ( int j = 0; j < this->diameter; j++ ) {
-    unsigned int light, normal, shade;
-    light  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 1.15f) );
-    normal = (unsigned int) floor(255.0f * this->tables[SIN][j]);
-    shade  = (unsigned int) floor(255.0f * this->tables[SIN][j] * 0.85f);
+    unsigned int light, front, normal, shade, color;
 
+    light  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->light) ) << 24) +
+             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->light) ) << 16) +
+             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->light) ) << 8);
+    front  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->front) ) << 24) +
+             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->front) ) << 16) +
+             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->front) ) << 8);
+    normal = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->normal) ) << 24) +
+             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->normal) ) << 16) +
+             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->normal) ) << 8);
+    shade  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->shade) ) << 24) +
+             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->shade) ) << 16) +
+             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->shade) ) << 8);
+
+    if ( this->byteorder == ABGR ) {
+      light   = swapWord( light );
+      normal  = swapWord( normal );
+      front   = swapWord( front );
+      shade   = swapWord( shade );
+    }
+
+    static bool flag = false;
     if ( newsquare ) {
-      normal = 0x00000000;
+      color=front;
       newsquare = false;
+      flag = true;
     } else {
-      normal = 0x00ffffff;
+      if ( flag == true ) {
+        if ( j < (this->diameter * 2 / 3) )
+          color = shade;
+        else
+          color = normal;
+        flag = false;
+      } else {
+        color = normal;
+      }
     }
 
     if ( vertical == true ) {
-      for ( int i = 0; i < (this->width); i++ )
-        buffer[(j*this->width)+i] = normal;
-    } else {
-      for ( int i = 0; i < (this->width); i++ )
-        buffer[j+(i*this->diameter)] = normal;
-    }
- 
+      buffer[(this->width*j)] = front;
+      buffer[(this->width*j)+1] = front;
+      if ( flag == true ) buffer[(this->width*j)+2] = front;
+      else                buffer[(this->width*j)+2] = shade;
 
+      for ( int i = 3; i < (this->width-2); i++ )
+        buffer[(j*this->width)+i] = color;
+
+      if ( flag == true ) buffer[(this->width*j)+this->width-3] = front;
+      else                buffer[(this->width*j)+this->width-3] = normal;
+      buffer[(this->width*j)+this->width-2] = front;
+      buffer[(this->width*j)+this->width-1] = front;
+    } else {
+
+      buffer[j] = front;
+      buffer[j+this->diameter] = front;
+      if ( flag == true ) buffer[j+(this->diameter*2)] = front;
+      else                buffer[j+(this->diameter*2)] = shade;
+
+      for ( int i = 2; i < (this->width-2); i++ )
+        buffer[j+(i*this->diameter)] = color;
+
+      if ( flag == true ) buffer[j+(this->diameter*(this->width-3))] = front;
+      else                buffer[j+(this->diameter*(this->width-3))] = normal;
+      buffer[j+(this->diameter*(this->width-2))] = front;
+      buffer[j+(this->diameter*(this->width-1))] = front;
+    }
 
     if ( j < (this->diameter - 1) ) {
       radian += this->tables[RAD][j+1] - this->tables[RAD][j];
       if ( radian > modulo ) {
+        if ( vertical == true ) {
+          int color = 0;
+          if ( j > (this->diameter * 2 / 3) )
+            color = light;
+          else if ( j > (this->diameter / 3) )
+            color = front;
+          if ( color != 0 )
+            for ( int i = 3; i < (this->width-2); i++ )
+              buffer[(j*this->width)+i] = color;
+        } else {
+          int color = 0;
+          if ( j > (this->diameter * 2 / 3) )
+            color = light;
+          else if ( j > (this->diameter / 3) )
+            color = front;
+          if ( color != 0 )
+            for ( int i = 3; i < (this->width-2); i++ )
+              buffer[j+(this->diameter*i)] = color;
+        }
         radian = fmod( radian, modulo );
         newsquare = true;
       }
     }
-
   }
-/*
-  enum LineMode {
-    LINE_SQUARE,
-    LINE_SHADE_ALIAS,
-    LINE_SHADE,
-    LINE_FRONT,
-    LINE_LIGHT_ALIAS,
-    LINE_LIGHT
-  };
-
-  float totlen = squarelength + squarespacing + shadelength;
-
-  LineMode mode = LINE_SHADE;
-  for ( int i = 0; i < this->diameter; i++ ) {
-    // bright edges
-    float factor = front * sines[i];
-    SetColor( int8c(factor*red), int8c(factor*green), int8c(factor*blue) );
-    StrokeLine( 0, i, 1, i );
-    StrokeLine( width - 1, i, width, i );
-
-    // sunken-square pattern
-    float pixpos = metrics[i] + fmod( -value, totlen );
-    float squarepos = fmod( pixpos, totlen );
-    float shadefact = float(i)/float(diameter);
-    float lightfact = 1.0f - shadefact;
-    if ( squarepos <= squarelength ) {
-        if ( mode == LINE_FRONT && lightfact > 0.25f )
-          factor = light * sines[i];
-        else
-          factor = normal * sines[i];
-        mode = LINE_SQUARE;
-    } else if ( squarepos <= (squarelength + (shadelength * shadefact) ) ) {
-        // antialiased shading
-        factor = shade * sines[i] * shadefact + normal * sines[i] * lightfact;
-        mode = LINE_SHADE_ALIAS;
-    } else if ( squarepos <= (squarelength + shadelength) ) {
-        factor = shade * sines[i];
-        mode = LINE_SHADE;
-    } else if ( squarepos <= (squarelength + (shadelength * shadefact) + squarespacing) ) {
-        if ( mode == LINE_SQUARE && shadefact > 0.25f )
-          factor = shade * sines[i];
-        else
-          factor = front * sines[i];
-        mode = LINE_FRONT;
-    } else if ( squarepos <= (squarelength + (shadelength * lightfact) + squarespacing) ) {
-        // antialiased light
-        factor = front * sines[i] * shadefact + light * sines[i] * lightfact;
-        mode = LINE_LIGHT_ALIAS;
-    } else {
-        factor = light * sines[i];
-        mode = LINE_LIGHT;
-    }
-
-    SetColor( int8clamp(factor*red), int8clamp(factor*green), int8clamp(factor*blue) );
-    StrokeLine( 2, i, this->width - 2, i );
-  }
-*/
 } // DrawEnabledWheel()
 
 // ************************************************************************
