@@ -95,7 +95,7 @@ Label::scene[] =
   "",
   "Separator {",
   "  SoGuiTranslation { translation 1 1 0 }",
-  "  Scale { scaleFactor 1.2 1.2 1 }",
+  "  Scale { scaleFactor 1.5 1.5 1 }",
   "  BaseColor { rgb 0 0 0 }",
   "  DEF text AsciiText { }",
   "}",
