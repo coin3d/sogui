@@ -235,6 +235,12 @@ do
             ;;
         esac
       done
+      if test -z "$objs"; then
+        echo >&2 "$usage"
+        echo >&2 ""
+        echo >&2 "$me: no object files"
+        exit 1
+      fi
       echo $compiler $CPPFLAGS $cppflags $CXXFLAGS $cxxflags \
         $LDFLAGS $ldflags $extraldflags \
         -o $progname $objs $extralibs $libs $LIBS \
