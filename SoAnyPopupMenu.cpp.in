@@ -159,7 +159,7 @@ SoAnyPopupMenu::SetMenuItemMarked(
       groupsize++;
   }
   if ( this->menu->GetMenuItemMarked( itemid ) == marked ) {
-#if SO@uGUI@_DEBUG
+#if SO@uGUI@_DEBUG && 0
     SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
       "Marked state already '%s'.", marked ? "on" : "off" );
 #endif // SO@uGUI@_DEBUG
