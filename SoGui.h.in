@@ -38,13 +38,13 @@ class SbPList;
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
 #include <windows.h>
-#include <Inventor/SoDB.h>
-#include <Inventor/errors/SoDebugError.h>
 #endif // __COIN_SOWIN__
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>
 #include <Inventor/SbString.h>
+#include <Inventor/SoDB.h>
+#include <Inventor/errors/SoDebugError.h>
 
 // *************************************************************************
 
