@@ -547,7 +547,7 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * cameraarg,
 // What we should really try to do is:
 //
 //       * when going from orthocam -> perspectivecam: set the
-//       heightAngle field to it's default value (45°), and move
+//       heightAngle field to its default value (45°), and move
 //       camera to a position where the scene/model would fill about
 //       the same screenspace as it did in the orthocam
 //
@@ -577,6 +577,12 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
     // 45° is the default value of this field in SoPerspectiveCamera.
     out->heightAngle = (float)(M_PI / 4.0);
   }
+
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@ViewerP::convertOrtho2Perspective",
+                         "perspective heightAngle==%f",
+                         180.0f * out->heightAngle.getValue() / M_PI);
+#endif // debug
 }
 
 void
@@ -592,6 +598,12 @@ So@Gui@ViewerP::convertPerspective2Ortho(const SoPerspectiveCamera * in,
   float focaldist = in->focalDistance.getValue();
 
   out->height = 2.0f * focaldist * (float)tan(in->heightAngle.getValue() / 2.0);
+
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@ViewerP::convertOrtho2Perspective",
+                         "ortho height==%f",
+                         out->height.getValue());
+#endif // debug
 }
 
 void
