@@ -63,7 +63,10 @@ EXTRACT_STATIC         = NO
 # defined locally in source files will be included in the documentation. 
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = NO
+# For some strange reason, this setting must be "YES" for at least
+# SoQt -- or no class documentation will be set up for most classes.
+# For Coin it seems ok to have it set to "NO", though. 20020610 mortene.
+EXTRACT_LOCAL_CLASSES  = YES
 
 # If the HIDE_UNDOC_MEMBERS tag is set to YES, Doxygen will hide all 
 # undocumented members of documented classes, files or namespaces. 
