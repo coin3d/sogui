@@ -138,6 +138,8 @@ public:
 
 // *************************************************************************
 
+SO@GUI@_OBJECT_SOURCE(So@Gui@ColorEditor);
+
 #define PRIVATE(obj) ((ColorEditorComponent *) ((So@Gui@ColorEditor *) obj)->internals)
 #define PUBLIC(obj) (((ColorEditorComponent *) obj)->api)
 
@@ -158,8 +160,6 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
   PRIVATE(this)->attachment_sensor = NULL;
 
   PRIVATE(this)->editor = NULL;
-
-  // PRIVATE(this)->updating = FALSE;
 
   this->setSize(SbVec2s(320, 256));
 
@@ -464,7 +464,7 @@ void
 So@Gui@ColorEditor::setUpdateFrequency(So@Gui@ColorEditor::UpdateFrequency freq)
 {
   assert(PRIVATE(this)->editor != NULL);
-  return PRIVATE(this)->editor->update.setValue((So@Gui@ColorEditor::UpdateFrequency) freq);
+  PRIVATE(this)->editor->update.setValue((So@Gui@ColorEditor::UpdateFrequency) freq);
 }
 
 /*!
@@ -499,7 +499,7 @@ So@Gui@ColorEditor::getDefaultTitle(void) const
 const char *
 So@Gui@ColorEditor::getDefaultIconTitle(void) const
 {
-  static const char iconTitle[] = "ColorEditor";
+  static const char iconTitle[] = "ColEd";
   return iconTitle;
 }
 
@@ -568,7 +568,6 @@ ColorEditorComponent::attachment_update_cb(void * closure, SoSensor * sensor)
   assert(closure != NULL);
   ColorEditorComponent * me = (ColorEditorComponent *) closure;
   if ( me->colorsEqual() ) return;
-  // SoDebugError::postInfo("ColorEditorComponent::attachment_update_cb", "invoked");
 
   switch ( me->attachment ) {
   case SFCOLOR:
@@ -592,9 +591,6 @@ ColorEditorComponent::attachment_update_cb(void * closure, SoSensor * sensor)
   default:
     break;
   }
-  // me->updating = TRUE;
-  // me->editor->color.setValue(color);
-  // me->updating = FALSE;
 }
 
 void
@@ -603,7 +599,6 @@ ColorEditorComponent::editor_update_cb(void * closure, SoSensor * sensor)
   assert(closure != NULL);
   ColorEditorComponent * me = (ColorEditorComponent *) closure;
   if ( me->colorsEqual() ) return;
-  // SoDebugError::postInfo("ColorEditorComponent::editor_update_cb", "invoked");
 
   SbColor color = me->editor->color.getValue();
 
@@ -625,9 +620,8 @@ ColorEditorComponent::editor_update_cb(void * closure, SoSensor * sensor)
     break;
   }
 
-  if ( me->editor->update.getValue() == SoGuiColorEditor::CONTINUOUS ) {
+  if ( me->editor->update.getValue() == SoGuiColorEditor::CONTINUOUS )
     me->invokeColorChangeCallbacks();
-  }
 }
 
 // *************************************************************************
