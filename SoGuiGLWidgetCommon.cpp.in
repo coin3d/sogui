@@ -31,10 +31,10 @@
   \ingroup components
 
   This is the basic, abstract component class which sets up an OpenGL
-  canvas for it's subclasses.
+  canvas for its subclasses.
 
   Application programmers will normally not use this class directly,
-  but rather through the interface of either it's direct descendent;
+  but rather through the interface of either its direct descendent;
   So@Gui@RenderArea, or through one of the "rapid application
   development"-style viewer subclasses.
 
@@ -53,10 +53,10 @@
   \code
   QMainWindow * toplevel = new QMainWindow;
   QFrame * frame = new QFrame(toplevel);
-  So@Gui@ExaminerViewer * viewer = new So@Gui@ExaminerViewer(toplevelwidget);
+  So@Gui@ExaminerViewer * viewer = new So@Gui@ExaminerViewer(toplevel);
   \endcode
 
-  ..events from the keyboard will not always automatically be
+  ...events from the keyboard will not always automatically be
   forwarded to the viewer OpenGL canvas. This is the code you need to
   add in this case:
 
