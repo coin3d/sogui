@@ -1,6 +1,10 @@
 NEWS
 ====
 
+2000-03-16 larsa:
+	* added SoAnyPopupMenu interface.  code is only used in uncommmit'ed
+	  SoBe code at the moment.
+
 2000-03-08 larsa:
 	* removed Makefile.am/in and built these sources into the other
 	  relevant sub-libraries to avoid the Makefile.in file that changes
