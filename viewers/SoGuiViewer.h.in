@@ -244,6 +244,8 @@ protected:
   SoSeparator * sceneRoot;
   SoNode * sceneGraph;
 
+  void getCameraCoordinateSystem(SbMatrix & matrix, SbMatrix & inverse);
+
 private:
   class So@Gui@ViewerP * pimpl;
   friend class So@Gui@ViewerP;
