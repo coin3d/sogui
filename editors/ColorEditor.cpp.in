@@ -30,6 +30,7 @@
 #include <Inventor/fields/SoMFUInt32.h>
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoTexture2.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 
@@ -39,6 +40,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+#include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
 
 #include <Inventor/@Gui@/editors/So@Gui@ColorEditor.h>
 
@@ -136,6 +138,7 @@ public:
   SoGuiSlider1 * slider_h; // hue
   SoGuiSlider1 * slider_s; // saturation
   SoGuiSlider1 * slider_v; // value
+  SoGuiSlider2 * slider_wheel;
 
   SoFieldSensor * sensor_r;
   SoFieldSensor * sensor_g;
@@ -195,7 +198,7 @@ ColorEditor::editorscene[] = {
   "    value 5", // start with the RGB_V group
   "  }",
   "  SoGuiPosition { position 0 0 0 = USE windowgeometry.oB }",
-  "  DEF slider_wheel SoGuiSlider2 {",
+  "  DEF colorwheel SoGuiSlider2 {",
   "    size 80 80 0",
   "  }",
   // the bottom-left positioning of sliders is done right here (position = [...] . oB)
@@ -314,6 +317,7 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
   PRIVATE(this)->slider_h = (SoGuiSlider1 *) SoAny::scanSceneForName(PRIVATE(this)->editor, "slider_h", TRUE);
   PRIVATE(this)->slider_s = (SoGuiSlider1 *) SoAny::scanSceneForName(PRIVATE(this)->editor, "slider_s", TRUE);
   PRIVATE(this)->slider_v = (SoGuiSlider1 *) SoAny::scanSceneForName(PRIVATE(this)->editor, "slider_v", TRUE);
+  PRIVATE(this)->slider_wheel = (SoGuiSlider2 *) SoAny::scanSceneForName(PRIVATE(this)->editor, "colorwheel", TRUE);
   if ( PRIVATE(this)->slider_r ) {
     PRIVATE(this)->slider_r->ref();
     PRIVATE(this)->slider_r->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 0, 0));
@@ -356,6 +360,39 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
     PRIVATE(this)->sensor_v = new SoFieldSensor(ColorEditor::update_v_cb, PRIVATE(this));
     PRIVATE(this)->sensor_v->setPriority(0);
     PRIVATE(this)->sensor_v->attach(&(PRIVATE(this)->slider_v->value));
+  }
+  if ( PRIVATE(this)->slider_wheel ) {
+    SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_wheel, "surfaceTexture", SoTexture2);
+    assert(texture);
+    SbVec2s size(256, 256);
+    int nc = 3;
+    texture->image.setValue(size, nc, NULL);
+    texture->model.setValue(SoTexture2::DECAL);
+    unsigned char * bytes = texture->image.startEditing(size, nc);
+    int x, y;
+    const float value = 1.0f;
+    for ( y = 0; y < size[1]; y++ ) { 
+      const float ypos = ((float) y - 128.0f) / 128.0f;
+      for ( x = 0; x < size[0]; x++ ) { 
+        const float xpos = ((float) x - 128.0f) / 128.0f; 
+        const float saturation = (float) sqrt(xpos * xpos + ypos * ypos);
+        float hue;
+        if ( xpos == 0.0f ) hue = ((ypos < 0.0f) ? 3.0f : 1.0f) * M_PI / 2.0f;
+        else hue = (float) atan(ypos / xpos);
+        if ( xpos < 0.0f ) hue += M_PI; 
+        if ( hue < 0.0f ) hue += (2.0 * M_PI);
+        hue /= 2.0f * M_PI; 
+        float r = 0.0f, g = 0.0f, b = 0.0f;
+        SbColor color(r, g, b); 
+        if ( saturation <= 1.0f ) color.setHSVValue(hue, saturation, value);
+        color.getValue(r, g, b);
+        bytes[(size[0]*y+x)*nc+0] = (unsigned char) (r * 255.0f);
+        bytes[(size[0]*y+x)*nc+1] = (unsigned char) (g * 255.0f);
+        bytes[(size[0]*y+x)*nc+2] = (unsigned char) (b * 255.0f);
+        // if ( nc > 3 ) bytes[(size[0]*y+x)*nc+4] = 255;
+      }
+    }
+    texture->image.finishEditing();
   }
   this->setSceneGraph(PRIVATE(this)->editor);
   PRIVATE(this)->editor->unref();
