@@ -1,0 +1,112 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// @configure_input@
+
+#include <Inventor/@Gui@/So@Gui@.h>
+
+/*!
+  \typedef void So@Gui@::FatalErrorCB(const SbString errmsg, So@Gui@::FatalErrors errcode, void * userdata)
+
+  An application function callback for handling fatal errors should be
+  of this type.
+
+  The first argument is an error message in English describing the
+  details of the error. The second argument is an error code used so
+  the application can identify specific conditions. The third argument
+  is the userdata pointer passed in to So@Gui@::setFatalErrorHandler().
+*/
+
+/*!
+  \enum So@Gui@::FatalErrors
+  Numerical identifiers for classifying the different kinds of possible
+  fatal errors.
+*/
+
+/*!
+  \var So@Gui@::FatalErrors So@Gui@::NO_OPENGL_CANVAS
+
+  Could not construct \e any valid OpenGL canvas. Something is very
+  wrong on the client system.
+*/
+/*!
+  \var So@Gui@::FatalErrors So@Gui@::INTERNAL_ASSERT
+
+  An internal error condition that should never happen was
+  detected. The most likely cause of this is programmering errors
+  within the So@Gui@ library itself.
+*/
+/*!
+  \var So@Gui@::FatalErrors So@Gui@::UNSPECIFIED_ERROR
+
+  Signifies that we were not able to specify in any greater detail the
+  error condition that came up.
+*/
+
+/*!
+  Set up a callback to invoke in the case of unexpected fatal error
+  conditions within the So@Gui@ library.
+
+  Almost any error condition within the library is handled in a robust
+  way through return values indicating errors for the offending calls,
+  but there are a few cases that are impossible to handle without
+  seriously crippling the functionality.
+
+  (One example is if we fail to find \e any way of making a valid
+  OpenGL canvas. This is an indication that something is seriously
+  wrong on the end-user's system, and the So@Gui@ library will not work
+  properly.)
+
+  In the case of a fatal error, it is expected that the given
+  application callback function communicates the problem to the
+  end-user and then either exits the application or at least refrains
+  from using any part of the So@Gui@ library.
+
+  If no callback is explicitly set up by the application, the So@Gui@
+  library will display an error message to the end-user and then exit
+  the application.
+
+  When setting a callback, this method returns a pointer to the
+  previous callback function, or \c NULL if none.
+
+  (This is an extension versus the original SGI InventorXt library
+  API.)
+
+
+  On a related note, be aware that the end-user will still be notified
+  about non-fatal errors and warning messages through a dialog box. If
+  you want to handle these yourself, or if you don't want your
+  end-user to see any of these non-critical messages, you will also
+  need to install an error handler callback function on the Coin
+  library itself:
+
+  \code
+    SoDebugError::setHandlerCallback(myErrorHandlerCB, myCBUserData);
+  \endcode
+
+  (Please also see the documentation of
+  SoDebugError::setHandlerCallback().)
+
+ */
+So@Gui@::FatalErrorCB *
+So@Gui@::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
+{
+  return SoAny::si()->setFatalErrorHandler(cb, userdata);
+}
