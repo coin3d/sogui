@@ -1,0 +1,72 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI toolkit libraries.
+ *  Copyright (C) 1998-2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License version
+ *  2.1 as published by the Free Software Foundation.  See the file
+ *  LICENSE.LGPL at the root directory of the distribution for all the
+ *  details.
+ *
+ *  If you want to use Coin GUI toolkits for applications not compatible
+ *  with the LGPL, please contact SIM to acquire a Professional Edition
+ *  License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+#if SO@GUI@_DEBUG
+static const char rcsid[] =
+  "$Id$";
+#endif
+
+#include <Inventor/@Gui@/So@Gui@Object.h>
+#include <Inventor/@Gui@/devices/So@Gui@Device.h>
+#include <Inventor/@Gui@/So@Gui@Component.h>
+
+/*!
+  \class So@Gui@Object Inventor/@Gui@/So@Gui@Object.h
+  \brief The So@Gui@Object class is for run-time type checking of the So@Gui@
+  objects.
+*/
+
+// *************************************************************************
+
+SoType So@Gui@Object::classTypeId; // static
+
+void
+So@Gui@Object::init( // static
+  void )
+{
+  So@Gui@Object::initClass();
+  So@Gui@Device::initClasses();
+  So@Gui@Component::initClasses();
+} // init()
+
+void
+So@Gui@Object::initClass( // static
+  void )
+{
+  assert( So@Gui@Object::classTypeId == SoType::badType() );
+  So@Gui@Object::classTypeId =
+    SoType::createType( SoType::badType(), "So@Gui@Object");
+} // initClass()
+
+SbBool
+So@Gui@Object::isOfType(
+  SoType type ) const
+{
+  return this->getTypeId().isDerivedFrom(type);
+} // isOfType()
+
+SoType
+So@Gui@Object::getClassTypeId( // static
+  void ) 
+{
+  return So@Gui@Object::classTypeId;
+} // getClassTypeId()
+
+// *************************************************************************
