@@ -143,9 +143,12 @@ protected:
 
 private:
   class So@Gui@GLWidgetP * pimpl;
-  friend class So@Gui@GLWidgetP; // FIXME: only used by So[Gtk|Win]GLWidgetP -- get rid of it? 20011012 mortene.
+#ifndef DOXYGEN_SKIP_THIS
+  friend class SoGuiGLWidgetP;
+  friend class So@Gui@GLWidgetP;
+#endif // DOXYGEN_SKIP_THIS
 
-  void buildGLWidget(void); // FIXME: could we get rid of this? 20011012 mortene.
+  // FIXME: get rid of toolkit-specific stuff below? 20011012 mortene.
 
 #ifdef __COIN_SOQT__
 public:
