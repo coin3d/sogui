@@ -152,16 +152,12 @@ protected:
   virtual void leftWheelStart(void);
   virtual void bottomWheelStart(void);
 
-  virtual GtkWidget * makeSubPreferences(GtkWidget * parent);
-
 private:
   void constructor(const SbBool build);
   void setCursorRepresentation(int mode);
 
-private:
   // friends and family
   class SoAnyExaminerViewer * common;
-  friend class SoAnyExaminerViewer;
   class SoGtkExaminerViewerP * pimpl;
   friend class SoGtkExaminerViewerP;
 #endif // ! __COIN_SOGTK__
