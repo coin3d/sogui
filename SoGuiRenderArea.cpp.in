@@ -61,6 +61,8 @@ static const char rcsid[] =
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
 
+#define RENDERAREA_DEBUG_REDRAWS 0
+
 // *************************************************************************
 
 /*!
@@ -632,33 +634,32 @@ void
 So@Gui@RenderArea::render(
   void )
 {
-#if SO@GUI@_DEBUG && 0 // debug
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
   SoDebugError::postInfo("So@Gui@RenderArea::render",
-                         "start (waitForExpose: %s)",
+                         "start (isVisible=%s waitForExpose=%s)",
+                         this->isVisible() ? "TRUE" : "FALSE",
                          this->waitForExpose ? "TRUE" : "FALSE");
 #endif // debug
 
-  if ( ! this->isVisible() )
+  if ( !this->isVisible() || this->waitForExpose )
     return;
 
-  if (!this->waitForExpose) {
-    this->glLock(); // this makes the GL context "current"
+  this->glLock(); // this makes the GL context "current"
 
-    SbBool drawfront =
-      !this->isDoubleBuffer() ||
-      this->isDrawToFrontBufferEnable();
+  SbBool drawfront =
+    !this->isDoubleBuffer() ||
+    this->isDrawToFrontBufferEnable();
 
-    glDrawBuffer( drawfront ? GL_FRONT_LEFT : GL_BACK_LEFT );
+  glDrawBuffer( drawfront ? GL_FRONT_LEFT : GL_BACK_LEFT );
 
-    this->redraw();
+  this->redraw();
 
-    if ( !drawfront ) this->glSwapBuffers();
-    else this->glFlushBuffer();
+  if ( !drawfront ) this->glSwapBuffers();
+  else this->glFlushBuffer();
 
-    this->glUnlock();
-  }
+  this->glUnlock();
 
-#if SO@GUI@_DEBUG && 0 // debug
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
   SoDebugError::postInfo("So@Gui@RenderArea::render", "done");
 #endif // debug
 } // render()
@@ -684,6 +685,11 @@ void
 So@Gui@RenderArea::scheduleRedraw(
   void )
 {
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
+  SoDebugError::postInfo("So@Gui@RenderArea::scheduleRedraw",
+                         "invoked");
+#endif // debug
+
   assert( this->normalManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
@@ -898,6 +904,10 @@ void
 So@Gui@RenderArea::redraw( // virtual, protected
   void )
 {
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
+  SoDebugError::postInfo("So@Gui@RenderArea::redraw",
+                         "invoked");
+#endif // debug
   this->actualRedraw();
 } // redraw()
 
@@ -1135,7 +1145,7 @@ So@Gui@RenderArea::glReshape( // virtual, derived
   int width,
   int height )
 {
-#if SO@GUI@_DEBUG && 0
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS
   SoDebugError::postInfo( "So@Gui@RenderArea::glReshape",
                           "invoked, <%d, %d>", width, height );
 #endif // SO@GUI@_DEBUG
