@@ -35,6 +35,20 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FlyViewer.h>
+#include <Inventor/nodes/SoCamera.h>
+
+// ************************************************************************
+
+class So@Gui@FlyViewerP {
+public:
+  So@Gui@FlyViewerP( So@Gui@FlyViewer * owner ) { this->viewer = owner; }
+  void dolly( const float delta ) const;
+
+private:
+  So@Gui@FlyViewer * viewer;
+};
+
+#define PRIVATE( o ) ( o->pimpl )
 
 // ************************************************************************
 
@@ -53,6 +67,7 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // public
   So@Gui@Viewer::Type type )
 : inherited( parent, name, embed, flag, type, TRUE )
 {
+  this->constructor( TRUE );
 } // So@Gui@FlyViewer()
 
 // ************************************************************************
@@ -70,7 +85,26 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // protected
   SbBool build )
 : inherited( parent, name, embed, flag, type, FALSE )
 {
+  this->constructor( build );
 } // So@Gui@FlyViewer()
+
+/*!
+  Common constructor code.
+*/
+
+void
+So@Gui@FlyViewer::constructor( // private
+  SbBool build )
+{
+  PRIVATE( this ) = new So@Gui@FlyViewerP( this );
+
+  this->setClassName( this->getDefaultWidgetName() );
+
+  if ( build ) {
+    @WIDGET@ viewer = inherited::buildWidget( this->getParentWidget() );
+    this->setBaseWidget( viewer );
+  }
+} // constructor()
 
 // ************************************************************************
 
@@ -79,81 +113,78 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // protected
 */
 So@Gui@FlyViewer::~So@Gui@FlyViewer()
 {
+  delete PRIVATE( this );
 } // ~So@Gui@FlyViewer()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::setViewing( // virtual
   SbBool enable )
 {
+  inherited::setViewing( enable );
+  // FIXME: what else? 20010907 mortene.
 } // setViewing()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::resetToHomePosition( // virtual
   void )
 {
+  inherited::resetToHomePosition();
+  // FIXME: what else? 20010907 mortene.
 } // resetToHomePosition()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::setCamera( // virtual
   SoCamera * camera )
 {
+  inherited::setCamera( camera );
+  // FIXME: what else? 20010907 mortene.
 } // setCamera()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::setCursorEnabled( // virtual
   SbBool enable )
 {
+  inherited::setCursorEnabled( enable );
+  // FIXME: what else? 20010907 mortene.
 } // setCursorEnabled()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::setCameraType( // virtual
   SoType type )
 {
+  inherited::setCameraType( type );
+  // FIXME: what else? 20010907 mortene.
 } // setCameraType()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 const char *
 So@Gui@FlyViewer::getDefaultWidgetName( // virtual
   void ) const
 {
-  static const char defaultWidgetName[] = "";
+  static const char defaultWidgetName[] = "So@Gui@FlyViewer";
   return defaultWidgetName;
 } // getDefaultWidgetName()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 const char *
 So@Gui@FlyViewer::getDefaultTitle( // virtual
   void ) const
@@ -164,37 +195,36 @@ So@Gui@FlyViewer::getDefaultTitle( // virtual
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 const char *
 So@Gui@FlyViewer::getDefaultIconTitle( // virtual
   void ) const
 {
-  static const char defaultIconTitle[] = "";
+  static const char defaultIconTitle[] = "Fly Viewer";
   return defaultIconTitle;
 } // getDefaultIconTitle()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::processEvent( // virtual
   @EVENT@ event )
 {
+  if ( this->processCommonEvents( event ) ) { return; }
+  // FIXME: take care of our specific events here. 20010907 mortene.
+  inherited::processEvent( event );
 } // processEvent()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::setSeekMode( // virtual
   SbBool enable )
 {
+  inherited::setSeekMode( enable );
+  // FIXME: what else? 20010907 mortene.
 } // setSeekMode()
 
 // ************************************************************************
@@ -210,36 +240,59 @@ So@Gui@FlyViewer::actualRedraw( // virtual
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::rightWheelMotion( // virtual
   float value )
 {
+  PRIVATE( this )->dolly( value - this->getRightWheelValue() );
+  inherited::rightWheelMotion( value );
 } // rightWheelMotion()
 
 // ************************************************************************
 
 /*!
   FIXME: doc
-*/
+ */
 void
 So@Gui@FlyViewer::createPrefSheet( // virtual
   void )
 {
+  SO@GUI@_STUB();
 } // createPrefSheet()
 
 // ************************************************************************
 
-/*!
-  FIXME: doc
-*/
+// doc in super
 void
 So@Gui@FlyViewer::openViewerHelpCard( // virtual
   void )
 {
   // FIXME: mark obsoleted. 20010907 mortene.
 } // openViewerHelpCard()
+
+// ************************************************************************
+
+// This method dollies the camera back and forth in the scene.
+void
+So@Gui@FlyViewerP::dolly(
+  const float delta ) const
+{
+  SoCamera * const camera = this->viewer->getCamera();
+  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+
+  SbPlane walkplane( this->viewer->getUpDirection(), camera->position.getValue() );
+  SbVec3f campos = camera->position.getValue();
+  SbVec3f camvec;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
+  SbLine cross( campos + camvec,
+                campos + camvec + this->viewer->getUpDirection() );
+  SbVec3f intersect;
+  walkplane.intersect( cross, intersect );
+  SbVec3f dir = intersect - campos;
+  dir.normalize();
+
+  camera->position = campos - dir * delta;
+} // dolly()
 
 // ************************************************************************

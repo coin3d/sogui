@@ -69,6 +69,10 @@ protected:
   virtual void createPrefSheet(void);
   virtual void openViewerHelpCard(void);
 
+private:
+  void constructor( SbBool build );
+  class So@Gui@FlyViewerP * pimpl;
+
 }; // class So@Gui@FlyViewer
 
 // ************************************************************************
