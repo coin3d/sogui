@@ -26,6 +26,7 @@
 #include <Inventor/sensors/SoPathSensor.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/actions/SoGetMatrixAction.h>
+#include <Inventor/actions/SoGetBoundingBoxAction.h>
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/fields/SoSFBool.h>        
 #include <Inventor/fields/SoSFTime.h>
@@ -99,6 +100,19 @@ SoGuiViewpointWrapper::setViewpoint(SoPath * path)
     this->pathsensor->attach(path); 
     this->updateCamera();
     this->sendBindEvents(this->pathtoviewpoint->getTail(), TRUE);
+
+    // calculate a focal distance. It's not possible to specify a
+    // focal point in VRML97. We just set it to the center of the
+    // scene.
+    SbViewportRegion vp(640, 480);
+    SoGetBoundingBoxAction bboxaction(vp);
+    bboxaction.apply(path->getHead());
+    SbVec3f center = bboxaction.getCenter();
+    
+    float dist = (this->position.getValue() - center).length();
+    // avoid focalDistance ~= 0
+    if (dist < 0.1f) dist = 0.1f;
+    this->focalDistance = dist; 
   }
 }
 
