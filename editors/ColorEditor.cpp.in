@@ -22,6 +22,7 @@
 \**************************************************************************/
 
 // FIXME: overload the getClassName() type functions
+// FIXME: make scene graph usable outside the component
 
 #include <Inventor/SbPList.h>
 #include <Inventor/SoSceneManager.h>
@@ -158,6 +159,7 @@ ColorEditor::scenegraph[] = {
   "  OrthographicCamera { }",
   "  DEF viewportfix SoGuiViewportFix { }",
   "  Material { ambientColor 0.8 0.8 0.8 }",
+  // FIXME: set/getSceneGraph() should connect *here*, not at the root, so overload
   "  DEF pane SoGuiPane {",
   "    worldSize 1 1 0",
   "    objectSize 0 0 0 = USE viewportfix.viewportSize",
