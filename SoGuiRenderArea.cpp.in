@@ -38,12 +38,22 @@
 
 /*!
   \class So@Gui@RenderArea Inventor/@Gui@/So@Gui@RenderArea.h
-  \brief The So@Gui@RenderArea class adds scenegraph and event management.
+  \brief The So@Gui@RenderArea class adds scenegraph handling and event management.
   \ingroup components common
 
   The So@Gui@RenderArea class is a component that adds scenegraph
   management and input device event handling to the So@Gui@GLWidget
   component.
+
+  The class has many convenient methods for controlling aspects of the
+  rendering, like for instance transparency, aliasing and for
+  scheduling of redraws.
+
+  Native toolkit events are caught by So@Gui@RenderArea components,
+  translated to Coin SoEvent instances and passed on to the
+  scenegraph, in case the user is doing interactive operations on for
+  instance Coin geometry draggers.
+
 
   So@Gui@RenderArea is the first non-abstract component in it's
   inheritance hierarchy that you can use directly from client
