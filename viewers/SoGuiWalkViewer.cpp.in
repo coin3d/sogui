@@ -44,6 +44,15 @@
 #define PRIVATE(ptr) ptr->pimpl
 #define PUBLIC(ptr) ptr->pub
 
+SoGuiWalkViewerP::SoGuiWalkViewerP(So@Gui@WalkViewer * publ)
+{
+  PUBLIC(this) = publ;
+}
+
+SoGuiWalkViewerP::~SoGuiWalkViewerP()
+{
+}
+
 // This method dollies the camera back and forth in the scene.
 void
 SoGuiWalkViewerP::dollyCamera(const float delta) const
