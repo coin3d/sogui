@@ -792,7 +792,7 @@ So@Gui@FullViewer::setComponentCursor(const So@Gui@Cursor & cursor)
   // parent widget, which makes it affect all sub-widgets, like the
   // decorations stuff.
 
-  So@Gui@Component::setWidgetCursor(this->getRenderAreaWidget(), cursor);
+  So@Gui@Component::setWidgetCursor(this->getGLWidget(), cursor);
 }
 
 // *************************************************************************
