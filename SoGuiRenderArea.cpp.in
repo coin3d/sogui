@@ -124,8 +124,11 @@ public:
   static const int GL_DEFAULT_MODE;
 
   // OpenGL info-window hack.
-  SbBool checkMagicSequence( const char c );
+  enum { NONE, OPENGL, INVENTOR, TOOLKIT };
+  int checkMagicSequences( const char c );
   void showOpenGLDriverInformation( void );
+  void showInventorInformation( void );
+  void showToolkitInformation( void );
 
 private:
   So@Gui@RenderArea * pub; // public interface class
@@ -173,23 +176,84 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation( void )
 #endif // SO@GUI@_DEBUG
 }
 
-SbBool
-So@Gui@RenderAreaP::checkMagicSequence( const char c )
+void
+So@Gui@RenderAreaP::showInventorInformation( void )
+{
+#if SO@GUI@_DEBUG
+  SbString info = SoDB::getVersion();
+  // FIXME: dump list of available node classes? 20010927 mortene.
+  So@Gui@::createSimpleErrorDialog( NULL, "Inventor implementation info",
+                                    info.getString() );
+#endif // SO@GUI@_DEBUG
+}
+
+void
+So@Gui@RenderAreaP::showToolkitInformation( void )
+{
+#if SO@GUI@_DEBUG
+  SbString info = "So@Gui@ version "; info += SO@GUI@_VERSION; info += "\n";
+#if SO@GUI@_MAKE_DLL
+  info += "Built as MSWindows DLL.\n";
+#endif // !SO@GUI@_MAKE_DLL
+#if SO@GUI@_DEBUG
+  info += "Built with debug messages enabled.\n";
+#endif // !SO@GUI@_DEBUG
+
+  // FIXME: include information about the underlying toolkit library,
+  // if possible (ie Qt version, Gtk version, Motif implementation,
+  // MSWindows version, ...).  20010927 mortene.
+
+  // FIXME: information about DLL path(s) (both for the So@Gui@ and
+  // Coin/Inventor library) would be _extremely_ useful for debugging
+  // "remote" applications, as application programmers (including
+  // ourselves) tend to spread those files around misc diskdrive
+  // directories -- especially on MSWindows platforms.  Mismatches for
+  // run-time binding and link-time binding then causes bugs which are
+  // hard to understand.
+  //
+  // I don't know if any platforms have enough introspection
+  // functionality to enable us to do this, though. Should
+  // investigate.
+  //
+  // 20010927 mortene.
+
+  // FIXME: dump rcsid strings for all components. 20010927 mortene.
+
+  info += "\n";
+  info += "Inventor implementation: "; info += SoDB::getVersion();
+  So@Gui@::createSimpleErrorDialog( NULL, "So@Gui@ implementation info",
+                                    info.getString() );
+#endif // SO@GUI@_DEBUG
+}
+
+int
+So@Gui@RenderAreaP::checkMagicSequences( const char c )
 {
 #if SO@GUI@_DEBUG
   this->currentinput += c;
-  static const char magicseq[] = "glinfo";
-  int ml = strlen( magicseq );
   int cl = this->currentinput.getLength( );
 
-  if ( cl >= ml && this->currentinput.getSubString( cl - ml ) == magicseq ) {
-    return TRUE;
+  static const char glinfoseq[] = "glinfo";
+  static const char ivinfoseq[] = "ivinfo";
+  static const char soinfoseq[] = "soinfo";
+
+  int ml = strlen( glinfoseq );
+  if ( cl >= ml && this->currentinput.getSubString( cl - ml ) == glinfoseq ) {
+    return So@Gui@RenderAreaP::OPENGL;
+  }
+  ml = strlen( ivinfoseq );
+  if ( cl >= ml && this->currentinput.getSubString( cl - ml ) == ivinfoseq ) {
+    return So@Gui@RenderAreaP::INVENTOR;
+  }
+  ml = strlen( soinfoseq );
+  if ( cl >= ml && this->currentinput.getSubString( cl - ml ) == soinfoseq ) {
+    return So@Gui@RenderAreaP::TOOLKIT;
   }
 
   // Limit memory usage.
   if ( cl > 1024 ) { this->currentinput = ""; }
 #endif // SO@GUI@_DEBUG
-  return FALSE;
+  return So@Gui@RenderAreaP::NONE;
 }
 
 #define PRIVATE(ptr) (ptr->priv)
@@ -1386,16 +1450,34 @@ So@Gui@RenderArea::processEvent( // virtual, protected
 
   if ( soevent != NULL ) {
 #if SO@GUI@_DEBUG
-    // Undocumented feature: tap in the characters in "glinfo" to pop
-    // up a dialog box with information about GL driver, vendor etc.
+    // Undocumented feature: there are several "magic" sequences of
+    // keys when tapped into the rendering canvas which'll pop up a
+    // dialog box with information about that particular feature.
+    //
+    // See code comments behind "case" statements below for which
+    // sequences are available so far.
+
     if ( soevent->isOfType( SoKeyboardEvent::getClassTypeId( ) ) ) {
       SoKeyboardEvent * ke = ( SoKeyboardEvent * )soevent;
       if ( ke->getState( ) == SoButtonEvent::UP ) {
         char c = ke->getPrintableCharacter();
-        if ( PRIVATE( this )->checkMagicSequence( c ) ) {
+        switch ( PRIVATE( this )->checkMagicSequences( c ) ) {
+        case So@Gui@RenderAreaP::NONE:
+          break;
+        case So@Gui@RenderAreaP::OPENGL:  // "glinfo"
           this->glLockNormal();
           PRIVATE( this )->showOpenGLDriverInformation( );
           this->glUnlockNormal();
+          break;
+        case So@Gui@RenderAreaP::INVENTOR:  // "ivinfo"
+          PRIVATE( this )->showInventorInformation( );
+          break;
+        case So@Gui@RenderAreaP::TOOLKIT:  // "soinfo"
+          PRIVATE( this )->showToolkitInformation( );
+          break;
+        default:
+          assert(FALSE && "unknown debug key sequence");
+          break;
         }
       }
     }
