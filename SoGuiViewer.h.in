@@ -239,73 +239,32 @@ protected:
   SoSeparator * sceneRoot; // viewerroot
 
 private:
+  class SoGuiViewerP * pimpl;
+
   void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
   
   // Seek functionality
-  SoTimerSensor * seeksensor;
   static void seeksensorCB( void * data, SoSensor * );
-  float seekperiod;
-  SbBool inseekmode;
-  SbBool seektopoint;
-  SbVec3f camerastartposition, cameraendposition;
-  float seekdistance;
-  SbBool seekdistanceabs;
-
-  // Camera handling
-  SbBool deletecamera;
-  SbVec3f storedposition;
-  SbRotation storedorientation;
-  float storedheightval;
-
-  // Headlight handling
-  SbBool lighton;
-  SoGroup * lightroot;
 
   // Drawstyles
-  DrawStyle drawstyles[2];
+  void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
   SbBool drawInteractiveAsStill(void) const;
   SbBool drawAsHiddenLine(void) const;
   So@Gui@Viewer::DrawStyle currentDrawStyle(void) const;
-  void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
-  SoSwitch * drawstyleroot, * hiddenlineroot, * polygonoffsetparent;
-  SoBaseColor * sobasecolor;
-  SoComplexity * socomplexity;
-  SoDrawStyle * sodrawstyle;
-  SoLightModel * solightmodel;
-  SoMaterialBinding * somaterialbinding;
-  SoPolygonOffset * sopolygonoffset;
 
   // Automatic setting of clipping planes
-  SbBool adjustclipplanes;
   void setClippingPlanes(void);
-
-  // Misc
-  SoType cameratype;
-  SbBool cursoron, localsetbuffertype;
-
-  SoCallbackList * interactionstartCallbacks, * interactionendCallbacks;
-
-  static void interactivestartCB( void *, So@Gui@Viewer * thisp );
-  static void interactiveendCB( void *, So@Gui@Viewer * thisp );
-  int interactionnesting;
-
-  BufferType buffertype;
-
-  void moveCameraScreen( const SbVec2f & screenpos );
-
-  SbBool stereoviewing;
-  float stereooffset;
 
   // Methods to keep track of frames-per-second value. Not available
   // in the original Inventor API -- Coin extension.
   void resetFrameCounter(void);
   void addFrametime(const double ft);
   void recordFPS(void);
-  // These variables and methods are used to keep track of the
-  // frames-per-second counter.
-  enum { FRAMESARRAY_SIZE = 10}; // Const value trick for old compilers.
-  double lasttimeofday, frames[FRAMESARRAY_SIZE], totalval, currentframetime;
-  int framecount;
+
+  // Misc
+  static void interactivestartCB( void *, So@Gui@Viewer * thisp );
+  static void interactiveendCB( void *, So@Gui@Viewer * thisp );
+  void moveCameraScreen( const SbVec2f & screenpos );
 
 }; // class So@Gui@Viewer
 

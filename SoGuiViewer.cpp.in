@@ -117,6 +117,60 @@ static const char rcsid[] =
 
 // *************************************************************************
 
+// The private data for the So@Gui@Viewer.
+class SoGuiViewerP {
+public:
+  // Seek functionality
+  SoTimerSensor * seeksensor;
+  float seekperiod;
+  SbBool inseekmode;
+  SbBool seektopoint;
+  SbVec3f camerastartposition, cameraendposition;
+  float seekdistance;
+  SbBool seekdistanceabs;
+
+  // Camera handling
+  SbBool deletecamera;
+  SbVec3f storedposition;
+  SbRotation storedorientation;
+  float storedheightval;
+
+  // Headlight handling
+  SbBool lighton;
+  SoGroup * lightroot;
+
+  // Drawstyles
+  So@Gui@Viewer::DrawStyle drawstyles[2];
+  SoSwitch * drawstyleroot, * hiddenlineroot, * polygonoffsetparent;
+  SoBaseColor * sobasecolor;
+  SoComplexity * socomplexity;
+  SoDrawStyle * sodrawstyle;
+  SoLightModel * solightmodel;
+  SoMaterialBinding * somaterialbinding;
+  SoPolygonOffset * sopolygonoffset;
+
+  // Automatic setting of clipping planes
+  SbBool adjustclipplanes;
+
+  // Keep track of the frames-per-second counter.
+  enum { FRAMESARRAY_SIZE = 10 }; // Const value trick for old compilers.
+  double lasttimeofday, frames[FRAMESARRAY_SIZE], totalval, currentframetime;
+  int framecount;
+
+  // Misc
+  SoType cameratype;
+  SbBool cursoron, localsetbuffertype;
+  SoCallbackList * interactionstartCallbacks, * interactionendCallbacks;
+  int interactionnesting;
+  So@Gui@Viewer::BufferType buffertype;
+  SbBool stereoviewing;
+  float stereooffset;
+};
+
+#define THIS (this->pimpl)
+
+// *************************************************************************
+
 SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 
 // *************************************************************************
@@ -316,6 +370,8 @@ So@Gui@Viewer::So@Gui@Viewer(
   SbBool build )
 : inherited( parent, name, embed, TRUE, TRUE, FALSE )
 {
+  THIS = new SoGuiViewerP;
+
   // initialization of protected data
   this->type = t;
   this->viewingFlag = TRUE;
@@ -324,23 +380,23 @@ So@Gui@Viewer::So@Gui@Viewer(
   this->sceneGraph = NULL;
 
   // initialization of internal data
-  this->cursoron = TRUE;
-  this->localsetbuffertype = FALSE;
+  THIS->cursoron = TRUE;
+  THIS->localsetbuffertype = FALSE;
 
-  this->cameratype = SoPerspectiveCamera::getClassTypeId();
-  this->deletecamera = FALSE;
-  this->buffertype = this->isDoubleBuffer() ? BUFFER_DOUBLE : BUFFER_SINGLE;
+  THIS->cameratype = SoPerspectiveCamera::getClassTypeId();
+  THIS->deletecamera = FALSE;
+  THIS->buffertype = this->isDoubleBuffer() ? BUFFER_DOUBLE : BUFFER_SINGLE;
 
-  this->interactionstartCallbacks = new SoCallbackList;
-  this->interactionendCallbacks = new SoCallbackList;
-  this->interactionnesting = 0;
+  THIS->interactionstartCallbacks = new SoCallbackList;
+  THIS->interactionendCallbacks = new SoCallbackList;
+  THIS->interactionnesting = 0;
 
-  this->seekdistance = 50.0f;
-  this->seekdistanceabs = TRUE;
-  this->seektopoint = TRUE;
-  this->seekperiod = 2.0f;
-  this->inseekmode = FALSE;
-  this->seeksensor = new SoTimerSensor(So@Gui@Viewer::seeksensorCB, this);
+  THIS->seekdistance = 50.0f;
+  THIS->seekdistanceabs = TRUE;
+  THIS->seektopoint = TRUE;
+  THIS->seekperiod = 2.0f;
+  THIS->inseekmode = FALSE;
+  THIS->seeksensor = new SoTimerSensor(So@Gui@Viewer::seeksensorCB, this);
 
 
   this->sceneRoot = new SoSeparator;
@@ -350,71 +406,71 @@ So@Gui@Viewer::So@Gui@Viewer(
 
   // Drawstyle subgraph.
   {
-    this->drawstyleroot = new SoSwitch;
+    THIS->drawstyleroot = new SoSwitch;
 
-    this->solightmodel = new SoLightModel;
-    this->solightmodel->setOverride(TRUE);
-    this->solightmodel->model = SoLightModel::BASE_COLOR;
+    THIS->solightmodel = new SoLightModel;
+    THIS->solightmodel->setOverride(TRUE);
+    THIS->solightmodel->model = SoLightModel::BASE_COLOR;
 
-    this->sodrawstyle = new SoDrawStyle;
-    this->sodrawstyle->setOverride(TRUE);
-    this->sodrawstyle->pointSize.setIgnored(TRUE);
-    this->sodrawstyle->lineWidth.setIgnored(TRUE);
-    this->sodrawstyle->linePattern.setIgnored(TRUE);
+    THIS->sodrawstyle = new SoDrawStyle;
+    THIS->sodrawstyle->setOverride(TRUE);
+    THIS->sodrawstyle->pointSize.setIgnored(TRUE);
+    THIS->sodrawstyle->lineWidth.setIgnored(TRUE);
+    THIS->sodrawstyle->linePattern.setIgnored(TRUE);
 
-    this->socomplexity = new SoComplexity;
-    this->socomplexity->setOverride(TRUE);
-    this->socomplexity->textureQuality = 0.0f;
-    this->socomplexity->value = 0.1f;
+    THIS->socomplexity = new SoComplexity;
+    THIS->socomplexity->setOverride(TRUE);
+    THIS->socomplexity->textureQuality = 0.0f;
+    THIS->socomplexity->value = 0.1f;
 
-    this->drawstyleroot->addChild(this->solightmodel);
-    this->drawstyleroot->addChild(this->sodrawstyle);
-    this->drawstyleroot->addChild(this->socomplexity);
-    this->sceneRoot->addChild(this->drawstyleroot);
-    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
+    THIS->drawstyleroot->addChild(THIS->solightmodel);
+    THIS->drawstyleroot->addChild(THIS->sodrawstyle);
+    THIS->drawstyleroot->addChild(THIS->socomplexity);
+    this->sceneRoot->addChild(THIS->drawstyleroot);
+    THIS->drawstyleroot->whichChild = SO_SWITCH_NONE;
   }
 
   // Hidden line rendering subgraph.
   {
-    this->hiddenlineroot = new SoSwitch;
+    THIS->hiddenlineroot = new SoSwitch;
 
-    this->sobasecolor = new SoBaseColor;
-    this->sobasecolor->setOverride(TRUE);
-    this->hiddenlineroot->addChild(this->sobasecolor);
+    THIS->sobasecolor = new SoBaseColor;
+    THIS->sobasecolor->setOverride(TRUE);
+    THIS->hiddenlineroot->addChild(THIS->sobasecolor);
 
-    this->somaterialbinding = new SoMaterialBinding;
-    this->somaterialbinding->setOverride(TRUE);
-    this->somaterialbinding->value = SoMaterialBinding::OVERALL;
-    this->hiddenlineroot->addChild(this->somaterialbinding);
+    THIS->somaterialbinding = new SoMaterialBinding;
+    THIS->somaterialbinding->setOverride(TRUE);
+    THIS->somaterialbinding->value = SoMaterialBinding::OVERALL;
+    THIS->hiddenlineroot->addChild(THIS->somaterialbinding);
 
-    this->polygonoffsetparent = new SoSwitch;
-    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    THIS->polygonoffsetparent = new SoSwitch;
+    THIS->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
 #if HAVE_SOPOLYGONOFFSET
-    this->sopolygonoffset = new SoPolygonOffset;
-    this->sopolygonoffset->setOverride(TRUE);
-    this->polygonoffsetparent->addChild(this->sopolygonoffset);
+    THIS->sopolygonoffset = new SoPolygonOffset;
+    THIS->sopolygonoffset->setOverride(TRUE);
+    THIS->polygonoffsetparent->addChild(THIS->sopolygonoffset);
 #endif // HAVE_SOPOLYGONOFFSET
-    this->hiddenlineroot->addChild(this->polygonoffsetparent);
+    THIS->hiddenlineroot->addChild(THIS->polygonoffsetparent);
 
-    this->drawstyleroot->addChild(this->hiddenlineroot);
-    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
+    THIS->drawstyleroot->addChild(THIS->hiddenlineroot);
+    THIS->hiddenlineroot->whichChild = SO_SWITCH_NONE;
   }
 
 
-  this->drawstyles[STILL] = VIEW_AS_IS;
-  this->drawstyles[INTERACTIVE] = VIEW_SAME_AS_STILL;
+  THIS->drawstyles[STILL] = VIEW_AS_IS;
+  THIS->drawstyles[INTERACTIVE] = VIEW_SAME_AS_STILL;
 
-  this->lighton = TRUE;
-  this->lightroot = NULL;
+  THIS->lighton = TRUE;
+  THIS->lightroot = NULL;
 
   this->addStartCallback(So@Gui@Viewer::interactivestartCB);
   this->addFinishCallback(So@Gui@Viewer::interactiveendCB);
 
-  this->adjustclipplanes = TRUE;
+  THIS->adjustclipplanes = TRUE;
   this->autoClipBboxAction = NULL;
 
-  this->stereoviewing = FALSE;
-  this->stereooffset = 0.1f;
+  THIS->stereoviewing = FALSE;
+  THIS->stereooffset = 0.1f;
 
   if ( build ) {
     this->setClassName( "So@Gui@Viewer" );
@@ -436,14 +492,16 @@ So@Gui@Viewer::~So@Gui@Viewer(
 {
   delete this->autoClipBboxAction;
 
-  delete this->interactionstartCallbacks;
-  delete this->interactionendCallbacks;
+  delete THIS->interactionstartCallbacks;
+  delete THIS->interactionendCallbacks;
 
-  delete this->seeksensor;
+  delete THIS->seeksensor;
 
   if ( this->sceneGraph ) this->setSceneGraph(NULL);
-  if ( this->lightroot ) this->lightroot->unref();
+  if ( THIS->lightroot ) THIS->lightroot->unref();
   this->sceneRoot->unref();
+
+  delete THIS;
 } // ~So@Gui@Viewer()
 
 // *************************************************************************
@@ -468,10 +526,10 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
 
     // If we made the camera, detach it. Otherwise just leave it in
     // the graph.
-    if (this->deletecamera) {
+    if (THIS->deletecamera) {
       SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
       cameraparent->removeChild(this->camera);
-      this->deletecamera = FALSE;
+      THIS->deletecamera = FALSE;
     }
 
     this->camera->unref();
@@ -483,10 +541,10 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
     this->camera->ref();
     this->saveHomePosition();
     if (headlightflag) this->setHeadlight(TRUE);
-    this->cameratype = this->camera->getTypeId();
+    THIS->cameratype = this->camera->getTypeId();
   }
   else {
-    this->lighton = headlightflag;
+    THIS->lighton = headlightflag;
   }
 } // setCamera()
 
@@ -527,7 +585,7 @@ So@Gui@Viewer::setCameraType(SoType t)
 {
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
-  SbBool oldisperspective = this->cameratype.isDerivedFrom(perspectivetype);
+  SbBool oldisperspective = THIS->cameratype.isDerivedFrom(perspectivetype);
   SbBool newisperspective = t.isDerivedFrom(perspectivetype);
 
   if ( ( oldisperspective && newisperspective ) ||
@@ -584,13 +642,13 @@ So@Gui@Viewer::setCameraType(SoType t)
     SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
     cameraparent->insertChild( newcamera,
                                cameraparent->findChild( this->camera ) );
-    SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
-    this->setCamera( newcamera ); // This will set this->cameratype.
-    this->deletecamera = TRUE;
+    SoCamera * oldcamera = !THIS->deletecamera ? this->camera : NULL;
+    this->setCamera( newcamera ); // This will set THIS->cameratype.
+    THIS->deletecamera = TRUE;
     if ( oldcamera )
       cameraparent->removeChild( oldcamera );
   } else { // A camera has not been instantiated for the scene.
-    this->cameratype = t; // No call to setCamera(), so set type explicitly.
+    THIS->cameratype = t; // No call to setCamera(), so set type explicitly.
   }
 } // setCameraType()
 
@@ -609,7 +667,7 @@ So@Gui@Viewer::setCameraType(SoType t)
 SoType
 So@Gui@Viewer::getCameraType(void) const
 {
-  return this->cameratype;
+  return THIS->cameratype;
 } // getCameraType()
 
 // *************************************************************************
@@ -639,16 +697,16 @@ So@Gui@Viewer::saveHomePosition(void)
 {
   if ( ! this->camera ) return; // probably a scene-less viewer
 
-  this->storedorientation = this->camera->orientation.getValue();
-  this->storedposition = this->camera->position.getValue();
+  THIS->storedorientation = this->camera->orientation.getValue();
+  THIS->storedposition = this->camera->position.getValue();
 
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
-    this->storedheightval =
+    THIS->storedheightval =
       ((SoOrthographicCamera *)this->camera)->height.getValue();
   }
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-    this->storedheightval =
+    THIS->storedheightval =
       ((SoPerspectiveCamera *)this->camera)->heightAngle.getValue();
   }
 } // saveHomePosition()
@@ -666,14 +724,14 @@ So@Gui@Viewer::resetToHomePosition(void)
 {
   if ( ! this->camera ) return; // probably a scene-less viewer
 
-  this->camera->orientation = this->storedorientation;
-  this->camera->position = this->storedposition;
+  this->camera->orientation = THIS->storedorientation;
+  this->camera->position = THIS->storedposition;
 
   SoType t = this->camera->getTypeId();
   if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()))
-    ((SoOrthographicCamera *)this->camera)->height = this->storedheightval;
+    ((SoOrthographicCamera *)this->camera)->height = THIS->storedheightval;
   else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()))
-    ((SoPerspectiveCamera *)this->camera)->heightAngle = this->storedheightval;
+    ((SoPerspectiveCamera *)this->camera)->heightAngle = THIS->storedheightval;
 
   this->setClippingPlanes();
   this->camera->focalDistance =
@@ -697,42 +755,42 @@ So@Gui@Viewer::setHeadlight(SbBool on)
   SoSearchAction search;
 
   if (on) {
-    if (!this->lightroot) {
-      this->lightroot = new SoTransformSeparator;
-      this->lightroot->ref(); // Matched by an unref() in the destructor.
-      this->lightroot->addChild(new SoRotation);
+    if (!THIS->lightroot) {
+      THIS->lightroot = new SoTransformSeparator;
+      THIS->lightroot->ref(); // Matched by an unref() in the destructor.
+      THIS->lightroot->addChild(new SoRotation);
       SoDirectionalLight * dl = new SoDirectionalLight;
       dl->direction.setValue(1, -1, -10);
-      this->lightroot->addChild(dl);
+      THIS->lightroot->addChild(dl);
     }
 
     if (!this->camera) { // Headlight flag set early -- just store and return.
-      this->lighton = on;
+      THIS->lighton = on;
       return;
     }
 
     SoGroup * cameraparent = GETPARENTOFNODE(this->sceneRoot, this->camera);
-    int lidx = cameraparent->findChild(this->lightroot);
+    int lidx = cameraparent->findChild(THIS->lightroot);
     if (lidx == -1) {
       int idx = cameraparent->findChild(this->camera);
-      cameraparent->insertChild(this->lightroot, idx+1);
+      cameraparent->insertChild(THIS->lightroot, idx+1);
 
-      SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
+      SoRotation * lorient = (SoRotation *) THIS->lightroot->getChild(0);
       lorient->rotation.connectFrom(& this->camera->orientation);
     }
   }
   else {
-    if (this->lightroot) {
+    if (THIS->lightroot) {
       SoGroup * lightparent = GETPARENTOFNODE(this->sceneRoot,
-                                              this->lightroot);
-      lightparent->removeChild(this->lightroot);
+                                              THIS->lightroot);
+      lightparent->removeChild(THIS->lightroot);
 
-      SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
+      SoRotation * lorient = (SoRotation *) THIS->lightroot->getChild(0);
       lorient->rotation.disconnect();
     }
   }
 
-  this->lighton = on;
+  THIS->lighton = on;
 } // setHeadlight()
 
 // *************************************************************************
@@ -750,7 +808,7 @@ So@Gui@Viewer::setHeadlight(SbBool on)
 SbBool
 So@Gui@Viewer::isHeadlight(void) const
 {
-  return this->lighton;
+  return THIS->lighton;
 } // isheadlight()
 
 // *************************************************************************
@@ -767,10 +825,10 @@ So@Gui@Viewer::isHeadlight(void) const
 SoDirectionalLight *
 So@Gui@Viewer::getHeadlight(void) const
 {
-  if (!this->lightroot) return NULL;
+  if (!THIS->lightroot) return NULL;
 
   SoDirectionalLight * dl =
-    (SoDirectionalLight *) this->lightroot->getChild(1);
+    (SoDirectionalLight *) THIS->lightroot->getChild(1);
   assert(dl->isOfType(SoDirectionalLight::getClassTypeId()));
   return dl;
 } // getHeadlight()
@@ -812,7 +870,7 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
     return;
   }
 
-  this->drawstyles[type] = style;
+  THIS->drawstyles[type] = style;
   this->changeDrawStyle(this->currentDrawStyle());
 } // setDrawStyle()
 
@@ -832,10 +890,10 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
   if ((type != STILL) && (type != INTERACTIVE)) {
     SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
                               "unknown drawstyle type setting 0x%x", type);
-    return this->drawstyles[STILL];
+    return THIS->drawstyles[STILL];
   }
 #endif // SO@GUI@_DEBUG
-  return this->drawstyles[type];
+  return THIS->drawstyles[type];
 } // getDrawStyle()
 
 // *************************************************************************
@@ -857,7 +915,7 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
 void
 So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
 {
-  if (type == this->buffertype) return;
+  if (type == THIS->buffertype) return;
 
   if (type != BUFFER_SINGLE &&
       type != BUFFER_DOUBLE &&
@@ -869,11 +927,11 @@ So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
     return;
   }
 
-  this->buffertype = type;
+  THIS->buffertype = type;
 
-  this->localsetbuffertype = TRUE;
+  THIS->localsetbuffertype = TRUE;
   inherited::setDoubleBuffer(type == BUFFER_DOUBLE);
-  this->localsetbuffertype = FALSE;
+  THIS->localsetbuffertype = FALSE;
 } // setBufferingType()
 
 // *************************************************************************
@@ -887,7 +945,7 @@ So@Gui@Viewer::setBufferingType(So@Gui@Viewer::BufferType type)
 So@Gui@Viewer::BufferType
 So@Gui@Viewer::getBufferingType(void) const
 {
-  return this->buffertype;
+  return THIS->buffertype;
 } // getBufferingType()
 
 // *************************************************************************
@@ -956,7 +1014,7 @@ So@Gui@Viewer::isViewing(void) const
 void
 So@Gui@Viewer::setCursorEnabled(SbBool on)
 {
-  this->cursoron = on;
+  THIS->cursoron = on;
 } // setCursorEnabled()
 
 // *************************************************************************
@@ -970,7 +1028,7 @@ So@Gui@Viewer::setCursorEnabled(SbBool on)
 SbBool
 So@Gui@Viewer::isCursorEnabled(void) const
 {
-  return this->cursoron;
+  return THIS->cursoron;
 } // isCursorEnabled()
 
 // *************************************************************************
@@ -989,13 +1047,13 @@ So@Gui@Viewer::setAutoClipping(
   SbBool enable )
 {
 #if SO@GUI@_DEBUG
-  if ( this->adjustclipplanes == enable ) {
+  if ( THIS->adjustclipplanes == enable ) {
     SoDebugError::postWarning("So@Gui@Viewer::setAutoClipping",
                               "unnecessary called");
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->adjustclipplanes = enable;
+  THIS->adjustclipplanes = enable;
   if ( enable ) this->scheduleRedraw();
 } // setAutoClipping()
 
@@ -1011,7 +1069,7 @@ SbBool
 So@Gui@Viewer::isAutoClipping(
   void ) const
 {
-  return this->adjustclipplanes;
+  return THIS->adjustclipplanes;
 } // isAutoClipping()
 
 // *************************************************************************
@@ -1026,7 +1084,7 @@ void
 So@Gui@Viewer::setStereoViewing( // virtual
   SbBool enable )
 {
-  this->stereoviewing = enable;
+  THIS->stereoviewing = enable;
   this->scheduleRedraw();
 } // setStereoViewing()
 
@@ -1046,7 +1104,7 @@ SbBool
 So@Gui@Viewer::isStereoViewing(
   void ) const
 {
-  return this->stereoviewing;
+  return THIS->stereoviewing;
 } // setStereoViewing()
 
 // *************************************************************************
@@ -1063,7 +1121,7 @@ void
 So@Gui@Viewer::setStereoOffset( // virtual
   const float dist )
 {
-  this->stereooffset = dist;
+  THIS->stereooffset = dist;
   this->scheduleRedraw();
 } // setStereoOffset()
 
@@ -1077,7 +1135,7 @@ float
 So@Gui@Viewer::getStereoOffset(
   void ) const
 {
-  return this->stereooffset;
+  return THIS->stereooffset;
 } // getStereoOffset()
 
 // *************************************************************************
@@ -1094,13 +1152,13 @@ void
 So@Gui@Viewer::setDetailSeek(const SbBool on)
 {
 #if SO@GUI@_DEBUG
-  if (this->seektopoint == on) {
+  if (THIS->seektopoint == on) {
     SoDebugError::postWarning("So@Gui@Viewer::setDetailSeek",
                               "unnecessary called");
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->seektopoint = on;
+  THIS->seektopoint = on;
 } // setDetailSeek()
 
 // *************************************************************************
@@ -1115,7 +1173,7 @@ So@Gui@Viewer::setDetailSeek(const SbBool on)
 SbBool
 So@Gui@Viewer::isDetailSeek(void) const
 {
-  return this->seektopoint;
+  return THIS->seektopoint;
 } // isDetailSeek()
 
 // *************************************************************************
@@ -1141,7 +1199,7 @@ So@Gui@Viewer::setSeekTime(const float seconds)
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->seekperiod = seconds;
+  THIS->seekperiod = seconds;
 } // setSeekTime()
 
 // *************************************************************************
@@ -1155,7 +1213,7 @@ So@Gui@Viewer::setSeekTime(const float seconds)
 float
 So@Gui@Viewer::getSeekTime(void) const
 {
-  return this->seekperiod;
+  return THIS->seekperiod;
 } // getSeekTime()
 
 // *************************************************************************
@@ -1169,7 +1227,7 @@ So@Gui@Viewer::getSeekTime(void) const
 void
 So@Gui@Viewer::addStartCallback(So@Gui@ViewerCB * func, void * data)
 {
-  this->interactionstartCallbacks->addCallback((SoCallbackListCB *)func, data);
+  THIS->interactionstartCallbacks->addCallback((SoCallbackListCB *)func, data);
 } // addStartCallback()
 
 /*!
@@ -1182,7 +1240,7 @@ So@Gui@Viewer::addStartCallback(So@Gui@ViewerCB * func, void * data)
 void
 So@Gui@Viewer::removeStartCallback(So@Gui@ViewerCB * func, void * data)
 {
-  this->interactionstartCallbacks->removeCallback((SoCallbackListCB *)func,
+  THIS->interactionstartCallbacks->removeCallback((SoCallbackListCB *)func,
                                                   data);
 } // removeStartCallback()
 
@@ -1197,7 +1255,7 @@ So@Gui@Viewer::removeStartCallback(So@Gui@ViewerCB * func, void * data)
 void
 So@Gui@Viewer::addFinishCallback(So@Gui@ViewerCB * func, void * data)
 {
-  this->interactionendCallbacks->addCallback((SoCallbackListCB *)func, data);
+  THIS->interactionendCallbacks->addCallback((SoCallbackListCB *)func, data);
 } // addFinishCallback()
 
 /*!
@@ -1210,7 +1268,7 @@ So@Gui@Viewer::addFinishCallback(So@Gui@ViewerCB * func, void * data)
 void
 So@Gui@Viewer::removeFinishCallback(So@Gui@ViewerCB * func, void * data)
 {
-  this->interactionendCallbacks->removeCallback((SoCallbackListCB *)func,
+  THIS->interactionendCallbacks->removeCallback((SoCallbackListCB *)func,
                                                 data);
 } // removeFinishCallback()
 
@@ -1510,8 +1568,8 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 void
 So@Gui@Viewer::setDoubleBuffer(SbBool on)
 {
-  if (!this->localsetbuffertype)
-    this->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
+  if (!THIS->localsetbuffertype)
+    THIS->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
 
   inherited::setDoubleBuffer(on);
 } // setDoubleBuffer()
@@ -1577,8 +1635,8 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
 
   // Make our own camera if none was available.
   if (!scenecamera) {
-    scenecamera = (SoCamera *)this->cameratype.createInstance();
-    this->deletecamera = TRUE;
+    scenecamera = (SoCamera *)THIS->cameratype.createInstance();
+    THIS->deletecamera = TRUE;
 
     if ( this->type == So@Gui@Viewer::BROWSER ) {
       this->sceneRoot->insertChild(scenecamera, 1);
@@ -1643,12 +1701,12 @@ So@Gui@Viewer::setSeekMode(
     assert( this->isViewing() );
 #endif // SO@GUI@_DEBUG
 
-  if ( ! enable && this->seeksensor->isScheduled() ) {
-    this->seeksensor->unschedule();
+  if ( ! enable && THIS->seeksensor->isScheduled() ) {
+    THIS->seeksensor->unschedule();
     this->interactiveCountDec();
   }
 
-  this->inseekmode = enable;
+  THIS->inseekmode = enable;
 } // setSeekMode()
 
 // *************************************************************************
@@ -1662,7 +1720,7 @@ So@Gui@Viewer::setSeekMode(
 SbBool
 So@Gui@Viewer::isSeekMode(void) const
 {
-  return this->inseekmode;
+  return THIS->inseekmode;
 } // isSeekMode()
 
 // *************************************************************************
@@ -1695,7 +1753,7 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 //  this->setSeekMode(TRUE);
 
   SbVec3f hitpoint;
-  if (this->seektopoint) {
+  if (THIS->seektopoint) {
     hitpoint = picked->getPoint();
   } else {
     SoGetBoundingBoxAction bbaction(this->getViewportRegion());
@@ -1704,24 +1762,24 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
     hitpoint = bbox.getCenter();
   }
 
-  this->camerastartposition = this->camera->position.getValue();
+  THIS->camerastartposition = this->camera->position.getValue();
 
-  float fd = this->seekdistance;
-  if (this->seekdistanceabs)
+  float fd = THIS->seekdistance;
+  if (THIS->seekdistanceabs)
     fd *= (hitpoint - this->camera->position.getValue()).length()/100.0f;
   this->camera->focalDistance = fd;
 
   SbVec3f dir;
   this->camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
-  this->cameraendposition = hitpoint - fd * dir;
+  THIS->cameraendposition = hitpoint - fd * dir;
 
-  if (this->seeksensor->isScheduled()) {
-    this->seeksensor->unschedule();
+  if (THIS->seeksensor->isScheduled()) {
+    THIS->seeksensor->unschedule();
     this->interactiveCountDec();
   }
 
-  this->seeksensor->setBaseTime(SbTime::getTimeOfDay());
-  this->seeksensor->schedule();
+  THIS->seeksensor->setBaseTime(SbTime::getTimeOfDay());
+  THIS->seeksensor->schedule();
   this->interactiveCountInc();
 
   return TRUE;
@@ -1737,27 +1795,27 @@ So@Gui@Viewer::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 
     // First pass: render as filled, but with the background color.
 
-    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
-    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
+    THIS->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    THIS->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    THIS->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    THIS->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
     // textureQuality field of socomplexity node is always 0.0
 
-    this->sobasecolor->rgb.setValue(this->getBackgroundColor());
-    this->sobasecolor->rgb.setIgnored(FALSE);
-    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
-    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+    THIS->sobasecolor->rgb.setValue(this->getBackgroundColor());
+    THIS->sobasecolor->rgb.setIgnored(FALSE);
+    THIS->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
+    THIS->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
     this->getSceneManager()->render(clearcol, clearz);
 
 
     // Second pass, render wireframe on top.
 
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force lines
-    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
-    this->somaterialbinding->value.setIgnored(TRUE); // as-is
-    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    THIS->sodrawstyle->style = SoDrawStyle::LINES;
+    THIS->sodrawstyle->style.setIgnored(FALSE); // force lines
+    THIS->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
+    THIS->somaterialbinding->value.setIgnored(TRUE); // as-is
+    THIS->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
     
     this->getSceneManager()->render(FALSE, FALSE);
 
@@ -1913,15 +1971,15 @@ void
 So@Gui@Viewer::interactiveCountInc(void)
 {
   // Catch problems with missing interactiveCountDec() calls.
-  assert(this->interactionnesting < 100);
+  assert(THIS->interactionnesting < 100);
 
-  if (++(this->interactionnesting) == 1)
-    this->interactionstartCallbacks->invokeCallbacks(this);
+  if (++(THIS->interactionnesting) == 1)
+    THIS->interactionstartCallbacks->invokeCallbacks(this);
 
 #if 0 // debug
   SoDebugError::postInfo("So@Gui@Viewer::interactiveCountInc", "%d -> %d",
-                         this->interactionnesting - 1,
-                         this->interactionnesting);
+                         THIS->interactionnesting - 1,
+                         THIS->interactionnesting);
 #endif // debug
 } // interactiveCountInc()
 
@@ -1946,15 +2004,15 @@ void
 So@Gui@Viewer::interactiveCountDec(void)
 {
 #if SO@GUI@_DEBUG
-  if (this->interactionnesting <= 0) {
+  if (THIS->interactionnesting <= 0) {
     SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
         "interaction count nesting went below zero" );
   }
 #endif // SO@GUI@_DEBUG
 
-  if (--(this->interactionnesting) <= 0) {
-    this->interactionendCallbacks->invokeCallbacks(this);
-    this->interactionnesting = 0;
+  if (--(THIS->interactionnesting) <= 0) {
+    THIS->interactionendCallbacks->invokeCallbacks(this);
+    THIS->interactionnesting = 0;
     this->resetFrameCounter();
   }
 } // interactiveCountDec()
@@ -1971,7 +2029,7 @@ So@Gui@Viewer::interactiveCountDec(void)
 int
 So@Gui@Viewer::getInteractiveCount(void) const
 {
-  return this->interactionnesting;
+  return THIS->interactionnesting;
 } // getInteractiveCount()
 
 // *************************************************************************
@@ -2003,7 +2061,7 @@ So@Gui@Viewer::setSeekDistance(const float distance)
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->seekdistance = distance;
+  THIS->seekdistance = distance;
 } // setSeekDistance()
 
 // *************************************************************************
@@ -2019,7 +2077,7 @@ So@Gui@Viewer::setSeekDistance(const float distance)
 float
 So@Gui@Viewer::getSeekDistance(void) const
 {
-  return this->seekdistance;
+  return THIS->seekdistance;
 } // getSeekDistance()
 
 // *************************************************************************
@@ -2044,7 +2102,7 @@ So@Gui@Viewer::setSeekValueAsPercentage(const SbBool on)
     return;
   }
 #endif // SO@GUI@_DEBUG
-  this->seekdistanceabs = on ? FALSE : TRUE;
+  THIS->seekdistanceabs = on ? FALSE : TRUE;
 } // setSeekValkueAsPercentage()
 
 // *************************************************************************
@@ -2060,7 +2118,7 @@ So@Gui@Viewer::setSeekValueAsPercentage(const SbBool on)
 SbBool
 So@Gui@Viewer::isSeekValuePercentage(void) const
 {
-  return this->seekdistanceabs ? FALSE : TRUE;
+  return THIS->seekdistanceabs ? FALSE : TRUE;
 } // isSeekValuePercentage()
 
 // *************************************************************************
@@ -2076,7 +2134,7 @@ So@Gui@Viewer::toggleCameraType(void)
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
 
-  this->setCameraType( this->cameratype.isDerivedFrom( perspectivetype )
+  this->setCameraType( THIS->cameratype.isDerivedFrom( perspectivetype )
                        ? orthotype : perspectivetype );
 } // toggleCameraType()
 
@@ -2092,13 +2150,13 @@ So@Gui@Viewer::toggleCameraType(void)
 SbBool
 So@Gui@Viewer::drawInteractiveAsStill(void) const
 {
-  SbBool moveasstill = this->drawstyles[INTERACTIVE] == VIEW_SAME_AS_STILL;
+  SbBool moveasstill = THIS->drawstyles[INTERACTIVE] == VIEW_SAME_AS_STILL;
   if (!moveasstill)
-    moveasstill = this->drawstyles[INTERACTIVE] == this->drawstyles[STILL];
+    moveasstill = THIS->drawstyles[INTERACTIVE] == THIS->drawstyles[STILL];
   if (!moveasstill)
     moveasstill =
-      this->drawstyles[INTERACTIVE] == VIEW_NO_TEXTURE &&
-      this->drawstyles[STILL] != VIEW_AS_IS;
+      THIS->drawstyles[INTERACTIVE] == VIEW_NO_TEXTURE &&
+      THIS->drawstyles[STILL] != VIEW_AS_IS;
   return moveasstill;
 } // drawInteractiveAsStill()
 
@@ -2116,9 +2174,9 @@ So@Gui@Viewer::currentDrawStyle(void) const
   SbBool interactivemode = this->getInteractiveCount() > 0 ? TRUE : FALSE;
 
   if (!interactivemode || this->drawInteractiveAsStill())
-    return this->drawstyles[STILL];
+    return THIS->drawstyles[STILL];
   else
-    return this->drawstyles[INTERACTIVE];
+    return THIS->drawstyles[INTERACTIVE];
 } // currentDrawStyle()
 
 // *************************************************************************
@@ -2173,24 +2231,24 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   // Render everything as its supposed to be done, don't override
   // any of the settings in the ``real'' graph.
   if (style == VIEW_AS_IS) {
-    this->drawstyleroot->whichChild = SO_SWITCH_NONE;
+    THIS->drawstyleroot->whichChild = SO_SWITCH_NONE;
     return;
   }
 
-  this->drawstyleroot->whichChild = SO_SWITCH_ALL;
+  THIS->drawstyleroot->whichChild = SO_SWITCH_ALL;
   if (style == VIEW_HIDDEN_LINE) {
-    this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
+    THIS->hiddenlineroot->whichChild = SO_SWITCH_ALL;
     return;
   }
   else {
-    this->hiddenlineroot->whichChild = SO_SWITCH_NONE;
+    THIS->hiddenlineroot->whichChild = SO_SWITCH_NONE;
   }
 
   // Set or unset lightmodel override.
   switch (style) {
   case VIEW_NO_TEXTURE:
   case VIEW_LOW_COMPLEXITY:
-    this->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
+    THIS->solightmodel->model.setIgnored(TRUE); // as-is BASE or PHONG
     break;
 
   case VIEW_LINE:
@@ -2198,7 +2256,7 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   case VIEW_BBOX:
   case VIEW_LOW_RES_LINE:
   case VIEW_LOW_RES_POINT:
-    this->solightmodel->model.setIgnored(FALSE); // force BASE lighting
+    THIS->solightmodel->model.setIgnored(FALSE); // force BASE lighting
     break;
 
   default:
@@ -2210,20 +2268,20 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   switch (style) {
   case VIEW_NO_TEXTURE:
   case VIEW_LOW_COMPLEXITY:
-    this->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
+    THIS->sodrawstyle->style.setIgnored(TRUE); // as-is drawing style filled/lines/points
     break;
 
   case VIEW_LINE:
   case VIEW_LOW_RES_LINE:
   case VIEW_BBOX:
-    this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored(FALSE); // force line rendering
+    THIS->sodrawstyle->style = SoDrawStyle::LINES;
+    THIS->sodrawstyle->style.setIgnored(FALSE); // force line rendering
     break;
 
   case VIEW_POINT:
   case VIEW_LOW_RES_POINT:
-    this->sodrawstyle->style = SoDrawStyle::POINTS;
-    this->sodrawstyle->style.setIgnored(FALSE); // force point rendering
+    THIS->sodrawstyle->style = SoDrawStyle::POINTS;
+    THIS->sodrawstyle->style.setIgnored(FALSE); // force point rendering
     break;
 
   default:
@@ -2236,13 +2294,13 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   case VIEW_LINE:
   case VIEW_POINT:
   case VIEW_BBOX:
-    this->socomplexity->value.setIgnored(TRUE); // as-is complexity
+    THIS->socomplexity->value.setIgnored(TRUE); // as-is complexity
     break;
 
   case VIEW_LOW_COMPLEXITY:
   case VIEW_LOW_RES_LINE:
   case VIEW_LOW_RES_POINT:
-    this->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
+    THIS->socomplexity->value.setIgnored(FALSE); // force complexity setting of 0.1
     break;
 
   default:
@@ -2257,12 +2315,12 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   case VIEW_POINT:
   case VIEW_LOW_RES_LINE:
   case VIEW_LOW_RES_POINT:
-    this->socomplexity->type.setIgnored(TRUE); // as-is
+    THIS->socomplexity->type.setIgnored(TRUE); // as-is
     break;
 
   case VIEW_BBOX:
-    this->socomplexity->type = SoComplexity::BOUNDING_BOX;
-    this->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
+    THIS->socomplexity->type = SoComplexity::BOUNDING_BOX;
+    THIS->socomplexity->type.setIgnored(FALSE); // force bounding box rendering
     break;
 
   default:
@@ -2277,14 +2335,14 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
                          "\tcomplexity type: 0x%02x, (isIgnored() == %s)\n"
                          "\tcomplexity value: %f, (isIgnored() == %s)\n"
                          "",
-                         this->sodrawstyle->style.getValue(),
-                         this->sodrawstyle->style.isIgnored() ? "T" : "F",
-                         this->solightmodel->model.getValue(),
-                         this->solightmodel->model.isIgnored() ? "T" : "F",
-                         this->socomplexity->type.getValue(),
-                         this->socomplexity->type.isIgnored() ? "T" : "F",
-                         this->socomplexity->value.getValue(),
-                         this->socomplexity->value.isIgnored() ? "T" : "F");
+                         THIS->sodrawstyle->style.getValue(),
+                         THIS->sodrawstyle->style.isIgnored() ? "T" : "F",
+                         THIS->solightmodel->model.getValue(),
+                         THIS->solightmodel->model.isIgnored() ? "T" : "F",
+                         THIS->socomplexity->type.getValue(),
+                         THIS->socomplexity->type.isIgnored() ? "T" : "F",
+                         THIS->socomplexity->value.getValue(),
+                         THIS->socomplexity->value.isIgnored() ? "T" : "F");
 #endif // debug
 } // changeDrawStyle()
 
@@ -2420,15 +2478,15 @@ void
 So@Gui@Viewer::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during interaction.
-  if (thisp->buffertype == BUFFER_INTERACTIVE) {
-    thisp->localsetbuffertype = TRUE;
+  if (thisp->pimpl->buffertype == BUFFER_INTERACTIVE) {
+    thisp->pimpl->localsetbuffertype = TRUE;
     thisp->inherited::setDoubleBuffer(TRUE);
-    thisp->localsetbuffertype = FALSE;
+    thisp->pimpl->localsetbuffertype = FALSE;
   }
 
   // Use the dynamic drawstyle.
   if (!thisp->drawInteractiveAsStill())
-    thisp->changeDrawStyle(thisp->drawstyles[INTERACTIVE]);
+    thisp->changeDrawStyle(thisp->pimpl->drawstyles[INTERACTIVE]);
 } // interactivestartCB()
 
 // *************************************************************************
@@ -2445,15 +2503,15 @@ So@Gui@Viewer::interactiveendCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during
   // interaction, singelbuffering while the camera is static.
-  if (thisp->buffertype == BUFFER_INTERACTIVE) {
-    thisp->localsetbuffertype = TRUE;
+  if (thisp->pimpl->buffertype == BUFFER_INTERACTIVE) {
+    thisp->pimpl->localsetbuffertype = TRUE;
     thisp->inherited::setDoubleBuffer(FALSE);
-    thisp->localsetbuffertype = FALSE;
+    thisp->pimpl->localsetbuffertype = FALSE;
   }
 
   // Back to static drawstyle.
   if (!thisp->drawInteractiveAsStill())
-    thisp->changeDrawStyle(thisp->drawstyles[STILL]);
+    thisp->changeDrawStyle(thisp->pimpl->drawstyles[STILL]);
 } // interactiveendCB()
 
 // *************************************************************************
@@ -2473,13 +2531,13 @@ So@Gui@Viewer::seeksensorCB(void * data, SoSensor * s)
   SoTimerSensor * sensor = (SoTimerSensor *)s;
 
   float t =
-    (currenttime - sensor->getBaseTime()).getValue() / thisp->seekperiod;
+    (currenttime - sensor->getBaseTime()).getValue() / thisp->pimpl->seekperiod;
   if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
   SbBool end = (t == 1.0f);
 
 //  t = 0.5f - cos(M_PI * t) * 0.5f;
-  thisp->camera->position = thisp->camerastartposition +
-    (thisp->cameraendposition - thisp->camerastartposition) * t;
+  thisp->camera->position = thisp->pimpl->camerastartposition +
+    (thisp->pimpl->cameraendposition - thisp->pimpl->camerastartposition) * t;
 
   if (end) thisp->setSeekMode(FALSE);
 } // seeksensorCB()
@@ -2511,11 +2569,11 @@ So@Gui@Viewer::sizeChanged(
 void
 So@Gui@Viewer::resetFrameCounter(void)
 {
-  this->framecount = 0;
-  for(int i=0; i < So@Gui@Viewer::FRAMESARRAY_SIZE; i++) this->frames[i] = 0.0;
-  this->totalval = 0.0;
-  this->currentframetime = 0.0;
-  this->lasttimeofday = 0.0;
+  THIS->framecount = 0;
+  for(int i=0; i < SoGuiViewerP::FRAMESARRAY_SIZE; i++) THIS->frames[i] = 0.0;
+  THIS->totalval = 0.0;
+  THIS->currentframetime = 0.0;
+  THIS->lasttimeofday = 0.0;
 }
 
 /*!
@@ -2530,15 +2588,15 @@ So@Gui@Viewer::resetFrameCounter(void)
 void
 So@Gui@Viewer::addFrametime(const double ft)
 {
-  this->framecount++;
+  THIS->framecount++;
 
-  int arrayptr = (this->framecount - 1) % So@Gui@Viewer::FRAMESARRAY_SIZE;
-  double oldval = this->frames[arrayptr];
-  this->frames[arrayptr] = ft;
-  this->totalval += (ft - oldval);
-  this->currentframetime =
-    this->totalval / So@Gui@Min(this->framecount,
-                                (int) So@Gui@Viewer::FRAMESARRAY_SIZE);
+  int arrayptr = (THIS->framecount - 1) % SoGuiViewerP::FRAMESARRAY_SIZE;
+  double oldval = THIS->frames[arrayptr];
+  THIS->frames[arrayptr] = ft;
+  THIS->totalval += (ft - oldval);
+  THIS->currentframetime =
+    THIS->totalval / So@Gui@Min(THIS->framecount,
+                                (int) SoGuiViewerP::FRAMESARRAY_SIZE);
 }
 
 static unsigned char fps2dfont[][12] = {
@@ -2708,20 +2766,20 @@ So@Gui@Viewer::recordFPS(void)
 {
 #if I_WANT_TO_SEE_THE_FRAMES_PER_SECOND_COUNTER
   double frametime, timeofday = SbTime::getTimeOfDay().getValue();
-  if((this->lasttimeofday == 0.0) ||
-     ((timeofday - this->lasttimeofday) > 1.0)) {
+  if((THIS->lasttimeofday == 0.0) ||
+     ((timeofday - THIS->lasttimeofday) > 1.0)) {
     this->resetFrameCounter();
     
     frametime = 0.0;
-    this->lasttimeofday = timeofday;
+    THIS->lasttimeofday = timeofday;
   }
   else {
-    frametime = timeofday - this->lasttimeofday;
-    this->lasttimeofday = timeofday;
+    frametime = timeofday - THIS->lasttimeofday;
+    THIS->lasttimeofday = timeofday;
     this->addFrametime(frametime);
 
     char buffer[64];
-    int nr = sprintf(buffer, "%.1f fps", 1.0/this->currentframetime);
+    int nr = sprintf(buffer, "%.1f fps", 1.0/THIS->currentframetime);
     assert(nr < 64);
     Draw2DString(buffer, this->getGlxSize(), SbVec2f(10, 10));
   }
