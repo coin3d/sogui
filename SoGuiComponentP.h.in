@@ -24,6 +24,8 @@
 #ifndef SOGUICOMPONENTP_H
 #define SOGUICOMPONENTP_H
 
+#include <Inventor/SbDict.h>
+
 class So@Gui@Component;
 
 // ************************************************************************
@@ -36,9 +38,14 @@ class SoGuiComponentP
 public:
   ~SoGuiComponentP();
 
+  static SbDict * widget2compdict;
+
 protected:
   SoGuiComponentP(So@Gui@Component * publ);
   So@Gui@Component * pub;
+
+private:
+  static int nrofcomponents;
 };
 
 // ************************************************************************

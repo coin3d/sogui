@@ -47,6 +47,8 @@
 #include <Inventor/@Gui@/So@Gui@Component.h>
 #include <Inventor/@Gui@/So@Gui@ComponentP.h>
 
+#include <Inventor/SbPList.h>
+
 /*!
   \fn void So@Gui@Component::initClasses(void)
 
@@ -363,14 +365,6 @@ So@Gui@Component::getDefaultIconTitle(void) const
 */
 
 /*!
-  \fn So@Gui@Component * So@Gui@Component::getComponent(@WIDGET@ const widget)
-
-  Finds and returns the So@Gui@Component corresponding to the given
-  @WIDGET@, if any. If no So@Gui@Component is the "owner" of the
-  widget, \c NULL will be returned.
-*/
-
-/*!
   \fn SbBool So@Gui@Component::setFullScreen(const SbBool onoff)
 
   Toggle full screen mode for this component, if possible.
@@ -423,6 +417,82 @@ So@Gui@Component::getDefaultIconTitle(void) const
 */
 
 
+
+// *************************************************************************
+
+/*!
+  This method should be used by subclasses to register the widgets
+  they set up from the underlying native toolkit, so they can be
+  "reverse" mapped to the owner component.
+
+  Subclasses failing to register the widgets they use will cause the
+  So@Gui@Component::getComponent() method to fail with those widgets.
+
+  \sa unregisterWidget(), getComponent()
+*/
+void
+So@Gui@Component::registerWidget(@WIDGET@ widget)
+{
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@Component::registerWidget",
+                         "registering widget %p", widget);
+#endif // debug
+
+  // In case widget was already present.
+  void * comp;
+  if (SoGuiComponentP::widget2compdict->find((unsigned long)widget, comp)) {
+    if (((So@Gui@Component *)comp) != this) {
+#if SO@GUI@_DEBUG
+      SoDebugError::postWarning("So@Gui@Component::registerWidget",
+                                "widget %p already registered on a different "
+                                "component", widget);
+#endif // SO@GUI@_DEBUG
+      SoGuiComponentP::widget2compdict->remove((unsigned long)widget);
+    }
+    else {
+      return;
+    }
+  }
+
+  SoGuiComponentP::widget2compdict->enter((unsigned long)widget, (void *)this);
+}
+
+/*!
+  Remove a previously registered native toolkit widget from the
+  widget-to-component mappings used by
+  So@Gui@Component::getComponent().
+
+  \sa registerWidget()
+*/
+void
+So@Gui@Component::unregisterWidget(@WIDGET@ widget)
+{
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@Component::unregisterWidget",
+                         "unregistering widget %p", widget);
+#endif // debug
+
+  // Ignore return value to allow a widget to be unregistered several
+  // times (it doesn't matter, just as it doesn't matter if a widget
+  // is registered multiple times).
+  (void)SoGuiComponentP::widget2compdict->remove((unsigned long)widget);
+}
+
+/*!
+  Finds and returns the So@Gui@Component corresponding to the given
+  @WIDGET@, if any. If the widget does not seem to belong to any
+  So@Gui@Component, \c NULL will be returned.
+*/
+So@Gui@Component *
+So@Gui@Component::getComponent(@WIDGET@ widget)
+{
+  void * comp;
+  if (!SoGuiComponentP::widget2compdict->find((unsigned long)widget, comp)) {
+    return NULL;
+  }
+  return (So@Gui@Component *)comp;
+}
+
 // *************************************************************************
 
 #ifndef DOXYGEN_SKIP_THIS
@@ -430,14 +500,38 @@ So@Gui@Component::getDefaultIconTitle(void) const
 // Remaining code is for the SoGuiComponentP "private implementation"
 // class.
 
+SbDict * SoGuiComponentP::widget2compdict = NULL;
+int SoGuiComponentP::nrofcomponents = 0;
 
 SoGuiComponentP::SoGuiComponentP(So@Gui@Component * publ)
 {
   this->pub = publ;
+
+  if (SoGuiComponentP::widget2compdict == NULL) {
+    SoGuiComponentP::widget2compdict = new SbDict;
+  }
+  SoGuiComponentP::nrofcomponents++;
 }
 
 SoGuiComponentP::~SoGuiComponentP()
 {
+  SoGuiComponentP::nrofcomponents--;
+  if (SoGuiComponentP::nrofcomponents == 0) {
+#if SO@GUI@_DEBUG
+    // Check to see if widgets were forgotten (ie missing
+    // unregisterWidget() calls).
+    SbPList keys, values;
+    SoGuiComponentP::widget2compdict->makePList(keys, values);
+    for (int i=0; i < keys.getLength(); i++) {
+      SoDebugError::postWarning("SoGuiComponentP::~SoGuiComponentP",
+                                "widget %p not unregistered for component %p",
+                                keys[i], values[i]);
+    }
+#endif // SO@GUI@_DEBUG
+
+    delete SoGuiComponentP::widget2compdict;
+    SoGuiComponentP::widget2compdict = NULL;
+  }
 }
 
 #endif // DOXYGEN_SKIP_THIS

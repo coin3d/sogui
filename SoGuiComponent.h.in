@@ -83,7 +83,7 @@ public:
 
   void setWindowCloseCallback(So@Gui@ComponentCB * const func,
                               void * const user = NULL);
-  static So@Gui@Component * getComponent(@WIDGET@ const widget);
+  static So@Gui@Component * getComponent(@WIDGET@ widget);
 
   static void initClasses(void);
 
