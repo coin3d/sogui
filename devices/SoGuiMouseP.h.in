@@ -38,7 +38,7 @@ public:
   SoLocation2Event * locationevent;
   int eventmask;
 
-private:
+protected:
   class So@Gui@Mouse * pub;
 };
 
