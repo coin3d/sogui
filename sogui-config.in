@@ -67,8 +67,14 @@ done
 if test -f $prefix/share/Coin/conf/so@gui@-$alternate.cfg; then
   configfile="$prefix/share/Coin/conf/so@gui@-$alternate.cfg"
   . $configfile
+elif test -f /Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-$alternate.cfg; then
+  configfile="/Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-$alternate.cfg"
+  . $configfile
 elif test -f $prefix/share/Coin/conf/so@gui@-default.cfg; then
   configfile="$prefix/share/Coin/conf/so@gui@-default.cfg"
+  . $configfile
+elif test -f /Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-default.cfg; then
+  configfile="/Library/Frameworks/So@Gui@.framework/Versions/Current/Resources/conf/so@gui@-default.cfg"
   . $configfile
 else
   echo >&2 "$me: no default So@Gui@ config available"
