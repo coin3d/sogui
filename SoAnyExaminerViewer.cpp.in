@@ -43,6 +43,7 @@ static const char rcsid[] =
 
 #include <Inventor/@GUI@/So@GUI@Basic.h>
 #include <Inventor/@GUI@/viewers/So@GUI@ExaminerViewer.h>
+#include <Inventor/@GUI@/viewers/SoAnyExaminerViewer.h>
 
 // Bitmap representations of an "X", a "Y" and a "Z" for the axis cross.
 static GLubyte xbmp[] = { 0x11,0x11,0x0a,0x04,0x0a,0x11,0x11 };
@@ -55,7 +56,7 @@ static GLubyte zbmp[] = { 0x1f,0x10,0x08,0x04,0x02,0x01,0x1f };
 */
 
 SoAnyExaminerViewer::SoAnyExaminerViewer(
-  So@GUI@ExaminerViewer * container )
+  So@GUI@ExaminerViewer * const container )
 : viewer( container )
 {
   assert( container != NULL );
@@ -592,7 +593,7 @@ SoAnyExaminerViewer::spin(
   if ( pointerpos == lastspinposition ) return;
   assert( this->spinprojector != NULL );
 
-  lastspinposition = pointerpos;
+  this->lastspinposition = pointerpos;
 
   SbRotation r;
   this->spinprojector->projectAndGetRotation( pointerpos, r);
@@ -651,7 +652,7 @@ SoAnyExaminerViewer::pan(
   vv.projectPointToLine( mousepos, line );
   SbVec3f current_planept;
   this->panningplane.intersect( line, current_planept );
-  vv.projectPointToLine( viewer->lastmouseposition, line );
+  vv.projectPointToLine( this->lastmouseposition, line );
   SbVec3f old_planept;
   this->panningplane.intersect( line, old_planept );
 

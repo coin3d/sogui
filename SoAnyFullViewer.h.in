@@ -76,7 +76,7 @@ enum SoViewerPopupMenuRadioGroup {
 // ************************************************************************
 
 class SoAnyFullViewer {
-protected:
+public:
   SoAnyFullViewer( So@GUI@FullViewer * container );
   ~SoAnyFullViewer(void);
 

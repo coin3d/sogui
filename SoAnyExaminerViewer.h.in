@@ -33,8 +33,10 @@ class So@GUI@ExaminerViewer;
 // ************************************************************************
 
 class SoAnyExaminerViewer {
+  friend class So@GUI@ExaminerViewer;
+
 public:
-  SoAnyExaminerViewer( So@GUI@ExaminerViewer * viewer );
+  SoAnyExaminerViewer( So@GUI@ExaminerViewer * const viewer );
   ~SoAnyExaminerViewer(void);
 
   void setAnimationEnabled( const SbBool enable );
