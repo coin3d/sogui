@@ -809,8 +809,7 @@ SoGuiPlaneViewerP::getPointerOrigoAngle(void) const
   now[0] -= this->canvas[0] / 2;
   now[1] -= this->canvas[1] / 2;
 
-  double nowradval = (now != SbVec2s(0, 0)) ?
-    atan(fabs(now[1] / now[0])) : 0.0;
+  double nowradval = (now[0] != 0) ? atan(fabs(now[1] / now[0])) : 0.0;
 
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
@@ -832,14 +831,11 @@ SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
   then[0] -= this->canvas[0] / 2;
   then[1] -= this->canvas[1] / 2;
 
-  double nowradval = (now != SbVec2s(0, 0)) ?
-    atan(fabs(now[1] / now[0])) : 0.0;
-
+  double nowradval = (now[0] != 0) ? atan(fabs(now[1] / now[0])) : 0.0;
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
-  double thenradval = (then != SbVec2s(0, 0)) ? 
-    atan(fabs(then[1] / then[0])) : 0.0;
+  double thenradval = (then[0] != 0) ? atan(fabs(then[1] / then[0])) : 0.0;
   if (then[0] < 0) thenradval = M_PI - thenradval;
   if (then[1] < 0) thenradval = 2 * M_PI - thenradval;
 
