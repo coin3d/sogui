@@ -8,13 +8,19 @@
  *
  */
 /*
- * The module contains interface routines to the Si library routines contained 
- * in the associated Dynamic Link Library.  The DLL is loaded explicitly when 
+ * The module contains interface routines to the Si library routines contained
+ * in the associated Dynamic Link Library.  The DLL is loaded explicitly when
  * Si is initialized.  When the DLL is loaded, the initialization routine finds
  * the addresses of the routines that it exposes to the world.  Once this is
- * done the library routines are used as if they were part of the original 
- * source code.  
+ * done the library routines are used as if they were part of the original
+ * source code. 
  */
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#ifdef HAVE_WIN32_API
 
 #define SPW_DEFINE_COPYRIGHT
 #define SPW_DEFINE_GLOBALS
@@ -32,7 +38,7 @@ static LPCTSTR DllLibrary = "siappdll";
 
 static LPCSTR strDLLRetVal          = "SpwErrorVal";
 
-/* Names of functions contained in DLL; used to find their addresses at load 
+/* Names of functions contained in DLL; used to find their addresses at load
    time */
 
 static LPCSTR fnSiBeep              = "SiBeep";
@@ -68,7 +74,7 @@ HINSTANCE ghDll;
 enum SpwRetVal SpwErrorVal;
 
 /*-----------------------------------------------------------------------------
- * 
+ *
  *  void __SiAppInitialize(void)
  *
  *  Args:
@@ -78,7 +84,7 @@ enum SpwRetVal SpwErrorVal;
  *    None
  *
  *  Description:
- *    This function opens up the DLL library and, if successful, loads a 
+ *    This function opens up the DLL library and, if successful, loads a
  *  function pointer table with exported UAPI functions contained in the DLL.
  *
  *---------------------------------------------------------------------------*/
@@ -112,162 +118,162 @@ int __SiAppInitialize(void)
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
 
-      if ((pfnSiInit = (PFNSI_INIT) 
-                           GetProcAddress(ghDll, fnSiInitialize)) == NULL)       
+      if ((pfnSiInit = (PFNSI_INIT)
+                           GetProcAddress(ghDll, fnSiInitialize)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
-      if ((pfnSiTerminate = (PFNSI_TERMINATE) 
-                           GetProcAddress(ghDll, fnSiTerminate)) == NULL)       
+        
+      if ((pfnSiTerminate = (PFNSI_TERMINATE)
+                           GetProcAddress(ghDll, fnSiTerminate)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetNumDevices = (PFNSI_GETNUMDEVICES)
-                           GetProcAddress(ghDll, fnSiGetNumDevices)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetNumDevices)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-      
-      if ((pfnSiGetDeviceID = (PFNSI_GETDEVICEID) 
-                           GetProcAddress(ghDll, fnSiGetDeviceID)) == NULL)       
+     
+      if ((pfnSiGetDeviceID = (PFNSI_GETDEVICEID)
+                           GetProcAddress(ghDll, fnSiGetDeviceID)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
 
-      if ((pfnSiDeviceIndex = (PFNSI_DEVICEINDEX) 
-                           GetProcAddress(ghDll, fnSiDeviceIndex)) == NULL)       
+      if ((pfnSiDeviceIndex = (PFNSI_DEVICEINDEX)
+                           GetProcAddress(ghDll, fnSiDeviceIndex)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiDispatch = (PFNSI_DISPATCH)
-                           GetProcAddress(ghDll, fnSiDispatch)) == NULL)       
+                           GetProcAddress(ghDll, fnSiDispatch)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiOpenWinInit = (PFNSI_OPENWININIT)
-                           GetProcAddress(ghDll, fnSiOpenWinInit)) == NULL)       
+                           GetProcAddress(ghDll, fnSiOpenWinInit)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiOpen = (PFNSI_OPEN)
-                           GetProcAddress(ghDll, fnSiOpen)) == NULL)       
+                           GetProcAddress(ghDll, fnSiOpen)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
-      if ((pfnSiClose = (PFNSI_CLOSE) 
-                           GetProcAddress(ghDll, fnSiClose)) == NULL)       
+        
+      if ((pfnSiClose = (PFNSI_CLOSE)
+                           GetProcAddress(ghDll, fnSiClose)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
-      if ((pfnSiGetEventWinInit = (PFNSI_GETEVENTWININIT) 
-                           GetProcAddress(ghDll, fnSiGetEventWinInit)) == NULL)       
+        
+      if ((pfnSiGetEventWinInit = (PFNSI_GETEVENTWININIT)
+                           GetProcAddress(ghDll, fnSiGetEventWinInit)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiIsSpaceWareEvent = (PFNSI_ISSPACEWAREEVENT)
-                           GetProcAddress(ghDll, fnSiIsSpaceWareEvent)) == NULL)       
+                           GetProcAddress(ghDll, fnSiIsSpaceWareEvent)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetEvent = (PFNSI_GETEVENT)
-                           GetProcAddress(ghDll, fnSiGetEvent)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetEvent)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiRezero = (PFNSI_REZERO)
-                           GetProcAddress(ghDll, fnSiRezero)) == NULL)       
+                           GetProcAddress(ghDll, fnSiRezero)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGrabDevice = (PFNSI_GRABDEVICE)
-                           GetProcAddress(ghDll, fnSiGrabDevice)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGrabDevice)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiReleaseDevice = (PFNSI_RELEASEDEVICE)
-                           GetProcAddress(ghDll, fnSiReleaseDevice)) == NULL)       
+                           GetProcAddress(ghDll, fnSiReleaseDevice)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiButtonPressed = (PFNSI_BUTTONPRESSED)
-                           GetProcAddress(ghDll, fnSiButtonPressed)) == NULL)       
+                           GetProcAddress(ghDll, fnSiButtonPressed)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiButtonReleased = (PFNSI_BUTTONRELEASED)
-                           GetProcAddress(ghDll, fnSiButtonReleased)) == NULL)       
+                           GetProcAddress(ghDll, fnSiButtonReleased)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiSetUiMode = (PFNSI_SETUIMODE)
-                           GetProcAddress(ghDll, fnSiSetUIMode)) == NULL)       
+                           GetProcAddress(ghDll, fnSiSetUIMode)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetDevicePort = (PFNSI_GETDEVICEPORT)
-                           GetProcAddress(ghDll, fnSiGetDevicePort)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetDevicePort)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetDriverInfo = (PFNSI_GETDRIVERINFO)
-                           GetProcAddress(ghDll, fnSiGetDriverInfo)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetDriverInfo)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetLibraryInfo = (PFNSI_GETLIBRARYINFO)
-                           GetProcAddress(ghDll, fnSiGetLibraryInfo)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetLibraryInfo)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSiGetDeviceInfo = (PFNSI_GETDEVICEINFO)
-                           GetProcAddress(ghDll, fnSiGetDeviceInfo)) == NULL)       
+                           GetProcAddress(ghDll, fnSiGetDeviceInfo)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
          }
-         
+        
       if ((pfnSpwErrorString = (PFNSPW_ERRORSTRING)
-                           GetProcAddress(ghDll, fnSpwErrorString)) == NULL)       
+                           GetProcAddress(ghDll, fnSpwErrorString)) == NULL)      
          {
          nResult = FAILED;
          nErrorCode = DLL_FUNCTION_LOAD_FAILURE;
@@ -282,7 +288,7 @@ int __SiAppInitialize(void)
    /* set the global variable */
 
    gInitStatus = nResult;
-   
+  
    return nErrorCode;
 }
 
@@ -303,7 +309,7 @@ int __SiAppInitialize(void)
  *
  *---------------------------------------------------------------------------*/
 
-enum SpwRetVal 
+enum SpwRetVal
 SiInitialize(void)
 {
    enum SpwRetVal tmpRetVal;  /* temporary return value */
@@ -352,7 +358,7 @@ SiTerminate(void)
          SpwErrorVal = SPW_DLL_LOAD_ERROR;  /* global variable */
          return;
          }
-   
+  
       /* if we weren't returning void, we'd do error handling here */
       }
 
@@ -459,7 +465,7 @@ SiGetDeviceID (SiHdl hdl)
  * Description:
  *    Given a device index, SiDeviceIndex returns the associated device ID.
  *    This routine is particularly useful with the function SiGetDevicePort.
- * 
+ *
  *---------------------------------------------------------------------------*/
 
 SiDevID
@@ -541,7 +547,7 @@ SiDispatch (SiHdl hdl, SiGetEventData *pData,
  * Description:
  *    This function initializes the Windows platform specific data for a
  *    subsequent call to SiOpen.
- * 
+ *
  *---------------------------------------------------------------------------*/
 
 void
@@ -638,7 +644,7 @@ SiOpenWinInit (SiOpenData *pData, HWND hWnd)
  *---------------------------------------------------------------------------*/
 
 SiHdl
-SiOpen (char *pAppName, SiDevID devID, SiTypeMask *pTMask, int mode, 
+SiOpen (char *pAppName, SiDevID devID, SiTypeMask *pTMask, int mode,
               SiOpenData *pData)
 {
    SiHdl tmpRetVal;  /* temporary return value */
@@ -716,7 +722,7 @@ SpwRetVal SiClose (SiHdl hdl)
  * Notes:
  *    NULL may be passed for pHdl if the return of the intended handle is not
  *    required.
- * 
+ *
  *---------------------------------------------------------------------------*/
 
 SPWbool
@@ -755,11 +761,11 @@ SiIsSpaceWareEvent(SiGetEventData *pData, SiHdl *pHdl)
  * Description:
  *    This function initializes the Windows platform specific data for a
  *    subsequent call to SiGetEvent.
- * 
+ *
  *---------------------------------------------------------------------------*/
 
-void 
-SiGetEventWinInit (SiGetEventData *pData, UINT msg, WPARAM wParam, 
+void
+SiGetEventWinInit (SiGetEventData *pData, UINT msg, WPARAM wParam,
                    LPARAM lParam)
 {
    if (gInitStatus != LOADED)
@@ -800,7 +806,7 @@ SiGetEventWinInit (SiGetEventData *pData, UINT msg, WPARAM wParam,
  *---------------------------------------------------------------------------*/
 
 enum SpwRetVal
-SiGetEvent (SiHdl hdl, int flags, SiGetEventData *pData, 
+SiGetEvent (SiHdl hdl, int flags, SiGetEventData *pData,
                            SiSpwEvent *pEvent)
 {
    enum SpwRetVal tmpRetVal;  /* temporary return value */
@@ -857,7 +863,7 @@ SiBeep(SiHdl hdl, char *pString)
          }
       }
 
-   tmpRetVal = pfnSiBeep(hdl, pString); 
+   tmpRetVal = pfnSiBeep(hdl, pString);
    SpwErrorVal = *pDllSpwRetVal;
    return tmpRetVal;
 }
@@ -895,7 +901,7 @@ SiRezero (SiHdl hdl)
          }
       }
 
-   tmpRetVal = pfnSiRezero(hdl); 
+   tmpRetVal = pfnSiRezero(hdl);
    SpwErrorVal = *pDllSpwRetVal;
    return tmpRetVal;
 }
@@ -922,7 +928,7 @@ SiRezero (SiHdl hdl)
  *    SpaceWare implementations only allow one non-exclusive grab.  Others
  *    allow multiple non-exclusive grabs and provide an interface for inter-
  *    actively selecting the current non-exclusive grab application.  An exclu-
- *    sive grab fails if another application has already exclusively captured 
+ *    sive grab fails if another application has already exclusively captured
  *    the device.  A non-exclusive grab fails if the SpaceWare implementation
  *    only allows one non-exclusive grab and another application has already
  *    non-exclusively captured the device.  Note that an exclusive grab should
@@ -1131,7 +1137,7 @@ SiSetUiMode (SiHdl hdl, SPWuint32 mode)
  *
  * Description:
  *   This function provides compatibility with older software.
- * 
+ *
  *---------------------------------------------------------------------------*/
 
 enum SpwRetVal
@@ -1242,7 +1248,7 @@ void
 SiGetLibraryInfo (SiVerInfo *pInfo)
 {
    if (gInitStatus != LOADED)
-      {   
+      {  
       SiInitialize();
       if (gInitStatus == FAILED)
          {
@@ -1324,3 +1330,7 @@ SpwErrorString (enum SpwRetVal val)
 
    return (char *) pfnSpwErrorString(val);
 }
+
+#endif /* HAVE_WIN32_API */
+
+

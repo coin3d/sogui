@@ -11,6 +11,14 @@
 #ifndef SPWINPUT_WIN32_H
 #define SPWINPUT_WIN32_H
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#ifndef HAVE_WIN32_API
+#error "Do not include this file unless HAVE_WIN32_API is set."
+#endif /* !HAVE_WIN32_API */
+
 #include <tchar.h>
 /* some enumerated types used in spwinput_win32.cpp */
 
