@@ -38,6 +38,9 @@ class QWidget;
 #ifdef __COIN_SOWIN__
 #include <wtypes.h>
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOMAC__
+// WORK-IN-PROGRESS
+#endif // __COIN_SOMAC__
 
 
 class So@Gui@Component;
