@@ -36,6 +36,10 @@
 #ifdef __COIN_SOGTK__
 #include <gtk/gtk.h>
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+#include <windows.h>
+class SoWinGLArea;
+#endif // __COIN_SOWIN__
 
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
@@ -86,6 +90,26 @@ public:
   virtual void setOverlayVisual(XVisualInfo * visual);
   XVisualInfo * getOverlayVisual(void);
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOWIN__
+  HWND getNormalWindow(void);
+  HWND getOverlayWindow(void);
+  HDC getNormalDC(void);
+  HDC getOverlayDC(void);
+  HGLRC getNormalContext(void);
+  HGLRC getOverlayContext(void);
+
+  void setStealFocus(SbBool doStealFocus);
+
+  virtual void setNormalVisual(PIXELFORMATDESCRIPTOR * vis);
+  PIXELFORMATDESCRIPTOR * getNormalVisual(void);
+  virtual void setOverlayVisual(PIXELFORMATDESCRIPTOR * vis);
+  PIXELFORMATDESCRIPTOR * getOverlayVisual(void);
+  virtual void setPixelFormat(int format);
+  int getPixelFormat(void);
+
+  void setCursor(HCURSOR newCursor);
+  HCURSOR getCursor(void);
+#endif // __COIN_SOWIN__
 
   SbBool hasOverlayGLArea(void) const;
   SbBool hasNormalGLArea(void) const;
@@ -147,6 +171,20 @@ protected:
   virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
   static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
 #endif // __COIN_SOGTK__
+#ifdef __COIN_SOWIN__
+  static LRESULT CALLBACK glWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  static LRESULT CALLBACK mgrWidgetProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+  static LRESULT eventHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+  int getDisplayListShareGroup(HGLRC ctx);
+  HWND getManagerWidget(void);
+  HWND parent;
+  HWND toplevel;
+  SbBool makeNormalCurrent(void);
+  SbBool swapNormalBuffers(void);
+  SbBool swapOverlayBuffers(void);
+  void setOverlayRender(const SbBool enable);
+  SbBool isOverlayRender(void) const;
+#endif // __COIN_SOWIN__
 
   void glLockNormal(void);
   void glUnlockNormal(void);
@@ -168,7 +206,7 @@ private slots:
 
 private:
   class So@Gui@GLWidgetP * pimpl;
-  friend class So@Gui@GLWidgetP; // FIXME: only used by SoGtkGLWidgetP -- get rid of it? 20011012 mortene.
+  friend class So@Gui@GLWidgetP; // FIXME: only used by So[Gtk|Win]GLWidgetP -- get rid of it? 20011012 mortene.
 
   void buildGLWidget(void); // FIXME: could we get rid of this? 20011012 mortene.
 
