@@ -564,21 +564,21 @@ HTML_ALIGN_MEMBERS     = YES
 # Microsoft HTML help workshop to generate a compressed HTML help file (.chm) 
 # of the generated HTML documentation.
 
-GENERATE_HTMLHELP      = NO
+GENERATE_HTMLHELP      = @COIN_DOC_HTML_HELP@
 
 # If the GENERATE_HTMLHELP tag is set to YES, the CHM_FILE tag can 
 # be used to specify the file name of the resulting .chm file. You 
 # can add a path in front of the file if the result should not be 
 # written to the html output dir.
 
-CHM_FILE               = 
+CHM_FILE               = @path_tag@@coin_html_help_dir@/Coin-@COIN_MAJOR_VERSION@_@COIN_MINOR_VERSION@.chm
 
 # If the GENERATE_HTMLHELP tag is set to YES, the HHC_LOCATION tag can 
 # be used to specify the location (absolute path including file name) of 
 # the HTML help compiler (hhc.exe). If non empty doxygen will try to run 
 # the html help compiler on the generated index.hhp.
 
-HHC_LOCATION           = 
+HHC_LOCATION           = @path_tag@@sim_ac_hhc_exe@
 
 # If the GENERATE_HTMLHELP tag is set to YES, the GENERATE_CHI flag 
 # controls if a separate .chi index file is generated (YES) or that 
