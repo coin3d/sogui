@@ -809,6 +809,7 @@ SoAnyExaminerViewer::processSoEvent(
 
     if ( event->getState() == SoButtonEvent::UP ) {
       if ( button == SoMouseButtonEvent::BUTTON1 ) {
+        this->spinanimating = FALSE;
         if ( viewer->isSeekMode() )
           return FALSE;
         this->button1Down = FALSE;
@@ -823,25 +824,33 @@ SoAnyExaminerViewer::processSoEvent(
         SbVec3f to = this->spinprojector->project( normalized );
         SbRotation rot = this->spinprojector->getRotation( from, to );
 
+        SbTime stoptime = (event->getTime() - this->log.time[0]);
+        if ( stoptime.getMsecValue() > 100 ) {
+          viewer->interactiveCountDec();
+          return TRUE;
+        }
+
         SbTime delta = (this->log.time[0] - this->log.time[2]);
         float deltatime = (float) delta.getMsecValue();
         if ( deltatime == 1.0f ) {
           SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
             this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue() );
+          viewer->interactiveCountDec();
           return TRUE;
         }
-        rot.scaleAngle( 200.0f / deltatime );
         rot.invert();
+        rot.scaleAngle( 200.0f / deltatime );
 
         SbVec3f axis;
         float radians;
         rot.getValue( axis, radians );
-        if ( radians < 0.005f ) {
+        if ( radians < 0.01f || deltatime > 300.0f ) {
           viewer->interactiveCountDec();
           return TRUE;
         }
         this->spinRotation = rot;
         this->spinanimating = TRUE;
+        viewer->scheduleRedraw();
         return TRUE; 
       }
       if ( button == SoMouseButtonEvent::BUTTON3 ) {
