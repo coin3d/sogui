@@ -70,6 +70,7 @@ public:
 
   static void mainLoop(void);
   static void exitMainLoop(void);
+  static void done(void);
 
   static @WIDGET@ getTopLevelWidget(void);
   static @WIDGET@ getShellWidget(const @WIDGET@ w);
