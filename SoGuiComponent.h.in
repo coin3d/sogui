@@ -1,0 +1,115 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// $Id$
+
+#ifndef SO@GUI@_COMPONENT_H
+#define SO@GUI@_COMPONENT_H
+
+#include <Inventor/SbLinear.h>
+#include <Inventor/@Gui@/So@Gui@Object.h>
+
+#ifdef __COIN_SOQT__
+class QWidget;
+#endif // __COIN_SOQT__
+
+class So@Gui@Component;
+
+typedef void So@Gui@ComponentCB(void * user, So@Gui@Component * component);
+typedef void So@Gui@ComponentVisibilityCB(void * user, SbBool visible);
+
+// *************************************************************************
+
+class SO@GUI@_DLL_API So@Gui@Component : public So@Gui@Object {
+  SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@Component, So@Gui@Object);
+  @COMPONENTHEADER@
+
+public:
+  virtual ~So@Gui@Component(void);
+
+  virtual void show(void);
+  virtual void hide(void);
+
+  SbBool isFullScreen(void) const;
+  SbBool setFullScreen(const SbBool onoff);
+
+  SbBool isVisible(void);
+  @WIDGET@ getWidget(void) const;
+  @WIDGET@ baseWidget(void) const;
+  SbBool isTopLevelShell(void) const;
+  @WIDGET@ getShellWidget(void) const;
+  @WIDGET@ getParentWidget(void) const;
+  void setSize(const SbVec2s size);
+  SbVec2s getSize(void) const;
+  void setTitle(const char * const title);
+  const char * getTitle(void) const;
+  void setIconTitle(const char * const title);
+  const char * getIconTitle(void) const;
+  void setWindowCloseCallback(So@Gui@ComponentCB * const func,
+                              void * const user = NULL);
+  static So@Gui@Component * getComponent(@WIDGET@ const widget);
+  const char * getWidgetName(void) const;
+  const char * getClassName(void) const;
+
+  static void initClasses(void);
+
+protected:
+  So@Gui@Component(@WIDGET@ const parent = NULL,
+                   const char * const name = NULL,
+                   const SbBool embed = TRUE);
+
+  virtual void afterRealizeHook(void);
+
+  void setClassName(const char * const name);
+  void setBaseWidget(@WIDGET@ const widget);
+
+  void registerWidget(@WIDGET@ widget);
+  void unregisterWidget(@WIDGET@ widget);
+
+  virtual const char * getDefaultWidgetName(void) const;
+  virtual const char * getDefaultTitle(void) const;
+  virtual const char * getDefaultIconTitle(void) const;
+
+  virtual void sizeChanged(const SbVec2s size);
+
+  void addVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
+                                    void * const user = NULL);
+  void removeVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
+                                       void * const user = NULL);
+
+  void openHelpCard(const char * const name);
+
+#ifdef __COIN_SOQT__
+  virtual bool eventFilter(QObject * obj, QEvent * e);
+#endif // __COIN_SOQT__
+
+#ifdef __COIN_SOQT__
+private slots:
+  void widgetClosed(void);
+#endif // __COIN_SOQT__
+
+private:
+  class So@Gui@ComponentP * pimpl;
+
+}; // class So@Gui@Component
+
+// *************************************************************************
+
+#endif // ! SO@GUI@_COMPONENT_H
