@@ -31,6 +31,7 @@
 \**************************************************************************/
 
 #include <assert.h>
+#include <common/soguidefs.h>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
@@ -698,7 +699,7 @@ void
 So@GUI@RenderArea::initGraphic( // virtual, protected
   void )
 {
-  COIN_STUB();
+  SOGUI_STUB();
 } // initGraphic()
 
 /*!
@@ -708,7 +709,7 @@ void
 So@GUI@RenderArea::initOverlayGraphic( // virtual, protected
   void )
 {
-  COIN_STUB();
+  SOGUI_STUB();
 } // initOverlayGraphic()
 
 /*!
@@ -748,7 +749,7 @@ void
 So@GUI@RenderArea::widgetChanged( // virtual, protected
   @WIDGET@ widget )
 {
-  COIN_STUB();
+  SOGUI_STUB();
 } // widgetChanged()
 
 /*!
