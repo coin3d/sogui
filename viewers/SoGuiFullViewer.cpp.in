@@ -1,0 +1,84 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// @configure_input@
+
+#if SO@GUI@_DEBUG
+static const char rcsid[] =
+  "$Id$";
+#endif // SO@GUI@_DEBUG
+
+// This file contains the generic, "templatize-able" parts of the
+// So*FullViewer sourcecode.
+
+
+// *************************************************************************
+
+#include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
+
+// *************************************************************************
+
+// Doc in superclass.
+void
+So@Gui@FullViewer::setComponentCursor(const So@Gui@Cursor & cursor)
+{
+  // Overridden to apply the new cursor only for the rendering canvas
+  // widget. Otherwise, the default So@Gui@Component
+  // setComponentCursor() method will set the cursor for the top-most
+  // parent widget, which makes it affect all sub-widgets, like the
+  // decorations stuff.
+
+  So@Gui@Component::setWidgetCursor(this->getRenderAreaWidget(), cursor);
+}
+
+// *************************************************************************
+
+/*!
+  This method returns the native widget for the label below the left
+  thumb wheel.
+*/
+
+@WIDGET@
+So@Gui@FullViewer::getLeftWheelLabelWidget(void) const
+{
+  return this->leftWheelLabel;
+}
+
+/*!
+  This method returns the native widget for the label below the right thumb
+  wheel.
+*/
+@WIDGET@
+So@Gui@FullViewer::getRightWheelLabelWidget(void) const
+{
+  return this->rightWheelLabel;
+}
+
+/*!
+  This method returns the native widget for the label beside the
+  bottom thumb wheel.
+*/
+@WIDGET@
+So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
+{
+  return this->bottomWheelLabel;
+}
+
+// *************************************************************************
