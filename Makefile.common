@@ -5,15 +5,17 @@
 # across all the Coin3D GUI toolkit libraries.
 #
 
-So@Gui@_BuiltFiles = \
+SoGui_BuiltFiles = \
   $(top_builddir)/so@gui@-config \
   $(top_builddir)/so@gui@-@CONFIG@.cfg
 
-So@Gui@_src_BuiltFiles = \
+SoGui_src_BuiltFiles = \
   $(top_builddir)/src/so@gui@defs.h
 ##$(top_builddir)/src/config.h
 
-So@Gui@_src_Inventor_@Gui@_BuiltFiles = \
+SoGui_src_Inventor_BuiltFiles =
+
+SoGui_src_Inventor_Gui_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/SoAny.h \
   $(top_builddir)/src/Inventor/@Gui@/SoAny.cpp \
   $(top_builddir)/src/Inventor/@Gui@/So@Gui@Basic.h \
@@ -28,14 +30,14 @@ So@Gui@_src_Inventor_@Gui@_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/So@Gui@RenderArea.cpp \
   $(So@Gui@_src_Inventor_@Gui@_common_BuiltFiles)
 
-So@Gui@_src_Inventor_@Gui@_common_BuiltFiles = \
+SoGui_src_Inventor_Gui_common_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/common/gl.h
 
-So@Gui@_src_Inventor_@Gui@_devices_BuiltFiles = \
+SoGui_src_Inventor_Gui_devices_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/devices/spwinput.h \
   $(top_builddir)/src/Inventor/@Gui@/devices/spwinput_x11.cpp
 
-So@Gui@_src_Inventor_@Gui@_viewers_BuiltFiles = \
+SoGui_src_Inventor_Gui_viewers_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@Viewer.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@Viewer.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h \
@@ -49,24 +51,28 @@ So@Gui@_src_Inventor_@Gui@_viewers_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/SoAnyPlaneViewer.h \
   $(top_builddir)/src/Inventor/@Gui@/viewers/SoAnyPlaneViewer.cpp
 
-So@Gui@_src_Inventor_@Gui@_widgets_BuiltFiles = \
+SoGui_src_Inventor_Gui_widgets_BuiltFiles = \
   $(top_builddir)/src/Inventor/@Gui@/widgets/SoAnyThumbWheel.h \
   $(top_builddir)/src/Inventor/@Gui@/widgets/SoAnyThumbWheel.cpp \
   $(top_builddir)/src/Inventor/@Gui@/widgets/SoAnyPopupMenu.h \
   $(top_builddir)/src/Inventor/@Gui@/widgets/SoAnyPopupMenu.cpp
 
-So@Gui@BuiltFiles = \
-  $(So@Gui@_BuiltFiles) \
-  $(So@Gui@_src_BuiltFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_BuiltFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_devices_BuiltFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_viewers_BuiltFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_widgets_BuiltFiles) \
-  $(So@Gui@_ExtraBuiltFiles)
+SoGuiBuiltFiles = \
+  $(SoGui_BuiltFiles) \
+  $(SoGui_src_BuiltFiles) \
+  $(SoGui_src_Inventor_BuiltFiles) \
+  $(SoGui_src_Inventor_Gui_BuiltFiles) \
+  $(SoGui_src_Inventor_Gui_devices_BuiltFiles) \
+  $(SoGui_src_Inventor_Gui_viewers_BuiltFiles) \
+  $(SoGui_src_Inventor_Gui_widgets_BuiltFiles)
 
 if BUILD_METAFILES
 
-So@Gui@_src_Inventor_@Gui@_BuiltMetaFiles = \
+SoGui_BuiltMetaFiles =
+SoGui_src_BuiltMetaFiles =
+SoGui_src_Inventor_BuiltMetaFiles =
+
+SoGui_src_Inventor_Gui_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Object.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Component.cpp \
@@ -78,7 +84,7 @@ So@Gui@_src_Inventor_@Gui@_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@SliderSetBase.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@TransformSliderSet.cpp
 
-So@Gui@_src_Inventor_@Gui@_devices_BuiltMetaFiles = \
+SoGui_src_Inventor_Gui_devices_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Device.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@InputFocus.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Keyboard.cpp \
@@ -86,7 +92,7 @@ So@Gui@_src_Inventor_@Gui@_devices_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@Spaceball.cpp \
   $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystick.cpp
 
-So@Gui@_src_Inventor_@Gui@_viewers_BuiltMetaFiles = \
+SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@Viewer.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewer.cpp \
   $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewer.cpp \
@@ -102,25 +108,27 @@ So@Gui@_src_Inventor_@Gui@_widgets_BuiltMetaFiles = \
 
 else
 
-So@Gui@_src_Inventor_@Gui@_BuiltMetaFiles =
-So@Gui@_src_Inventor_@Gui@_devices_BuiltMetaFiles =
-So@Gui@_src_Inventor_@Gui@_viewers_BuiltMetaFiles =
-So@Gui@_src_Inventor_@Gui@_widgets_BuiltMetaFiles =
+SoGui_src_Inventor_Gui_BuiltMetaFiles =
+SoGui_src_Inventor_Gui_devices_BuiltMetaFiles =
+SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles =
+SoGui_src_Inventor_Gui_widgets_BuiltMetaFiles =
 
 endif
 
-So@Gui@BuiltMetaFiles = \
-  $(So@Gui@_src_Inventor_@Gui@_BuiltMetaFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_devices_BuiltMetaFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_viewers_BuiltMetaFiles) \
-  $(So@Gui@_src_Inventor_@Gui@_widgets_BuiltMetaFiles) \
-  $(So@Gui@_ExtraBuiltMetaFiles)
+SoGuiBuiltMetaFiles = \
+  $(SoGui_BuiltMetaFiles) \
+  $(SoGui_src_BuiltMetaFiles) \
+  $(SoGui_src_Inventor_BuiltMetaFiles) \
+  $(SoGui_src_Inventor_Gui_BuiltMetaFiles) \
+  $(SoGui_src_Inventor_Gui_devices_BuiltMetaFiles) \
+  $(SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles) \
+  $(SoGui_src_Inventor_Gui_widgets_BuiltMetaFiles)
 
-So@Gui@AllBuiltFiles = \
-  $(So@Gui@BuiltFiles) \
-  $(So@Gui@BuiltMetaFiles)
+SoGuiAllBuiltFiles = \
+  $(SoGuiBuiltFiles) \
+  $(SoGuiBuiltMetaFiles)
 
-So@Gui@CommonDistFiles = \
+SoGuiCommonDistFiles = \
   src/Inventor/@Gui@/common/ChangeLog \
   src/Inventor/@Gui@/common/Makefile.common \
   src/Inventor/@Gui@/common/sogui-config.in \
