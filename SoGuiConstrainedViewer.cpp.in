@@ -32,9 +32,10 @@ static const char rcsid[] =
 */
 // FIXME: document class properly. 20010905 mortene.
 
-#include <Inventor/errors/SoDebugError.h>
-#include <so@gui@defs.h>
 #include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/nodes/SoCamera.h>
+#include <so@gui@defs.h>
 
 
 // ************************************************************************
@@ -68,6 +69,9 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
   PRIVATE( this ) = new So@Gui@ConstrainedViewerP;
 
   this->setClassName( "So@Gui@ConstrainedViewer" );
+  this->setLeftWheelString( "Tilt" );
+  this->setBottomWheelString( "Rotate" );
+  this->setRightWheelString( "Dolly" );
 
   this->sceneHeight = 0.0f;
   this->upVector = SbVec3f( 0.0f, 1.0f, 0.0f );
@@ -82,11 +86,10 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
 // ************************************************************************
 
 /*!
-  The destructor.
+  Virtual destructor.
 */
 
-So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( // virtual
-  void )
+So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
 {
   delete PRIVATE( this );
 } // ~So@Gui@ConstarinedViewer()
@@ -94,25 +97,25 @@ So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( // virtual
 // ************************************************************************
 
 /*!
-  FIXME: doc
+  Set up-direction vector for the camera viewpoint.
 */
 
 void
 So@Gui@ConstrainedViewer::setUpDirection(
-  const SbVec3f & upDirection )
+  const SbVec3f & dir )
 {
-  this->upVector = upDirection;
+  this->upVector = dir;
+  // FIXME: do checkForCameraUpConstrain() here? 20010907 mortene.
 } // setUpDirection()
 
 // ************************************************************************
 
 /*!
-  FIXME: doc
+  Return up-direction vector for the camera viewpoint.
 */
 
 const SbVec3f &
-So@Gui@ConstrainedViewer::getUpDirection(
-  void )
+So@Gui@ConstrainedViewer::getUpDirection( void ) const
 {
   return this->upVector;
 } // getUpDirection()
@@ -122,9 +125,9 @@ So@Gui@ConstrainedViewer::getUpDirection(
 // doc in super
 void
 So@Gui@ConstrainedViewer::setCamera( // virtual
-  SoCamera * newCamera )
+  SoCamera * newcam )
 {
-  inherited::setCamera( newCamera );
+  inherited::setCamera( newcam );
   // FIXME: enforce upvector. 20010905 mortene.
 } // setCamera()
 
@@ -153,58 +156,66 @@ So@Gui@ConstrainedViewer::resetToHomePosition( // virtual
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::recomputeSceneSize( // virtual
   void )
 {
   SO@GUI@_STUB();
+  inherited::recomputeSceneSize();
 } // recomputeSceneGraph()
 
 // ************************************************************************
 
 /*!
-  aka upperLeftWheelMotion() ;)
+  This method tilts the camera \a delta degrees closer to the up
+  direction.
 */
-
 void
 So@Gui@ConstrainedViewer::tiltCamera( // virtual, protected
   float delta )
 {
-  SO@GUI@_STUB();
+  SoCamera * const camera = this->getCamera();
+  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+
+  SbVec3f camdir;
+  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camdir );
+  camera->orientation = camera->orientation.getValue() *
+    SbRotation( this->getUpDirection().cross( camdir ), delta );
 } // tiltCamera()
 
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::bottomWheelMotion( // virtual, protected
   float value )
 {
-  SO@GUI@_STUB();
+  this->rotateCamera( value - this->getBottomWheelValue() );
+  inherited::bottomWheelMotion( value );
 } // bottomWheelMotion()
 
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::leftWheelMotion( // virtual, protected
   float value )
 {
-//  SoAnyConstrainedViewer::elevation( );
-  SO@GUI@_STUB();
+  this->tiltCamera( value - this->getLeftWheelValue() );
+  inherited::leftWheelMotion( value );
 } // leftWheelMotion()
 
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
   SoCamera * camera )
@@ -215,21 +226,21 @@ So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::findUpDirection(
-  SbVec2s mouseLocation )
+  SbVec2s mouselocation )
 {
   SO@GUI@_STUB();
-  // pick on point, set upVector to normal of picked polygon
+  // FIXME: pick on point, set upVector to normal of picked polygon
 } // findUpDirection()
 
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::checkForCameraUpConstrain(
   void )
@@ -240,13 +251,26 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain(
 // ************************************************************************
 
 /*!
+  FIXME: doc
 */
-
 void
 So@Gui@ConstrainedViewer::computeSeekFinalOrientation( // virtual, protected
   void )
 {
   SO@GUI@_STUB();
 } // computeSeekFinalOrientation()
+
+// ************************************************************************
+
+// private
+void
+So@Gui@ConstrainedViewer::rotateCamera( const float delta ) const
+{
+  SoCamera * const camera = this->getCamera();
+  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+
+  camera->orientation = camera->orientation.getValue() *
+    SbRotation( this->getUpDirection(), -delta );
+} // rotateCamera()
 
 // ************************************************************************
