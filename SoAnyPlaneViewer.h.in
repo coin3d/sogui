@@ -67,7 +67,7 @@ public:
 private:
   So@GUI@PlaneViewer * const viewer;
 
-  struct {
+  struct pointerdata {
     SbVec2s now;
     SbVec2s then;
   } pointer;
