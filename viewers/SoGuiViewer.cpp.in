@@ -2024,7 +2024,16 @@ So@Gui@Viewer::saveHomePosition(void)
 
   PRIVATE(this)->storedcamera = (SoNode *)t.createInstance();
   PRIVATE(this)->storedcamera->ref();
-  PRIVATE(this)->storedcamera->copyContents(PRIVATE(this)->camera, FALSE);
+
+  // We copy the field data directly, instead of using
+  // SoFieldContainer::copyContents(), as that has one problematic
+  // side-effect: the new camera node used for storing the data would
+  // also get the *name* of the old camera, which would overwrite the
+  // old name->ptr entry of the global dictionary behind
+  // SoNode::getByName(). This can cause surprising and hard to find
+  // bugs for app programmers, for instance when using
+  // SoNode::getByName() to get at a camera loaded from an iv-file.
+  PRIVATE(this)->storedcamera->copyFieldValues(PRIVATE(this)->camera);
 }
 
 // *************************************************************************
@@ -2045,7 +2054,10 @@ So@Gui@Viewer::resetToHomePosition(void)
 
   // most common case
   if (t == s) {
-    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedcamera, FALSE);
+    // We copy the field data directly, instead of using
+    // SoFieldContainer::copyContents(), for the reason described in
+    // detail in So@Gui@Viewer::saveHomePosition().
+    PRIVATE(this)->camera->copyFieldValues(PRIVATE(this)->storedcamera);
   }
   // handle common case #1
   else if (t == SoOrthographicCamera::getClassTypeId() &&
@@ -3324,6 +3336,12 @@ So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
     // while this is called (as could e.g. happen with a size
     // indicator, as with the Sawfish window manager), the stencil
     // mask will not be set up for that part. 20041019 mortene.
+    //
+    // UPDATE 20041019 mortene: discussed this with pederb, and we
+    // believe this may be due to a bug in either the OpenGL driver
+    // (Nvidia 61.11, Linux) or window system or manager (Sawfish,
+    // XFree86 v4.1.0.1). Should test on other systems to see if they
+    // show the same artifact.
 
     glRasterPos2f(0, 0);
     glDrawPixels(newsize[0], newsize[1], GL_STENCIL_INDEX, GL_BITMAP,
