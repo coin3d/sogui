@@ -233,6 +233,15 @@ So@Gui@Component::getShellWidget(void) const
   Set the window title of this component. The title will appear on the
   window title bar, if the component manages its own window.
 
+  \if SOQT_DOC
+
+  Note that there is one peculiarity to be aware of if you are using
+  the non-commercial version of Qt: only window titles with the
+  substring "Qt" in them are allowed (!), and attempts to set a window
+  title without this substring will simply be ignored.
+
+  \endif
+
   \sa getTitle(), setIconTitle(), isTopLevelShell()
 */
 

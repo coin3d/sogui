@@ -182,7 +182,7 @@ So@Gui@::init(const char * appname, const char * classname)
   operating system should take care of cleaning up resource use when
   an application exits. This method is mainly provided as a manner to
   be able to clean up in "unusual" run-time environments, for instance
-  if SoQt is part of a browser plug-in.)
+  if So@Gui@ is used as a component in a browser plug-in.)
 
   Nevertheless, it should never be invoked more than \e once, and that
   is just before application exit, as it deallocates \e static data
