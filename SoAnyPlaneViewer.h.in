@@ -22,6 +22,8 @@
 #ifndef SOANY_PLANEVIEWER_H
 #define SOANY_PLANEVIEWER_H
 
+#include <Inventor/SbLinear.h>
+
 class SoCamera;
 
 // ************************************************************************
