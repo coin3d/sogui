@@ -176,6 +176,9 @@ public:
 
   void setStealFocus(SbBool doStealFocus);
 
+  // FIXME: get rid of these. If someone cries up, we should rather
+  // make a new API method for registering a callback for
+  // user-supplied evaluation of available formats. 20020729 mortene.
   virtual void setNormalVisual(PIXELFORMATDESCRIPTOR * vis);
   PIXELFORMATDESCRIPTOR * getNormalVisual(void);
   virtual void setOverlayVisual(PIXELFORMATDESCRIPTOR * vis);
