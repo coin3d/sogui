@@ -61,6 +61,7 @@ main(int argc, char **argv)
   \sa So@Gui@Component
 */
 
+#include <stdlib.h>
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/SoAny.h>
 
