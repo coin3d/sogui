@@ -55,6 +55,7 @@ static const char rcsid[] =
 #endif // HAVE_CONFIG_H
 
 #include <assert.h>
+#include <math.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -91,6 +92,10 @@ static const char rcsid[] =
 #include <Inventor/SoPickedPoint.h>
 
 #include <Inventor/@GUI@/viewers/So@GUI@Viewer.h>
+
+#ifndef M_PI
+#define M_PI 3.1415926535f
+#endif // ! M_PI
 
 /*!
   \enum So@GUI@Viewer::Type
