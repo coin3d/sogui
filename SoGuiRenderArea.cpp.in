@@ -154,7 +154,8 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation( void )
   SbString exts = (const char *)extensions;
   const char * p;
   int count = 0;
-  while (p = strchr(exts.getString(), ' ')) {
+  // (the extra parentheses in the while-expression kills a gcc warning)
+  while ((p = strchr(exts.getString(), ' '))) {
     const char * start = exts.getString();
     info += exts.getSubString(0, p - start);
     exts.deleteSubString(0, p - start);
@@ -1391,8 +1392,6 @@ So@Gui@RenderArea::processEvent( // virtual, protected
       SoKeyboardEvent * ke = ( SoKeyboardEvent * )soevent;
       if ( ke->getState( ) == SoButtonEvent::UP ) {
         char c = ke->getPrintableCharacter();
-        // XXX debug
-        // SoDebugError::postInfo("hepp", "new char=%c", c);
         if ( PRIVATE( this )->checkMagicSequence( c ) ) {
           this->glLockNormal();
           PRIVATE( this )->showOpenGLDriverInformation( );
