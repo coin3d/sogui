@@ -204,6 +204,9 @@ So@Gui@Cursor::getCustomCursor(void) const
   return *(this->cc);
 }
 
+/*!
+  Returns a "zoom" indicator cursor.
+*/
 const So@Gui@Cursor &
 So@Gui@Cursor::getZoomCursor(void)
 {
@@ -213,6 +216,10 @@ So@Gui@Cursor::getZoomCursor(void)
   return *zoomcursor;
 }
 
+/*!
+  Returns a cursor with "pan" graphics (ie for translation in the
+  camera normal plane).
+*/
 const So@Gui@Cursor &
 So@Gui@Cursor::getPanCursor(void)
 {
@@ -222,6 +229,9 @@ So@Gui@Cursor::getPanCursor(void)
   return *pancursor;
 }
 
+/*!
+  Returns a "rotate" indicator cursor.
+*/
 const So@Gui@Cursor &
 So@Gui@Cursor::getRotateCursor(void)
 {
