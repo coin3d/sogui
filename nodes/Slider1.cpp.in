@@ -67,22 +67,6 @@
     size
 */
 
-#if 0
-#Inventor V2.1 ascii
-
-DEF topSeparator Separator {
-  DEF surfaceGeometry Separator {
-    Material {}
-    Texture2 {}
-    TexCoord2 {}
-    Coordinate3 {}
-    IndexedFaceSet {}
-  }
-  DEF knobGeometry Separator {
-  }
-}
-#endif
-
 // *************************************************************************
 
 class Slider1 {
