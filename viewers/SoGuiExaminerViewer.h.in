@@ -31,13 +31,11 @@ class SoTranslation;
 class SoScale;
 
 class So@Gui@ThumbWheel;
-class SoAnyExaminerViewer;
 
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@ExaminerViewer : public So@Gui@FullViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@ExaminerViewer, So@Gui@FullViewer);
-  friend class SoAnyExaminerViewer;
   @COMPONENTHEADER@
 
 public:
@@ -216,9 +214,6 @@ private slots:
 
 // viewer buttons row:
   void cameratoggleClicked(void);
-
-private:
-  SoAnyExaminerViewer * const common;
 #endif // ! __COIN_SOQT__
 
 
@@ -231,7 +226,6 @@ protected:
 private:
   void setCursorRepresentation(int mode);
 
-  SoAnyExaminerViewer * common;
   class SoWinExaminerViewerP * pimpl;
   friend class SoWinExaminerViewerP;
 #endif // ! __COIN_SOWIN__
@@ -247,7 +241,6 @@ private:
   void setCursorRepresentation(int mode);
 
   // friends and family
-  class SoAnyExaminerViewer * common;
   class SoGtkExaminerViewerP * pimpl;
   friend class SoGtkExaminerViewerP;
 #endif // ! __COIN_SOGTK__
@@ -293,8 +286,6 @@ private:
 
   Widget * prefparts;
   int numprefparts;
-
-  SoAnyExaminerViewer * const common;
 #endif // ! __COIN_SOXT__
 };
 
