@@ -40,15 +40,15 @@ public:
   SoAnyPopupMenu(void);
   virtual ~SoAnyPopupMenu(void);
 
-  virtual int newMenu( char * name, int menuid = -1 ) = 0;
-  virtual int getMenu( char * name ) = 0;
-  virtual void setMenuTitle( int id, char * title ) = 0;
-  virtual char * getMenuTitle( int id ) = 0;
+  virtual int newMenu( const char * name, int menuid = -1 ) = 0;
+  virtual int getMenu( const char * name ) = 0;
+  virtual void setMenuTitle( int id, const char * title ) = 0;
+  virtual const char * getMenuTitle( int id ) = 0;
 
-  virtual int newMenuItem( char * name, int itemid = -1 ) = 0;
-  virtual int getMenuItem( char * name ) = 0;
-  virtual void setMenuItemTitle( int itemid, char * title ) = 0;
-  virtual char * getMenuItemTitle( int itemid ) = 0;
+  virtual int newMenuItem( const char * name, int itemid = -1 ) = 0;
+  virtual int getMenuItem( const char * name ) = 0;
+  virtual void setMenuItemTitle( int itemid, const char * title ) = 0;
+  virtual const char * getMenuItemTitle( int itemid ) = 0;
   virtual void setMenuItemEnabled( int itemid, SbBool enabled ) = 0;
   virtual SbBool getMenuItemEnabled( int itemid ) = 0;
   void setMenuItemMarked( int itemid, SbBool marked );
