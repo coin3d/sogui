@@ -1430,12 +1430,7 @@ SoGuiFullViewerP::pan(SoCamera * cam,
                       const SbVec2f & currpos, const SbVec2f & prevpos)
 {
   if (cam == NULL) return; // can happen for empty scenegraph
-  if (currpos == prevpos) {
-#if SO@GUI@_DEBUG
-    SoDebugError::postInfo("SoGuiFullViewerP::pan", "useless invokation");
-#endif // SO@GUI@_DEBUG
-    return;
-  }
+  if (currpos == prevpos) return; // useless invocation
 
 #if SO@GUI@_DEBUG && 0
   SoDebugError::postInfo("SoGuiFullViewerP::pan",
