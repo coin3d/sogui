@@ -123,6 +123,8 @@
   <li>hold down the 'ALT' key to temporary toggle from
   camera-interaction mode to scenegraph-interaction mode</li>
 
+  <li>'q' quits the application</li>
+
   </ul>
 
   The So@Gui@ExaminerViewer provides a user decoration's button for

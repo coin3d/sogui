@@ -59,6 +59,26 @@ SoSearchAction * SoAny::finder = NULL;
 
 #ifndef DOXYGEN_SKIP_THIS
 
+// Following block explains OpenGL cache context handling in some
+// depth. Copied from an email write-up by pederb:
+//
+// The SoGui toolkits use the SoAny class to handle cache context ids
+// and cache context id sharing (cache context ids can be shared on
+// Windows and on Unix if the display and screen are equal).
+//
+// E.g. in SoQt, when a new GL-widget is created, it is registered
+// using SoAny::registerGLContext (from SoQtGLWidget.cpp). When the
+// GL-widget is destructed, SoAny::unregisterGLContext() must be
+// called. Then, in SoGuiRenderArea::initGraphic(),
+// SoAny::getSharedCacheContextId() is called to find a valid cache
+// context id for SoGLRenderAction.
+//
+// What one needs to to is to detect when the GL-context is
+// destructed, and then call SoAny::unregisterGLContext(). Then
+// SoAny::registerGLContext() to register the new context, and then
+// set the new cache context id in the SoGLRenderAction. This can
+// probably be done just by calling SoGuiRenderArea::initGraphic().
+
 class soany_cache_context {
 public:
   soany_cache_context(void * display, void * screen)
