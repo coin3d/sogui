@@ -108,8 +108,11 @@ public:
 
   float calculateChangeInTime();
   void  updateCurrentSpeed( float dt );
-  
+
   void updateCamera( SoCamera * camera, float dt );
+
+  void incrementMaxSpeed();
+  void decrementMaxSpeed();
 
   SbBool button1down, button3down;
   int lctrldown, rctrldown;
@@ -558,26 +561,18 @@ So@Gui@FlyViewerP::processMouseButtonEvent( const SoMouseButtonEvent * const me 
   case So@Gui@FlyViewerP::FLYING:
     switch (me->getButton()) {
     case SoMouseButtonEvent::BUTTON1:
+
       switch (me->getState()) {
+        
       case SoButtonEvent::DOWN:
+        // Incrementing speed.
 	this->button1down = TRUE;
 	if (this->button3down) {
 	  this->currentspeed = 0.0f;
 	  this->maxspeed = 0.0f;
-	} else {
-	  if (this->maxspeed == 0)
-	    this->maxspeed = SO@GUI@_MIN_STEP;
-	  else if ((this->maxspeed >= -SO@GUI@_MIN_STEP) &&
-		   (this->maxspeed < 0.0f))
-	    this->maxspeed = 0.0f;
-	  else if (this->maxspeed > 0)
-	    this->maxspeed *= SO@GUI@_INC_FACTOR;
-	  else
-	    this->maxspeed /= SO@GUI@_INC_FACTOR;
-	  if (this->maxspeed > SO@GUI@_MAX_SPEED)
-	    this->maxspeed = SO@GUI@_MAX_SPEED;
-	  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
-	    this->maxspeed = -SO@GUI@_MAX_SPEED;
+	} 
+        else {
+          this->incrementMaxSpeed();
 	}
 	this->updateSpeedIndicator();
 	PUBLIC(this)->scheduleRedraw();
@@ -589,28 +584,20 @@ So@Gui@FlyViewerP::processMouseButtonEvent( const SoMouseButtonEvent * const me 
 	break;
       }
       break;
+
     case SoMouseButtonEvent::BUTTON3:
+
       switch (me->getState()) {
       case SoButtonEvent::DOWN:
 	this->button3down = TRUE;
-	if (this->button1down) {
+	
+        if (this->button1down) {
 	  this->currentspeed = 0.0f;
 	  this->maxspeed = 0.0f;
-	} else {
-	  if ((this->maxspeed > 0.0f) &&
-	      (this->maxspeed <= SO@GUI@_MIN_STEP))
-	    this->maxspeed = 0.0f;
-	  else if (this->maxspeed == 0.0f)
-	    this->maxspeed = -SO@GUI@_MIN_STEP;
-	  else if (this->maxspeed > 0)
-	    this->maxspeed /= SO@GUI@_INC_FACTOR;
-	  else
-	    this->maxspeed *= SO@GUI@_INC_FACTOR;
-	  if (this->maxspeed > SO@GUI@_MAX_SPEED)
-	    this->maxspeed = SO@GUI@_MAX_SPEED;
-	  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
-	    this->maxspeed = -SO@GUI@_MAX_SPEED;
-	}
+	} 
+        else
+          this->decrementMaxSpeed();
+     
 	this->updateSpeedIndicator();
 	PUBLIC(this)->scheduleRedraw();
 	return TRUE;
@@ -634,14 +621,15 @@ SbBool
 So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
 {
   if (this->getMode() == So@Gui@FlyViewerP::TILTING) {
-
     SbVec2s newpos = lev->getPosition();
     float dx = newpos[0] - this->tiltpos[0];
     float dy = newpos[1] - this->tiltpos[1];
 
     if (dx != 0.0f || dy != 0.0f) {
       SoCamera * camera = PUBLIC(this)->getCamera();
-      if (camera == NULL) { return TRUE; } // probably sceneless
+      if (camera == NULL) 
+        return TRUE; // probably sceneless
+
       SbVec3f up(this->tiltup);
       SbVec3f dir;
       SbRotation orientation(this->tiltrotation);
@@ -714,7 +702,9 @@ void
 So@Gui@FlyViewerP::updateSpeedIndicator(void)
 {
   assert(this->sgeometry != NULL);
+
   SbVec3f * points = this->sgeometry->point.startEditing();
+
   if (points[10][0] == 0.0f)
     this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
   if (points[14][0] == 0.0f)
@@ -724,6 +714,7 @@ So@Gui@FlyViewerP::updateSpeedIndicator(void)
   points[14][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   points[15][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   this->sgeometry->point.finishEditing();
+
   if (this->maxspeed == 0.0f)
     this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
   if (this->currentspeed == 0.0f)
@@ -783,6 +774,7 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
   SbVec2s glsize( PUBLIC(this)->getGLSize() );
   SbVec2s mid( glsize[0]/2, glsize[1]/2 );
 
+  
   float xfrac =
     float(mid[0] - this->mouseloc[0]) / float(mid[0]);
   float yfrac =
@@ -821,6 +813,61 @@ So@Gui@FlyViewerP::updateCamera( SoCamera * camera, float dt )
   camera->orientation.setValue(orientation);
   
 }
+
+void
+So@Gui@FlyViewerP::incrementMaxSpeed()
+{
+  // FIXME: Use an integer factor to update the speed, 
+  // and multiply the max speed factor. 20021016 rolvs
+
+  if (this->maxspeed == 0)
+    this->maxspeed = SO@GUI@_MIN_STEP;
+  else if ((this->maxspeed >= -SO@GUI@_MIN_STEP) &&
+           (this->maxspeed < 0.0f))
+    this->maxspeed = 0.0f;
+  else if (this->maxspeed > 0)
+    this->maxspeed *= SO@GUI@_INC_FACTOR;
+  else
+    this->maxspeed /= SO@GUI@_INC_FACTOR;
+  
+  if (this->maxspeed > SO@GUI@_MAX_SPEED)
+    this->maxspeed = SO@GUI@_MAX_SPEED;
+  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
+    this->maxspeed = -SO@GUI@_MAX_SPEED;
+
+  if( this->maxspeed == 0.0f )
+    this->currentspeed = 0.0f;
+}
+
+
+void
+So@Gui@FlyViewerP::decrementMaxSpeed()
+{	
+  // FIXME: Use an integer factor to update the speed, 
+  // and multiply the max speed factor. 20021016 rolvs.
+
+  if ((this->maxspeed > 0.0f) &&
+      (this->maxspeed <= SO@GUI@_MIN_STEP))
+    this->maxspeed = 0.0f;
+  else if (this->maxspeed == 0.0f)
+    this->maxspeed = -SO@GUI@_MIN_STEP;
+  else if (this->maxspeed > 0){
+    this->maxspeed /= SO@GUI@_INC_FACTOR;
+  }
+  else{
+    this->maxspeed *= SO@GUI@_INC_FACTOR;
+  }
+  
+  if (this->maxspeed > SO@GUI@_MAX_SPEED)
+    this->maxspeed = SO@GUI@_MAX_SPEED;
+  else if (this->maxspeed < -SO@GUI@_MAX_SPEED)
+    this->maxspeed = -SO@GUI@_MAX_SPEED;
+
+  if( this->maxspeed == 0.0f )
+    this->currentspeed = 0.0f;
+}
+
+
 
 // Set cursor graphics according to mode.
 void
