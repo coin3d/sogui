@@ -162,7 +162,6 @@ public:
   static SbBool nextEvent(int appContext, MSG * msg);
   static void setInstance(HINSTANCE instance);
   static HINSTANCE getInstance(void);
-  static void errorHandlerCB(const class SoError * error, void * data);
   static void doIdleTasks(void);
 
 protected:
