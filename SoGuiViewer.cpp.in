@@ -613,8 +613,15 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
 // *************************************************************************
 
 /*!
-  Returns the camera currently used by the viewer for rendering
-  the scene.
+  Returns the camera currently used by the viewer for the user's main
+  viewpoint.
+
+  It \e is possible that this function returns \c NULL, for instance
+  if there's no scenegraph present in the viewer.  (This is mostly
+  meant as a note for developers extending the So@Gui@ library, as
+  application programmers usually controls if and when a viewer
+  contains a scenegraph, and therefore know in advance if this method
+  will return a valid camera pointer.)
 
   \sa setCamera()
 */
@@ -707,9 +714,9 @@ So@Gui@Viewer::setCameraType(SoType t)
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
     this->setCamera( newcamera ); // This will set PRIVATE(this)->cameratype.
     PRIVATE(this)->deletecamera = TRUE;
-    if ( oldcamera )
-      cameraparent->removeChild( oldcamera );
-  } else { // A camera has not been instantiated for the scene.
+    if ( oldcamera ) { cameraparent->removeChild( oldcamera ); }
+  }
+  else { // A camera has not been instantiated for the scene.
     PRIVATE(this)->cameratype = t; // No call to setCamera(), so set type explicitly.
   }
 } // setCameraType()
