@@ -33,6 +33,6 @@ SoGuiNodes::initClasses(void)
   SoGuiFrame::initClass();
   SoGuiClickCounter::initClass();
   SoGuiSlider1::initClass();
-  // SoGuiSlider2::initClass();
+  SoGuiSlider2::initClass();
 }
 

@@ -35,7 +35,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiFrame.h>
 #include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
-// #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
+#include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
 
 class SoGuiNodes {
 public:
