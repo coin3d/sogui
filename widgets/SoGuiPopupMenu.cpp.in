@@ -44,6 +44,7 @@
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
 #include <Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h>
+#include <Inventor/@Gui@/SoGuiIntList.h>
 
 // *************************************************************************
 
@@ -64,8 +65,8 @@
 
 class So@Gui@PopupMenuP {
 public:
-  SbIntList * menuitems;
-  SbIntList * radiogroups;
+  SoGuiIntList * menuitems;
+  SoGuiIntList * radiogroups;
   SbPList * callbacks;
   SbPList * userdata;
 };
@@ -97,8 +98,8 @@ So@Gui@PopupMenu::So@Gui@PopupMenu(void)
 {
   PRIVATE(this) = new So@Gui@PopupMenuP;
 
-  PRIVATE(this)->menuitems = new SbIntList;
-  PRIVATE(this)->radiogroups = new SbIntList;
+  PRIVATE(this)->menuitems = new SoGuiIntList;
+  PRIVATE(this)->radiogroups = new SoGuiIntList;
   PRIVATE(this)->callbacks = NULL;
   PRIVATE(this)->userdata = NULL;
 } // So@Gui@PopupMenu()
@@ -133,8 +134,8 @@ So@Gui@PopupMenu::setMenuItemMarked(
   int groupsize = 0;
   int i;
   for (i = 0; i < numGroupedItems; i++) {
-    if (((*PRIVATE(this)->radiogroups)[i] == groupid) &&
-         ((*PRIVATE(this)->menuitems)[i] != -1))
+    if ((PRIVATE(this)->radiogroups->get(i) == groupid) &&
+         (PRIVATE(this)->menuitems->get(i) != -1))
       groupsize++;
   }
   if (this->getMenuItemMarked(itemid) == marked) {
@@ -149,10 +150,10 @@ So@Gui@PopupMenu::setMenuItemMarked(
   } else if ((groupsize == 2) ||
               ((groupsize > 2) && marked)) {
     for (i = 0; i < numGroupedItems; i++) {
-      if (((*PRIVATE(this)->radiogroups)[i] == groupid) &&
-           ((*PRIVATE(this)->menuitems)[i] != -1)) {
-        this->_setMenuItemMarked((*PRIVATE(this)->menuitems)[i],
-          ((*PRIVATE(this)->menuitems)[i] == itemid) ? marked :
+      if ((PRIVATE(this)->radiogroups->get(i) == groupid) &&
+           (PRIVATE(this)->menuitems->get(i) != -1)) {
+        this->_setMenuItemMarked(PRIVATE(this)->menuitems->get(i),
+          (PRIVATE(this)->menuitems->get(i) == itemid) ? marked :
           ((groupsize == 2) ? (! marked) : FALSE));
       }
     }
@@ -180,7 +181,7 @@ So@Gui@PopupMenu::newRadioGroup(
     SbBool hit = FALSE;
     int i;
     for (i = 0; i < numGroupedItems && hit == FALSE; i++) {
-      if ((*PRIVATE(this)->radiogroups)[i] == id)
+      if (PRIVATE(this)->radiogroups->get(i) == id)
         hit = TRUE;
     }
     if (hit == TRUE) {
@@ -198,7 +199,7 @@ So@Gui@PopupMenu::newRadioGroup(
       found = FALSE;
       int i;
       for (i = 0; i < numGroupedItems && found == FALSE; i++) {
-        if ((*PRIVATE(this)->radiogroups)[i] == id)
+        if (PRIVATE(this)->radiogroups->get(i) == id)
           found = TRUE;
       }
     } while (found == TRUE);
@@ -220,8 +221,8 @@ So@Gui@PopupMenu::getRadioGroup(
   const int numGroupedItems = PRIVATE(this)->radiogroups->getLength();
   int i;
   for (i = 0; i < numGroupedItems; i++) {
-    if ((*PRIVATE(this)->menuitems)[i] == itemid)
-      return (*PRIVATE(this)->radiogroups)[i];
+    if (PRIVATE(this)->menuitems->get(i) == itemid)
+      return PRIVATE(this)->radiogroups->get(i);
   }
   return -1;
 } // getRadioGroup()
@@ -237,8 +238,8 @@ So@Gui@PopupMenu::getRadioGroupSize(
   const int numItems = PRIVATE(this)->radiogroups->getLength();
   int i;
   for (i = 0; i < numItems; i++) {
-    if ((*PRIVATE(this)->radiogroups)[i] == groupid &&
-         (*PRIVATE(this)->menuitems)[i] != -1)
+    if (PRIVATE(this)->radiogroups->get(i) == groupid &&
+         PRIVATE(this)->menuitems->get(i) != -1)
       count++;
   }
   return count;
@@ -267,7 +268,7 @@ So@Gui@PopupMenu::removeRadioGroupItem(
   const int numGroupedItems = PRIVATE(this)->menuitems->getLength();
   int i;
   for (i = 0; i < numGroupedItems; i++) {
-    if ((*PRIVATE(this)->menuitems)[i] == itemid) {
+    if (PRIVATE(this)->menuitems->get(i) == itemid) {
       PRIVATE(this)->menuitems->remove(i);
       PRIVATE(this)->radiogroups->remove(i);
       return;
@@ -283,14 +284,14 @@ So@Gui@PopupMenu::setRadioGroupMarkedItem(
   int i;
   int groupid = -1;
   for (i = 0; i < numItems && groupid == -1; i++) {
-    if ((*PRIVATE(this)->menuitems)[i] == itemid)
-      groupid = (*PRIVATE(this)->radiogroups)[i];
+    if (PRIVATE(this)->menuitems->get(i) == itemid)
+      groupid = PRIVATE(this)->radiogroups->get(i);
   }
   if (groupid == -1)
     return;
   for (i = 0; i < numItems; i++) {
-    if ((*PRIVATE(this)->radiogroups)[i] == groupid) {
-      int item = (*PRIVATE(this)->menuitems)[i];
+    if (PRIVATE(this)->radiogroups->get(i) == groupid) {
+      int item = PRIVATE(this)->menuitems->get(i);
       if (item != -1 && item != itemid)
         this->setMenuItemMarked(item, FALSE);
     }
@@ -304,8 +305,8 @@ So@Gui@PopupMenu::getRadioGroupMarkedItem(
   const int numItems = PRIVATE(this)->menuitems->getLength();
   int i;
   for (i = 0; i < numItems; i++) {
-    if ((*PRIVATE(this)->radiogroups)[i] == groupid) {
-      int item = (*PRIVATE(this)->menuitems)[i];
+    if (PRIVATE(this)->radiogroups->get(i) == groupid) {
+      int item = PRIVATE(this)->menuitems->get(i);
       if (item != -1 && this->getMenuItemMarked(item))
         return item;
     }

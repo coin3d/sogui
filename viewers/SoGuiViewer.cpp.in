@@ -127,6 +127,7 @@
 
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/SoAny.h>
+#include <Inventor/@Gui@/SoGuiIntList.h>
 
 #include <Inventor/SoDB.h>
 
@@ -287,7 +288,7 @@ public:
   SoSearchAction * searchaction;
   SoGetMatrixAction * matrixaction;
   SbPList * superimpositions;
-  SbIntList * superimpositionsenabled;
+  SoGuiIntList * superimpositionsenabled;
   So@Gui@Viewer * pub;
 
   // auto clipping parameters
@@ -3297,7 +3298,7 @@ So@Gui@Viewer::addSuperimposition(SoNode * scene)
 {
   if (PRIVATE(this)->superimpositions == NULL) {
     PRIVATE(this)->superimpositions = new SbPList;
-    PRIVATE(this)->superimpositionsenabled = new SbIntList;
+    PRIVATE(this)->superimpositionsenabled = new SoGuiIntList;
   }
   PRIVATE(this)->searchaction->reset();
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
@@ -3363,7 +3364,7 @@ So@Gui@Viewer::setSuperimpositionEnabled(SoNode * scene,
   if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
   if (idx == -1) goto error;
-  (*PRIVATE(this)->superimpositionsenabled)[idx] = enable;
+  PRIVATE(this)->superimpositionsenabled->set(idx, enable);
   return;
 
  error:
@@ -3389,7 +3390,7 @@ So@Gui@Viewer::getSuperimpositionEnabled(SoNode * scene) const
   if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
   if (idx == -1) goto error;
-  return (*PRIVATE(this)->superimpositionsenabled)[idx];
+  return PRIVATE(this)->superimpositionsenabled->get(idx);
 
  error:
   if (SO@GUI@_DEBUG) {
