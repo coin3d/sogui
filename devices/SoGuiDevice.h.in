@@ -24,14 +24,17 @@
 #ifndef SO@GUI@_DEVICE_H
 #define SO@GUI@_DEVICE_H
 
-#include <Inventor/SbLinear.h>
-#include <Inventor/@Gui@/So@Gui@Object.h>
-
-class SoEvent;
-
 // *************************************************************************
+//
+// Toolkit-specific typedef and include(s). Put these before any Coin
+// and/or So@Gui@ includes, in case there are any dependency bugs in
+// the underlying native toolkit set of include files versus the
+// compiler environment's include files.
+//
+// (We've had reports of these with at least GCC 3.1 in combination
+// with Qt 3.0.  20020705 mortene.)
 
-// Toolkit-specific typedef and include(s).
+#include <Inventor/@Gui@/So@Gui@Basic.h> // Contains __COIN_SO@GUI@__ define.
 
 #ifdef __COIN_SOQT__
 #include <qevent.h>
@@ -49,6 +52,13 @@ typedef gint So@Gui@EventHandler(@WIDGET@, @EVENT@, gpointer);
 #include <wtypes.h>
 typedef LRESULT So@Gui@EventHandler(@WIDGET@, UINT, WPARAM, LPARAM);
 #endif // __COIN_SOWIN__
+
+// *************************************************************************
+
+#include <Inventor/SbLinear.h>
+#include <Inventor/@Gui@/So@Gui@Object.h>
+
+class SoEvent;
 
 // *************************************************************************
 
