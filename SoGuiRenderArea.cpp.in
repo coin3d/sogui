@@ -821,6 +821,14 @@ So@Gui@RenderArea::getAntialiasing(SbBool & smoothing, int & numPasses) const
 /*!
   This method sets whether the render buffer should be cleared before
   rendering.
+
+  The first argument specifies whether or not to clear out the pixels
+  in the buffer, the second argument specifies whether or not the
+  z-buffer values should be cleared between renderings.
+
+  Setting the first argument to \c FALSE can for instance be used when
+  you want to clear out the buffer yourself, for instance by drawing a
+  background image "under" the 3D scene rendered by Coin / Inventor.
 */
 void
 So@Gui@RenderArea::setClearBeforeRender(SbBool enable, SbBool zbEnable)
