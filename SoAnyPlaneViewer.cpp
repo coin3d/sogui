@@ -32,18 +32,26 @@ static const char rcsid[] =
 
 // ************************************************************************
 
+/*!
+*/
+
 float
 SoAnyPlaneViewer::transYWheelMotion( // static
   float value,
   float oldvalue,
   SoCamera * camera )
 {
+  // FIXME: GLX aspect ratio needs to be factored in
   assert( camera != NULL );
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f( 0, 1, 0 ), dir );
-  camera->position = camera->position.getValue() + (dir * (value - oldvalue));
+  camera->position = camera->position.getValue() + (dir * (value - oldvalue)) *
+    camera->focalDistance.getValue() / 2.5f;
   return value;
 } // transYWheelMotion()
+
+/*!
+*/
 
 float
 SoAnyPlaneViewer::transXWheelMotion( // static
@@ -51,10 +59,12 @@ SoAnyPlaneViewer::transXWheelMotion( // static
   float oldvalue,
   SoCamera * camera )
 {
+  // FIXME: GLX aspect ratio needs to be factored in
   assert( camera != NULL );
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f( 1, 0, 0 ), dir );
-  camera->position = camera->position.getValue() + (dir * (value - oldvalue));
+  camera->position = camera->position.getValue() + (dir * (value - oldvalue)) *
+    camera->focalDistance.getValue() / 2.5f;
   return value;
 } // transXWheelMotion()
 
