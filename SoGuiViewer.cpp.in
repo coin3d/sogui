@@ -30,6 +30,7 @@ static const char rcsid[] =
 #endif // HAVE_CONFIG_H
 
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #if HAVE_WINDOWS_H
