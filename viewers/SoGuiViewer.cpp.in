@@ -119,7 +119,7 @@
   method.
 */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
@@ -167,7 +167,7 @@
 #include <math.h>
 #include <float.h> // FLT_MAX
 
-#if HAVE_SOPOLYGONOFFSET
+#ifdef HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoPolygonOffset.h>
 #endif // HAVE_SOPOLYGONOFFSET
 
@@ -235,7 +235,7 @@ public:
   SoMaterialBinding * somaterialbinding;
   SoSeparator * usersceneroot;
   SoSwitch * superimpositionroot;
-#if HAVE_SOPOLYGONOFFSET
+#ifdef HAVE_SOPOLYGONOFFSET
   SoPolygonOffset * sopolygonoffset;
 #endif // HAVE_SOPOLYGONOFFSET
   // Automatic setting of clipping planes
@@ -392,7 +392,7 @@ So@Gui@ViewerP::createSuperScene(void)
     "    }",
     "    DEF so@gui@->polygonoffsetparent Switch {",
     "      whichChild -1",
-#if HAVE_SOPOLYGONOFFSET
+#ifdef HAVE_SOPOLYGONOFFSET
     "      DEF so@gui@->polygonoffset PolygonOffset { }",
 #endif // HAVE_SOPOLYGONOFFSET
     "    }",

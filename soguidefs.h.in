@@ -50,13 +50,13 @@
 #define SO@GUI@_STUB_LINE 0
 #endif
 
-#if HAVE_VAR___PRETTY_FUNCTION__
+#ifdef HAVE_VAR___PRETTY_FUNCTION__
 #define SO@GUI@_STUB_FUNC __PRETTY_FUNCTION__
 #else
-#if HAVE_VAR___FUNCTION__
+#ifdef HAVE_VAR___FUNCTION__
 #define SO@GUI@_STUB_FUNC __FUNCTION__
 #else
-#if HAVE_VAR___func__
+#ifdef HAVE_VAR___func__
 #define SO@GUI@_STUB_FUNC __func__
 #else
 #define SO@GUI@_STUB_FUNC ((char *)0L)

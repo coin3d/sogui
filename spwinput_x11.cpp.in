@@ -56,19 +56,19 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 #include <string.h>
 #include <time.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif // HAVE_UNISTD_H
-#if HAVE_NETINET_IN_H
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif /* HAVE_NETINET_IN_H */
-#if HAVE_SYS_TIME_H
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif /* HAVE_SYS_TIME_H */
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif /* HAVE_SYS_TYPES_H */
-#if HAVE_SELECT_H
+#ifdef HAVE_SELECT_H
 #include <select.h>
 #endif /* HAVE_SELECT_H */
 
@@ -76,14 +76,14 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#if HAVE_X11_EXTENSIONS_SGIMISC_H
+#ifdef HAVE_X11_EXTENSIONS_SGIMISC_H
 #include <X11/extensions/SGIMisc.h>
 #elif HAVE_X11_XPROTO_H
 #include <X11/Xproto.h>
 #endif /* HAVE_X11_XPROTO */
 
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
 #include <X11/extensions/XInput.h>
 #endif /* HAVE_X11_EXTENSIONS_XINPUT_H */
 
@@ -187,7 +187,7 @@ static Atom SPW_InputPassThruAtom;  /* Main daemon communication Atom */
 
 static Atom WM_SAVE_YOURSELF;               /* Atoms daemon will use */
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
 
 static XID SpaceballDevID = 0;                 /* XIE ID for the Spaceball device */
 static XDevice *pSpaceballDev = NULL;          /* The spaceball XIE structure */
@@ -472,7 +472,7 @@ void SPW_InputResetSpaceball (Display *display)
  *---------------------------------------------------------------------------*/
 void SPW_InputCloseXIE (Display *display)
 {
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   if (SpaceballInputExtension == 1) {
     XCloseDevice (display, pSpaceballDev);
     
@@ -549,7 +549,7 @@ int SPW_InputIsXCM (void)
 void SPW_InputSelectExtensionEvent (Display *display, Window window)
 {
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   XSelectExtensionEvent (display, window, SPW_SpaceballEventClass, 3);
 #endif
 
@@ -801,7 +801,7 @@ static int FindXCM (Display *display)
 
 int SPW_FindXIE (Display *display)
 {
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   int          ieMajor;      
   int          ieFirstEvent; 
   int          ieFirstError; 
@@ -992,7 +992,7 @@ int SPW_InputCheckForSpaceball (Display *display,
     return 0;
   }
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
 
   /* If we're using XIE, try to enable Spaceball events */
 
@@ -1125,7 +1125,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     }
   }  /* if (event->type == ClientMessage */
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   /* check to see if the event is a spaceball XIE motion event */
   else if ((event->type == SPW_DevMotionEventType) &&
            (((XDeviceMotionEvent *)event)->deviceid == SpaceballDevID)) {
@@ -1307,10 +1307,10 @@ void SPW_InputBeep (Display *display, char *string)
 {
   char sndStr[15];  /* the control string to be sent to the driver */
 
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   /* if we are connected via XIE use that to beep the ball */
   if (SpaceballInputExtension == 1) {
-#if HAVE_X11_EXTENSIONS_SGIMISC_H
+#ifdef HAVE_X11_EXTENSIONS_SGIMISC_H
     /* SGI beep */
     int slen = strlen (string);
     static char buf[32];
@@ -1382,11 +1382,11 @@ void SPW_InputBeep (Display *display, char *string)
  *---------------------------------------------------------------------------*/
 void SPW_InputRezero (Display *display)
 {
-#if HAVE_X11_EXTENSIONS_XINPUT_H
+#ifdef HAVE_X11_EXTENSIONS_XINPUT_H
   /* if we are connected via XIE use that to rezero the ball */
   if (SpaceballInputExtension == 1)
     {
-#if HAVE_X11_EXTENSIONS_SGIMISC_H
+#ifdef HAVE_X11_EXTENSIONS_SGIMISC_H
       /* SGI rezero */
       static char *cmd = "\rZ\r";
 
