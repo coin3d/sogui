@@ -22,6 +22,9 @@ static const char rcsid[] =
 
 #include <assert.h>
 
+#include <Inventor/SoLists.h>
+#include <Inventor/errors/SoDebugError.h>
+
 #include <Inventor/@GUI@/widgets/So@GUI@PopupMenu.h>
 
 #include <Inventor/@GUI@/widgets/SoAnyPopupMenu.h>
@@ -36,17 +39,28 @@ static const char rcsid[] =
 
 // *************************************************************************
 
+/*!
+*/
+
 SoAnyPopupMenu::SoAnyPopupMenu(
   void )
 {
   this->menu = new So@GUI@PopupMenu( this );
   assert( this->menu != NULL );
+  this->menuitems = new SbIntList;
+  this->radiogroups = new SbIntList;
+  assert( this->menuitems != NULL && this->radiogroups != NULL );
 } // SoAnyPopupMenu()
+
+/*!
+*/
 
 SoAnyPopupMenu::~SoAnyPopupMenu(
   void )
 {
   delete this->menu;
+  delete this->menuitems;
+  delete this->radiogroups;
 } // ~SoAnyPopupMenu()
 
 // *************************************************************************
@@ -178,12 +192,116 @@ SoAnyPopupMenu::RemoveMenuItem(
 
 // *************************************************************************
 
+/*!
+*/
+
+int
+SoAnyPopupMenu::NewRadioGroup(
+  int groupid )
+{
+  const int numGroupedItems = this->radiogroups->getLength();
+  int id = groupid;
+  if ( id != -1 ) {
+    bool hit = false;
+    for ( int i = 0; i < numGroupedItems && hit == false; i++ ) {
+      if ( (*this->radiogroups)[i] == id )
+        hit = true;
+    }
+    if ( hit == true ) {
+#if SO@uGUI@_DEBUG
+      SoDebugError::postInfo( "SoAnyPopupMenu::NewRadioGroup",
+        "requested group id already taken" );
+#endif // SO@uGUI@_DEBUG
+      return -1; 
+    }
+  } else {
+    id = 0;
+    bool found;
+    do {
+      id++;
+      found = false;
+      for ( int i = 0; i < numGroupedItems && found == false; i++ ) {
+        if ( (*this->radiogroups)[i] == id )
+          found = true;
+      }
+    } while ( found == true );
+  }
+  // id is OK here
+  this->menuitems->append( -1 ); // fake menu item
+  this->radiogroups->append( id ); // register id in array
+  return id;
+} // NewRadioGroup()
+
+/*!
+*/
+
+int
+SoAnyPopupMenu::GetRadioGroup(
+  int itemid )
+{
+  assert( itemid != -1 );
+  const int numGroupedItems = this->radiogroups->getLength();
+  for ( int i = 0; i < numGroupedItems; i++ ) {
+    if ( (*this->menuitems)[i] == itemid )
+      return (*this->radiogroups)[i];
+  }
+  return -1;
+} // GetRadioGroup()
+
+/*!
+*/
+
+void
+SoAnyPopupMenu::AddRadioGroupItem(
+  int groupid,
+  int itemid )
+{
+  this->menuitems->append( itemid );
+  this->radiogroups->append( groupid );
+} // AddRadioGroupItem()
+
+/*!
+*/
+
+void
+SoAnyPopupMenu::RemoveRadioGroupItem(
+  int itemid )
+{
+  assert( itemid != -1 );
+  const int numGroupedItems = this->menuitems->getLength();
+  for ( int i = 0; i < numGroupedItems; i++ ) {
+    if ( (*this->menuitems)[i] == itemid ) {
+      this->menuitems->remove(i);
+      this->radiogroups->remove(i);
+      return;
+    }
+  }
+} // RemoveRadioGroupItem()
+
+// *************************************************************************
+
+/*!
+*/
+
 int
 SoAnyPopupMenu::PopUp(
   int screenx,
   int screeny )
 {
-  return this->menu->PopUp( screenx, screeny );
+  int itemid = this->menu->PopUp( screenx, screeny );
+  if ( itemid == -1 )
+    return itemid;
+  int groupid = this->GetRadioGroup( itemid );
+  if ( groupid == -1 )
+    return itemid;
+  const int numGroupedItems = this->menuitems->getLength();
+  for ( int i = 0; i < numGroupedItems; i++ ) {
+    if ( (*this->radiogroups)[i] == groupid ) {
+      int item = (*this->menuitems)[i];
+      this->menu->SetMenuItemMarked( item, (item == itemid) ? TRUE : FALSE );
+    }
+  }
+  return itemid;
 } // PopUp()
 
 // *************************************************************************

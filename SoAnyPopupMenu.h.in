@@ -22,6 +22,7 @@
 #ifndef SOANY_POPUPMENU_H
 #define SOANY_POPUPMENU_H
 
+class SbIntList;
 class So@GUI@PopupMenu;
 
 // *************************************************************************
@@ -58,8 +59,16 @@ public:
 
   SOANY_POPUPMENU_INTERFACE
 
+  int NewRadioGroup( int groupid = -1 );
+  int GetRadioGroup( int itemid );
+  void AddRadioGroupItem( int groupid, int itemid );
+  void RemoveRadioGroupItem( int itemid );
+
 private:
   So@GUI@PopupMenu * menu;
+
+  SbIntList * menuitems;
+  SbIntList * radiogroups;
 
 }; // class SoAnyPopupMenu
 
