@@ -24,6 +24,9 @@
 #ifndef SOGUIFULLVIEWERP_H
 #define SOGUIFULLVIEWERP_H
 
+#include <Inventor/SbString.h>
+#include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
+
 class So@Gui@FullViewer;
 
 // ************************************************************************
@@ -111,8 +114,8 @@ public:
       STEREO_GROUP
       };
 
-  So@Gui@PopupMenu * setupStandardPopupMenu(void);
-  void prepareMenu(So@Gui@PopupMenu * menu);
+  class So@Gui@PopupMenu * setupStandardPopupMenu(void);
+  void prepareMenu(class So@Gui@PopupMenu * menu);
   void menuSelection(int menuitemid);
   static void menuSelectionCallback(int menuitemid, void * userdata);
   SbString popupmenutitle;

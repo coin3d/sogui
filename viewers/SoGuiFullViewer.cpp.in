@@ -740,7 +740,7 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     (void)PUBLIC(this)->setFullScreen(PUBLIC(this)->isFullScreen() ? FALSE : TRUE);
     break;
   case PREFERENCES_ITEM:
-    PUBLIC(this)->selectedPrefs();
+    ((So@Gui@FullViewerP *)this)->selectedPrefs();
     break;
 
   case HELP_ITEM:
@@ -756,7 +756,7 @@ SoGuiFullViewerP::menuSelection(int menuitemid)
     PUBLIC(this)->viewAll();
     break;
   case SEEK_ITEM:
-    PUBLIC(this)->seekbuttonClicked();
+    ((So@Gui@FullViewerP *)this)->seekbuttonClicked();
     break;
   case COPY_VIEW_ITEM:
     PUBLIC(this)->copyView(SbTime::getTimeOfDay());
