@@ -61,10 +61,8 @@ public:
   virtual void show(void);
   virtual void hide(void);
 
-#ifdef __COIN_SOQT__
   void setCursor(const So@Gui@Cursor & cursor);
   const So@Gui@Cursor & getCursor(void) const;
-#endif // __COIN_SOQT__
 
   SbBool isFullScreen(void) const;
   SbBool setFullScreen(const SbBool onoff);
