@@ -1,5 +1,5 @@
 /* XPM */
-static char * set_home_xpm[] = {
+static const char * set_home_xpm[] = {
 "24 24 9 1",
 " 	c None",
 ".	c #000000",

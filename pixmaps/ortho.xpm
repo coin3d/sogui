@@ -1,5 +1,5 @@
 /* XPM */
-static char * ortho_xpm[] = {
+static const char * ortho_xpm[] = {
 "24 24 15 1",
 " 	c None",
 ".	c #000000",

@@ -212,7 +212,7 @@ So@Gui@FlyViewer::constructor(// private
 
   this->setClassName(this->getDefaultWidgetName());
 
-  static char * superimposed[] = {
+  static const char * superimposed[] = {
     "#Inventor V2.1 ascii",
     "",
     "Separator {",
