@@ -24,35 +24,30 @@
 #ifndef SO@GUI@_BASIC_H
 #define SO@GUI@_BASIC_H
 
-/*!
-  \defgroup devices @Gui@ Device Classes
-*/
+// *************************************************************************
 
-/*!
-  \defgroup components @Gui@ Components
-*/
+/* For the Doxygen tool. */
+/* FIXME: these Doxygen "tags" should be moved to an internal
+   headerfile. 20010810 mortene. */
 
-/*!
-  \defgroup viewers @Gui@ Viewer Components
-*/
-
-/*!
-  \defgroup editors @Gui@ Editor Components
-*/
-
-/*!
-  \defgroup slidersets @Gui@ Slider Set Components
-*/
-
-/*!
-  \defgroup misc Miscellaneous Classes
-*/
-
-/*!
-  \defgroup common Common Code
-*/
+/*! \defgroup devices @Gui@ Device Classes */
+/*! \defgroup components @Gui@ Components */
+/*! \defgroup viewers @Gui@ Viewer Components */
+/*! \defgroup editors @Gui@ Editor Components */
+/*! \defgroup slidersets @Gui@ Slider Set Components */
+/*! \defgroup misc Miscellaneous Classes */
+/*! \defgroup common Common Code */
 
 // *************************************************************************
+
+/* Some useful inline template functions (instead of macros):
+ *   So@Gui@Min(Val1, Val2)       - returns minimum value
+ *   So@Gui@Max(Val1, Val2)       - returns maximum value
+ *   So@Gui@Clamp(Val, Min, Max)  - returns clamped value
+ *   So@Gui@Swap(Val1, Val2)      - swaps the two values (no return value)
+ *
+ * FIXME: write Doxygen doc for these methods. 20010810 mortene.
+ */
 
 template <class Type>
 inline Type So@Gui@Min( Type a, Type b ) { return (b < a) ? b : a; }
@@ -92,15 +87,13 @@ inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
 #endif /* SO@GUI@_DLL_API */
 
 /*
-  On MSWindows platforms, one of these defines must always be set:
+  On MSWindows platforms, one of these defines must always be set when
+  building application programs:
 
-   - "SO@GUI@_MAKE_DLL", only when building the library itself. Taken
-     care of automatically by the configure / build process.
+   - "SO@GUI@_DLL", when the application programmer is using the
+     library in the form of a dynamic link library (DLL)
 
-   - "SO@GUI@_DLL", when application programmers are using the library
-     in the form of a dynamic link library (DLL)
-
-   - "SO@GUI@_NOT_DLL", when application programmers are using the
+   - "SO@GUI@_NOT_DLL", when the application programmer is using the
      library in the form of a static object library (LIB)
 
   Note that either SO@GUI@_DLL or SO@GUI@_NOT_DLL _must_ be defined by
@@ -123,11 +116,11 @@ inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
   correct is likely to cause mysterious crashes.
  */
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-/* Enable to generate SO@GUI@.DLL (under Win32). */
-# ifdef SO@GUI@_MAKE_DLL
-#  define SO@GUI@_DLL_API __declspec(dllexport)
-# else /* !SO@GUI@_MAKE_DLL */
-/* Enable to build against SO@GUI@.DLL (under Win32). */
+# ifdef SO@GUI@_INTERNAL
+#  ifdef SO@GUI@_MAKE_DLL
+#   define SO@GUI@_DLL_API __declspec(dllexport)
+#  endif /* SO@GUI@_MAKE_DLL */
+# else /* !SO@GUI@_INTERNAL */
 #  ifdef SO@GUI@_DLL
 #   define SO@GUI@_DLL_API __declspec(dllimport)
 #  else /* !SO@GUI@_DLL */
