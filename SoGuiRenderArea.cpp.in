@@ -861,6 +861,7 @@ So@Gui@RenderArea::setBackgroundColor(const SbColor & color)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->setBackgroundColor(color);
+  this->scheduleRedraw();
 }
 
 /*!
@@ -883,6 +884,7 @@ So@Gui@RenderArea::setBackgroundIndex(int idx)
 {
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->setBackgroundIndex(idx);
+  this->scheduleRedraw();
 }
 
 /*!
@@ -905,6 +907,7 @@ So@Gui@RenderArea::setOverlayBackgroundIndex(int idx)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
   PRIVATE(this)->overlayManager->setBackgroundIndex(idx);
+  this->scheduleOverlayRedraw();
 }
 
 /*!
@@ -931,6 +934,7 @@ So@Gui@RenderArea::setColorMap(int start, int num, const SbColor * colors)
   PRIVATE(this)->normalColormap = new SbColor [ num ];
   for (int i = 0; i < num; i++)
     PRIVATE(this)->normalColormap[i] = colors[i];
+  this->scheduleRedraw();
 }
 
 /*!
@@ -947,6 +951,7 @@ So@Gui@RenderArea::setOverlayColorMap(int start, int num,
   for (int i = 0; i < num; i++) {
     PRIVATE(this)->overlayColormap[i] = colors[i];
   }
+  this->scheduleOverlayRedraw();
 }
 
 // *************************************************************************
@@ -968,6 +973,7 @@ So@Gui@RenderArea::setViewportRegion(const SbViewportRegion & region)
 
   PRIVATE(this)->normalManager->setViewportRegion(region);
   PRIVATE(this)->overlayManager->setViewportRegion(region);
+  this->scheduleRedraw();
 }
 
 /*!
@@ -991,6 +997,7 @@ So@Gui@RenderArea::setTransparencyType(SoGLRenderAction::TransparencyType type)
   assert(PRIVATE(this)->normalManager != NULL);
   PRIVATE(this)->normalManager->getGLRenderAction()->setTransparencyType(type);
   PRIVATE(this)->overlayManager->getGLRenderAction()->setTransparencyType(type);
+  this->scheduleRedraw();
 }
 
 /*!
@@ -1039,6 +1046,8 @@ So@Gui@RenderArea::setAntialiasing(SbBool smoothing, int numPasses)
       glra->setNumPasses(numPasses);
     }
   }
+
+  this->scheduleRedraw();
 }
 
 /*!
@@ -1082,6 +1091,8 @@ So@Gui@RenderArea::setClearBeforeRender(SbBool enable, SbBool zbEnable)
 {
   PRIVATE(this)->clear = enable;
   PRIVATE(this)->clearZBuffer = zbEnable;
+
+  this->scheduleRedraw();
 }
 
 /*!
@@ -1112,6 +1123,7 @@ void
 So@Gui@RenderArea::setClearBeforeOverlayRender(SbBool enable)
 {
   PRIVATE(this)->clearOverlay = enable;
+  this->scheduleOverlayRedraw();
 }
 
 /*!
