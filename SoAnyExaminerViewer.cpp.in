@@ -315,9 +315,8 @@ void
 SoAnyExaminerViewer::drawAxisCross(
   void )
 {
-  // Store GL state information for the variables that we modify.
-  glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
-               GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
+  // Store GL state.
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
   GLfloat depthrange[2];
   glGetFloatv(GL_DEPTH_RANGE, depthrange);
   GLdouble projectionmatrix[16];
@@ -329,6 +328,7 @@ SoAnyExaminerViewer::drawAxisCross(
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_LIGHTING);
   glEnable(GL_COLOR_MATERIAL);
+  glDisable(GL_BLEND); // Kills transparency.
 
   // Set the viewport in the OpenGL canvas. Dimensions are calculated
   // as a percentage of the total canvas size.
@@ -460,9 +460,13 @@ SoAnyExaminerViewer::drawAxisCross(
   glPopMatrix();
 
   // Reset original state.
+
+  // FIXME: are these 3 lines really necessary, as we push
+  // GL_ALL_ATTRIB_BITS at the start? 20000604 mortene.
   glDepthRange(depthrange[0], depthrange[1]);
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixd(projectionmatrix);
+
   glPopAttrib();
 } // drawAxisCross()
 
