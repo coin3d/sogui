@@ -2,8 +2,8 @@ TODO
 ====
 
 * [20000324:larsa]: Set up all files as .in templates because it's easier
-  to untemplatify them into the build directory than to compile them from
-  this one.
+  (more portable) to untemplatify them into the build directory than to
+  compile them from this one.
 
 * [20000324:larsa]: Move ThumbWheel to SoAnyThumbWheel to conform with the
   rest of the system.
