@@ -483,6 +483,31 @@
   Right Thing.
 */
 
+/*!
+  \fn void So@Gui@GLWidget::setStealFocus(SbBool enable)
+
+  Sets whether the GL widget should steal keyboard focus when the
+  mouse is over the GL view.
+
+  Default is \c TRUE.
+
+  \sa isStealFocus
+  \since 2004-12-08
+*/
+
+/*!
+  \fn SbBool So@Gui@GLWidget::isStealFocus(void) const
+
+  Returns whether focus stealing policy is on (\c TRUE) or off (\c
+  FALSE).
+
+  Default is \c TRUE.
+
+  \sa setStealFocus
+  \since 2004-12-08
+*/
+
+
 // *************************************************************************
 
 /*!
