@@ -48,6 +48,10 @@ static const char rcsid[] =
   \sa So@GUI@FullViewer
 */
 
+// FIXME: find this value by using configure (SoPolygonOffset is not
+// present in all Inventor versions). 20000308 mortene.
+#define HAVE_SOPOLYGONOFFSET 1
+
 #include <assert.h>
 
 #include <GL/gl.h>
@@ -63,7 +67,9 @@ static const char rcsid[] =
 #include <Inventor/nodes/SoMaterialBinding.h>
 #include <Inventor/nodes/SoOrthographicCamera.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
+#if HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoPolygonOffset.h>
+#endif // HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoResetTransform.h>
 #include <Inventor/nodes/SoRotation.h>
 #include <Inventor/nodes/SoSeparator.h>
@@ -295,9 +301,11 @@ So@GUI@Viewer::So@GUI@Viewer(
 
     this->polygonoffsetparent = new SoSwitch;
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+#if HAVE_SOPOLYGONOFFSET
     this->sopolygonoffset = new SoPolygonOffset;
     this->sopolygonoffset->setOverride(TRUE);
     this->polygonoffsetparent->addChild(this->sopolygonoffset);
+#endif // HAVE_SOPOLYGONOFFSET
     this->hiddenlineroot->addChild(this->polygonoffsetparent);
 
     this->drawstyleroot->addChild(this->hiddenlineroot);
