@@ -381,6 +381,9 @@ So@GUI@Viewer::setCamera(SoCamera * cam)
     this->saveHomePosition();
     if (headlightflag) this->setHeadlight(TRUE);
   }
+  else {
+    this->lighton = headlightflag;
+  }
 } // setCamera()
 
 // *************************************************************************
@@ -534,22 +537,12 @@ So@GUI@Viewer::resetToHomePosition(void)
 void
 So@GUI@Viewer::setHeadlight(SbBool on)
 {
-#if SO@uGUI@_DEBUG
-  if (this->lightroot &&
-      ((on && this->isHeadlight()) || (!on && !this->isHeadlight()))) {
-    SoDebugError::postWarning("So@GUI@Viewer::setHeadlight",
-                              "headlight already turned %s",
-                              on ? "on" : "off");
-    return;
-  }
-#endif // SO@uGUI@_DEBUG
-
   SoSearchAction search;
 
   if (on) {
     if (!this->lightroot) {
       this->lightroot = new SoGroup;
-      this->lightroot->ref();
+      this->lightroot->ref(); // Matched by an unref() in the destructor.
       this->lightroot->addChild(new SoRotation);
       SoDirectionalLight * dl = new SoDirectionalLight;
       dl->direction.setValue(1, -1, -10);
@@ -559,11 +552,14 @@ So@GUI@Viewer::setHeadlight(SbBool on)
 
     assert(this->camera);
     SoGroup * cameraparent = getParentOfNode(this->viewerroot, this->camera);
-    int idx = cameraparent->findChild(this->camera);
-    cameraparent->insertChild(this->lightroot, idx+1);
+    int lidx = cameraparent->findChild(this->lightroot);
+    if (lidx == -1) {
+      int idx = cameraparent->findChild(this->camera);
+      cameraparent->insertChild(this->lightroot, idx+1);
 
-    SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
-    lorient->rotation.connectFrom(& this->camera->orientation);
+      SoRotation * lorient = (SoRotation *) this->lightroot->getChild(0);
+      lorient->rotation.connectFrom(& this->camera->orientation);
+    }
   }
   else {
     assert(this->lightroot);
