@@ -135,7 +135,7 @@ So@GUI@RenderArea::~So@GUI@RenderArea(
 
 void
 So@GUI@RenderArea::setSceneGraph( // virtual
-  SoNode * const scene )
+  SoNode * scene )
 {
   this->normalManager->setSceneGraph( scene );
 } // setSceneGraph()
@@ -155,7 +155,7 @@ So@GUI@RenderArea::getSceneGraph( // virtual
 
 void
 So@GUI@RenderArea::setOverlaySceneGraph(
-  SoNode * const scene )
+  SoNode * scene )
 {
   this->overlayManager->setSceneGraph( scene );
 } // setOverlaySceneGraph()
@@ -177,7 +177,7 @@ So@GUI@RenderArea::getOverlaySceneGraph(
 
 void
 So@GUI@RenderArea::registerDevice(
-  So@GUI@Device * const device )
+  So@GUI@Device * device )
 {
   if ( ! this->devices.extra )
     this->devices.extra = new SbPList;
@@ -190,7 +190,7 @@ So@GUI@RenderArea::registerDevice(
 
 void
 So@GUI@RenderArea::unregisterDevice(
-  So@GUI@Device * const device )
+  So@GUI@Device * device )
 {
   assert( this->devices.extra != NULL );
   int idx = this->devices.extra->find( device );
@@ -258,7 +258,7 @@ So@GUI@RenderArea::getBackgroundIndex(
 
 void
 So@GUI@RenderArea::setOverlayBackgroundIndex(
-  const int idx )
+  int idx )
 {
   assert( this->overlayManager != NULL );
   this->overlayManager->setBackgroundIndex( idx );
@@ -284,7 +284,7 @@ void
 So@GUI@RenderArea::setColorMap(
   int start,
   int num,
-  const SbColor * const colors )
+  const SbColor * colors )
 {
   delete [] this->normalColormap;
   this->normalColormapStart = start;
@@ -301,7 +301,7 @@ void
 So@GUI@RenderArea::setOverlayColorMap(
   int start,
   int num,
-  const SbColor * const colors )
+  const SbColor * colors )
 {
   delete [] this->overlayColormap;
   this->overlayColormapStart = start;
@@ -537,7 +537,7 @@ So@GUI@RenderArea::scheduleOverlayRedraw(
 
 void
 So@GUI@RenderArea::redrawOnSelectionChange(
-  SoSelection * const selection )
+  SoSelection * selection )
 {
   this->normalSelection = selection;
 } // redrawOnSelectionChange()
@@ -547,7 +547,7 @@ So@GUI@RenderArea::redrawOnSelectionChange(
 
 void
 So@GUI@RenderArea::redrawOverlayOnSelectionChange(
-  SoSelection * const selection )
+  SoSelection * selection )
 {
   this->overlaySelection = selection;
 } // redrawOverlayOnSelectionChange()
@@ -569,7 +569,7 @@ So@GUI@RenderArea::setEventCallback(
 
 void
 So@GUI@RenderArea::setSceneManager(
-  SoSceneManager * const manager )
+  SoSceneManager * manager )
 {
   assert( this->normalManager != NULL );
   this->normalManager = manager;
@@ -590,7 +590,7 @@ So@GUI@RenderArea::getSceneManager(
 
 void
 So@GUI@RenderArea::setOverlaySceneManager(
-  SoSceneManager * const manager )
+  SoSceneManager * manager )
 {
   this->overlayManager = manager;
 } // setOverlaySceneManager()
@@ -610,7 +610,7 @@ So@GUI@RenderArea::getOverlaySceneManager(
 
 void
 So@GUI@RenderArea::setGLRenderAction(
-  SoGLRenderAction * const action )
+  SoGLRenderAction * action )
 {
   assert( this->normalManager != NULL );
   this->normalManager->setGLRenderAction( action );
@@ -632,7 +632,7 @@ So@GUI@RenderArea::getGLRenderAction(
 
 void
 So@GUI@RenderArea::setOverlayGLRenderAction(
-  SoGLRenderAction * const action )
+  SoGLRenderAction * action )
 {
   assert( this->overlayManager != NULL );
   this->overlayManager->setGLRenderAction( action );
