@@ -402,7 +402,9 @@ So@Gui@ViewerP::createSuperScene(void)
   delete input;
   delete [] buf;
   if (!ok) {
-    SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
+    // FIXME: this looks unnecessary robust, and I believe it should
+    // be replaced by an assert()..? 20030430 mortene.
+    SoDebugError::post("So@Gui@ViewerP::createSuperScene",
 		       "couldn't create viewer superscene");
     return NULL;
   }
@@ -493,7 +495,7 @@ So@Gui@ViewerP::createFPSSuperimposition(void)
   delete input;
   delete [] buf;
   if (!ok) {
-    SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
+    SoDebugError::post("So@Gui@ViewerP::createFPSSuperimposition",
 		       "couldn't create viewer superscene");
     return NULL;
   }
