@@ -46,6 +46,7 @@ static const char rcsid[] =
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/SoAnyMaterialList.h>
+#include <Inventor/@Gui@/SoAny.h>
 
 struct So@Gui@MaterialListCallbackInfo {
   So@Gui@MaterialListCB * callback;
@@ -368,11 +369,11 @@ SoAnyMaterialList::getMaterialDirectory(
 
   // get the path to search for materials in
   SbBool path_allocated = FALSE;
-  char * path = this->dirpath;
-  if (! path) path = getenv("SO_MATERIAL_DIR");
+  const char * path = this->dirpath;
+  if (! path) path = SoAny::si()->getenv("SO_MATERIAL_DIR");
   if (path == NULL) {
-    path = getenv("WALLET");
-    if (! path) path = getenv("COIN_HOME");
+    path = SoAny::si()->getenv("WALLET");
+    if (! path) path = SoAny::si()->getenv("COIN_HOME");
     if (path != NULL) {
       char * buf = new char [ strlen(path) + 12 ];
       sprintf(buf, "%s/materials", path); // use DIRSEP string?
@@ -381,7 +382,7 @@ SoAnyMaterialList::getMaterialDirectory(
     }
   }
   if (! path) {
-    path = getenv("OIVHOME");
+    path = SoAny::si()->getenv("OIVHOME");
     if (path != NULL) {
       char * buf = new char [ strlen(path) + 15 ];
       sprintf(buf, "%s/data/materials", path); // use DIRSEP string?

@@ -61,6 +61,7 @@ static const char rcsid[] =
 #include <math.h>
 
 #include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/SoAny.h>
 
 #include <Inventor/SoDB.h>
 
@@ -3159,7 +3160,7 @@ void
 So@Gui@ViewerP::recordFPS(void)
 {
   if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
-    char * env = getenv("COIN_SHOW_FPS_COUNTER");
+    const char * env = SoAny::si()->getenv("COIN_SHOW_FPS_COUNTER");
     COIN_SHOW_FPS_COUNTER = env ? atoi(env) : 0;
   }
 
