@@ -1,0 +1,8 @@
+#include <Inventor/@Gui@/engines/SoGuiEngines.h>
+
+void
+SoGuiEngines::initClasses(void)
+{
+  SoGuiRadioGroup::initClass();
+}
+
