@@ -185,8 +185,6 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 
-#ifndef DOXYGEN_SKIP_THIS
-
 class So@Gui@RenderAreaP {
 public:
 
@@ -680,8 +678,6 @@ So@Gui@RenderAreaP::getSoEvent(@EVENT@ event)
 
   return soevent;
 }
-
-#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 
