@@ -105,13 +105,13 @@ SoGui_src_BuiltMetaFiles =
 SoGui_src_Inventor_BuiltMetaFiles =
 
 SoGui_src_Inventor_Gui_BuiltMetaFiles = \
-  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@P.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.cpp
+  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@P.icc \
+  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.icc \
+  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.icc
 
 if HAVE_JOYSTICK_LINUX
 SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles = \
-  $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.cpp
+  $(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.icc
 else
 SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles =
 endif
@@ -120,14 +120,14 @@ SoGui_src_Inventor_Gui_devices_BuiltMetaFiles = \
   $(SoGui_src_Inventor_Gui_devices_LinuxJoystickMetaFiles)
 
 SoGui_src_Inventor_Gui_viewers_BuiltMetaFiles = \
-  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.cpp
+  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.icc \
+  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.icc \
+  $(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.icc
 
 SoGui_src_Inventor_Gui_widgets_BuiltMetaFiles = \
-  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.cpp
+  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.icc \
+  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.icc \
+  $(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.icc
 
 else
 
@@ -466,62 +466,62 @@ if BUILD_METAFILES
 
 ## src/Inventor/@Gui@/
 
-$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@P.cpp: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@P.icc: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@P.cpp $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h"; \
-	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@P.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@P.icc $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h"; \
+	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@P.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@P.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.icc: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp src/Inventor/@Gui@/So@Gui@ComponentP.h"; \
-	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.icc src/Inventor/@Gui@/So@Gui@ComponentP.h"; \
+	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.cpp: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@GLWidgetP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.icc: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@GLWidgetP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.cpp src/Inventor/@Gui@/So@Gui@GLWidgetP.h"; \
-	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@GLWidgetP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.icc src/Inventor/@Gui@/So@Gui@GLWidgetP.h"; \
+	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidgetP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@GLWidgetP.h` )
 
 
 ## src/Inventor/@Gui@/devices/
 
-$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.cpp: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.icc: $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/devices/@meta_prefix@So@Gui@LinuxJoystickP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/devices/So@Gui@LinuxJoystickP.h` )
 
 ## src/Inventor/@Gui@/viewers/
 
-$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.cpp: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.icc: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@FullViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@FullViewerP.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.cpp: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.icc: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@ExaminerViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@ExaminerViewerP.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.cpp: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.icc: $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/viewers/@meta_prefix@So@Gui@PlaneViewerP.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h` )
 
 ## src/Inventor/@Gui@/widgets/
 
-$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.cpp: $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.icc: $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@ThumbWheel.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.cpp: $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.icc: $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@So@Gui@GLArea.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/So@Gui@GLArea.h` )
 
-$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.cpp: $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.icc: $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h`"; \
-	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h` )
+	echo " $(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h`"; \
+	$(MOC) -o src/Inventor/@Gui@/widgets/@meta_prefix@@Gui@NativePopupMenu.icc `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/widgets/@Gui@NativePopupMenu.h` )
 
 endif
 
