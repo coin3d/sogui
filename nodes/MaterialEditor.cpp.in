@@ -25,12 +25,15 @@
 
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/sensors/SoFieldSensor.h>
+#include <Inventor/sensors/SoNodeSensor.h>
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiImage.h>
 #include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+#include <Inventor/@Gui@/nodes/SoGuiToggleButton.h>
+#include <Inventor/@Gui@/nodes/SoGuiRadioButton.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
 
@@ -43,13 +46,35 @@ public:
   SoGuiMaterialEditor * api;
 
   SoMaterial * material;
+  SoNodeSensor * material_sensor;
+  static void material_cb(void * closure, SoSensor * sensor);
+
+  SoFieldSensor * material_field_sensor;
+  static void material_field_cb(void * closure, SoSensor * sensor);
+
+  SoGuiToggleButton * button1;
+  SoGuiToggleButton * button2;
+  SoGuiToggleButton * button3;
+  SoGuiToggleButton * button4;
+  SoFieldSensor * button1_sensor;
+  SoFieldSensor * button2_sensor;
+  SoFieldSensor * button3_sensor;
+  SoFieldSensor * button4_sensor;
+  static void button1_cb(void * closure, SoSensor * sensor);
+  static void button2_cb(void * closure, SoSensor * sensor);
+  static void button3_cb(void * closure, SoSensor * sensor);
+  static void button4_cb(void * closure, SoSensor * sensor);
+  SoGuiRadioButton * radio1;
+  SoGuiRadioButton * radio2;
+  SoGuiRadioButton * radio3;
+  SoGuiRadioButton * radio4;
+
   SoGuiSlider1 * slider1;
   SoGuiSlider1 * slider2;
   SoGuiSlider1 * slider3;
   SoGuiSlider1 * slider4;
   SoGuiSlider1 * slider5;
   SoGuiSlider1 * slider6;
-
   SoFieldSensor * ambient_slider_sensor;
   SoFieldSensor * diffuse_slider_sensor;
   SoFieldSensor * specular_slider_sensor;
@@ -110,6 +135,23 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   SbBool ok = this->setAnyPart("root", scene);
   assert(ok);
 
+  PRIVATE(this)->button1 = (SoGuiToggleButton *) SoAny::scanSceneForName(scene, "tbutton1");
+  PRIVATE(this)->button2 = (SoGuiToggleButton *) SoAny::scanSceneForName(scene, "tbutton2");
+  PRIVATE(this)->button3 = (SoGuiToggleButton *) SoAny::scanSceneForName(scene, "tbutton3");
+  PRIVATE(this)->button4 = (SoGuiToggleButton *) SoAny::scanSceneForName(scene, "tbutton4");
+  assert(PRIVATE(this)->button1);
+  assert(PRIVATE(this)->button2);
+  assert(PRIVATE(this)->button3);
+  assert(PRIVATE(this)->button4);
+  PRIVATE(this)->radio1 = (SoGuiRadioButton *) SoAny::scanSceneForName(scene, "rbutton1");
+  PRIVATE(this)->radio2 = (SoGuiRadioButton *) SoAny::scanSceneForName(scene, "rbutton2");
+  PRIVATE(this)->radio3 = (SoGuiRadioButton *) SoAny::scanSceneForName(scene, "rbutton3");
+  PRIVATE(this)->radio4 = (SoGuiRadioButton *) SoAny::scanSceneForName(scene, "rbutton4");
+  assert(PRIVATE(this)->radio1);
+  assert(PRIVATE(this)->radio2);
+  assert(PRIVATE(this)->radio3);
+  assert(PRIVATE(this)->radio4);
+
   PRIVATE(this)->slider1 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider1");
   PRIVATE(this)->slider2 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider2");
   PRIVATE(this)->slider3 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider3");
@@ -146,23 +188,6 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   ok = sphereimage->setPart("texture", texture);
   assert(ok);
 
-  /*
-  PRIVATE(this)->slider5->value.connectFrom(&(PRIVATE(this)->material->shininess));
-  PRIVATE(this)->slider5->value.getValue();
-  PRIVATE(this)->material->shininess.connectFrom(&(PRIVATE(this)->slider5->value));
-  PRIVATE(this)->slider6->value.connectFrom(&(PRIVATE(this)->material->transparency));
-  PRIVATE(this)->slider6->value.getValue();
-  PRIVATE(this)->material->transparency.connectFrom(&(PRIVATE(this)->slider6->value));
-  */
-  // set up sensors
-
-  SoFieldSensor * ambient_slider_sensor;
-  SoFieldSensor * diffuse_slider_sensor;
-  SoFieldSensor * specular_slider_sensor;
-  SoFieldSensor * emissive_slider_sensor;
-  SoFieldSensor * shininess_slider_sensor;
-  SoFieldSensor * transparency_slider_sensor;
-
   PRIVATE(this)->ambient_slider_sensor = new SoFieldSensor(MaterialEditor::ambient_slider_cb, PRIVATE(this));
   PRIVATE(this)->diffuse_slider_sensor = new SoFieldSensor(MaterialEditor::diffuse_slider_cb, PRIVATE(this));
   PRIVATE(this)->specular_slider_sensor = new SoFieldSensor(MaterialEditor::specular_slider_cb, PRIVATE(this));
@@ -175,6 +200,22 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   PRIVATE(this)->emissive_slider_sensor->attach(&(PRIVATE(this)->slider4->value));
   PRIVATE(this)->shininess_slider_sensor->attach(&(PRIVATE(this)->slider5->value));
   PRIVATE(this)->transparency_slider_sensor->attach(&(PRIVATE(this)->slider6->value));
+
+  PRIVATE(this)->button1_sensor = new SoFieldSensor(MaterialEditor::button1_cb, PRIVATE(this));
+  PRIVATE(this)->button2_sensor = new SoFieldSensor(MaterialEditor::button2_cb, PRIVATE(this));
+  PRIVATE(this)->button3_sensor = new SoFieldSensor(MaterialEditor::button3_cb, PRIVATE(this));
+  PRIVATE(this)->button4_sensor = new SoFieldSensor(MaterialEditor::button4_cb, PRIVATE(this));
+  PRIVATE(this)->button1_sensor->attach(&(PRIVATE(this)->button1->on));
+  PRIVATE(this)->button2_sensor->attach(&(PRIVATE(this)->button2->on));
+  PRIVATE(this)->button3_sensor->attach(&(PRIVATE(this)->button3->on));
+  PRIVATE(this)->button4_sensor->attach(&(PRIVATE(this)->button4->on));
+
+  PRIVATE(this)->material_sensor = new SoNodeSensor(MaterialEditor::material_cb, PRIVATE(this));
+  PRIVATE(this)->material_sensor->attach(PRIVATE(this)->material);
+  PRIVATE(this)->material->touch();
+
+  PRIVATE(this)->material_field_sensor = new SoFieldSensor(MaterialEditor::material_field_cb, PRIVATE(this));
+  PRIVATE(this)->material_field_sensor->attach(&(this->material));
 }
 
 SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
@@ -200,6 +241,7 @@ SoGuiMaterialEditor::~SoGuiMaterialEditor(void)
 // |                   |       Shininess  |======================| 0.00 |
 // |                   |       Transp     |======================| 0.00 |
 // +--------------------------------------------------------------------+
+//                                                          [nice - Ed]
 
 const char *
 MaterialEditor::texturescene[] =
@@ -243,6 +285,9 @@ MaterialEditor::texturescene[] =
   "}",
   NULL
 };
+
+// FIXME: add labels
+// FIXME: adjust geometry
 
 const char *
 MaterialEditor::editorscene[] =
@@ -365,67 +410,31 @@ MaterialEditor::editorscene[] =
   "    complement FALSE = USE tbutton4.on",
   "    design EMBOSS",
   "  }",
+
   "  SoGuiPosition { position 0 0 0 = USE wm2.oB }",
-  "  DEF frame1 SoGuiFrame {",
+  "  DEF sliderframe SoGuiFrame {",
   "    size 0 0 0 = USE wm2.oC",
   "    width 2",
   "    complement TRUE",
   "    design EMBOSS",
   "  }",
-  "  DEF slider1 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame1.size",
-  "  }",
+  "  DEF slider1 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
-  "  DEF frame2 SoGuiFrame {",
-  "    size 0 0 0 = USE wm2.oC",
-  "    width 2",
-  "    complement TRUE",
-  "    design EMBOSS",
-  "  }",
-  "  DEF slider2 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame2.size",
-  "  }",
+  "  USE sliderframe",
+  "  DEF slider2 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
-  "  DEF frame3 SoGuiFrame {",
-  "    size 0 0 0 = USE wm2.oC",
-  "    width 2",
-  "    complement TRUE",
-  "    design EMBOSS",
-  "  }",
-  "  DEF slider3 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame3.size",
-  "  }",
+  "  USE sliderframe",
+  "  DEF slider3 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
-  "  DEF frame4 SoGuiFrame {",
-  "    size 0 0 0 = USE wm2.oC",
-  "    width 2",
-  "    complement TRUE",
-  "    design EMBOSS",
-  "  }",
-  "  DEF slider4 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame4.size",
-  "  }",
+  "  USE sliderframe",
+  "  DEF slider4 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
-  "  DEF frame5 SoGuiFrame {",
-  "    size 0 0 0 = USE wm2.oC",
-  "    width 2",
-  "    complement TRUE",
-  "    design EMBOSS",
-  "  }",
-  "  DEF slider5 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame5.size",
-  "  }",
+  "  USE sliderframe",
+  "  DEF slider5 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
   "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
-  "  DEF frame6 SoGuiFrame {",
-  "    size 0 0 0 = USE wm2.oC",
-  "    width 2",
-  "    complement TRUE",
-  "    design EMBOSS",
-  "  }",
-  "  DEF slider6 SoGuiSlider1 {",
-  "    size 0 0 0 = USE frame6.size",
-  "  }",
+  "  USE sliderframe",
+  "  DEF slider6 SoGuiSlider1 { size 0 0 0 = USE sliderframe.size }",
 
   "  SoGuiPosition { position 0 0 0 = USE pane.objectSize }",
   "  SoGuiTranslation { translation -35 -25 0 }",
@@ -454,6 +463,15 @@ MaterialEditor::editorscene[] =
 MaterialEditor::MaterialEditor(void)
 {
   this->api = NULL;
+  this->material = NULL;
+  this->button1 = NULL;
+  this->button2 = NULL;
+  this->button3 = NULL;
+  this->button4 = NULL;
+  this->radio1 = NULL;
+  this->radio2 = NULL;
+  this->radio3 = NULL;
+  this->radio4 = NULL;
   this->slider1 = NULL;
   this->slider2 = NULL;
   this->slider3 = NULL;
@@ -475,12 +493,13 @@ MaterialEditor::ambient_slider_cb(void * closure, SoSensor * sensor)
   MaterialEditor * me = (MaterialEditor *) closure;
   assert(me->material);
   assert(me->slider1);
-  SbColor ambient = me->material->ambientColor.operator[](0);
+  SbColor ambient = me->material->ambientColor[0];
   float h, s, v;
   ambient.getHSVValue(h, s, v);
   v = me->slider1->value.getValue();
   ambient.setHSVValue(h, s, v);
-  me->material->ambientColor.setValue(ambient);
+  if ( ambient != me->material->ambientColor[0] )
+    me->material->ambientColor.set1Value(0, ambient);
 }
 
 void
@@ -490,12 +509,13 @@ MaterialEditor::diffuse_slider_cb(void * closure, SoSensor * sensor)
   MaterialEditor * me = (MaterialEditor *) closure;
   assert(me->material);
   assert(me->slider2);
-  SbColor diffuse = me->material->diffuseColor.operator[](0);
+  SbColor diffuse = me->material->diffuseColor[0];
   float h, s, v;
   diffuse.getHSVValue(h, s, v);
   v = me->slider2->value.getValue();
   diffuse.setHSVValue(h, s, v);
-  me->material->diffuseColor.set1Value(0, diffuse);
+  if ( diffuse != me->material->diffuseColor[0] )
+    me->material->diffuseColor.set1Value(0, diffuse);
 }
 
 void
@@ -505,12 +525,13 @@ MaterialEditor::specular_slider_cb(void * closure, SoSensor * sensor)
   MaterialEditor * me = (MaterialEditor *) closure;
   assert(me->material);
   assert(me->slider3);
-  SbColor specular = me->material->specularColor.operator[](0);
+  SbColor specular = me->material->specularColor[0];
   float h, s, v;
   specular.getHSVValue(h, s, v);
   v = me->slider3->value.getValue();
   specular.setHSVValue(h, s, v);
-  me->material->specularColor.set1Value(0, specular);
+  if ( specular != me->material->specularColor[0] )
+    me->material->specularColor.set1Value(0, specular);
 }
 
 void
@@ -520,12 +541,13 @@ MaterialEditor::emissive_slider_cb(void * closure, SoSensor * sensor)
   MaterialEditor * me = (MaterialEditor *) closure;
   assert(me->material);
   assert(me->slider4);
-  SbColor emissive = me->material->emissiveColor.operator[](0);
+  SbColor emissive = me->material->emissiveColor[0];
   float h, s, v;
   emissive.getHSVValue(h, s, v);
   v = me->slider4->value.getValue();
   emissive.setHSVValue(h, s, v);
-  me->material->emissiveColor.set1Value(0, emissive);
+  if ( emissive != me->material->emissiveColor[0] )
+    me->material->emissiveColor.set1Value(0, emissive);
 }
 
 void
@@ -536,7 +558,8 @@ MaterialEditor::shininess_slider_cb(void * closure, SoSensor * sensor)
   assert(me->material);
   assert(me->slider5);
   float shininess = me->slider5->value.getValue();
-  me->material->shininess.set1Value(0, shininess);
+  if ( shininess != me->material->shininess[0] )
+    me->material->shininess.set1Value(0, shininess);
 }
 
 void
@@ -547,7 +570,185 @@ MaterialEditor::transparency_slider_cb(void * closure, SoSensor * sensor)
   assert(me->material);
   assert(me->slider6);
   float transparency = me->slider6->value.getValue();
-  me->material->transparency.set1Value(0, transparency);
+  if ( transparency != me->material->transparency[0] )
+    me->material->transparency.set1Value(0, transparency);
+}
+
+void
+MaterialEditor::button1_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SbBool down = me->button1->on.getValue();
+  if ( !down ) {
+    if ( me->radio1->on.getValue() ) me->radio1->on.setValue(FALSE);
+
+    if (  me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio2->on.getValue() ) me->radio2->on.setValue(TRUE);
+    if ( !me->button2->on.getValue() &&
+          me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio3->on.getValue() ) me->radio3->on.setValue(TRUE);
+    if ( !me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+          me->button4->on.getValue() &&
+         !me->radio4->on.getValue() ) me->radio4->on.setValue(TRUE);
+  } else {
+    if ( me->radio2->on.getValue() ) me->radio2->on.setValue(FALSE);
+    if ( me->radio3->on.getValue() ) me->radio3->on.setValue(FALSE);
+    if ( me->radio4->on.getValue() ) me->radio4->on.setValue(FALSE);
+    if ( !me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio1->on.getValue() ) me->radio1->on.setValue(TRUE);
+  }
+}
+
+void
+MaterialEditor::button2_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SbBool down = me->button2->on.getValue();
+  if ( !down ) {
+    if ( me->radio2->on.getValue() ) me->radio2->on.setValue(FALSE);
+    if (  me->button1->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio1->on.getValue() ) me->radio1->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+          me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio3->on.getValue() ) me->radio3->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+         !me->button3->on.getValue() &&
+          me->button4->on.getValue() &&
+         !me->radio4->on.getValue() ) me->radio4->on.setValue(TRUE);
+  } else {
+    if ( me->radio1->on.getValue() ) me->radio1->on.setValue(FALSE);
+    if ( me->radio3->on.getValue() ) me->radio3->on.setValue(FALSE);
+    if ( me->radio4->on.getValue() ) me->radio4->on.setValue(FALSE);
+    if ( !me->button1->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio2->on.getValue() ) me->radio2->on.setValue(TRUE);
+  }
+}
+
+void
+MaterialEditor::button3_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SbBool down = me->button3->on.getValue();
+  if ( !down ) {
+    if ( me->radio3->on.getValue() ) me->radio3->on.setValue(FALSE);
+    if (  me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio1->on.getValue() ) me->radio1->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+          me->button2->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio2->on.getValue() ) me->radio2->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+          me->button4->on.getValue() &&
+         !me->radio4->on.getValue() ) me->radio4->on.setValue(TRUE);
+  } else {
+    if ( me->radio1->on.getValue() ) me->radio1->on.setValue(FALSE);
+    if ( me->radio2->on.getValue() ) me->radio2->on.setValue(FALSE);
+    if ( me->radio4->on.getValue() ) me->radio4->on.setValue(FALSE);
+    if ( !me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+         !me->button4->on.getValue() &&
+         !me->radio3->on.getValue() ) me->radio3->on.setValue(TRUE);
+  }
+}
+
+void
+MaterialEditor::button4_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SbBool down = me->button4->on.getValue();
+  if ( !down ) {
+    if ( me->radio4->on.getValue() ) me->radio4->on.setValue(FALSE);
+    if (  me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->radio1->on.getValue() ) me->radio1->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+          me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->radio2->on.getValue()  ) me->radio2->on.setValue(TRUE);
+    if ( !me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+          me->button3->on.getValue() &&
+         !me->radio3->on.getValue() ) me->radio3->on.setValue(TRUE);
+  } else {
+    if ( me->radio1->on.getValue() ) me->radio1->on.setValue(FALSE);
+    if ( me->radio2->on.getValue() ) me->radio2->on.setValue(FALSE);
+    if ( me->radio3->on.getValue() ) me->radio3->on.setValue(FALSE);
+    if ( !me->button1->on.getValue() &&
+         !me->button2->on.getValue() &&
+         !me->button3->on.getValue() &&
+         !me->radio4->on.getValue() ) me->radio4->on.setValue(TRUE);
+  }
+}
+
+void
+MaterialEditor::material_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SoMaterial * mat = me->material;
+  if ( !mat ) return;
+  float h, s, v;
+  SbColor color = mat->ambientColor[0];
+  color.getHSVValue(h, s, v);
+  if ( v != me->slider1->value.getValue() ) me->slider1->value.setValue(v);
+  color = mat->diffuseColor[0];
+  color.getHSVValue(h, s, v);
+  if ( v != me->slider2->value.getValue() ) me->slider2->value.setValue(v);
+  color = mat->specularColor[0];
+  color.getHSVValue(h, s, v);
+  if ( v != me->slider3->value.getValue() ) me->slider3->value.setValue(v);
+  color = mat->emissiveColor[0];
+  color.getHSVValue(h, s, v);
+  if ( v != me->slider4->value.getValue() ) me->slider4->value.setValue(v);
+  v = mat->shininess[0];
+  if ( v != me->slider5->value.getValue() ) me->slider5->value.setValue(v);
+  v = mat->transparency[0];
+  if ( v != me->slider6->value.getValue() ) me->slider6->value.setValue(v);
+}
+
+void
+MaterialEditor::material_field_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  MaterialEditor * me = (MaterialEditor *) closure;
+  SoNode * node = PUBLIC(me)->material.getValue();
+  if ( !node ) return;
+  SoMaterial * mat1 = (SoMaterial *) node;
+  SoMaterial * mat2 = me->material;
+
+  if ( mat1->ambientColor[0] != mat2->ambientColor[0] )
+    mat2->ambientColor.set1Value(0, mat1->ambientColor[0]);
+  if ( mat1->diffuseColor[0] != mat2->diffuseColor[0] )
+    mat2->diffuseColor.set1Value(0, mat1->diffuseColor[0]);
+  if ( mat1->specularColor[0] != mat2->specularColor[0] )
+    mat2->specularColor.set1Value(0, mat1->specularColor[0]);
+  if ( mat1->emissiveColor[0] != mat2->emissiveColor[0] )
+    mat2->emissiveColor.set1Value(0, mat1->emissiveColor[0]);
+  if ( mat1->shininess[0] != mat2->shininess[0] )
+    mat2->shininess.set1Value(0, mat1->shininess[0]);
+  if ( mat1->transparency[0] != mat2->transparency[0] )
+    mat2->transparency.set1Value(0, mat1->transparency[0]);
 }
 
 #undef PUBLIC
