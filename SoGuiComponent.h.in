@@ -95,6 +95,7 @@ protected:
                    const SbBool embed = TRUE);
 
   virtual void afterRealizeHook(void);
+  SbBool firstRealize;
 
   void setClassName(const char * const name);
   void setBaseWidget(@WIDGET@ widget);
@@ -135,11 +136,7 @@ protected:
   // 20011012 mortene.
   void invokeVisibilityChangeCallbacks(const SbBool enable) const;
   void invokeWindowCloseCallbacks(void) const;
-
-  // FIXME: get rid of these? 20011012 mortene.
   virtual void windowCloseAction(void);
-  static char * getlabel(unsigned int what);
-  SbBool firstRealize;
 
   // FIXME: should this really be protected? Same goes for the other
   // toolkits' eventHandler() functions. They also have nameclashes
