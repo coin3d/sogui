@@ -89,18 +89,16 @@ protected:
 
 private:
   class So@Gui@ExaminerViewerP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
+
   friend class SoGuiExaminerViewerP;
   friend class So@Gui@ExaminerViewerP;
-#endif // DOXYGEN_SKIP_THIS
 
 
-//// FIXME!: merge the So*ExaminerViewer defines properly. 20020109 mortene.
+//// FIXME!: get rid of toolkit-specific stuff. 20020109 mortene.
 
 #ifdef __COIN_SOWIN__
 protected:
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
 #endif // ! __COIN_SOWIN__
 };
 

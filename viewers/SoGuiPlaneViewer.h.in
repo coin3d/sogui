@@ -79,18 +79,16 @@ protected:
 
 private:
   class So@Gui@PlaneViewerP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
+
   friend class SoGuiPlaneViewerP;
   friend class So@Gui@PlaneViewerP;
-#endif // DOXYGEN_SKIP_THIS
 
-//// FIXME!: merge the remaining So*PlaneViewer definitions. 20020111 mortene.
+//// FIXME!: get rid of toolkit-specific stuff. 20020109 mortene.
 
 #ifdef __COIN_SOWIN__
 protected:
   virtual LRESULT onCommand(HWND window,UINT message,
                             WPARAM wparam, LPARAM lparam);
-  virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);  
 #endif // !__COIN_SOWIN__
 };
 

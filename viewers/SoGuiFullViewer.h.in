@@ -26,14 +26,6 @@
 
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
-// FIXME: get rid of non-templatized code. 20020108 mortene.
-#ifdef __COIN_SOWIN__
-typedef void AppPushButtonCB(HWND hwnd, int id, void * buttonData, void * userData);
-typedef void RedrawAppPushButtonCB(LPDRAWITEMSTRUCT lpdis, void * userData);
-typedef void CreateAppPushButtonCB(LPMEASUREITEMSTRUCT lpmis, void * userData);
-#endif // ! __COIN_SOWIN__
-
-
 class So@Gui@PopupMenu;
 
 // *************************************************************************
@@ -121,15 +113,13 @@ protected:
   virtual SbBool processSoEvent(const SoEvent * const event);
 
 protected:
-  @WIDGET@ leftDecoration;
-  @WIDGET@ rightDecoration;
-  @WIDGET@ bottomDecoration;
-
-#ifndef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
   @WIDGET@ leftWheel;
   @WIDGET@ rightWheel;
   @WIDGET@ bottomWheel;
-#endif // !__COIN_SOWIN__
+
+  @WIDGET@ leftDecoration;
+  @WIDGET@ rightDecoration;
+  @WIDGET@ bottomDecoration;
 
   @WIDGET@ leftWheelLabel;
   char * leftWheelStr;
@@ -151,10 +141,10 @@ private:
   // described as the "Bridge" pattern in «Design Patterns» by Gamma
   // et al (aka The Gang Of Four).
   class So@Gui@FullViewerP * pimpl;
-#ifndef DOXYGEN_SKIP_THIS
+
   friend class SoGuiFullViewerP;
   friend class So@Gui@FullViewerP;
-#endif // DOXYGEN_SKIP_THIS
+
 
 
 // FIXME: get rid of non-templatized code. 20020108 mortene.
@@ -171,32 +161,7 @@ protected:
 
 #ifdef __COIN_SOWIN__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 public:
-  static void setDoButtonBar(SbBool enable);
-  static SbBool isDoButtonBar(void);
-
-  void addAppPushButtonCallback(AppPushButtonCB * callback,
-                                 void * data = NULL);
-  void addRedrawAppPushButtonCallback(RedrawAppPushButtonCB * callback,
-                                       void * data = NULL);
-  void addCreateAppPushButtonCallback(CreateAppPushButtonCB * callback,
-                                       void * data = NULL);
-
-  virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
-
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  virtual LRESULT onDrawItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-  virtual LRESULT onMeasureItem(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
-
-  class SoWinThumbWheel * rightWheel;
-  class SoWinThumbWheel * bottomWheel;
-  class SoWinThumbWheel * leftWheel;
-
-  HWND viewerWidget;
-  HWND renderAreaWidget;
-
-protected:
-  SbPList * viewerButtonList;
-  SbPList * appButtonList;
 #endif // __COIN_SOWIN__
 };
 
