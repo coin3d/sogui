@@ -1,7 +1,7 @@
 /**************************************************************************
  *
  *  This file is part of the Coin GUI binding libraries.
- *  Copyright (C) 2000 by Systems in Motion.  All rights reserved.
+ *  Copyright (C) 2000-2001 by Systems in Motion.  All rights reserved.
  *
  *  The libraries this file is part of is free software; you can
  *  redistribute them and/or modify them under the terms of the GNU
@@ -41,11 +41,11 @@ public:
     So@Gui@Viewer::Type type = BROWSER );
   ~So@Gui@FlyViewer();
 
-  virtual void setViewing( SbBool enable );
+  virtual void setViewing(SbBool enable );
   virtual void resetToHomePosition(void);
-  virtual void setCamera( SoCamera * camera );
-  virtual void setCursorEnabled( SbBool enable );
-  virtual void setCameraType( SoType type );
+  virtual void setCamera(SoCamera * camera);
+  virtual void setCursorEnabled(SbBool enable);
+  virtual void setCameraType(SoType type);
 
 protected:
   So@Gui@FlyViewer(
