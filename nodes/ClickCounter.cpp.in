@@ -105,7 +105,7 @@ SoGuiClickCounter::SoGuiClickCounter(void)
   assert(surfacetexcoords);
   surfacetexcoords->point.setValues(0, 4, surfacetexturecoordinates);
 
-  static int surfaceindices[] = { 0, 1, 2, -1, 0, 2, 3, -1 };
+  static int32_t surfaceindices[] = { 0, 1, 2, -1, 0, 2, 3, -1 };
   SoIndexedFaceSet * surfacefaceset = SO_GET_ANY_PART(this, "surfaceFaceSet", SoIndexedFaceSet);
   assert(surfacefaceset);
   surfacefaceset->textureCoordIndex.setValues(0, 8, surfaceindices);

@@ -217,13 +217,13 @@ SoGuiSlider1::SoGuiSlider1(void)
   assert(surfacetexcoords);
   surfacetexcoords->point.setValues(0, 4, surfacetexturecoordinates);
 
-  static int surfaceindices[] = { 0, 1, 2, -1, 0, 2, 3, -1 };
+  static int32_t surfaceindices[] = { 0, 1, 2, -1, 0, 2, 3, -1 };
   SoIndexedFaceSet * surfacefaceset = SO_GET_ANY_PART(this, "surfaceFaceSet", SoIndexedFaceSet);
   assert(surfacefaceset);
   surfacefaceset->textureCoordIndex.setValues(0, 8, surfaceindices);
   surfacefaceset->coordIndex.setValues(0, 8, surfaceindices);
  
-  static int knobindices[] = {
+  static int32_t knobindices[] = {
     0, 1, 2, -1, 0, 2, 3, -1,
     4, 5, 6, -1, 4, 6, 7, -1,
     8, 2, 5, -1, 8, 5, 9, -1,
@@ -256,12 +256,12 @@ SoGuiSlider1::SoGuiSlider1(void)
   // FIXME: move these to correct coordinates
   SoIndexedLineSet * lightlineset = SO_GET_ANY_PART(this, "knobLightLineSet", SoIndexedLineSet);
   assert(lightlineset);
-  static int lightindices[] = { 16, 17, 18, -1, 12, 15, 14, -1 };
+  static int32_t lightindices[] = { 16, 17, 18, -1, 12, 15, 14, -1 };
   lightlineset->coordIndex.setValues(0, sizeof(lightindices) / sizeof(lightindices[0]), lightindices);
 
   SoIndexedLineSet * shadelineset = SO_GET_ANY_PART(this, "knobShadeLineSet", SoIndexedLineSet);
   assert(shadelineset);
-  static int shadeindices[] = { 12, 13, 14, -1, 16, 19, 18, -1 };
+  static int32_t shadeindices[] = { 12, 13, 14, -1, 16, 19, 18, -1 };
   shadelineset->coordIndex.setValues(0, sizeof(shadeindices) / sizeof(shadeindices[0]), shadeindices);
 
   // set up sensors
