@@ -26,6 +26,7 @@
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/sensors/SoFieldSensor.h>
 #include <Inventor/sensors/SoNodeSensor.h>
+#include <Inventor/VRMLnodes/SoVRMLMaterial.h>
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
@@ -112,6 +113,7 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   SO_KIT_CONSTRUCTOR(SoGuiMaterialEditor); 
 
   SO_KIT_ADD_FIELD(material, (NULL));
+  SO_KIT_ADD_FIELD(index, (0));
   SO_KIT_ADD_FIELD(update, (CONTINUOUS));
       
   SO_KIT_DEFINE_ENUM_VALUE(Update, CONTINUOUS);
@@ -725,6 +727,31 @@ MaterialEditor::material_cb(void * closure, SoSensor * sensor)
   if ( v != me->slider5->value.getValue() ) me->slider5->value.setValue(v);
   v = mat->transparency[0];
   if ( v != me->slider6->value.getValue() ) me->slider6->value.setValue(v);
+  SoNode * attachment = PUBLIC(me)->material.getValue();
+  if ( attachment ) {
+    if ( attachment->isOfType(SoMaterial::getClassTypeId()) ) {
+      SoMaterial * material = (SoMaterial *) attachment;
+      int index = PUBLIC(me)->index.getValue();
+      material->ambientColor.set1Value(index, mat->ambientColor[0]);
+      material->diffuseColor.set1Value(index, mat->diffuseColor[0]);
+      material->specularColor.set1Value(index, mat->specularColor[0]);
+      material->emissiveColor.set1Value(index, mat->emissiveColor[0]);
+      material->shininess.set1Value(index, mat->shininess[0]);
+      material->transparency.set1Value(index, mat->transparency[0]);
+    } else if ( attachment->isOfType(SoVRMLMaterial::getClassTypeId()) ) {
+      SoVRMLMaterial * material = (SoVRMLMaterial *) attachment;
+      SbColor ambient = mat->ambientColor[0];
+      float h, s, v;
+      ambient.getHSVValue(h, s, v);
+      material->ambientIntensity.setValue(v);
+      material->diffuseColor.setValue(mat->diffuseColor[0]);
+      material->specularColor.setValue(mat->specularColor[0]);
+      material->emissiveColor.setValue(mat->emissiveColor[0]);
+      material->shininess.setValue(mat->shininess[0]);
+      material->transparency.setValue(mat->transparency[0]);
+    } else {
+    }
+  }
 }
 
 void

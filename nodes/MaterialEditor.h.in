@@ -25,6 +25,7 @@
 \**************************************************************************/
 
 #include <Inventor/fields/SoSFEnum.h>
+#include <Inventor/fields/SoSFShort.h>
 #include <Inventor/fields/SoSFNode.h>
 #include <Inventor/nodekits/SoBaseKit.h>
 
@@ -43,8 +44,8 @@ public:
   };
 
   SoSFNode material;
+  SoSFShort index;
   SoSFEnum update;
-  // bool VRML?
 
 protected:
   ~SoGuiMaterialEditor(void);
