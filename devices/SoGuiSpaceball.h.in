@@ -37,7 +37,6 @@
 
 class SO@GUI@_DLL_API So@Gui@Spaceball : public So@Gui@Device {
   SO@GUI@_OBJECT_HEADER(So@Gui@Spaceball, So@Gui@Device);
-  @COMPONENTHEADER@
 
 public:
   enum Mask {

@@ -34,7 +34,6 @@ class SoKeyboardEvent;
 
 class SO@GUI@_DLL_API So@Gui@Keyboard : public So@Gui@Device {
   SO@GUI@_OBJECT_HEADER(So@Gui@Keyboard, So@Gui@Device);
-  @COMPONENTHEADER@
 
 public:
   enum Events {

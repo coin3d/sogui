@@ -28,6 +28,9 @@
 
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 
+// FIXME: use configure defines for the header files.
+// 20020613 mortene.
+
 #ifdef __COIN_SOQT__
 #include <qobject.h>
 #endif // __COIN_SOQT__

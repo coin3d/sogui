@@ -38,7 +38,6 @@
 
 class SO@GUI@_DLL_API So@Gui@InputFocus : public So@Gui@Device {
   SO@GUI@_OBJECT_HEADER(So@Gui@InputFocus, So@Gui@Device);
-  @COMPONENTHEADER@
 
 public:
   enum Events {

@@ -24,10 +24,10 @@
 // Pulls in __COIN_SO@GUI@__ define used below.
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 
-#ifdef __COIN_SOQT__
-#include <qmetaobject.h>
-#include <moc_SoQtObject.cpp>
-#endif // __COIN_SOQT__
+// #ifdef __COIN_SOQT__
+// #include <qmetaobject.h>
+// #include <moc_SoQtObject.cpp>
+// #endif // __COIN_SOQT__
 
 #if HAVE_CONFIG_H
 #include <config.h>

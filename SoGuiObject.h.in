@@ -34,16 +34,8 @@
 
 // *************************************************************************
 
-#ifndef __COIN_SOQT__
-// Hackery to fool Qt's moc.
-#define UNMOCABLE class
-UNMOCABLE SO@GUI@_DLL_API So@Gui@Object {
-#else
-#include <qobject.h>
-class SO@GUI@_DLL_API So@Gui@Object : public QObject {
-#endif
+class SO@GUI@_DLL_API So@Gui@Object {
   static SoType classTypeId;
-  @COMPONENTHEADER@
 
 public:
   static void initClass(void);

@@ -40,7 +40,8 @@
 
   Note that the relationship between all So@Gui@Component derived
   classes and @Gui@ widgets is one of "has-A", \e not "is-A" --
-  i.e. So@Gui@Component \e contains a @WIDGET@.
+  i.e. So@Gui@Component \e contains a @WIDGET@, it doesn't derive from
+  or subclass it.
 */
 
 #include <Inventor/@Gui@/So@Gui@.h>

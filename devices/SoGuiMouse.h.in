@@ -37,7 +37,6 @@ class SoLocation2Event;
 
 class SO@GUI@_DLL_API So@Gui@Mouse : public So@Gui@Device {
   SO@GUI@_OBJECT_HEADER(So@Gui@Mouse, So@Gui@Device);
-  @COMPONENTHEADER@
 
 public:
   enum Events {

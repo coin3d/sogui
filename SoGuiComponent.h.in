@@ -27,6 +27,9 @@
 #include <Inventor/SbLinear.h>
 #include <Inventor/@Gui@/So@Gui@Object.h>
 
+#ifdef __COIN_SOQT__
+class QWidget;
+#endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
 #include <X11/Intrinsic.h>
 #endif // __COIN_SOXT__

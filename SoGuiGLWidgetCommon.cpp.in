@@ -23,6 +23,43 @@
 
 // @configure_input@
 
+// *************************************************************************
+
+/*!
+  \class So@Gui@GLWidget So@Gui@GLWidget.h Inventor/@Gui@/So@Gui@GLWidget.h
+  \brief The So@Gui@GLWidget class contains an OpenGL canvas.
+
+  [FIXME: basic doc here]
+
+  \if SOQT_DOC
+
+  An important thing to know about embedding So@Gui@GLWidget derived
+  components into other @Gui@ widgets is that you need to set up
+  "focus proxying" to have events still be sent to the OpenGL canvas
+  widget. This is true for both the So@Gui@RenderArea aswell as all
+  the viewer components (like So@Gui@ExaminerViewer,
+  So@Gui@PlaneViewer etc).  As an example, if you embed an
+  So@Gui@ExaminerViewer inside a QFrame like this:
+
+  \code
+  QMainWindow * toplevel = new QMainWindow;
+  QFrame * frame = new QFrame(toplevel);
+  So@Gui@ExaminerViewer * viewer = new So@Gui@ExaminerViewer(toplevelwidget);
+  \endcode
+
+  ..events from the keyboard will not always automatically be
+  forwarded to the viewer OpenGL canvas. This is the code you need to
+  add in this case:
+
+  \code
+  toplevel->setFocusProxy(viewer);
+  \endcode
+
+  \endif
+*/
+
+// *************************************************************************
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
