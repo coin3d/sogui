@@ -641,7 +641,7 @@ SoAny::loadSceneGraph(char * buffer, unsigned int bufsize) // static
 }
 
 SoNode *
-SoAny::scanSceneForName(SoNode * scene, const char * name)
+SoAny::scanSceneForName(SoNode * scene, const char * name, SbBool searchAll)
 {
   SoPath * path;
   if ( SoAny::finder == NULL )
@@ -649,6 +649,7 @@ SoAny::scanSceneForName(SoNode * scene, const char * name)
   SoAny::finder->reset();
   SoAny::finder->setName(SbName(name));
   SoAny::finder->setInterest(SoSearchAction::FIRST);
+  if ( searchAll ) SoAny::finder->setSearchingAll(TRUE);
   SoAny::finder->apply(scene);
   path = SoAny::finder->getPath();
   return path ? path->getTail() : NULL;

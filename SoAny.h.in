@@ -67,7 +67,7 @@ public:
   static char * strconcat(const char ** stringlist, const char * glue = NULL, SbBool glueend = TRUE);
   static SoNode * loadSceneGraph(const char ** stringlist);
   static SoNode * loadSceneGraph(char * buffer, unsigned int bufsize = 0);
-  static SoNode * scanSceneForName(SoNode * scene, const char * name);
+  static SoNode * scanSceneForName(SoNode * scene, const char * name, SbBool searchAll = FALSE);
 
 private:
   SoAny(void);
