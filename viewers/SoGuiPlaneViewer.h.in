@@ -23,8 +23,8 @@
 
 // $Id$
 
-#ifndef SO@GUI@_PLANEVIEWER_H
-#define SO@GUI@_PLANEVIEWER_H
+#ifndef SO@GUI@PLANEVIEWER_H
+#define SO@GUI@PLANEVIEWER_H
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 
@@ -163,4 +163,4 @@ protected:
 #endif // ! __COIN_SOWIN__
 };
 
-#endif // ! SO@GUI@_PLANEVIEWER_H
+#endif // ! SO@GUI@PLANEVIEWER_H

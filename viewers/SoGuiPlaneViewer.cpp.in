@@ -78,8 +78,6 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
 
 // ************************************************************************
 
-/*!
-*/
 void
 So@Gui@PlaneViewer::commonConstructor(void)
 {
@@ -99,12 +97,8 @@ So@Gui@PlaneViewer::commonConstructor(void)
 
 // *************************************************************************
 
-/*!
-*/
-
 void
-So@Gui@PlaneViewer::translateX(
-  const float delta) const
+So@Gui@PlaneViewer::translateX(const float delta) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -113,14 +107,10 @@ So@Gui@PlaneViewer::translateX(
   camera->orientation.getValue().multVec(SbVec3f(1, 0, 0), dir);
   camera->position = camera->position.getValue() - dir * delta *
     camera->focalDistance.getValue() / 2.5f;
-} // translateX()
-
-/*!
-*/
+}
 
 void
-So@Gui@PlaneViewer::translateY(
-  const float delta) const
+So@Gui@PlaneViewer::translateY(const float delta) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -129,14 +119,10 @@ So@Gui@PlaneViewer::translateY(
   camera->orientation.getValue().multVec(SbVec3f(0, 1, 0), dir);
   camera->position = camera->position.getValue() + dir * delta *
     camera->focalDistance.getValue() / 2.5f;
-} // translateY()
-
-/*!
-*/
+}
 
 void
-So@Gui@PlaneViewer::rotateZ(
-  const float angle) const
+So@Gui@PlaneViewer::rotateZ(const float angle) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -145,16 +131,12 @@ So@Gui@PlaneViewer::rotateZ(
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
   camera->orientation =
     camera->orientation.getValue() * SbRotation(dir, angle);
-} // rotateZ()
+}
 
 // *************************************************************************
 
-/*!
-*/
-
 void
-So@Gui@PlaneViewer::viewPlaneX(
-  void) const
+So@Gui@PlaneViewer::viewPlaneX(void) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -166,14 +148,10 @@ So@Gui@PlaneViewer::viewPlaneX(
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(1, 0, 0);
   camera->orientation = SbRotation(SbVec3f(0, 1, 0), M_PI/2.0f);
-} // viewPlaneX()
-
-/*!
-*/
+}
 
 void
-So@Gui@PlaneViewer::viewPlaneY(
-  void) const
+So@Gui@PlaneViewer::viewPlaneY(void) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -185,14 +163,10 @@ So@Gui@PlaneViewer::viewPlaneY(
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(0, 1, 0);
   camera->orientation = SbRotation(SbVec3f(1, 0, 0), -M_PI/2.0f);
-} // viewPlaneY()
-
-/*!
-*/
+}
 
 void
-So@Gui@PlaneViewer::viewPlaneZ(
-  void) const
+So@Gui@PlaneViewer::viewPlaneZ(void) const
 {
   SoCamera * const camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -204,17 +178,13 @@ So@Gui@PlaneViewer::viewPlaneZ(
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(0, 0, 1);
   camera->orientation = SbRotation(SbVec3f(0, 1, 0), 0);
-} // viewPlaneZ()
+}
 
 // *************************************************************************
 
-/*!
-  This method moves the camera inwards and outwards.
-*/
-
+// This method moves the camera inwards and outwards.
 void
-So@Gui@PlaneViewer::zoom(
-  const float difference) const
+So@Gui@PlaneViewer::zoom(const float difference) const
 {
   SoCamera * camera = this->getCamera();
   if (! camera) return; // probably a scene-less viewer
@@ -235,57 +205,37 @@ So@Gui@PlaneViewer::zoom(
   } else {
     assert(0 && "impossible");
   }
-} // zoom()
+}
 
 // *************************************************************************
 
-/*!
-*/
-
 void
-So@Gui@PlaneViewer::setCanvasSize(
-  const SbVec2s size)
+So@Gui@PlaneViewer::setCanvasSize(const SbVec2s size)
 {
   this->canvas = size;
-} // setCanvasSize()
-
-/*!
-*/
+}
 
 void
-So@Gui@PlaneViewer::setPointerLocation(
-  const SbVec2s position)
+So@Gui@PlaneViewer::setPointerLocation(const SbVec2s position)
 {
   this->pointer.then = this->pointer.now;
   this->pointer.now = position;
-} // setPointerLocation()
-
-/*!
-*/
+}
 
 int
-So@Gui@PlaneViewer::getPointerXMotion(
-  void) const
+So@Gui@PlaneViewer::getPointerXMotion(void) const
 {
   return this->pointer.now[0] - this->pointer.then[0];
-} // getPointerXMotion()
-
-/*!
-*/
+}
 
 int
-So@Gui@PlaneViewer::getPointerYMotion(
-  void) const
+So@Gui@PlaneViewer::getPointerYMotion(void) const
 {
   return this->pointer.now[1] - this->pointer.then[1];
-} // getPointerYMotion()
-
-/*!
-*/
+}
 
 float
-So@Gui@PlaneViewer::getPointerOrigoAngle(
-  void) const
+So@Gui@PlaneViewer::getPointerOrigoAngle(void) const
 {
   SbVec2s now = this->pointer.now;
   now[0] -= this->canvas[0] / 2;
@@ -296,14 +246,10 @@ So@Gui@PlaneViewer::getPointerOrigoAngle(
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
   return nowradval;
-} // getPointerOrigoAngle()
-
-/*!
-*/
+}
 
 float
-So@Gui@PlaneViewer::getPointerOrigoMotionAngle(
-  void) const
+So@Gui@PlaneViewer::getPointerOrigoMotionAngle(void) const
 {
   if (this->pointer.then == this->pointer.now)
     return 0.0f;
@@ -325,18 +271,14 @@ So@Gui@PlaneViewer::getPointerOrigoMotionAngle(
   if (then[1] < 0) thenradval = 2 * M_PI - thenradval;
 
   return nowradval - thenradval;
-} // getPointerMotionAngle()
+}
 
 // ************************************************************************
 
-/*!
-  This method draws the rotate mode graphics...
-  FIXME: use Inventor instead of OpenGL...
-*/
-
+// This method draws the rotate mode graphics...
+// FIXME: use Inventor instead of OpenGL...
 void
-So@Gui@PlaneViewer::drawRotateGraphics(
-  void) const
+So@Gui@PlaneViewer::drawRotateGraphics(void) const
 {
   glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
                GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
@@ -380,7 +322,7 @@ So@Gui@PlaneViewer::drawRotateGraphics(
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixd(projectionmatrix);
   glPopAttrib();
-} // drawRotateGraphics()
+}
 
 // ************************************************************************
 
@@ -638,10 +580,7 @@ So@Gui@PlaneViewer::setSeekMode(SbBool on)
 
 // ************************************************************************
 
-/*!
-  Decide whether or not the mouse pointer cursor should be visible in the
-  rendering canvas.
-*/
+// Documented in superclass.
 void
 So@Gui@PlaneViewer::setCursorEnabled(SbBool enable)
 {
