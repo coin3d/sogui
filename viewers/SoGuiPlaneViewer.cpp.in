@@ -41,28 +41,28 @@
 
 
   Controls:
-  <li>
+  <ul>
 
-  <ul>hold down left mousebutton and move mouse pointer to dolly (or
-  hold both left and middle mousebuttons)</ul>
+  <li>hold down left mousebutton and move mouse pointer to dolly (or
+  hold both left and middle mousebuttons)</li>
 
-  <ul>hold middle mousebutton to pan (or a CTRL-key plus left
-  mousebutton, or a SHIFT-key plus left mousebutton)</ul>
+  <li>hold middle mousebutton to pan (or a CTRL-key plus left
+  mousebutton, or a SHIFT-key plus left mousebutton)</li>
 
-  <ul>hold down CTRL + middle mousebutton to rotate (or CTRL, SHIFT
-  and the left mousebutton)</ul>
+  <li>hold down CTRL + middle mousebutton to rotate (or CTRL, SHIFT
+  and the left mousebutton)</li>
 
-  <ul>click 's', then pick with the left mousebutton to seek</ul>
+  <li>click 's', then pick with the left mousebutton to seek</li>
 
-  <ul>right mousebutton open the popup menu</ul>
+  <li>right mousebutton open the popup menu</li>
 
-  <ul>click 'ESC' key to switch to and from 'view' mode and
-  'scenegraph interaction' mode (see setViewing() documentation)</ul>
+  <li>click 'ESC' key to switch to and from 'view' mode and
+  'scenegraph interaction' mode (see setViewing() documentation)</li>
 
-  <ul>hold down the 'ALT' key to temporary toggle from
-  camera-interaction mode to scenegraph-interaction mode</ul>
+  <li>hold down the 'ALT' key to temporary toggle from
+  camera-interaction mode to scenegraph-interaction mode</li>
 
-  </li>
+  </ul>
 
   Hitting any of the X, Y or Z buttons in the panel on the right side
   of the render canvas will "flip" the current camera direction around
@@ -556,6 +556,15 @@ So@Gui@PlaneViewer::afterRealizeHook(void)
 {
   PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
   inherited::afterRealizeHook();
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::openViewerHelpCard(void)
+{
+  this->openHelpCard("So@Gui@PlaneViewer.help");
 }
 
 // *************************************************************************

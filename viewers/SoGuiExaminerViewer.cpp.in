@@ -1156,3 +1156,56 @@ So@Gui@ExaminerViewer::setCursorEnabled(SbBool enable)
 }
 
 // *************************************************************************
+
+// Documented in superclass.
+const char *
+So@Gui@ExaminerViewer::getDefaultWidgetName(void) const
+{
+  return "So@Gui@ExaminerViewer";
+}
+
+// *************************************************************************
+
+// Documented in superclass.
+const char *
+So@Gui@ExaminerViewer::getDefaultTitle(void) const
+{
+  return "Examiner Viewer";
+}
+
+// *************************************************************************
+
+// Documented in superclass.
+const char *
+So@Gui@ExaminerViewer::getDefaultIconTitle(void) const
+{
+  return "Examiner Viewer";
+}
+
+// *************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@ExaminerViewer::openViewerHelpCard(void)
+{
+  this->openHelpCard("So@Gui@ExaminerViewer.help");
+}
+
+// *************************************************************************
+
+// Documented in superclass. Overrides this method to be able to draw
+// the axis cross if selected in the preferences sheet, and to keep a
+// continuous animation upon spin.
+void
+So@Gui@ExaminerViewer::actualRedraw(void)
+{
+  this->actualGenericRedraw();
+  inherited::actualRedraw();
+
+  if (this->isFeedbackVisible()) { this->drawAxisCross(); }
+
+  // Immediately reschedule to get continous spin animation.
+  if (this->isAnimating()) { this->scheduleRedraw(); }
+}
+
+// *************************************************************************

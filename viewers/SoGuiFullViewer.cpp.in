@@ -837,6 +837,23 @@ So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
   return inherited::processSoEvent(ev);
 }
 
+// *************************************************************************
+
+/*!
+  Override this method to provide functionality when the user clicks
+  the Help button. Default implementation does nothing.
+*/
+void
+So@Gui@FullViewer::openViewerHelpCard(void)
+{
+#if SO@GUI@_DEBUG
+  SoDebugError::postWarning("So@Gui@FullViewer::openViewerHelpCard",
+                            "should be overridden");
+#endif // SO@GUI@_DEBUG
+}
+
+// *************************************************************************
+
 // FIXME: get rid of this hack and make this file truly
 // "generic". 20020109 mortene.
 #ifndef __COIN_SOWIN__
