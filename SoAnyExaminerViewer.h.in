@@ -120,6 +120,8 @@ protected:
   SbVec2s canvas;
 
 private:
+  So@Gui@ExaminerViewer * const viewer;
+
   enum ViewerMode {
     IDLE,
     INTERACT,
@@ -131,7 +133,10 @@ private:
     PANNING
   } mode;
 
-  So@Gui@ExaminerViewer * const viewer;
+  ViewerMode currentmode;
+  void setMode( const ViewerMode mode );
+
+  SbBool firstevent;
 
 }; // class SoAnyExaminerViewer
 

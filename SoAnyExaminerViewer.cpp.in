@@ -82,6 +82,9 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
 {
   assert( container != NULL );
 
+  this->firstevent = TRUE;
+  this->currentmode = SoAnyExaminerViewer::EXAMINE;
+
   this->prevRedrawTime = SbTime::getTimeOfDay();
   this->spinanimatingallowed = TRUE;
   this->spinanimating = FALSE;
@@ -256,6 +259,49 @@ SoAnyExaminerViewer::isAnimating(
 {
   return this->spinanimating;
 } // isAnimating()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  The viewer is a state machine, and all changes to the current state
+  are made through this call.
+*/
+
+void
+SoAnyExaminerViewer::setMode(const ViewerMode mode)
+{
+  this->viewer->setCursorRepresentation(mode);
+
+  switch (mode) {
+  case INTERACT:
+    if (this->isAnimating()) this->stopAnimating();
+    while (this->viewer->getInteractiveCount())
+      this->viewer->interactiveCountDec();
+    break;
+
+  case DRAGGING:
+    this->spinprojector->project( this->lastmouseposition );
+    break;
+
+  case PANNING:
+    {
+      // The plane we're projecting the mouse coordinates to get 3D
+      // coordinates should stay the same during the whole pan
+      // operation, so we should calculate this value here.
+      SoCamera * cam = this->viewer->getCamera();
+      SbViewVolume vv = cam->getViewVolume(this->viewer->getGLAspectRatio());
+      this->panningplane = vv.getPlane(cam->focalDistance.getValue());
+    }
+    break;
+
+  default: // include default to avoid compiler warnings.
+    break;
+  }
+
+  this->currentmode = mode;
+} // setMode()
 
 // ************************************************************************
 
@@ -765,6 +811,12 @@ SbBool
 SoAnyExaminerViewer::processSoEvent(
   const SoEvent * const ev )
 {
+  // Upon first event detected, make sure the cursor is set correctly.
+  if ( this->firstevent ) {
+    this->viewer->setCursorRepresentation( this->currentmode );
+    this->firstevent = FALSE;
+  }
+
   // SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "[invoked]" );
   if ( ! viewer->isViewing() ) // event is for scene graph
     return FALSE;
@@ -801,7 +853,7 @@ SoAnyExaminerViewer::processSoEvent(
       break;
     default:
       break;
-    } // shitch ( button )
+    } // switch ( button )
 
     if ( press ) {
       switch ( button ) {
