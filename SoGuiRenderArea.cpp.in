@@ -145,6 +145,9 @@ private:
   SbString currentinput; // For the OpenGL info-window hack.
 }; // class So@Gui@RenderAreaP
 
+#define PRIVATE(ptr) (ptr->priv)
+#define PUBLIC(ptr) (ptr->pub)
+
 const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
                                                  SO_GL_ZBUFFER |
                                                  SO_GL_DOUBLE);
@@ -183,24 +186,20 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
 
   // Limits.
   {
-    // glPointSize()
+    SbVec2f range;
+    float granularity;
+    PUBLIC(this)->getPointSizeLimits(range, granularity);
 
-    GLfloat bounds[2];
-    glGetFloatv(GL_POINT_SIZE_RANGE, bounds);
-    GLfloat granularity[1];
-    glGetFloatv(GL_POINT_SIZE_GRANULARITY, granularity);
     SbString limits;
     limits.sprintf("glPointSize(): range=[%f, %f], granularity=%f\n",
-                   bounds[0], bounds[1], granularity[0]);
+                   range[0], range[1], granularity);
     info += limits;
 
 
-    // glLineWidth()
+    PUBLIC(this)->getLineWidthLimits(range, granularity);
 
-    glGetFloatv(GL_LINE_WIDTH_RANGE, bounds);
-    glGetFloatv(GL_LINE_WIDTH_GRANULARITY, granularity);
     limits.sprintf("glLineWidth(): range=[%f, %f], granularity=%f\n",
-                   bounds[0], bounds[1], granularity[0]);
+                   range[0], range[1], granularity);
     info += limits;
   }
 
@@ -324,9 +323,6 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
 #endif // SO@GUI@_DEBUG
   return So@Gui@RenderAreaP::NONE;
 }
-
-#define PRIVATE(ptr) (ptr->priv)
-#define PUBLIC(ptr) (ptr->pub)
 
 // *************************************************************************
 
