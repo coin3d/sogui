@@ -466,7 +466,7 @@ So@Gui@FlyViewerP::processKeyboardEvent( const SoKeyboardEvent * const ke )
       this->stopMoving();
       this->updateSpeedIndicator();
       PUBLIC(this)->scheduleRedraw();
-      return PUBLIC(this)->inherited::processSoEvent( ke );
+      return FALSE;
       
     case SoKeyboardEvent::LEFT_SHIFT:
       this->lshiftdown = FALSE;
@@ -1126,7 +1126,7 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
   // up the inheritance hierarchy.
   if (this->isSeekMode()) { return inherited::processSoEvent(event); }
   
-  // FIXME: There is more parts of the kode in
+  // FIXME: There is more parts of the code in
   // So@Gui@*FlyViewer::processEvent that should go in to the
   // processKeyboardEvent function; to be fixed later. 
   // 20021015 rolvs
