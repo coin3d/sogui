@@ -23,6 +23,11 @@ static const char rcsid[] =
   "$Id$";
 #endif
 
+#ifdef SOQT_INTERNAL
+#include <qmetaobject.h>
+#include <moc_SoQtObject.cpp>
+#endif // SOQT_INTERNAL
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif

@@ -32,6 +32,11 @@ static const char rcsid[] =
 */
 // FIXME: document class properly. 20010905 mortene.
 
+#ifdef SOQT_INTERNAL
+#include <qmetaobject.h>
+#include <moc_SoQtConstrainedViewer.cpp>
+#endif // SOQT_INTERNAL
+
 #include <Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h>
 #include <Inventor/actions/SoRayPickAction.h>
 #include <Inventor/errors/SoDebugError.h>
