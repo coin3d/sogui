@@ -1,5 +1,5 @@
-#ifndef COIN_@GUI@COLOREDITOR_H
-#define COIN_@GUI@COLOREDITOR_H
+#ifndef COIN_SO@GUI@COLOREDITOR_H
+#define COIN_SO@GUI@COLOREDITOR_H
 
 /**************************************************************************\
  *
@@ -24,6 +24,7 @@
  *
 \**************************************************************************/
 
+#include <Inventor/@Gui@/nodes/SoGuiColorEditor.h>
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
 
 typedef void So@Gui@ColorEditorCB(void * closure, const SbColor * color);
@@ -41,17 +42,17 @@ public:
   ~So@Gui@ColorEditor(void);
 
   enum Sliders {
-    NONE, 
-    INTENSITY,
-    RGB, 
-    HSV, 
-    RGB_V, 
-    RGB_HSV
+    NONE = SoGuiColorEditor::NONE, 
+    INTENSITY = SoGuiColorEditor::INTENSITY,
+    RGB = SoGuiColorEditor::RGB, 
+    HSV = SoGuiColorEditor::HSV, 
+    RGB_V = SoGuiColorEditor::RGB_V, 
+    RGB_HSV = SoGuiColorEditor::RGB_HSV
   };
   
   enum UpdateFrequency {
-    CONTINUOUS,
-    AFTER_ACCEPT
+    CONTINUOUS = SoGuiColorEditor::CONTINUOUS,
+    AFTER_ACCEPT = SoGuiColorEditor::AFTER_ACCEPT
   };
   
   void attach(SoSFColor * color, SoBase * node = NULL);
@@ -74,13 +75,15 @@ public:
   
   void setUpdateFrequency(UpdateFrequency freq);
   UpdateFrequency getUpdateFrequency(void) const;
-  
-  virtual void setSceneGraph(SoNode * scene);
-  virtual SoNode * getSceneGraph(void);
+
+protected:
+  virtual const char * getDefaultWidgetName(void) const;
+  virtual const char * getDefaultTitle(void) const;
+  virtual const char * getDefaultIconTitle(void) const;
 
 private:
   void * internals;
 
 };
 
-#endif // !COIN_@GUI@COLOREDITOR_H
+#endif // !COIN_SO@GUI@COLOREDITOR_H
