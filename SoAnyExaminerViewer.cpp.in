@@ -295,8 +295,13 @@ SoAnyExaminerViewer::setMode(const ViewerMode mode)
       // coordinates should stay the same during the whole pan
       // operation, so we should calculate this value here.
       SoCamera * cam = this->viewer->getCamera();
-      SbViewVolume vv = cam->getViewVolume(this->viewer->getGLAspectRatio());
-      this->panningplane = vv.getPlane(cam->focalDistance.getValue());
+      if (cam == NULL) { // can happen for empty scenegraph
+        this->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
+      }
+      else {
+        SbViewVolume vv = cam->getViewVolume(this->viewer->getGLAspectRatio());
+        this->panningplane = vv.getPlane(cam->focalDistance.getValue());
+      }
     }
     break;
 
@@ -438,7 +443,13 @@ SoAnyExaminerViewer::drawAxisCross(
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   SbMatrix mx;
-  mx = viewer->getCamera()->orientation.getValue();
+  SoCamera * cam = viewer->getCamera();
+
+  // If there is no camera (like for an empty scene, for instance),
+  // just use an identity rotation.
+  if (cam) { mx = cam->orientation.getValue(); }
+  else { mx = SbMatrix::identity(); }
+
   mx = mx.inverse();
   mx[3][2] = -3.5; // Translate away from the projection point (along z axis).
   glLoadMatrixf((float *)mx);
@@ -873,8 +884,13 @@ SoAnyExaminerViewer::processSoEvent(
           if (this->isAnimating()) this->stopAnimating();
           viewer->interactiveCountInc();
           SoCamera * const camera = viewer->getCamera();
-          SbViewVolume volume = camera->getViewVolume(viewer->getGLAspectRatio());
-          this->panningplane = volume.getPlane(camera->focalDistance.getValue());
+          if (camera == NULL) { // can happen for empty scenegraph
+            this->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
+          }
+          else {
+            SbViewVolume volume = camera->getViewVolume(viewer->getGLAspectRatio());
+            this->panningplane = volume.getPlane(camera->focalDistance.getValue());
+          }
           processed = TRUE;
         }
         break;
@@ -1026,7 +1042,7 @@ SoAnyExaminerViewer::processSoEvent(
         // FIXME: move/rotate model
 #if SO@GUI@_DEBUG
         SoDebugError::postInfo("SoAnyExaminerViewer::processSoEvent",
-          "SoMotion3Event for model movement is not implemented yet");
+                               "SoMotion3Event for model movement is not implemented yet");
 #endif // SO@GUI@_DEBUG
         processed = TRUE;
       }
