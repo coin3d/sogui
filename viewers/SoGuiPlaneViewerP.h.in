@@ -91,6 +91,12 @@ public:
 
   SbPlane panningplane;
 
+  class SoNode * superimposition;
+  struct superdata {
+    class SoCoordinate3 * coords;
+    class SoOrthographicCamera * camera;
+  } super;
+
 protected:
   SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ);
   So@Gui@PlaneViewer * pub;

@@ -43,6 +43,13 @@
   <ul>hold down CTRL + middle mousebutton to rotate (or CTRL, SHIFT
   and the left mousebutton)</ul>
 
+  <ul>click 's', then pick with the left mousebutton to seek</ul>
+
+  <ul>right mousebutton open the popup menu</ul>
+
+  <ul>click 'ESC' key to switch to and from 'view' mode and
+  'scenegraph interaction' mode (see setViewing() documentation)</ul>
+
   </li>
 
   FIXME: complete class doc
@@ -63,7 +70,10 @@
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
 
 #include <Inventor/SbLinear.h>
+#include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoDrawStyle.h>
 #include <Inventor/nodes/SoOrthographicCamera.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/events/SoMouseButtonEvent.h>
@@ -311,18 +321,31 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   }
 
   if (newmode != currentmode) {
-    PRIVATE(this)->changeMode(newmode);
-
     if (newmode == SoGuiPlaneViewerP::ROTZ_MODE) {
       PRIVATE(this)->setCanvasSize(size);
       PRIVATE(this)->setPointerLocation(pos);
       PRIVATE(this)->setPointerLocation(pos);
     }
+
+    PRIVATE(this)->changeMode(newmode);
   }
 
   // If not handled in this class, pass on upwards in the inheritance
   // hierarchy.
   return processed || inherited::processSoEvent(ev);
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::actualRedraw(void)
+{
+  inherited::actualRedraw();
+
+  if (PRIVATE(this)->mode == SoGuiPlaneViewerP::ROTZ_MODE) {
+    PRIVATE(this)->drawRotateGraphics();
+  }
 }
 
 // ************************************************************************
@@ -512,6 +535,23 @@ SoGuiPlaneViewerP::SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ)
 
 SoGuiPlaneViewerP::~SoGuiPlaneViewerP()
 {
+  if (this->superimposition != NULL) {
+    PUBLIC(this)->removeSuperimposition(this->superimposition);
+    this->superimposition->unref();
+  }
+}
+
+// This method locates a named node in the superimposed scene.
+static SoNode *
+get_scenegraph_node(SoSearchAction * search, SoNode * root, const char * name)
+{
+  search->reset();
+  search->setName(SbName(name));
+  search->setInterest(SoSearchAction::FIRST);
+  search->setSearchingAll(TRUE);
+  search->apply(root);
+  assert(search->getPath());
+  return search->getPath()->getTail();
 }
 
 void
@@ -528,6 +568,59 @@ SoGuiPlaneViewerP::commonConstructor(void)
   this->rightshiftdown = FALSE;
   this->button1down = FALSE;
   this->button3down = FALSE;
+
+
+  static const char * superimposed = {
+    "#Inventor V2.1 ascii\n\n"
+    ""
+    "Separator {"
+    "  DEF so@gui@->orthocam OrthographicCamera {"
+    "    height 1"
+    "    nearDistance 0"
+    "    farDistance 1"
+    "  }"
+    "    LightModel {"
+    "      model BASE_COLOR"
+    "    }"
+    ""
+    "  Separator {"
+    "    DEF so@gui@->geometry Coordinate3 {"
+    "      point ["  // coordinates set from code
+    "       0 0 0,"
+    "       0 0 0," 
+    "       0 0 0,"
+    "       0 0 0"
+    "      ]"
+    "    }"
+    "    BaseColor { rgb 1 1 0 }"
+    "    DEF so@gui@->style0 DrawStyle { }" // lineWidth set in code
+    "    DEF so@gui@->mainline IndexedLineSet {" // fat line (exterior)
+    "      coordIndex ["
+    "        0, 1, -1, 1, 2, -1, 1, 3, -1"
+    "      ]"
+    "    }"
+    "    BaseColor { rgb 0 0 0 }"
+    "    DEF so@gui@->style1 DrawStyle { }" // lineWidth set in code
+    "    USE so@gui@->mainline" // thin line (interior)
+    "  }"
+    "}"
+  };
+
+  SoInput * input = new SoInput;
+  input->setBuffer((void *)superimposed, strlen(superimposed));
+  SbBool ok = SoDB::read(input, this->superimposition);
+  assert(ok && "error in superimposed scenegraph");
+  delete input;
+  this->superimposition->ref();
+
+  SoSearchAction s;
+  this->super.coords = (SoCoordinate3 *)
+    get_scenegraph_node(&s, this->superimposition, "so@gui@->geometry");
+  this->super.camera = (SoOrthographicCamera *)
+    get_scenegraph_node(&s, this->superimposition, "so@gui@->orthocam");
+
+  PUBLIC(this)->addSuperimposition(this->superimposition);
+  PUBLIC(this)->setSuperimpositionEnabled(this->superimposition, FALSE);
 }
 
 void
@@ -644,7 +737,9 @@ SoGuiPlaneViewerP::getPointerOrigoAngle(void) const
   now[0] -= this->canvas[0] / 2;
   now[1] -= this->canvas[1] / 2;
 
-  float nowradval = atan(fabs((float) now[1] / (float) now[0]));
+  float nowradval = (now != SbVec2s(0, 0)) ?
+    atan(fabs((float) now[1] / (float) now[0])) : 0.0f;
+
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
@@ -665,64 +760,69 @@ SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
   then[0] -= this->canvas[0] / 2;
   then[1] -= this->canvas[1] / 2;
 
-  float nowradval = atan(fabs((float) now[1] / (float) now[0]));
+  float nowradval = (now != SbVec2s(0, 0)) ?
+    atan(fabs((float) now[1] / (float) now[0])) : 0.0f;
+
   if (now[0] < 0) nowradval = M_PI - nowradval;
   if (now[1] < 0) nowradval = 2 * M_PI - nowradval;
 
-  float thenradval = atan(fabs((float) then[1] / (float) then[0]));
+  float thenradval = (then != SbVec2s(0, 0)) ? 
+    atan(fabs((float) then[1] / (float) then[0])) : 0.0f;
   if (then[0] < 0) thenradval = M_PI - thenradval;
   if (then[1] < 0) thenradval = 2 * M_PI - thenradval;
 
   return nowradval - thenradval;
 }
 
-// This method draws the rotate mode graphics...
-// FIXME: use Inventor instead of OpenGL...
+// This method draws the rotate-"anchor".
 void
 SoGuiPlaneViewerP::drawRotateGraphics(void) const
 {
-  glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
-               GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
-  GLfloat depthrange[2];
-  glGetFloatv(GL_DEPTH_RANGE, depthrange);
-  GLdouble projectionmatrix[16];
-  glGetDoublev(GL_PROJECTION_MATRIX, projectionmatrix);
+  static SbBool first = TRUE;
+  if (first) {
+    // Can't be done in constructor, as we need a valid OpenGL canvas
+    // for the getLineWidthLimits() call.
+    first = FALSE;
+    SbVec2f range;
+    float granularity;
+    PUBLIC(this)->getLineWidthLimits(range, granularity);
 
-  glDepthFunc(GL_ALWAYS);
-  glDepthMask(GL_TRUE);
-  glDepthRange(0, 0);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_LIGHTING);
-  glEnable(GL_COLOR_MATERIAL);
-  glPushMatrix();
+    SoSearchAction s;
+    SoDrawStyle * ds0 = (SoDrawStyle *)
+      get_scenegraph_node(&s, this->superimposition, "so@gui@->style0");
+    SoDrawStyle * ds1 = (SoDrawStyle *)
+      get_scenegraph_node(&s, this->superimposition, "so@gui@->style1");
 
-  // draw gfx
+    // Draw a thinner line on top of a fat line, to make an outline.
+    ds0->lineWidth = So@Gui@Min(5.0f, range[1]);
+    ds1->lineWidth = So@Gui@Max(3.0f, range[0]);
+  }
+
+  float x = float(this->pointer.now[0]) / float(this->canvas[0]);
+  float y = float(this->pointer.now[1]) / float(this->canvas[1]);
+
+  float aspectratio = PUBLIC(this)->getViewportRegion().getViewportAspectRatio();
+  SbViewVolume vv = this->super.camera->getViewVolume(aspectratio);
+  // know we have ADJUST_CAMERA mapping
+  if (aspectratio < 1.0f) vv.scale(1.0f / aspectratio);
+
+  SbVec3f p = vv.getPlanePoint(1.0, SbVec2f(x, y));
+
+  this->super.coords->point.set1Value(0, SbVec3f(0, 0, 0));
+  this->super.coords->point.set1Value(1, SbVec3f(p[0], p[1], 0));
+
   float angle = this->getPointerOrigoAngle();
-  glRotatef(angle * (180.0f/M_PI) - 90.0f, 0, 0, 1);
+  SbRotation r(SbVec3f(0, 0, 1), angle);
 
-  float length = 0;
-  float x = 0;
-  x = (float) this->pointer.now[0] / (float) this->canvas[0];
-  x = x * 2.0f - 1.0f;
-  float y = 0;
-  y = (float) this->pointer.now[1] / (float) this->canvas[1];
-  y = y * 2.0f - 1.0f;
+  SbVec3f xarrow(-0.02, -0.1, 0.0);
+  r.multVec(xarrow, xarrow);
+  p = vv.getPlanePoint(1.0, SbVec2f(x + xarrow[0], y + xarrow[1]));
+  this->super.coords->point.set1Value(2, SbVec3f(p[0], p[1], 0));
 
-  length = sqrt(x * x + y * y);
-
-  glColor3f(1, 1, 1);
-  glLineWidth(3.0f);
-  glBegin(GL_LINES);
-  glVertex2f(0.0f, 0.0f);
-  glVertex2f(0.0f, length);
-  glEnd();
-
-  // Reset original state.
-  glPopMatrix();
-  glDepthRange(depthrange[0], depthrange[1]);
-  glMatrixMode(GL_PROJECTION);
-  glLoadMatrixd(projectionmatrix);
-  glPopAttrib();
+  SbVec3f yarrow(-0.02, 0.1, 0.0);
+  r.multVec(yarrow, yarrow);
+  p = vv.getPlanePoint(1.0, SbVec2f(x + yarrow[0], y + yarrow[1]));
+  this->super.coords->point.set1Value(3, SbVec3f(p[0], p[1], 0));
 }
 
 // Set cursor graphics according to mode.
@@ -780,6 +880,7 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
 
   case SoGuiPlaneViewerP::ROTZ_MODE:
     PUBLIC(this)->interactiveCountInc();
+    PUBLIC(this)->setSuperimpositionEnabled(this->superimposition, TRUE);
     PUBLIC(this)->scheduleRedraw();
     break;
 
@@ -788,8 +889,12 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
   }
 
   switch (this->mode) {
-  case SoGuiPlaneViewerP::TRANSLATE_MODE:
   case SoGuiPlaneViewerP::ROTZ_MODE:
+    PUBLIC(this)->setSuperimpositionEnabled(this->superimposition, FALSE);
+    PUBLIC(this)->scheduleRedraw();
+    // fall through
+
+  case SoGuiPlaneViewerP::TRANSLATE_MODE:
   case SoGuiPlaneViewerP::DOLLY_MODE:
     PUBLIC(this)->interactiveCountDec();
     break;
