@@ -112,13 +112,18 @@ private:
     SEEK_MODE
   } mode;
 
+  void setCursorRepresentation(PlaneViewerMode mode);
+
   struct pointerdata {
     SbVec2s now;
     SbVec2s then;
   } pointer;
   SbVec2s canvas;
 
-  SbBool controldown;
+  SbBool leftcontroldown;
+  SbBool rightcontroldown;
+  SbBool leftshiftdown;
+  SbBool rightshiftdown;
   SbBool button1down;
   SbBool button2down;
   SbBool button3down;
@@ -130,9 +135,6 @@ private:
 
 private:
   void constructor(SbBool buildNow);
-
-  void setModeFromState(unsigned int state);
-  void setMode(PlaneViewerMode mode);
 
   SbVec2f prevMousePosition;
 
@@ -181,7 +183,6 @@ private:
 #ifdef __COIN_SOGTK__
 private:
   void constructor(const SbBool build);
-  void setCursorRepresentation(int mode);
 
   // friends and family
   class SoGtkPlaneViewerP * pimpl;

@@ -26,6 +26,27 @@
 // This file contains the generic, "templatize-able" parts of the
 // So*PlaneViewer sourcecode.
 
+/*!
+  \class So@Gui@PlaneViewer Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h
+  \brief The So@Gui@PlaneViewer class is for examining 3D models by moving the camera in orthogonal planes.
+  \ingroup components viewers
+
+  Controls:
+  <li>
+
+  <ul>hold down left mousebutton and move mouse pointer to dolly (or
+  hold both left and middle mousebuttons)</ul>
+
+  <ul>hold middle mousebutton to pan (or a CTRL-key plus left
+  mousebutton, or a SHIFT-key plus left mousebutton)</ul>
+
+  <ul>hold down CTRL + middle mousebutton to rotate (or CTRL, SHIFT
+  and the left mousebutton)</ul>
+
+  </li>
+
+  FIXME: complete class doc
+*/
 
 // *************************************************************************
 
@@ -39,6 +60,7 @@
 #include <math.h>
 
 #include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/So@Gui@Cursor.h>
 
 #include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>
@@ -62,7 +84,10 @@ So@Gui@PlaneViewer::commonConstructor(void)
   this->canvas = SbVec2s(0, 0);
   this->pointer.now = SbVec2s(0, 0);
   this->pointer.then = SbVec2s(0, 0);
-  this->controldown = FALSE;
+  this->leftcontroldown = FALSE;
+  this->rightcontroldown = FALSE;
+  this->leftshiftdown = FALSE;
+  this->rightshiftdown = FALSE;
   this->button1down = FALSE;
   this->button2down = FALSE;
   this->button3down = FALSE;
@@ -363,26 +388,33 @@ So@Gui@PlaneViewer::drawRotateGraphics(
 SbBool
 So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 {
-  // We're in "interact" mode (ie *not* the camera modification mode),
-  // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
-  // it's an ESC press (to switch modes).
-  if (!this->isViewing()) { return inherited::processSoEvent(ev); }
+  if (!this->isViewing()) {
+    // We're in "interact" mode (ie *not* the camera modification
+    // mode), so don't handle the event here. It should either be
+    // forwarded to the scenegraph, or caught by
+    // So@Gui@Viewer::processSoEvent() if it's an ESC press (to switch
+    // modes).
+    return inherited::processSoEvent(ev);
+  }
 
   SbBool processed = FALSE;
+  PlaneViewerMode previousmode = this->mode;
 
   const SoType type(ev->getTypeId());
 
   const SbVec2s size(this->getGLSize());
   const SbVec2s pos(ev->getPosition());
   const SbVec2f posn((float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
-                      (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
+                     (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
 
   if (type.isDerivedFrom(MOUSE_BUTTON_EVENT_TYPE)) {
+    processed = TRUE;
     const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
     const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
 
     if (press) {
+      // Called twice to initialize both "now" (current) and "then"
+      // (previous) pointer location.
       this->setPointerLocation(pos);
       this->setPointerLocation(pos);
     }
@@ -390,90 +422,79 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
     switch (event->getButton()) {
       case SoMouseButtonEvent::BUTTON1:
         this->button1down = press;
+
+        if (press && (previousmode == SEEK_WAIT_MODE)) {
+          this->mode = SEEK_MODE;
+          this->seekToPoint(pos); // implicitly calls interactiveCountInc()
+        }
         break;
+
       case SoMouseButtonEvent::BUTTON2:
         this->button2down = press;
         break;
+
       case SoMouseButtonEvent::BUTTON3:
         this->button3down = press;
-        break;
-      default:
-        break;
-    } // switch (event->getButton())
-
-    if (press) {
-      switch (event->getButton()) {
-      case SoMouseButtonEvent::BUTTON1:
-        if (this->mode == IDLE_MODE) {
-          this->interactiveCountInc();
-          this->mode = DOLLY_MODE;
-        } 
-        else if (this->mode == SEEK_WAIT_MODE) {
-          this->interactiveCountInc();
-          this->seekToPoint(pos);
-        }
-        break;
-
-      case SoMouseButtonEvent::BUTTON2:
-        break;
-
-      case SoMouseButtonEvent::BUTTON3:
-        if (this->mode == IDLE_MODE) {
-          this->interactiveCountInc();
-          this->mode = TRANSLATE_MODE;
-        } 
-        else if (this->mode == ROTZ_WAIT_MODE) {
-          this->mode = ROTZ_MODE;
-        }
         break;
 
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
-        this->zoom(0.1f);
+        if (press) this->zoom(0.1f);
         break;
 
       case SoMouseButtonEvent::BUTTON5:
-        this->zoom(-0.1f);
+        if (press) this->zoom(-0.1f);
         break;
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
 
       default:
         break;
-      } // switch (event->getButton())
-    } 
-    else {
-      switch (event->getButton()) {
-      case SoMouseButtonEvent::BUTTON1:
-      case SoMouseButtonEvent::BUTTON3:
-        if (this->mode != IDLE_MODE && this->mode != ROTZ_MODE) {
-          this->interactiveCountDec();
-          this->mode = IDLE_MODE;
-        }
-        break;
-
-      default:
-        break;
-      } // switch (((XButtonEvent *) event)->button)
-    }
-    processed = TRUE;
+    } // switch (event->getButton())
   }
 
+  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
+    const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
+    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
+
+    switch (event->getKey()) {
+    case SoKeyboardEvent::LEFT_CONTROL:
+      processed = TRUE;
+      this->leftcontroldown = press;
+      break;
+    case SoKeyboardEvent::RIGHT_CONTROL:
+      processed = TRUE;
+      this->rightcontroldown = press;
+      break;
+    case SoKeyboardEvent::LEFT_SHIFT:
+      processed = TRUE;
+      this->leftshiftdown = press;
+      break;
+    case SoKeyboardEvent::RIGHT_SHIFT:
+      processed = TRUE;
+      this->rightshiftdown = press;
+      break;
+
+    default:
+      break;
+    }
+
+  } // KEYBOARD_EVENT_TYPE
+
+
   if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
+    processed = TRUE;
     const SoLocation2Event * event = (const SoLocation2Event *) ev;
-
     this->setPointerLocation(pos);
-
     const SbVec2f prevn((float) this->pointer.then[0] / (float) So@Gui@Max(size[0], (short int)1),
-                         (float) this->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1));
+                        (float) this->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1));
 
     do {
-
-      if (this->controldown && this->button1down) {
+      if (this->mode == ROTZ_MODE) {
         this->rotateZ(this->getPointerOrigoMotionAngle());
         break;
       }
 
-      if (! this->controldown && this->button3down) {
+      if (this->mode == TRANSLATE_MODE) {
         if ((posn[0] != prevn[0]) || (posn[1] != prevn[1])) {
           float dx = (posn[0] - prevn[0]) * 2.5f;
           float dy = (posn[1] - prevn[1]) * 2.5f;
@@ -487,7 +508,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
         break;
       }
 
-      if (! this->controldown && this->button1down) {
+      if (this->mode == DOLLY_MODE) {
         if (posn[1] != prevn[1]) {
           float value = this->getRightWheelValue() + (prevn[1] - posn[1]) * 10.0f;
           this->rightWheelMotion(value);
@@ -497,34 +518,88 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       }
 
     } while (FALSE);
-    processed = TRUE;
   } // LOCATION2_EVENT_TYPE
 
-  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
-    const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
-    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
+  SbBool ctrldown = this->leftcontroldown || this->rightcontroldown;
+  SbBool shiftdown = this->leftshiftdown || this->rightshiftdown;
+  enum {
+    BUTTON1DOWN = 1 << 0,
+    BUTTON2DOWN = 1 << 1,
+    BUTTON3DOWN = 1 << 2,
+    CTRLDOWN =    1 << 3,
+    SHIFTDOWN =   1 << 4
+  };
+  unsigned int combo =
+    (this->button1down ? BUTTON1DOWN : 0) |
+    (this->button2down ? BUTTON2DOWN : 0) |
+    (this->button3down ? BUTTON3DOWN : 0) |
+    (ctrldown ? CTRLDOWN : 0) |
+    (shiftdown ? SHIFTDOWN : 0);
 
-    switch (event->getKey()) {
-    case SoKeyboardEvent::LEFT_CONTROL:
-    case SoKeyboardEvent::RIGHT_CONTROL:
-      this->controldown = press;
-      
-      if (press) {
-        this->setCanvasSize(size);
-        this->setPointerLocation(pos);
-        this->setPointerLocation(pos);
-        this->scheduleRedraw();
-      } 
-      else {
-        this->scheduleRedraw();
-      }
-      processed = TRUE;
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@PlaneViewer::processSoEvent",
+                         "button1==%d, button2==%d, button3==%d, "
+                         "lctrl==%d, rctrl==%d, lshift==%d, rshift==%d",
+                         this->button1down, this->button2down, this->button3down,
+                         this->leftcontroldown, this->rightcontroldown,
+                         this->leftshiftdown, this->rightshiftdown);
+#endif // debug
+  
+
+  switch (combo) {
+  case BUTTON1DOWN:
+  case BUTTON1DOWN|BUTTON3DOWN:
+    this->mode = DOLLY_MODE;
+    break;
+  case BUTTON3DOWN:
+  case CTRLDOWN|BUTTON1DOWN:
+  case SHIFTDOWN|BUTTON1DOWN:
+    this->mode = TRANSLATE_MODE;
+    break;
+  case CTRLDOWN|BUTTON3DOWN:
+  case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
+    this->mode = ROTZ_MODE;
+    break;
+  case CTRLDOWN:
+  case CTRLDOWN|SHIFTDOWN:
+    this->mode = ROTZ_WAIT_MODE;
+    break;
+  default:
+    this->mode = IDLE_MODE;
+    break;
+  }
+
+  if (previousmode != this->mode) {
+    switch (this->mode) {
+    case TRANSLATE_MODE:
+    case DOLLY_MODE:
+      this->interactiveCountInc();
+      break;
+
+    case ROTZ_MODE:
+      this->interactiveCountInc();
+      this->setCanvasSize(size);
+      this->setPointerLocation(pos);
+      this->setPointerLocation(pos);
+      this->scheduleRedraw();
+      break;
+
+    default:
+      break;
+    }
+
+    switch (previousmode) {
+    case TRANSLATE_MODE:
+    case ROTZ_MODE:
+    case DOLLY_MODE:
+      this->interactiveCountDec();
       break;
     default:
       break;
     }
 
-  } // KEYBOARD_EVENT_TYPE
+    this->setCursorRepresentation(this->mode);
+  }
 
   // If not handled in this class, pass on upwards in the inheritance
   // hierarchy.
@@ -550,9 +625,66 @@ So@Gui@PlaneViewer::setSeekMode(SbBool on)
 #endif // SO@GUI@_DEBUG
 
   inherited::setSeekMode(on);
-  this->setMode(on ?
-                So@Gui@PlaneViewer::SEEK_WAIT_MODE :
-                So@Gui@PlaneViewer::IDLE_MODE);
+  this->mode = on ?
+    So@Gui@PlaneViewer::SEEK_WAIT_MODE :
+    So@Gui@PlaneViewer::IDLE_MODE;
+
+  this->setCursorRepresentation(this->mode);
 }
 
-// *************************************************************************
+// ************************************************************************
+
+/*!
+  Decide whether or not the mouse pointer cursor should be visible in the
+  rendering canvas.
+*/
+void
+So@Gui@PlaneViewer::setCursorEnabled(SbBool enable)
+{
+  inherited::setCursorEnabled(enable);
+  this->setCursorRepresentation(this->mode);
+}
+
+// ************************************************************************
+
+// Set cursor graphics according to mode.
+void
+So@Gui@PlaneViewer::setCursorRepresentation(PlaneViewerMode mode)
+{
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@PlaneViewer::setCursorRepresentation",
+                         "mode==%d", mode);
+#endif // debug
+
+  assert(this->getGLWidget());
+
+  if (!this->isCursorEnabled()) {
+    this->setComponentCursor(So@Gui@Cursor::getBlankCursor());
+    return;
+  }
+
+  switch (mode) {
+  case So@Gui@PlaneViewer::IDLE_MODE:
+  case So@Gui@PlaneViewer::ROTZ_WAIT_MODE:
+    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
+    break ;
+  case So@Gui@PlaneViewer::DOLLY_MODE:
+    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
+    break;
+  case So@Gui@PlaneViewer::ROTZ_MODE:
+    this->setComponentCursor(So@Gui@Cursor::getRotateCursor());
+    break;
+  case So@Gui@PlaneViewer::SEEK_WAIT_MODE:
+  case So@Gui@PlaneViewer::SEEK_MODE:
+    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
+    break;
+  case So@Gui@PlaneViewer::TRANSLATE_MODE:
+    this->setComponentCursor(So@Gui@Cursor::getPanCursor());
+    break;
+  default:
+    assert(0 && "unknown PlaneViewer mode");
+    break;
+  }
+}
+
+// ************************************************************************
