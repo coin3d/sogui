@@ -1807,9 +1807,13 @@ So@Gui@Viewer::~So@Gui@Viewer()
   Set the camera we want the viewer to manipulate when interacting with
   the viewer controls.
 
-  The camera passed in as an argument to this method \e must already be
-  part of the viewer's scenegraph.  You do not inject viewpoint cameras to
-  the viewer with this method.
+  The camera passed in as an argument to this method \e must already
+  be part of the viewer's scenegraph.  You do \e not inject viewpoint
+  cameras to the viewer with this method.
+
+  You should rather insert a camera into the scene graph first (if
+  necessary, often one will be present already), then register it as
+  the camera used by the viewer controls with this method.
 
   If the application code doesn't explicitly set up a camera through
   this method, the viewer will automatically scan through the

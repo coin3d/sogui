@@ -61,7 +61,7 @@
   add in this case:
 
   \code
-  toplevel->setFocusProxy(viewer);
+  toplevel->setFocusProxy(viewer->getWidget());
   \endcode
 
   \endif
