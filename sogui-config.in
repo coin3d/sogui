@@ -292,7 +292,7 @@ do
   --header)
     shift
     classname=$1
-    for header in `find ${prefix}/include/Inventor -type f | xargs grep -n "^class SO@GUI@_DLL_API ${classname}\>" | cut -d: -f1`; do
+    for header in `find ${prefix}/include/Inventor/@Gui@ -type f | xargs grep -n "^class SO@GUI@_DLL_API ${classname}\>" | cut -d: -f1`; do
       echo "FILE: ${header}"
       cat "${header}"
     done
