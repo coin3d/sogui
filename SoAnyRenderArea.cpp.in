@@ -487,13 +487,32 @@ void
 So@GUI@RenderArea::render(
   void )
 {
-  this->glLock();
-  this->redraw();
-  if ( this->isDoubleBuffer() )
-    this->glSwapBuffers();
-  else
-    this->glFlushBuffer();
-  this->glUnlock();
+#if SO@uGUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@GUI@RenderArea::render",
+                         "start (waitForExpose: %s)",
+                         this->waitForExpose ? "TRUE" : "FALSE");
+#endif // debug
+
+  if (!this->waitForExpose) {
+    this->glLock(); // this makes the GL context "current"
+
+    SbBool drawfront =
+      !this->isDoubleBuffer() ||
+      this->isDrawToFrontBufferEnable();
+
+    glDrawBuffer( drawfront ? GL_FRONT_LEFT : GL_BACK_LEFT );
+
+    this->redraw();
+
+    if ( !drawfront ) this->glSwapBuffers();
+    else this->glFlushBuffer();
+
+    this->glUnlock();
+  }
+
+#if SO@uGUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@GUI@RenderArea::render", "done");
+#endif // debug
 } // render()
 
 /*!
@@ -666,7 +685,7 @@ So@GUI@RenderArea::actualRedraw( // virtual, protected
   void )
 {
   assert( this->normalManager != NULL );
-  this->normalManager->render( this->clear, this->clear /* ZBuffer ?? */ );
+  this->normalManager->render( this->clear, this->clearZBuffer );
 } // actualRedraw()
 
 /*!
@@ -848,6 +867,7 @@ void
 So@GUI@RenderArea::glRender( // virtual, derived
   void )
 {
+#if 0 // OBSOLETED: seems like the completely wrong thing to do for paintevents. 20000318 mortene.
   inherited::glRender();
 
   this->glLock();
@@ -857,6 +877,9 @@ So@GUI@RenderArea::glRender( // virtual, derived
   else
     this->glFlushBuffer();
   this->glUnlock();
+#else
+  this->scheduleRedraw();
+#endif
 } // glRender()
 
 /*!
