@@ -32,7 +32,7 @@
 
 #include <Inventor/events/SoMouseButtonEvent.h>
 #include <Inventor/events/SoKeyboardEvent.h>
-
+#include <Inventor/errors/SoDebugError.h>
 
 /*!
   Set title of popup menu.
@@ -482,7 +482,8 @@ So@Gui@FullViewer::menuSelection(// virtual
 
   default:
     SoDebugError::postInfo("So@Gui@FullViewer::menuSelection",
-      "popup menu handling for item %d is not implemented", menuitemid);
+                           "popup menu handling for item %d is not implemented", 
+                           menuitemid);
     break;
   } // switch (menuitemid)
 } // menuSelection()
