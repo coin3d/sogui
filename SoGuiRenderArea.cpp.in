@@ -171,8 +171,6 @@ So@Gui@RenderArea::constructor( // private
   this->devices.keyboard = keyboardInput ? new So@Gui@Keyboard : NULL;
   this->devices.extra = NULL;
 
-  if ( So@Gui@Spaceball::exists() )
-    this->registerDevice( new So@Gui@Spaceball );
 #ifdef HAVE_JOYSTICK_LINUX
   if ( So@Gui@LinuxJoystick::exists() )
     this->registerDevice( new So@Gui@LinuxJoystick );
@@ -187,6 +185,18 @@ So@Gui@RenderArea::constructor( // private
     this->setSize( SbVec2s( 400, 400 ) );
   }
 } // constructor()
+
+
+void 
+So@Gui@RenderArea::afterRealizeHook(void)
+{
+  if ( So@Gui@Spaceball::exists() ) { 
+    So@Gui@Spaceball * sb = new So@Gui@Spaceball;
+    sb->enable(this->getGLWidget(), NULL, NULL);
+    this->registerDevice( sb );
+  }
+  inherited::afterRealizeHook();
+}
 
 /*!
   Destructor.

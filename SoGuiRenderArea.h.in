@@ -156,6 +156,8 @@ protected:
 
   const SoEvent * getSoEvent( @EVENT@ event );
 
+  virtual void afterRealizeHook(void);
+
 private:
   void constructor( SbBool mouseInput, SbBool keyboardInput, SbBool build );
   void setDevicesWindowSize( const SbVec2s size );
