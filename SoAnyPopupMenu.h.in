@@ -22,10 +22,17 @@
 #ifndef SOANY_POPUPMENU_H
 #define SOANY_POPUPMENU_H
 
+#include <Inventor/SbBasic.h>
+
 class SbIntList;
 class So@GUI@PopupMenu;
 
 // *************************************************************************
+
+class SoAnyPopupMenu {
+public:
+  SoAnyPopupMenu(void);
+  ~SoAnyPopupMenu(void);
 
 #define SOANY_POPUPMENU_INTERFACE                           \
   int NewMenu( char * name, int menuid = -1 );              \
@@ -48,14 +55,6 @@ class So@GUI@PopupMenu;
   void RemoveMenuItem( int itemid );                        \
                                                             \
   int PopUp( int screenx, int screeny );                    \
-
-
-// *************************************************************************
-
-class SoAnyPopupMenu {
-public:
-  SoAnyPopupMenu(void);
-  ~SoAnyPopupMenu(void);
 
   SOANY_POPUPMENU_INTERFACE
 
