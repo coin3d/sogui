@@ -6,6 +6,7 @@
 #
 
 SoGui_BuiltFiles = \
+  $(top_builddir)/sogui.doxygen \
   $(top_builddir)/so@gui@-config \
   $(top_builddir)/so@gui@-@CONFIG@.cfg
 
@@ -13,8 +14,7 @@ SoGui_src_BuiltFiles = \
   $(top_builddir)/src/so@gui@defs.h
 ##$(top_builddir)/src/config.h
 
-SoGui_build_BuiltFiles = \
-  $(top_builddir)/build/so@gui@.doxygen
+SoGui_build_BuiltFiles = 
 
 SoGui_src_Inventor_BuiltFiles =
 
@@ -168,6 +168,7 @@ SoGuiCommonDistFiles = \
   src/Inventor/@Gui@/common/ChangeLog \
   src/Inventor/@Gui@/common/Makefile.common \
   src/Inventor/@Gui@/common/sogui-config.in \
+  src/Inventor/@Gui@/common/sogui.doxygen.in \
   src/Inventor/@Gui@/common/sogui-config.1.in \
   src/Inventor/@Gui@/common/sogui.cfg.in \
   src/Inventor/@Gui@/common/SoGuiBasic.h.in \
@@ -236,6 +237,9 @@ SoQt_ExtraBuiltMetaFiles = \
 ############################################################################
 ## the actual gory rules for generating the sources, invokable from *any*
 ## dir in So@Gui@
+
+$(top_builddir)/sogui.doxygen: $(top_srcdir)/src/Inventor/@Gui@/common/sogui.doxygen.in $(top_builddir)/config.status
+	@( cd $(top_builddir); $(SHELL) config.status --file=sogui.doxygen:src/Inventor/@Gui@/common/sogui.doxygen.in )
 
 $(top_builddir)/so@gui@-config: $(top_srcdir)/src/Inventor/@Gui@/common/sogui-config.in $(top_builddir)/config.status
 	@( cd $(top_builddir); $(SHELL) config.status --file=so@gui@-config:src/Inventor/@Gui@/common/sogui-config.in && chmod +x so@gui@-config )
@@ -399,10 +403,7 @@ $(top_builddir)/src/Inventor/@Gui@/widgets/So@Gui@PopupMenu.cpp: $(top_srcdir)/s
 
 ## build/
 
-$(top_builddir)/build/so@gui@.doxygen: $(top_srcdir)/build/so@gui@.doxygen.in $(top_builddir)/config.status
-	@( cd $(top_builddir); \
-	   if test -d build; then :; else mkdir build; fi; \
-	   ./config.status --file=build/so@gui@.doxygen:build/so@gui@.doxygen.in )
+## ..nothing at the moment..
 
 ## man/man1/
 
