@@ -29,6 +29,7 @@
 #endif // !SO@GUI@_INTERNAL
 
 #include <Inventor/@Gui@/engines/SoGuiRadioGroup.h>
+#include <Inventor/@Gui@/engines/SoGuiFormat.h>
 
 class SoGuiEngines {
 public:
