@@ -52,6 +52,8 @@ public:
   So@Gui@Cursor(const So@Gui@Cursor & cursor);
   ~So@Gui@Cursor();
 
+  So@Gui@Cursor & operator=(const So@Gui@Cursor & c);
+
   Shape getShape(void) const;
   void setShape(const Shape shape);
 

@@ -280,6 +280,9 @@ So@Gui@Cursor::commonConstructor(const Shape shape, const CustomCursor * cc)
   }
 }
 
+/*!
+  Constructor.
+*/
 So@Gui@Cursor::So@Gui@Cursor(const So@Gui@Cursor & cursor)
 {
   this->commonConstructor(cursor.shape, cursor.cc);
@@ -291,6 +294,17 @@ So@Gui@Cursor::So@Gui@Cursor(const So@Gui@Cursor & cursor)
 So@Gui@Cursor::~So@Gui@Cursor()
 {
   delete this->cc;
+}
+
+/*!
+  Equal operator.
+*/
+So@Gui@Cursor & 
+So@Gui@Cursor::operator=(const So@Gui@Cursor & c)
+{
+  delete this->cc;
+  this->cc = NULL;
+  this->commonConstructor(c.shape, c.cc);
 }
 
 /*!
