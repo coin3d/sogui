@@ -63,7 +63,7 @@ private:
   unsigned int swapWord( unsigned int ) const;
 
   int diameter, width;
-  float disabledred, disabledgreen, disabledblue;
+  // float disabledred, disabledgreen, disabledblue; // not implemented
   float red, green, blue;
   float light, front, normal, shade;
 

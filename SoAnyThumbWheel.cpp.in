@@ -86,13 +86,13 @@ SoAnyThumbWheel::SoAnyThumbWheel(
 {
   assert( sizeof(int) == 4 && "FIXME: use int32 datatype instead" );
 
-  this->disabledred = 1.0f;
-  this->disabledgreen = 1.0f;
-  this->disabledblue = 1.0f;
+//  this->disabledred = 1.0f;
+//  this->disabledgreen = 1.0f;
+//  this->disabledblue = 1.0f;
 
-  this->red = 220;
-  this->green = 180;
-  this->blue = 180;
+  this->red = 220.0f / 255.0f;
+  this->green = 180.0f / 255.0f;
+  this->blue = 180.0f / 255.0f;
   
   this->light = 1.3f;
   this->front = 1.2f;
@@ -497,8 +497,8 @@ SoAnyThumbWheel::drawDisabledWheel( // private
     unsigned int light, front, normal, shade;
     light  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 1.15f) );
     front = 0;
-    normal = (unsigned int) floor(255.0f * this->tables[SIN][j]);
-    shade  = (unsigned int) floor(255.0f * this->tables[SIN][j] * 0.85f);
+    normal = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j]) );
+    shade  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 0.85f) );
 
     // rgbx
     light  =  (light << 24) |  (light << 16) |  (light << 8);
@@ -548,26 +548,24 @@ SoAnyThumbWheel::drawEnabledWheel(
 
   float modulo = (2.0f * M_PI) / numsquares;
   float radian = modulo - (((2.0f * M_PI) / (float) numsquares) * (((float) (number - 1)) / (float) numEnabledBitmaps));
-//  fprintf( stderr, "radoffset = %8.4f\n", radoffset );
-//  DrawDisabledWheel( 0, bitmap, direction );
 
   int newsquare = TRUE;
   unsigned int * buffer = (unsigned int *) bitmap;
   for ( int j = 0; j < this->diameter; j++ ) {
     unsigned int light, front, normal, shade, color;
 
-    light  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->light) ) << 24) +
-             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->light) ) << 16) +
-             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->light) ) << 8);
-    front  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->front) ) << 24) +
-             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->front) ) << 16) +
-             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->front) ) << 8);
-    normal = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->normal) ) << 24) +
-             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->normal) ) << 16) +
-             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->normal) ) << 8);
-    shade  = (int8clamp( floor((float) this->red * this->tables[SIN][j] * this->shade) ) << 24) +
-             (int8clamp( floor((float) this->green * this->tables[SIN][j] * this->shade) ) << 16) +
-             (int8clamp( floor((float) this->blue * this->tables[SIN][j] * this->shade) ) << 8);
+    light  = (int8clamp( floor(255.0f * this->red * this->tables[SIN][j] * this->light) ) << 24) +
+             (int8clamp( floor(255.0f * this->green * this->tables[SIN][j] * this->light) ) << 16) +
+             (int8clamp( floor(255.0f * this->blue * this->tables[SIN][j] * this->light) ) << 8);
+    front  = (int8clamp( floor(255.0f * this->red * this->tables[SIN][j] * this->front) ) << 24) +
+             (int8clamp( floor(255.0f * this->green * this->tables[SIN][j] * this->front) ) << 16) +
+             (int8clamp( floor(255.0f * this->blue * this->tables[SIN][j] * this->front) ) << 8);
+    normal = (int8clamp( floor(255.0f * this->red * this->tables[SIN][j] * this->normal) ) << 24) +
+             (int8clamp( floor(255.0f * this->green * this->tables[SIN][j] * this->normal) ) << 16) +
+             (int8clamp( floor(255.0f * this->blue * this->tables[SIN][j] * this->normal) ) << 8);
+    shade  = (int8clamp( floor(255.0f * this->red * this->tables[SIN][j] * this->shade) ) << 24) +
+             (int8clamp( floor(255.0f * this->green * this->tables[SIN][j] * this->shade) ) << 16) +
+             (int8clamp( floor(255.0f * this->blue * this->tables[SIN][j] * this->shade) ) << 8);
 
     if ( this->byteorder != RGBA ) {
       light   = this->swapWord( light );
