@@ -1888,10 +1888,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation = camerarot * rot;
 
     if (quadstereo) {
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK_RIGHT);
-   else
-    glDrawBuffer(GL_FRONT_RIGHT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK_RIGHT);
+      else
+        glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else {
@@ -1906,10 +1906,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation.enableNotify(orientationstore);
     camera->enableNotify(notifystore);
     if (quadstereo) {
-   if (this->isDoubleBuffer())
-    glDrawBuffer(GL_BACK);
-   else
-    glDrawBuffer(GL_FRONT);
+      if (this->isDoubleBuffer())
+        glDrawBuffer(GL_BACK);
+      else
+        glDrawBuffer(GL_FRONT);
     }
     else {
       glColorMask(1,1,1,1); // restore GL color mask
@@ -2511,15 +2511,15 @@ void
 So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during interaction.
-  if ( thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
-    thisp->pimpl->localsetbuffertype = TRUE;
+  if ( PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
+    PRIVATE(thisp)->localsetbuffertype = TRUE;
     thisp->So@Gui@RenderArea::setDoubleBuffer( TRUE );
-    thisp->pimpl->localsetbuffertype = FALSE;
+    PRIVATE(thisp)->localsetbuffertype = FALSE;
   }
 
   // Use the dynamic drawstyle.
-  if (!thisp->pimpl->drawInteractiveAsStill())
-    thisp->pimpl->changeDrawStyle(thisp->pimpl->drawstyles[So@Gui@Viewer::INTERACTIVE]);
+  if (!PRIVATE(thisp)->drawInteractiveAsStill())
+    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::INTERACTIVE]);
 } // interactivestartCB()
 
 /*!
@@ -2534,15 +2534,15 @@ So@Gui@ViewerP::interactiveendCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during
   // interaction, singelbuffering while the camera is static.
-  if (thisp->pimpl->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
-    thisp->pimpl->localsetbuffertype = TRUE;
+  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
+    PRIVATE(thisp)->localsetbuffertype = TRUE;
     thisp->So@Gui@RenderArea::setDoubleBuffer(FALSE);
-    thisp->pimpl->localsetbuffertype = FALSE;
+    PRIVATE(thisp)->localsetbuffertype = FALSE;
   }
 
   // Back to static drawstyle.
-  if (!thisp->pimpl->drawInteractiveAsStill())
-    thisp->pimpl->changeDrawStyle(thisp->pimpl->drawstyles[So@Gui@Viewer::STILL]);
+  if (!PRIVATE(thisp)->drawInteractiveAsStill())
+    PRIVATE(thisp)->changeDrawStyle(PRIVATE(thisp)->drawstyles[So@Gui@Viewer::STILL]);
 } // interactiveendCB()
 
 // *************************************************************************
@@ -2562,13 +2562,13 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
   SoTimerSensor * sensor = (SoTimerSensor *)s;
 
   float t =
-    (currenttime - sensor->getBaseTime()).getValue() / thisp->pimpl->seekperiod;
+    (currenttime - sensor->getBaseTime()).getValue() / PRIVATE(thisp)->seekperiod;
   if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
   SbBool end = (t == 1.0f);
 
 //  t = 0.5f - cos(M_PI * t) * 0.5f;
-  thisp->camera->position = thisp->pimpl->camerastartposition +
-    (thisp->pimpl->cameraendposition - thisp->pimpl->camerastartposition) * t;
+  thisp->camera->position = PRIVATE(thisp)->camerastartposition +
+    (PRIVATE(thisp)->cameraendposition - PRIVATE(thisp)->camerastartposition) * t;
 
   if (end) thisp->setSeekMode(FALSE);
 } // seeksensorCB()
