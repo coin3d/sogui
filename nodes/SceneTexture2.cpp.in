@@ -1,0 +1,161 @@
+/**************************************************************************\
+ *
+ *  This file is part of the Coin family of 3D visualization libraries.
+ *  Copyright (C) 1998-2002 by Systems in Motion.  All rights reserved.
+ *
+ *  This library is free software; you can redistribute it and / or
+ *  modify it under the terms of the GNU General Public License
+ *  version 2 as published by the Free Software Foundation.  See the
+ *  file LICENSE.GPL at the root directory of this source distribution
+ *  for more details.
+ *
+ *  If you desire to use this library in software that is incompatible
+ *  with the GNU GPL, and / or you would like to take advantage of the
+ *  additional benefits with regard to our support services, please
+ *  contact Systems in Motion about acquiring a Coin Professional
+ *  Edition License.  See <URL:http://www.coin3d.org> for more
+ *  information.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, 7030 Trondheim, NORWAY
+ *  <URL:http://www.sim.no>, <mailto:support@sim.no>
+ *
+\**************************************************************************/
+
+#include <assert.h>
+#include <string.h>
+
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/sensors/SoNodeSensor.h>
+#include <Inventor/sensors/SoFieldSensor.h>
+#include <Inventor/SoOffscreenRenderer.h>
+
+#include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
+
+// *************************************************************************
+
+class SceneTexture2 {
+public:
+  SceneTexture2(void);
+
+  SoGuiSceneTexture2 * api;
+
+  SoOffscreenRenderer * renderer;
+
+  SoFieldSensor * size_sensor;
+  SoFieldSensor * field_sensor;
+  static void field_updated_cb(void * closure, SoSensor * sensor);
+  SoNodeSensor * scene_sensor;
+  static void scene_updated_cb(void * closure, SoSensor * sensor);
+};
+
+// *************************************************************************
+
+#define PRIVATE(obj) ((SceneTexture2 *) obj->internals)
+
+void
+SoGuiSceneTexture2::initClass(void)
+{
+  SO_NODE_INIT_CLASS(SoGuiSceneTexture2, SoTexture2, SoTexture2);
+}
+
+SO_NODE_SOURCE(SoGuiSceneTexture2);
+
+SoGuiSceneTexture2::SoGuiSceneTexture2(void)
+{
+  this->internals = new SceneTexture2;
+  PRIVATE(this)->api = this;
+
+  SO_NODE_CONSTRUCTOR(SoGuiSceneTexture2);
+  SO_NODE_ADD_FIELD(size, (SbVec2s(512, 512)));
+  SO_NODE_ADD_FIELD(scene, (NULL));
+
+  PRIVATE(this)->size_sensor = new SoFieldSensor(SceneTexture2::scene_updated_cb, PRIVATE(this));
+  PRIVATE(this)->size_sensor->attach(&(this->size));
+  PRIVATE(this)->field_sensor = new SoFieldSensor(SceneTexture2::field_updated_cb, PRIVATE(this));
+  PRIVATE(this)->field_sensor->attach(&(this->scene));
+}
+
+SoGuiSceneTexture2::~SoGuiSceneTexture2(void)
+{
+  if ( PRIVATE(this)->scene_sensor != NULL ) {
+    delete PRIVATE(this)->scene_sensor;
+  }
+  delete PRIVATE(this)->size_sensor;
+  delete PRIVATE(this)->field_sensor;
+  if ( PRIVATE(this)->renderer != NULL ) {
+    delete PRIVATE(this)->renderer;
+  }
+}
+
+#undef PRIVATE
+
+// *************************************************************************
+
+#define PUBLIC(obj) (((SceneTexture2 *) obj)->api)
+
+SceneTexture2::SceneTexture2(void)
+{
+  this->api = NULL;
+  this->size_sensor = NULL;
+  this->field_sensor = NULL;
+  this->scene_sensor = NULL;
+  this->renderer = NULL;
+}
+
+void
+SceneTexture2::field_updated_cb(void * closure, SoSensor * sensor)
+{
+  assert(closure);
+  SceneTexture2 * me = (SceneTexture2 *) closure;
+  if ( me->scene_sensor ) {
+    delete me->scene_sensor;
+    me->scene_sensor = NULL;
+  }
+  SoNode * scene = PUBLIC(me)->scene.getValue();
+  if ( scene != NULL ) {
+    me->scene_sensor = new SoNodeSensor(SceneTexture2::scene_updated_cb, me);
+    me->scene_sensor->attach(scene);
+    scene->touch();
+  }
+  // SceneTexture2::scene_updated_cb(closure, sensor);
+}
+
+void
+SceneTexture2::scene_updated_cb(void * closure, SoSensor * sensor)
+{
+  SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "");
+  assert(closure);
+  SceneTexture2 * me = (SceneTexture2 *) closure;
+
+  SbVec2s size = PUBLIC(me)->size.getValue();
+  SoNode * scene = PUBLIC(me)->scene.getValue();
+  if ( scene != NULL ) {
+    if ( me->renderer == NULL ) {
+      me->renderer = new SoOffscreenRenderer(SbViewportRegion(size));
+      me->renderer->setComponents(SoOffscreenRenderer::RGB);
+    } else {
+      me->renderer->setViewportRegion(SbViewportRegion(size));
+    }
+    SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "rendering");
+    me->renderer->render(scene);
+    SbBool save = PUBLIC(me)->image.enableNotify(FALSE);
+    PUBLIC(me)->image.setValue(size, 3, NULL);
+    SbVec2s dummy;
+    int dummync;
+    unsigned char * imagebytes = PUBLIC(me)->image.startEditing(dummy, dummync);
+
+    unsigned char * renderbuffer = me->renderer->getBuffer();
+    memcpy(imagebytes, renderbuffer, size[0] * size[1] * 3);
+
+    PUBLIC(me)->image.finishEditing();
+    PUBLIC(me)->image.enableNotify(save);
+    if ( save ) PUBLIC(me)->image.touch();
+
+  } else {
+    SoDebugError::postInfo("SceneTexture2::scene_updated_cb", "clear not implemented");
+  }
+}
+
+#undef PUBLIC
+
+// *************************************************************************
