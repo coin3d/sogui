@@ -146,7 +146,44 @@ SoAnyPopupMenu::SetMenuItemMarked(
   int itemid,
   SbBool marked )
 {
-  this->menu->SetMenuItemMarked( itemid, marked );
+  int groupid = GetRadioGroup( itemid );
+  if ( groupid == -1 ) {
+    this->menu->SetMenuItemMarked( itemid, marked );
+    return;
+  }
+  const int numGroupedItems = this->menuitems->getLength();
+  int groupsize = 0;
+  for ( int i = 0; i < numGroupedItems; i++ ) {
+    if ( ((*this->radiogroups)[i] == groupid) &&
+         ((*this->menuitems)[i] != -1) )
+      groupsize++;
+  }
+  if ( this->menu->GetMenuItemMarked( itemid ) == marked ) {
+#if SO@uGUI@_DEBUG
+    SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
+      "Marked state already '%s'.", marked ? "on" : "off" );
+#endif // SO@uGUI@_DEBUG
+  } else if ( groupsize == 0 ) {
+    assert( 0 && "how weird..." );
+  } else if ( groupsize == 1 ) {
+    this->menu->SetMenuItemMarked( itemid, marked );
+  } else if ( (groupsize == 2) ||
+              ((groupsize > 2) && marked) ) {
+    for ( int i = 0; i < numGroupedItems; i++ ) {
+      if ( ((*this->radiogroups)[i] == groupid) &&
+           ((*this->menuitems)[i] != -1) ) {
+        this->menu->SetMenuItemMarked( (*this->menuitems)[i],
+          ((*this->menuitems)[i] == itemid) ? marked :
+          ((groupsize == 2) ? (! marked) : FALSE) );
+      }
+    }
+  } else {
+#if SO@uGUI@_DEBUG
+    SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
+      "Couldn't handle request.  "
+      "Consider that radio grouping is handled automatically." );
+#endif // SO@uGUI@_DEBUG
+  }
 } // SetMenuItemEnabled()
 
 SbBool
@@ -175,6 +212,14 @@ SoAnyPopupMenu::AddMenuItem(
 {
   this->menu->AddMenuItem( menuid, itemid, pos );
 } // AddMenuItem()
+
+void
+SoAnyPopupMenu::AddSeparator(
+  int menuid,
+  int pos = -1 )
+{
+  this->menu->AddSeparator( menuid, pos );
+} // AddSeparator()
 
 void
 SoAnyPopupMenu::RemoveMenu(
@@ -299,7 +344,7 @@ SoAnyPopupMenu::PopUp(
   for ( int i = 0; i < numGroupedItems; i++ ) {
     if ( (*this->radiogroups)[i] == groupid ) {
       int item = (*this->menuitems)[i];
-      if ( item != itemid ) {
+      if ( item != itemid && item != -1 ) {
         this->menu->SetMenuItemMarked( item, FALSE );
         groupsize++;
       }
