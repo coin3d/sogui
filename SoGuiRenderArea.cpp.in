@@ -179,6 +179,9 @@
 
 #define RENDERAREA_DEBUG_REDRAWS 0
 
+#define PRIVATE(obj) ((obj)->pimpl)
+#define PUBLIC(obj) ((obj)->pub)
+
 // *************************************************************************
 
 SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
@@ -1990,3 +1993,7 @@ So@Gui@RenderArea::sendSoEvent(const SoEvent * event)
 }
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+
