@@ -59,7 +59,8 @@ static const char rcsid[] =
 SoAnyFullViewer::SoAnyFullViewer(
   So@Gui@FullViewer * const _viewer )
   : viewer( _viewer ),
-    prefmenu( NULL )
+    prefmenu( NULL ),
+    popupmenutitle( _( "Viewer settings" ) )
 {
   assert( _viewer != NULL );
 } // SoAnyFullViewer()
@@ -75,6 +76,15 @@ SoAnyFullViewer::~SoAnyFullViewer(
 
 // ************************************************************************
 
+void
+SoAnyFullViewer::setPopupMenuString( const char * name )
+{
+  this->popupmenutitle = name;
+  if (this->prefmenu) { this->prefmenu->setMenuTitle( ROOT_MENU, name ); }
+}
+
+// ************************************************************************
+
 SoAnyPopupMenu *
 SoAnyFullViewer::setupStandardPopupMenu(
   void )
@@ -82,6 +92,8 @@ SoAnyFullViewer::setupStandardPopupMenu(
   SoAnyPopupMenu * menu = new So@Gui@PopupMenu;
 
   menu->newMenu( "rootmenu", ROOT_MENU );
+  menu->setMenuTitle( ROOT_MENU, this->popupmenutitle.getString() );
+  menu->addSeparator( ROOT_MENU );
 
   menu->newMenu( "functionsmenu", FUNCTIONS_MENU );
   menu->setMenuTitle( FUNCTIONS_MENU, _( "Functions" ) );

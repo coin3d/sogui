@@ -107,6 +107,7 @@ public:
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);
   void prepareMenu( SoAnyPopupMenu * menu );
+  void setPopupMenuString( const char * title );
 
   void setDrawStyleMenuActivation(
     So@Gui@Viewer::DrawType type,
@@ -122,6 +123,7 @@ public:
 private:
   So@Gui@FullViewer * const viewer;
   SoAnyPopupMenu * prefmenu;
+  SbString popupmenutitle;
 
 }; // class SoAnyFullViewer
 
