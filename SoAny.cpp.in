@@ -192,6 +192,12 @@ SoAny::getSharedGLContext(void * display, void * screen)
 void 
 SoAny::registerGLContext(void * context, void * display, void * screen)
 {
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("SoAny::registerGLContext",
+                         "context==%p, display==%p, screen==%p",
+                         context, display, screen);
+#endif // debug
+
   int i, n = this->cclist.getLength();
   for (i = 0; i < n; i++) {
     soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
@@ -209,6 +215,10 @@ SoAny::registerGLContext(void * context, void * display, void * screen)
 void 
 SoAny::unregisterGLContext(void * context)
 {
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("SoAny::unregisterGLContext", "context==%p", context);
+#endif // debug
+
   for (int i = 0; i < this->cclist.getLength(); i++) {
     soany_cache_context * cc = (soany_cache_context*) this->cclist[i];
     if (cc->tryRemoveContext(context)) {
@@ -234,9 +244,11 @@ SoAny::getSharedCacheContextId(void * context)
     if (cc->findContext(context)) return cc->getCacheContextId();
   }
 #if SO@GUI@_DEBUG
-  SoDebugError::postWarning("SoAny::getSharedCacheContextId",
-                            "Shared context handling is not implemented for this toolkit.");
-#endif // COIN_DEBUG
+  SoDebugError::post("SoAny::getSharedCacheContextId",
+                     "could not find shared cache context for context %p "
+                     "(shared context handling not implemented for this "
+                     "toolkit?)", context);
+#endif // SO@GUI@_DEBUG
   return 0;
 }
 
