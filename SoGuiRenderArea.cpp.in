@@ -212,6 +212,15 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
     glGetIntegerv(GL_DEPTH_BITS, depthbits);
     s.sprintf("GL_DEPTH_BITS==%d\n", depthbits[0]);
     info += s;
+
+    GLint colbits[4];
+    glGetIntegerv(GL_RED_BITS, &colbits[0]);
+    glGetIntegerv(GL_GREEN_BITS, &colbits[1]);
+    glGetIntegerv(GL_BLUE_BITS, &colbits[2]);
+    glGetIntegerv(GL_ALPHA_BITS, &colbits[3]);
+    s.sprintf("GL_[RED|GREEN|BLUE|ALPHA]_BITS==[%d, %d, %d, %d]\n",
+              colbits[0], colbits[1], colbits[2], colbits[3]);
+    info += s;
   }
 
   So@Gui@::createSimpleErrorDialog(NULL, "OpenGL driver information",
