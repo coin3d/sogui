@@ -101,6 +101,12 @@ private:
   float rotationFactor;
   float translationFactor;
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__ // FIXME: make a "pure" template. 20011210 mortene.
+  int events;
+  float rotationscale;
+  float translationscale;
+  SbBool focustowindow;
+#endif // __COIN_SOGTK__
 };
 
 // *************************************************************************
