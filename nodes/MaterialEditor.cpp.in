@@ -201,6 +201,7 @@ MaterialEditor::texturescene[] =
   "      DirectionalLight { direction -0.556 -0.623 -0.551 }",
   "      DEF material Material { }",
   "      Complexity { value 0.8 }",
+  "      ShapeHints { vertexOrdering COUNTERCLOCKWISE shapeType SOLID }",
   "      Sphere { radius 0.85 }",
   "    }",
   "  }",
