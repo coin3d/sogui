@@ -37,6 +37,65 @@
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/errors/SoDebugError.h>
 
+// ************************************************************************
+
+/*!
+  \fn void So@Gui@FullViewer::createViewerButtons(@WIDGET@ parent, SbPList * buttonlist)
+
+  Set up the viewer buttons with pixmaps and event connections.
+
+
+  One important note if you want to override this method to add your
+  own buttons to the list (in the explanation below, it is assumed
+  that you know how virtual function table pointers are handled by
+  C++):
+
+  createViewerButtons() is called (indirectly) from the constructors
+  of the viewer classes. This means that you need to delay it's
+  invocation until your own subclass's constructor is run, because
+  otherwise your re-implementation won't have been added to the
+  internal virtual function table yet.
+
+  Delaying a superclass viewer from building it's decorations is done
+  by passing build==FALSE as the last argument of the protected
+  constructors. You will then have to explicitly trigger the building
+  in your own constructor.
+
+  Here's a minimal example that shows the steps needed to be able to
+  override createViewerButtons() from So@Gui@ExaminerViewer:
+
+  \code
+  class MyExaminerViewer : public So@Gui@ExaminerViewer {
+  
+  public:
+    MyExaminerViewer(@WIDGET@ parent);
+  
+  protected:
+    virtual void createViewerButtons(@WIDGET@ parent, SbPList * buttonlist);
+  };
+  
+  MyExaminerViewer::MyExaminerViewer(@WIDGET@ parent)
+    : So@Gui@ExaminerViewer(parent, NULL, TRUE,
+                            So@Gui@FullViewer::BUILD_ALL, So@Gui@FullViewer::BROWSER,
+                            // build == FALSE, to delay creation of decorations
+                            FALSE)
+  {
+    // Explicitly trigger the construction of viewer decorations.
+    @WIDGET@ widget = this->buildWidget(this->getParentWidget());
+    this->setBaseWidget(widget);
+  }
+  
+  void
+  MyExaminerViewer::createViewerButtons(@WIDGET@ parent, SbPList * buttonlist)
+  {
+    So@Gui@ExaminerViewer::createViewerButtons(parent, buttonlist);
+    // [now add your own button(s) to the buttonlist]
+  }
+  \endcode
+*/
+
+// ************************************************************************
+
 /*!
   Set title of popup menu.
 */
@@ -777,7 +836,6 @@ So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
 
   return inherited::processSoEvent(ev);
 }
-
 
 // FIXME: get rid of this hack and make this file truly
 // "generic". 20020109 mortene.
