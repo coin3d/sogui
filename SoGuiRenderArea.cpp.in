@@ -121,8 +121,8 @@ class So@Gui@RenderAreaP {
   So@Gui@RenderArea * pub; // public interface class
 }; // class So@Gui@RenderAreaP
 
-#define THIS (this->priv)
-#define THAT (this->pub)
+#define PRIVATE(ptr) (ptr->priv)
+#define PUBLIC(ptr) (ptr->pub)
 
 // *************************************************************************
 
@@ -186,30 +186,30 @@ So@Gui@RenderArea::constructor( // private
   SbBool keyboardInput,
   SbBool build )
 {
-  THIS = new So@Gui@RenderAreaP( this );
+  PRIVATE(this) = new So@Gui@RenderAreaP( this );
 
-  THIS->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-  THIS->normalManager->activate();
-  THIS->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-  THIS->overlayManager->activate();
-  THIS->overlayManager->getGLRenderAction()->setCacheContext(1);
+  PRIVATE(this)->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  PRIVATE(this)->normalManager->activate();
+  PRIVATE(this)->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  PRIVATE(this)->overlayManager->activate();
+  PRIVATE(this)->overlayManager->getGLRenderAction()->setCacheContext(1);
 
   this->deviceList = new SbPList ;
   this->appEventHandler = NULL;
   this->appEventHandlerData = NULL;
 
   if ( mouseInput ) {
-    THIS->devices.mouse = new So@Gui@Mouse;
+    PRIVATE(this)->devices.mouse = new So@Gui@Mouse;
     // FIXME: this does not work
-    // this->registerDevice( THIS->devices.mouse );
-    this->deviceList->append( THIS->devices.mouse );
+    // this->registerDevice( PRIVATE(this)->devices.mouse );
+    this->deviceList->append( PRIVATE(this)->devices.mouse );
   }
 
   if ( keyboardInput ) {
-    THIS->devices.keyboard = new So@Gui@Keyboard;
+    PRIVATE(this)->devices.keyboard = new So@Gui@Keyboard;
     // FIXME: this does not work
-    // this->registerDevice( THIS->devices.keyboard );
-    this->deviceList->append( THIS->devices.keyboard );
+    // this->registerDevice( PRIVATE(this)->devices.keyboard );
+    this->deviceList->append( PRIVATE(this)->devices.keyboard );
   }
 
   if ( ! build ) return;
@@ -232,7 +232,7 @@ So@Gui@RenderArea::~So@Gui@RenderArea(
     delete device;
   }
   delete this->deviceList;
-  delete THIS;
+  delete PRIVATE(this);
 } // ~So@Gui@RenderArea()
 
 // *************************************************************************
@@ -263,7 +263,7 @@ void
 So@Gui@RenderArea::setSceneGraph( // virtual
   SoNode * scene )
 {
-  THIS->normalManager->setSceneGraph( scene );
+  PRIVATE(this)->normalManager->setSceneGraph( scene );
 } // setSceneGraph()
 
 /*!
@@ -274,7 +274,7 @@ SoNode *
 So@Gui@RenderArea::getSceneGraph( // virtual
   void )
 {
-  return THIS->normalManager->getSceneGraph();
+  return PRIVATE(this)->normalManager->getSceneGraph();
 } // getSceneGraph()
 
 /*!
@@ -285,7 +285,7 @@ void
 So@Gui@RenderArea::setOverlaySceneGraph(
   SoNode * scene )
 {
-  THIS->overlayManager->setSceneGraph( scene );
+  PRIVATE(this)->overlayManager->setSceneGraph( scene );
 } // setOverlaySceneGraph()
 
 /*!
@@ -296,7 +296,7 @@ SoNode *
 So@Gui@RenderArea::getOverlaySceneGraph(
   void )
 {
-  return THIS->overlayManager->getSceneGraph();
+  return PRIVATE(this)->overlayManager->getSceneGraph();
 } // getOverlaySceneGraph()
 
 // *************************************************************************
@@ -352,8 +352,8 @@ void
 So@Gui@RenderArea::setBackgroundColor(
   const SbColor & color )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->setBackgroundColor( color );
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->setBackgroundColor( color );
 } // setBackgroundColor()
 
 /*!
@@ -364,8 +364,8 @@ const SbColor &
 So@Gui@RenderArea::getBackgroundColor(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getBackgroundColor();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getBackgroundColor();
 } // getBackgroundColor()
 
 // *************************************************************************
@@ -378,8 +378,8 @@ void
 So@Gui@RenderArea::setBackgroundIndex(
   int idx )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->setBackgroundIndex( idx );
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->setBackgroundIndex( idx );
 } // setBackgroundIndex()
 
 /*!
@@ -390,8 +390,8 @@ int
 So@Gui@RenderArea::getBackgroundIndex(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getBackgroundIndex();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getBackgroundIndex();
 } // getBackgroundIndex()
 
 // *************************************************************************
@@ -404,8 +404,8 @@ void
 So@Gui@RenderArea::setOverlayBackgroundIndex(
   int idx )
 {
-  assert( THIS->overlayManager != NULL );
-  THIS->overlayManager->setBackgroundIndex( idx );
+  assert( PRIVATE(this)->overlayManager != NULL );
+  PRIVATE(this)->overlayManager->setBackgroundIndex( idx );
 } // setOverlayBackgroundIndex()
 
 /*!
@@ -416,8 +416,8 @@ int
 So@Gui@RenderArea::getOverlayBackgroundIndex(
   void ) const
 {
-  assert( THIS->overlayManager != NULL );
-  return THIS->overlayManager->getBackgroundIndex();
+  assert( PRIVATE(this)->overlayManager != NULL );
+  return PRIVATE(this)->overlayManager->getBackgroundIndex();
 } // getOverlayBackgroundIndex()
 
 // *************************************************************************
@@ -432,12 +432,12 @@ So@Gui@RenderArea::setColorMap(
   int num,
   const SbColor * colors )
 {
-  delete [] THIS->normalColormap;
-  THIS->normalColormapStart = start;
-  THIS->normalColormapSize = num;
-  THIS->normalColormap = new SbColor [ num ];
+  delete [] PRIVATE(this)->normalColormap;
+  PRIVATE(this)->normalColormapStart = start;
+  PRIVATE(this)->normalColormapSize = num;
+  PRIVATE(this)->normalColormap = new SbColor [ num ];
   for ( int i = 0; i < num; i++ )
-    THIS->normalColormap[i] = colors[i];
+    PRIVATE(this)->normalColormap[i] = colors[i];
 } // setColorMap()
 
 /*!
@@ -450,12 +450,12 @@ So@Gui@RenderArea::setOverlayColorMap(
   int num,
   const SbColor * colors )
 {
-  delete [] THIS->overlayColormap;
-  THIS->overlayColormapStart = start;
-  THIS->overlayColormapSize = num;
-  THIS->overlayColormap = new SbColor [ num ];
+  delete [] PRIVATE(this)->overlayColormap;
+  PRIVATE(this)->overlayColormapStart = start;
+  PRIVATE(this)->overlayColormapSize = num;
+  PRIVATE(this)->overlayColormap = new SbColor [ num ];
   for ( int i = 0; i < num; i++ )
-    THIS->overlayColormap[i] = colors[i];
+    PRIVATE(this)->overlayColormap[i] = colors[i];
 } // setOverlayColorMap()
 
 // *************************************************************************
@@ -470,8 +470,8 @@ So@Gui@RenderArea::setViewportRegion(
 {
   if ( region.getWindowSize()[0] == -1 ) return;
 
-  THIS->normalManager->setViewportRegion( region );
-  THIS->overlayManager->setViewportRegion( region );
+  PRIVATE(this)->normalManager->setViewportRegion( region );
+  PRIVATE(this)->overlayManager->setViewportRegion( region );
 } // setViewportRegion()
 
 /*!
@@ -482,8 +482,8 @@ const SbViewportRegion &
 So@Gui@RenderArea::getViewportRegion(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getGLRenderAction()->getViewportRegion();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getGLRenderAction()->getViewportRegion();
 } // getViewportRegion()
 
 // *************************************************************************
@@ -496,9 +496,9 @@ void
 So@Gui@RenderArea::setTransparencyType(
   SoGLRenderAction::TransparencyType type )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->getGLRenderAction()->setTransparencyType( type );
-//  THIS->overlayManager->getGLRenderAction()->setTransparencyType( type );
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->getGLRenderAction()->setTransparencyType( type );
+//  PRIVATE(this)->overlayManager->getGLRenderAction()->setTransparencyType( type );
 } // setTransparencyType()
 
 /*!
@@ -509,8 +509,8 @@ SoGLRenderAction::TransparencyType
 So@Gui@RenderArea::getTransparencyType(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getGLRenderAction()->getTransparencyType();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getGLRenderAction()->getTransparencyType();
 } // getTransparencyType()
 
 // *************************************************************************
@@ -524,8 +524,8 @@ So@Gui@RenderArea::setAntialiasing(
   SbBool smoothing,
   int numPasses )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->setAntialiasing( smoothing, numPasses );
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->setAntialiasing( smoothing, numPasses );
 //  this->overlayManager->setAntialiasing( smoothing, numPasses );
 } // setAntialiasing()
 
@@ -538,8 +538,8 @@ So@Gui@RenderArea::getAntialiasing(
   SbBool & smoothing,
   int & numPasses) const
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->getAntialiasing(smoothing, numPasses);
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->getAntialiasing(smoothing, numPasses);
 } // getAntialiasing()
 
 /*!
@@ -552,8 +552,8 @@ So@Gui@RenderArea::setClearBeforeRender(
   SbBool enable,
   SbBool zbEnable )
 {
-  THIS->clear = enable;
-  THIS->clearZBuffer = zbEnable;
+  PRIVATE(this)->clear = enable;
+  PRIVATE(this)->clearZBuffer = zbEnable;
 } // setClearBeforeRender()
 
 /*!
@@ -565,7 +565,7 @@ SbBool
 So@Gui@RenderArea::isClearBeforeRender(
   void ) const
 {
-  return THIS->clear;
+  return PRIVATE(this)->clear;
 } // isClearBeforeRender()
 
 /*!
@@ -577,7 +577,7 @@ SbBool
 So@Gui@RenderArea::isClearZBufferBeforeRender(
   void ) const
 {
-  return THIS->clearZBuffer;
+  return PRIVATE(this)->clearZBuffer;
 } // isClearZBufferBeforeRender()
 
 /*!
@@ -589,7 +589,7 @@ void
 So@Gui@RenderArea::setClearBeforeOverlayRender(
   SbBool enable )
 {
-  THIS->clearOverlay = enable;
+  PRIVATE(this)->clearOverlay = enable;
 } // setClearBeforeOverlayRender()
 
 /*!
@@ -601,7 +601,7 @@ SbBool
 So@Gui@RenderArea::isClearBeforeOverlayRender(
   void ) const
 {
-  return THIS->clearOverlay;
+  return PRIVATE(this)->clearOverlay;
 } // isClearBeforeOverlayRender()
 
 /*!
@@ -613,19 +613,19 @@ So@Gui@RenderArea::setAutoRedraw(
   SbBool enable )
 {
   if ( enable ) {
-    THIS->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-    THIS->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+    PRIVATE(this)->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+    PRIVATE(this)->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
   }
   else {
-    THIS->normalManager->setRenderCallback( NULL, NULL );
-    THIS->overlayManager->setRenderCallback( NULL, NULL );
+    PRIVATE(this)->normalManager->setRenderCallback( NULL, NULL );
+    PRIVATE(this)->overlayManager->setRenderCallback( NULL, NULL );
   }
 
   // We can not use the render callback ptr as a flag, as the render
   // callback pointer will be set upon expose events and forced
   // redraws -- and autoRedraw is then used to remember that the
   // pointer should be set back to NULL again after redraw.
-  THIS->autoRedraw = enable;
+  PRIVATE(this)->autoRedraw = enable;
 } // setAutoRedraw()
 
 /*!
@@ -636,7 +636,7 @@ SbBool
 So@Gui@RenderArea::isAutoRedraw(
   void ) const
 {
-  return THIS->autoRedraw;
+  return PRIVATE(this)->autoRedraw;
 } // isAutoRedraw()
 
 /*!
@@ -647,8 +647,8 @@ void
 So@Gui@RenderArea::setRedrawPriority(
   uint32_t priority )
 {
-  THIS->normalManager->setRedrawPriority( priority );
-  THIS->overlayManager->setRedrawPriority( priority );
+  PRIVATE(this)->normalManager->setRedrawPriority( priority );
+  PRIVATE(this)->overlayManager->setRedrawPriority( priority );
 } // setRedrawPriority()
 
 /*!
@@ -659,8 +659,8 @@ uint32_t
 So@Gui@RenderArea::getRedrawPriority(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getRedrawPriority();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getRedrawPriority();
 } // getRedrawPriority()
 
 /*!
@@ -723,7 +723,7 @@ void
 So@Gui@RenderArea::renderOverlay(
   void )
 {
-  assert( THIS->overlayManager != NULL );
+  assert( PRIVATE(this)->overlayManager != NULL );
 
   if ( ! this->isVisible() || this->waitForExpose )
     return;
@@ -749,11 +749,11 @@ So@Gui@RenderArea::scheduleRedraw(
                          "invoked");
 #endif // debug
 
-  assert( THIS->normalManager != NULL );
+  assert( PRIVATE(this)->normalManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  THIS->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-  THIS->normalManager->scheduleRedraw(); // Redraw when idle.
+  PRIVATE(this)->normalManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  PRIVATE(this)->normalManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleRedraw()
 
 /*!
@@ -764,11 +764,11 @@ void
 So@Gui@RenderArea::scheduleOverlayRedraw(
   void )
 {
-  assert( THIS->overlayManager != NULL );
+  assert( PRIVATE(this)->overlayManager != NULL );
   // In case autoRedraw is OFF. The callback pointer will be reset to
   // NULL in renderCB() if autoRedraw is OFF.
-  THIS->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
-  THIS->overlayManager->scheduleRedraw(); // Redraw when idle.
+  PRIVATE(this)->overlayManager->setRenderCallback( So@Gui@RenderArea::renderCB, this );
+  PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
 } // scheduleOverlayRedraw()
 
 /*!
@@ -790,12 +790,12 @@ So@Gui@RenderArea::redrawOnSelectionChange(
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation. 20001002 mortene.
 
-  if ( THIS->normalSelection )
+  if ( PRIVATE(this)->normalSelection )
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
-    THIS->normalSelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
+    PRIVATE(this)->normalSelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
 
-  THIS->normalSelection = selection;
+  PRIVATE(this)->normalSelection = selection;
 
   if ( selection )
     selection->addChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
@@ -818,12 +818,12 @@ So@Gui@RenderArea::redrawOverlayOnSelectionChange(
   // FIXME: this interface is badly designed, see the comment above in
   // the function documentation on redrawOnSelectionChange(). 20001002 mortene.
 
-  if ( THIS->overlaySelection )
+  if ( PRIVATE(this)->overlaySelection )
     // FIXME: should we ref() and unref() to make sure we can't get a
     // crash here? 20001002 mortene.
-    THIS->overlaySelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
+    PRIVATE(this)->overlaySelection->removeChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
 
-  THIS->overlaySelection = selection;
+  PRIVATE(this)->overlaySelection = selection;
 
   if ( selection )
     selection->addChangeCallback( So@Gui@RenderArea::selection_redraw_cb, this );
@@ -851,8 +851,8 @@ void
 So@Gui@RenderArea::setSceneManager(
   SoSceneManager * manager )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager = manager;
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager = manager;
 } // setSceneManager()
 
 /*!
@@ -863,7 +863,7 @@ SoSceneManager *
 So@Gui@RenderArea::getSceneManager(
   void ) const
 {
-  return THIS->normalManager;
+  return PRIVATE(this)->normalManager;
 } // getSceneManager()
 
 /*!
@@ -874,7 +874,7 @@ void
 So@Gui@RenderArea::setOverlaySceneManager(
   SoSceneManager * manager )
 {
-  THIS->overlayManager = manager;
+  PRIVATE(this)->overlayManager = manager;
 } // setOverlaySceneManager()
 
 /*!
@@ -885,7 +885,7 @@ SoSceneManager *
 So@Gui@RenderArea::getOverlaySceneManager(
   void ) const
 {
-  return THIS->overlayManager;
+  return PRIVATE(this)->overlayManager;
 } // getOverlaySceneManager()
 
 /*!
@@ -896,8 +896,8 @@ void
 So@Gui@RenderArea::setGLRenderAction(
   SoGLRenderAction * action )
 {
-  assert( THIS->normalManager != NULL );
-  THIS->normalManager->setGLRenderAction( action );
+  assert( PRIVATE(this)->normalManager != NULL );
+  PRIVATE(this)->normalManager->setGLRenderAction( action );
   // Force an update of the SoGLRenderAction to the correct
   // updatearea, aspectratio, etc.
   this->sizeChanged( this->getSize() );
@@ -911,8 +911,8 @@ SoGLRenderAction *
 So@Gui@RenderArea::getGLRenderAction(
   void ) const
 {
-  assert( THIS->normalManager != NULL );
-  return THIS->normalManager->getGLRenderAction();
+  assert( PRIVATE(this)->normalManager != NULL );
+  return PRIVATE(this)->normalManager->getGLRenderAction();
 } // getGLRenderAction()
 
 /*!
@@ -924,8 +924,8 @@ void
 So@Gui@RenderArea::setOverlayGLRenderAction(
   SoGLRenderAction * action )
 {
-  assert( THIS->overlayManager != NULL );
-  THIS->overlayManager->setGLRenderAction( action );
+  assert( PRIVATE(this)->overlayManager != NULL );
+  PRIVATE(this)->overlayManager->setGLRenderAction( action );
 } // setOverlayGLRenderAction()
 
 /*!
@@ -937,8 +937,8 @@ SoGLRenderAction *
 So@Gui@RenderArea::getOverlayGLRenderAction(
   void ) const
 {
-  assert( THIS->overlayManager != NULL );
-  return THIS->overlayManager->getGLRenderAction();
+  assert( PRIVATE(this)->overlayManager != NULL );
+  return PRIVATE(this)->overlayManager->getGLRenderAction();
 } // getOverlayGLRenderAction()
 
 /*!
@@ -964,7 +964,7 @@ void
 So@Gui@RenderArea::actualRedraw( // virtual, protected
   void )
 {
-  assert( THIS->normalManager != NULL );
+  assert( PRIVATE(this)->normalManager != NULL );
   if ( ! this->isVisible() ) return;
 #if SO@GUI@_DEBUG && 0
   if ( this->getLockLevel() == 0 ) {
@@ -973,7 +973,7 @@ So@Gui@RenderArea::actualRedraw( // virtual, protected
     assert( 0 );
   }
 #endif
-  THIS->normalManager->render( THIS->clear, THIS->clearZBuffer );
+  PRIVATE(this)->normalManager->render( PRIVATE(this)->clear, PRIVATE(this)->clearZBuffer );
 } // actualRedraw()
 
 /*!
@@ -995,7 +995,7 @@ void
 So@Gui@RenderArea::actualOverlayRedraw( // virtual, protected
   void )
 {
-  assert( THIS->overlayManager != NULL );
+  assert( PRIVATE(this)->overlayManager != NULL );
   if ( ! this->isVisible() ) return;
 #if SO@GUI@_DEBUG && 0
   if ( this->getLockLevel() == 0 ) {
@@ -1004,7 +1004,7 @@ So@Gui@RenderArea::actualOverlayRedraw( // virtual, protected
     assert( 0 );
   }
 #endif
-  THIS->overlayManager->render( THIS->clearOverlay, THIS->clearZBuffer );
+  PRIVATE(this)->overlayManager->render( PRIVATE(this)->clearOverlay, PRIVATE(this)->clearZBuffer );
 } // actualOverlayRedraw()
 
 /*!
@@ -1056,8 +1056,8 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
   // So@Gui@RenderArea::glReshape() -- looks like terrible design to
   // me. Investigate. 20001125 mortene.
 
-  assert( THIS->normalManager != NULL );
-  assert( THIS->overlayManager != NULL );
+  assert( PRIVATE(this)->normalManager != NULL );
+  assert( PRIVATE(this)->overlayManager != NULL );
 
   const SbVec2s glsize = this->getGLSize();
 
@@ -1067,11 +1067,11 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
   this->setViewportRegion( SbViewportRegion( glsize ) );
   this->setDevicesWindowSize( glsize );
 
-  THIS->normalManager->setWindowSize( glsize );
-  THIS->normalManager->setSize( glsize );
+  PRIVATE(this)->normalManager->setWindowSize( glsize );
+  PRIVATE(this)->normalManager->setSize( glsize );
 
-  THIS->overlayManager->setWindowSize( glsize );
-  THIS->overlayManager->setSize( glsize );
+  PRIVATE(this)->overlayManager->setWindowSize( glsize );
+  PRIVATE(this)->overlayManager->setSize( glsize );
 
   this->scheduleRedraw();
 } // sizeChanged()
@@ -1081,22 +1081,22 @@ void
 So@Gui@RenderArea::widgetChanged( // virtual, protected
   @WIDGET@ widget )
 {
-  THIS->normalManager->reinitialize();
-  THIS->overlayManager->reinitialize();
+  PRIVATE(this)->normalManager->reinitialize();
+  PRIVATE(this)->overlayManager->reinitialize();
   // FIXME: colorindex mode not supported yet, so this has no
   // effect. 20001121 mortene.
 #if 0
-  THIS->normalManager->setRGBMode(this->isRGBMode());
-  THIS->overlayManager->setRGBMode(this->isRGBMode());
+  PRIVATE(this)->normalManager->setRGBMode(this->isRGBMode());
+  PRIVATE(this)->overlayManager->setRGBMode(this->isRGBMode());
 #endif
 
   // FIXME: this code needs to be enabled (and rewritten to work) to
   // handle display list caching. 20001121 mortene.
 #if 0
-  SoGLRenderAction * ra = THIS->normalManager->getGLRenderAction();
+  SoGLRenderAction * ra = PRIVATE(this)->normalManager->getGLRenderAction();
   ra->setCacheContext(XXX);
   ra->setRenderingIsRemote(XXX);
-  ra = THIS->overlayManager->getGLRenderAction();
+  ra = PRIVATE(this)->overlayManager->getGLRenderAction();
   ra->setCacheContext(XXX);
   ra->setRenderingIsRemote(XXX);
 #endif
@@ -1133,8 +1133,8 @@ So@Gui@RenderArea::buildWidget( // protected
   this->setDevicesWindowSize( glsize );
 
   this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
-  THIS->normalManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
-  THIS->overlayManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  PRIVATE(this)->normalManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  PRIVATE(this)->overlayManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
 */
   return widget;
 } // buildWidget()
@@ -1211,11 +1211,11 @@ So@Gui@RenderArea::glReshape( // virtual, derived
 
   const SbVec2s glsize = this->getGLSize();
 
-  THIS->normalManager->setWindowSize( glsize );
-  THIS->normalManager->setSize( glsize );
+  PRIVATE(this)->normalManager->setWindowSize( glsize );
+  PRIVATE(this)->normalManager->setSize( glsize );
 
-  THIS->overlayManager->setWindowSize( glsize );
-  THIS->overlayManager->setSize( glsize );
+  PRIVATE(this)->overlayManager->setWindowSize( glsize );
+  PRIVATE(this)->overlayManager->setSize( glsize );
 
   this->setDevicesWindowSize( glsize );
   this->glUnlock();
@@ -1267,9 +1267,9 @@ SbBool
 So@Gui@RenderArea::processSoEvent( // virtual
   const SoEvent * const event )
 {
-  if ( THIS->overlayManager->processEvent( event ) )
+  if ( PRIVATE(this)->overlayManager->processEvent( event ) )
     return TRUE;
-  if ( THIS->normalManager->processEvent( event ) )
+  if ( PRIVATE(this)->normalManager->processEvent( event ) )
     return TRUE;
   return FALSE;
 } // processSoEvent()
@@ -1347,9 +1347,9 @@ So@Gui@RenderArea::renderCB( // static
   SoSceneManager * manager )
 {
   So@Gui@RenderArea * thisptr = (So@Gui@RenderArea *) closure;
-  if ( manager == thisptr->priv->normalManager )
+  if ( manager == PRIVATE(thisptr)->normalManager )
     thisptr->render();
-  else if ( manager == thisptr->priv->overlayManager )
+  else if ( manager == PRIVATE(thisptr)->overlayManager )
     thisptr->renderOverlay();
   else assert(0);
 
@@ -1367,9 +1367,9 @@ So@Gui@RenderArea::selection_redraw_cb( // static
   SoSelection * sel )
 {
   So@Gui@RenderArea * ra = (So@Gui@RenderArea *) closure;
-  if ( sel == ra->priv->normalSelection )
+  if ( sel == PRIVATE(ra)->normalSelection )
     ra->scheduleRedraw();
-  else if ( sel == ra->priv->overlaySelection )
+  else if ( sel == PRIVATE(ra)->overlaySelection )
     ra->scheduleOverlayRedraw();
   else
     assert( 0 && "callback on unknown SoSelection node" );
@@ -1384,7 +1384,7 @@ So@Gui@RenderArea::selection_redraw_cb( // static
 So@Gui@RenderAreaP::So@Gui@RenderAreaP(
   So@Gui@RenderArea * pub )
 {
-  THAT = pub;
+  PUBLIC(this) = pub;
 
   this->normalManager = new SoSceneManager;
   this->overlayManager = new SoSceneManager;
