@@ -19,8 +19,8 @@
 
 //  $Id$
 
-#ifndef __SOANY_FULLVIEWER_H__
-#define __SOANY_FULLVIEWER_H__
+#ifndef SOANY_FULLVIEWER_H
+#define SOANY_FULLVIEWER_H
 
 // ************************************************************************
 
@@ -31,4 +31,4 @@ public:
 
 // ************************************************************************
 
-#endif // ! __SOANY_FULLVIEWER_H__
+#endif // ! SOANY_FULLVIEWER_H

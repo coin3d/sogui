@@ -19,8 +19,8 @@
 
 //  $Id$
 
-#ifndef __SOANY_EXAMINERVIEWER_H__
-#define __SOANY_EXAMINERVIEWER_H__
+#ifndef SOANY_EXAMINERVIEWER_H
+#define SOANY_EXAMINERVIEWER_H
 
 class SoCamera;
 
@@ -35,4 +35,4 @@ public:
 
 // ************************************************************************
 
-#endif // ! __SOANY_EXAMINERVIEWER_H__
+#endif // ! SOANY_EXAMINERVIEWER_H

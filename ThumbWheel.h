@@ -19,8 +19,8 @@
 
 //  $Id$
 
-#ifndef __THUMBWHEEL_H__
-#define __THUMBWHEEL_H__
+#ifndef THUMBWHEEL_H
+#define THUMBWHEEL_H
 
 // ************************************************************************
 
@@ -105,4 +105,4 @@ private:
 
 // ************************************************************************
 
-#endif // ! __THUMBWHEEL_H__
+#endif // ! THUMBWHEEL_H

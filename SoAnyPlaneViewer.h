@@ -19,8 +19,8 @@
 
 //  $Id$
 
-#ifndef __SOANY_PLANEVIEWER_H__
-#define __SOANY_PLANEVIEWER_H__
+#ifndef SOANY_PLANEVIEWER_H
+#define SOANY_PLANEVIEWER_H
 
 class SoCamera;
 
@@ -43,4 +43,4 @@ public:
 
 // ************************************************************************
 
-#endif // ! __SOANY_PLANEVIEWER_H__
+#endif // ! SOANY_PLANEVIEWER_H
