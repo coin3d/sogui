@@ -2706,6 +2706,24 @@ So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
     assert(FALSE); break;
   }
 
+  // Set or unset complexity textureQuality override (the value of the
+  // override-field is always 0.0, ie signalling "textures off").
+  switch (style) {
+  case So@Gui@Viewer::VIEW_HIDDEN_LINE:
+  case So@Gui@Viewer::VIEW_NO_TEXTURE:
+  case So@Gui@Viewer::VIEW_LINE:
+  case So@Gui@Viewer::VIEW_POINT:
+  case So@Gui@Viewer::VIEW_BBOX:
+  case So@Gui@Viewer::VIEW_LOW_RES_LINE:
+  case So@Gui@Viewer::VIEW_LOW_RES_POINT:
+    this->socomplexity->textureQuality.setIgnored(FALSE); // textures off
+    break;
+
+  default:
+    this->socomplexity->textureQuality.setIgnored(TRUE); // don't override
+    break;
+  }
+
   // Set or unset complexity type override.
   switch (style) {
   case So@Gui@Viewer::VIEW_NO_TEXTURE:
