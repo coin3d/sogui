@@ -52,7 +52,7 @@ SoAnyExaminerViewer::rotXWheelMotion(
   SbVec3f focalpoint = camera->position.getValue() +
     camera->focalDistance.getValue() * dir;
 
-  camera->orientation = SbRotation( SbVec3f( 1, 0, 0 ), value - oldvalue ) *
+  camera->orientation = SbRotation( SbVec3f( -1, 0, 0 ), value - oldvalue ) *
     camera->orientation.getValue();
 
   camera->orientation.getValue().multVec( SbVec3f(0, 0, -1), dir );
