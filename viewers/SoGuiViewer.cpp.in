@@ -198,7 +198,6 @@ static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
 // *************************************************************************
 
-#ifndef DOXYGEN_SKIP_THIS
 // The private data for the So@Gui@Viewer.
 class So@Gui@ViewerP {
 public:
@@ -267,7 +266,7 @@ public:
   float stereooffset;
   So@Gui@Viewer::StereoType stereotype;
   SbBool stereoanaglyphmask[2][3];
-  SbVec2s stereostencilmasksize;
+  SbViewportRegion stereostencilmaskvp;
   GLubyte * stereostencilmask;
   enum StencilType { ROWS, COLUMNS, NONE };
   So@Gui@Viewer::StereoType stereostenciltype;
@@ -351,7 +350,7 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
 
   this->stereotype = So@Gui@Viewer::STEREO_NONE;
   this->stereotypesetexplicit = FALSE;
-  this->stereostencilmasksize = SbVec2s(0, 0);
+  this->stereostencilmaskvp = SbViewportRegion(0, 0);
   this->stereostencilmask = NULL;
   this->stereostenciltype = So@Gui@Viewer::STEREO_NONE;
   this->stereoanaglyphmask[0][0] = TRUE;
@@ -1481,8 +1480,6 @@ So@Gui@ViewerP::recordFPS(const double rendertime)
     Draw2DString(buffer, PUBLIC(this)->getGLSize(), SbVec2f(10, 10));
   }
 }
-
-#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
 
@@ -3178,7 +3175,6 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   return TRUE;
 }
 
-#ifndef DOXYGEN_SKIP_THIS
 void
 So@Gui@ViewerP::setStereoEye(SoCamera * thecamera,
                              const So@Gui@ViewerP::Eye eye,
@@ -3253,41 +3249,49 @@ So@Gui@ViewerP::setStereoEye(SoCamera * thecamera,
 void
 So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
 {
+  const SbViewportRegion & currentvp = PUBLIC(this)->getViewportRegion();
+  if (this->stereostencilmaskvp == currentvp) { return; } // the common case
+
   So@Gui@Viewer::StereoType s = PUBLIC(this)->getStereoType();
   assert((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) ||
          (s == So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS));
 
   // Find out whether or not we need to regenerate the mask data.
   SbBool allocnewmask = (this->stereostencilmask == NULL);
-  const SbVec2s glsize = PUBLIC(this)->getGLSize();
+
+  const SbVec2s neworigin = currentvp.getViewportOriginPixels();
+  const SbVec2s newsize = currentvp.getViewportSizePixels();
+
+  const SbVec2s oldorigin = this->stereostencilmaskvp.getViewportOriginPixels();
+  const SbVec2s oldsize = this->stereostencilmaskvp.getViewportSizePixels();
+
   allocnewmask = allocnewmask ||
-    ((this->stereostencilmasksize[0] + 7) / 8 * this->stereostencilmasksize[1]) <
-    ((glsize[0] + 7) / 8 * glsize[1]);
+    ((oldsize[0] + 7) / 8 * oldsize[1]) < ((newsize[0] + 7) / 8 * newsize[1]);
 
-  SbBool fillmask = allocnewmask ||
-    (this->stereostenciltype != s) ||
-    ((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) && 
-     (this->stereostencilmasksize[0] != glsize[0]));
+  const SbBool fillmask = allocnewmask || (this->stereostenciltype != s) ||
+    ((s == So@Gui@Viewer::STEREO_INTERLEAVED_ROWS) && (oldsize[0] != newsize[0]));
 
+  const SbBool layoutchange = (this->stereostencilmaskvp != currentvp);
 
-  const short bytewidth = (glsize[0] + 7) / 8;
+  const short bytewidth = (newsize[0] + 7) / 8;
 
   if (allocnewmask) {
     delete[] this->stereostencilmask;
-    this->stereostencilmask = new GLubyte[bytewidth * glsize[1]];
-    this->stereostencilmasksize = glsize;
+    this->stereostencilmask = new GLubyte[bytewidth * newsize[1]];
   }
+
+  this->stereostencilmaskvp = currentvp;
 
   if (fillmask) {
     GLubyte * mask = this->stereostencilmask;
 
     if (s == So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS) {
       // alternating columns of 0's and 1's
-      (void)memset(mask, 0x55, bytewidth * glsize[1]);
+      (void)memset(mask, 0x55, bytewidth * newsize[1]);
     }
     else {
       // alternating rows of 0's and 1's
-      for (short h=0; h < glsize[1]; h++) {
+      for (short h=0; h < newsize[1]; h++) {
         const GLubyte fill = (h % 2) ? 0xff : 0x00;
         (void)memset(mask + (h * bytewidth), fill, bytewidth);
       }
@@ -3296,36 +3300,41 @@ So@Gui@ViewerP::initStencilBufferForInterleavedStereo(void)
     this->stereostenciltype = s;
   }
 
-  // FIXME: should we fill in the stencil buffer more often?
-  // 20040618 mortene.
+  if (layoutchange) {
+    glClearStencil(0x0);
 
-  if (!fillmask) { return; }
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_ALWAYS, GL_REPLACE, GL_REPLACE);
 
-  glClearStencil(0x0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
 
-  glClear(GL_STENCIL_BUFFER_BIT);
-  glStencilFunc(GL_ALWAYS, GL_REPLACE, GL_REPLACE);
+    glViewport(neworigin[0], neworigin[1], newsize[0], newsize[1]);
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0, glsize[0], 0, glsize[1], -1.0f, 1.0f);
+    glOrtho(0, newsize[0], 0, newsize[1], -1.0f, 1.0f);
 
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-  glRasterPos2f(0, 0);
-  glDrawPixels(glsize[0], glsize[1], GL_STENCIL_INDEX, GL_BITMAP,
-               this->stereostencilmask);
+    // FIXME: I've noticed a problem with this approach. If there is
+    // something in the window system obscuring part of the canvas
+    // while this is called (as could e.g. happen with a size
+    // indicator, as with the Sawfish window manager), the stencil
+    // mask will not be set up for that part. 20041019 mortene.
 
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
+    glRasterPos2f(0, 0);
+    glDrawPixels(newsize[0], newsize[1], GL_STENCIL_INDEX, GL_BITMAP,
+                 this->stereostencilmask);
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+  }
 }
-#endif // DOXYGEN_SKIP_THIS
 
 // Documented in superclass. Overridden from parent class to be able
 // to do the necessary two-pass rendering e.g. if the drawing style is
