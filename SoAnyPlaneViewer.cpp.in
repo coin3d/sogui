@@ -358,7 +358,7 @@ SoAnyPlaneViewer::drawRotateGraphics(
 
 SbBool
 SoAnyPlaneViewer::processSoEvent(
-  SoEvent * const event )
+  const SoEvent * const event )
 {
   return FALSE;
 } // processSoEvent()

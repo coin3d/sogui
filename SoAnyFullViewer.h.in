@@ -112,7 +112,7 @@ public:
   void menuSelection( int menuitemid );
   static void menuSelectionCallback( int menuitemid, void * userdata );
 
-  SbBool processSoEvent( SoEvent * const event );
+  SbBool processSoEvent( const SoEvent * const event );
 
 private:
   So@Gui@FullViewer * const viewer;

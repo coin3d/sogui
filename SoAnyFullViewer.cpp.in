@@ -31,6 +31,8 @@ static const char rcsid[] =
 */
 
 #include <Inventor/errors/SoDebugError.h>
+#include <Inventor/events/SoMouseButtonEvent.h>
+#include <Inventor/events/SoKeyboardEvent.h>
 
 #include <Inventor/@Gui@/So@Gui@Component.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
@@ -38,6 +40,9 @@ static const char rcsid[] =
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 
 #include <assert.h>
+
+#define MOUSEBUTTON_EVENT  SoMouseButtonEvent::getClassTypeId()
+#define KEYBOARD_EVENT     SoKeyboardEvent::getClassTypeId()
 
 // ************************************************************************
 
@@ -674,8 +679,46 @@ SoAnyFullViewer::drawstyleActivated(
 
 SbBool
 SoAnyFullViewer::processSoEvent(
-  SoEvent * const event )
+  const SoEvent * const ev )
 {
+  if ( ! viewer->isViewing() ) // scene event
+    return FALSE;
+
+  const SoType type( ev->getTypeId() );
+
+  if ( type.isDerivedFrom( MOUSEBUTTON_EVENT ) ) {
+    SoMouseButtonEvent * const event = (SoMouseButtonEvent *) ev;
+    const int button = event->getButton();
+    if ( (button == SoMouseButtonEvent::BUTTON1) &&
+         viewer->isSeekMode() ) {
+      if ( event->getState() == SoButtonEvent::DOWN )
+        viewer->seekToPoint( event->getPosition() );
+      return TRUE;
+    }
+    if ( (button == SoMouseButtonEvent::BUTTON2) ) {
+      if ( event->getState() == SoButtonEvent::DOWN )
+        viewer->openPopupMenu( event->getPosition() );
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  if ( type.isDerivedFrom( KEYBOARD_EVENT ) ) {
+    SoKeyboardEvent * const event = (SoKeyboardEvent *) ev;
+    if ( event->getState() == SoButtonEvent::DOWN ) {
+      if ( event->getKey() == SoKeyboardEvent::S ) {
+        viewer->setSeekMode( viewer->isSeekMode() ? FALSE : TRUE );
+        return TRUE;
+      }
+      return FALSE;
+    }
+    if ( event->getState() == SoButtonEvent::UP ) {
+      if ( event->getKey() == SoKeyboardEvent::S ) return TRUE;
+      return FALSE;
+    }
+    return FALSE;
+  }
+
   return FALSE;
 } // processSoEvent()
 

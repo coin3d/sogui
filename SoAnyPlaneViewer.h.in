@@ -58,7 +58,7 @@ public:
   void viewPlaneY( SoCamera * const camera );
   void viewPlaneZ( SoCamera * const camera );
 
-  SbBool processSoEvent( SoEvent * const event );
+  SbBool processSoEvent( const SoEvent * const event );
 
 private:
   So@Gui@PlaneViewer * const viewer;

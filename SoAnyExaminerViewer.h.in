@@ -23,11 +23,13 @@
 #ifndef SOANY_EXAMINERVIEWER_H
 #define SOANY_EXAMINERVIEWER_H
 
-class SoCamera;
-class SoTimerSensor;
+#include <Inventor/SbTime.h>
+
 class SbRotation;
 class SbSphereSheetProjector;
+class SbSpherePlaneProjector;
 class SoEvent;
+class SoCamera;
 
 class So@Gui@ExaminerViewer;
 
@@ -52,7 +54,12 @@ public:
   void setFeedbackSize( const int size );
   int getFeedbackSize(void) const;
 
-  SbBool processSoEvent( SoEvent * const event );
+  SbBool processSoEvent( const SoEvent * const event );
+
+  void actualRedraw(void);
+
+  void setMotion3OnCamera( SbBool enable );
+  SbBool getMotion3OnCamera(void) const;
 
 protected:
   float rotXWheelMotion( float value, float old );
@@ -60,9 +67,9 @@ protected:
 
   void reorientCamera( const SbRotation & rotation );
   void spin( const SbVec2f & mousepos );
-  void pan( const SbVec2f & mousepos );
+  void pan( const SbVec2f & mousepos, const SbVec2f & prevpos );
   void zoom( const float diffvalue );
-  void zoomByCursor( const SbVec2f & mousepos );
+  void zoomByCursor( const SbVec2f & mousepos, const SbVec2f & prevpos );
 
   SbVec2f lastmouseposition;
   SbPlane panningplane;
@@ -72,11 +79,9 @@ protected:
   SbVec2f lastspinposition;
   int spinsamplecounter;
   SbRotation spinincrement;
-  SoTimerSensor * spintimertrigger;
   SbSphereSheetProjector * spinprojector;
 
-  void spintimertriggeredCallback( SoSensor * sensor );
-  static void spintimertriggeredCB( void * data, SoSensor * sensor );
+  SbRotation spinRotation;
 
   SbBool axiscrossEnabled;
   int axiscrossSize;
@@ -84,7 +89,36 @@ protected:
   void drawAxisCross(void);
   static void drawArrow(void);
 
+  struct { // tracking mouse movement in a log
+    short size;
+    short historysize;
+    SbVec2s * position;
+    SbTime * time;
+  } log;
+
+  SbBool button1Down;
+  SbBool button2Down;
+  SbBool controlDown;
+
+  void clearLog(void);
+  void addToLog( const SbVec2s position );
+
+  SbTime prevRedrawTime;
+
+  SbBool motion3OnCamera;
+
 private:
+  enum ViewerMode {
+    IDLE,
+    INTERACT,
+    EXAMINE,
+    DRAGGING,
+    WAITING_FOR_SEEK,
+    ZOOMING,
+    WAITING_FOR_PAN,
+    PANNING
+  } mode;
+
   So@Gui@ExaminerViewer * const viewer;
 
 }; // class SoAnyExaminerViewer

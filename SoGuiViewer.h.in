@@ -218,6 +218,7 @@ protected:
   SbBool seekToPoint( const SbVec2s screenpos );
 
   virtual void actualRedraw(void);
+  virtual SbBool processSoEvent( const SoEvent * const event );
   SbBool processCommonEvents( @EVENT@ event );
 
   void interactiveCountInc(void);

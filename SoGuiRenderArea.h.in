@@ -148,6 +148,7 @@ protected:
   virtual void redrawOverlay(void);
   virtual void actualOverlayRedraw(void);
 
+  virtual SbBool processSoEvent( const SoEvent * const event );
   virtual void processEvent( @EVENT@ event );
   virtual void initGraphic(void);
   virtual void initOverlayGraphic(void);
@@ -172,8 +173,12 @@ protected:
   virtual void glReshape( int width, int height );
   virtual void glRender(void);
 
+  SoEvent * getSoEvent( @EVENT@ event );
+
 private:
   void constructor( SbBool mouseInput, SbBool keyboardInput, SbBool build );
+  void setDevicesWindowSize( const SbVec2s size );
+
   static void renderCB( void * user, SoSceneManager * manager );
 
   SbBool clear;

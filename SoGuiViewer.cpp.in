@@ -92,9 +92,11 @@ static const char rcsid[] =
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoCallbackList.h>
 #include <Inventor/sensors/SoTimerSensor.h>
+#include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/SoSceneManager.h>
 #include <Inventor/SoPickedPoint.h>
 
+#include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
 
 #ifndef M_PI
@@ -553,8 +555,7 @@ So@Gui@Viewer::setCameraType(SoType t)
           2.0f * atan( oldocam->height.getValue() / 2.0f / focaldist );
       else
         newpcam->heightAngle = 0.0f;
-    }
-    else {
+    } else {
       newocam = (SoOrthographicCamera *)newcamera;
       oldpcam = (SoPerspectiveCamera *)this->camera;
       newocam->height =
@@ -567,9 +568,9 @@ So@Gui@Viewer::setCameraType(SoType t)
     SoCamera * oldcamera = !this->deletecamera ? this->camera : NULL;
     this->setCamera( newcamera ); // This will set this->cameratype.
     this->deletecamera = TRUE;
-    if ( oldcamera ) cameraparent->removeChild( oldcamera );
-  }
-  else { // A camera has not been instantiated for the scene.
+    if ( oldcamera )
+      cameraparent->removeChild( oldcamera );
+  } else { // A camera has not been instantiated for the scene.
     this->cameratype = t; // No call to setCamera(), so set type explicitly.
   }
 } // setCameraType()
@@ -1648,15 +1649,15 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 
   SoPickedPoint * picked = rpaction.getPickedPoint();
   if (!picked) {
-    this->setSeekMode(FALSE);
+//    this->setSeekMode(FALSE);
     return FALSE;
   }
+//  this->setSeekMode(TRUE);
 
   SbVec3f hitpoint;
   if (this->seektopoint) {
     hitpoint = picked->getPoint();
-  }
-  else {
+  } else {
     SoGetBoundingBoxAction bbaction(this->getViewportRegion());
     bbaction.apply(picked->getPath());
     SbBox3f bbox = bbaction.getBoundingBox();
@@ -1674,11 +1675,14 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
   this->camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
   this->cameraendposition = hitpoint - fd * dir;
 
-  if (!this->seeksensor->isScheduled()) {
-    this->seeksensor->setBaseTime(SbTime::getTimeOfDay());
-    this->seeksensor->schedule();
-    this->interactiveCountInc();
+  if (this->seeksensor->isScheduled()) {
+    this->seeksensor->unschedule();
+    this->interactiveCountDec();
   }
+
+  this->seeksensor->setBaseTime(SbTime::getTimeOfDay());
+  this->seeksensor->schedule();
+  this->interactiveCountInc();
 
   return TRUE;
 } // seeekToPoint()
@@ -2368,7 +2372,7 @@ So@Gui@Viewer::seeksensorCB(void * data, SoSensor * s)
   if ((t > 1.0f) || (t + sensor->getInterval().getValue() > 1.0f)) t = 1.0f;
   SbBool end = (t == 1.0f);
 
-  t = 0.5f - cos(M_PI * t) * 0.5f;
+//  t = 0.5f - cos(M_PI * t) * 0.5f;
   thisp->camera->position = thisp->camerastartposition +
     (thisp->cameraendposition - thisp->camerastartposition) * t;
 
@@ -2387,6 +2391,90 @@ So@Gui@Viewer::sizeChanged(
 {
   inherited::sizeChanged( size );
 } // sizeChanged()
+
+// *************************************************************************
+
+/*!
+*/
+
+SbBool
+So@Gui@Viewer::processSoEvent( // virtual
+  const SoEvent * const event )
+{
+  if ( ! this->isViewing() )
+    return inherited::processSoEvent(event);
+
+  const SoType type( event->getTypeId() );
+
+  if ( type.isDerivedFrom( SoKeyboardEvent::getClassTypeId() ) ) {
+    do {
+      SoKeyboardEvent * const keyevent = (SoKeyboardEvent *) event;
+
+      if ( keyevent->getState() != SoButtonEvent::DOWN )
+        break;
+
+      // key events for both view and interact mode
+
+      switch ( keyevent->getKey() ) {
+      case SoKeyboardEvent::ESCAPE:
+        this->setViewing( this->isViewing() ? FALSE : TRUE );
+        return TRUE;
+      default:
+        break;
+      } // switch ( keyevent->getKey() )
+
+      if ( ! this->isViewing() )
+        break;
+
+      // key events just for the view mode
+
+      switch ( keyevent->getKey() ) {
+      case SoKeyboardEvent::S:
+        this->setSeekMode( this->isSeekMode() ? FALSE : TRUE );
+        return TRUE;
+      case SoKeyboardEvent::Q:
+        this->hide();
+        So@Gui@::exitMainLoop();
+        return TRUE;
+      case SoKeyboardEvent::HOME:
+        this->resetToHomePosition();
+        return TRUE;
+      case SoKeyboardEvent::LEFT_ARROW:
+        this->moveCameraScreen( SbVec2f( -0.1f, 0.0f ) );
+        return TRUE;
+      case SoKeyboardEvent::UP_ARROW:
+        this->moveCameraScreen( SbVec2f( 0.0f, 0.1f ) );
+        return TRUE;
+      case SoKeyboardEvent::RIGHT_ARROW:
+        this->moveCameraScreen( SbVec2f( 0.1f, 0.0f ) );
+        return TRUE;
+      case SoKeyboardEvent::DOWN_ARROW:
+        this->moveCameraScreen( SbVec2f( 0.0f, -0.1f ) );
+        return TRUE;
+      default:
+        break;
+      } // switch ( keyevent->getKey() )
+    } while ( FALSE );
+  }
+
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+/*!
+  This method is obsoleted.
+*/
+
+SbBool
+So@Gui@Viewer::processCommonEvents(
+  @EVENT@ event )
+{
+  if ( this->invokeAppCB( event ) )
+    return TRUE;
+
+  return FALSE;
+} // processCommonEvents()
 
 // *************************************************************************
 

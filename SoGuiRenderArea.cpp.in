@@ -906,24 +906,24 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
 
   const SbVec2s glsize = this->getGLSize();
 
+  if ( glsize[0] <= 0 || glsize[1] <= 0 ) 
+    return;
+
+#if SOXT_DEBUG && 0
+  SoDebugError::postInfo( "So@Gui@RenderArea::sizeChanged", "invoked" );
+#endif // SOXT_DEBUG
+
   this->normalManager->setWindowSize( glsize );
   this->normalManager->setSize( glsize );
-//  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
-//  this->normalManager->scheduleRedraw();
+  this->normalManager->setViewportRegion( SbViewportRegion( glsize ) );
+  this->normalManager->scheduleRedraw();
 
   this->overlayManager->setWindowSize( glsize );
   this->overlayManager->setSize( glsize );
-//  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
-//  this->overlayManager->scheduleRedraw();
+  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
+  this->overlayManager->scheduleRedraw();
 
-  if ( this->devices.mouse != NULL )
-    this->devices.mouse->setWindowSize( glsize );
-  if ( this->devices.keyboard != NULL )
-    this->devices.keyboard->setWindowSize( glsize );
-  if ( this->devices.extra != NULL ) {
-    for ( int i = 0; i < this->devices.extra->getLength(); i++ )
-      ((So@Gui@Device *)((*(this->devices.extra))[i]))->setWindowSize( glsize );
-  }
+  this->setDevicesWindowSize( glsize );
 } // sizeChanged()
 
 /*!
@@ -955,8 +955,16 @@ So@Gui@RenderArea::buildWidget( // protected
     }
   }
   const SbVec2s glsize = this->getGLSize();
-  if ( glsize[0] != -1 )
-    this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  if ( glsize[0] <= 0 || glsize[1] <= 0 )
+    return widget;
+
+/*
+  this->setDevicesWindowSize( glsize );
+
+  this->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  this->normalManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+  this->overlayManager->setViewportRegion( SbViewportRegion( glsize[0], glsize[1] ) );
+*/
   return widget;
 } // buildWidget()
 
@@ -1054,14 +1062,7 @@ So@Gui@RenderArea::glReshape( // virtual, derived
 //  this->overlayManager->setViewportRegion( SbViewportRegion( glsize ) );
 //  this->overlayManager->scheduleRedraw();
 
-  if ( this->devices.mouse != NULL )
-    this->devices.mouse->setWindowSize( glsize );
-  if ( this->devices.keyboard != NULL )
-    this->devices.keyboard->setWindowSize( glsize );
-  if ( this->devices.extra != NULL ) {
-    for ( int i = 0; i < this->devices.extra->getLength(); i++ )
-      ((So@Gui@Device *)((*(this->devices.extra))[i]))->setWindowSize( glsize );
-  }
+  this->setDevicesWindowSize( glsize );
   this->glUnlock();
   // call widgetChanged() or something?
   this->actualRedraw();
@@ -1092,6 +1093,93 @@ So@Gui@RenderArea::glInit( // virtual, derived
   inherited::glInit();
 
 } // glInit()
+
+// *************************************************************************
+
+/*!
+*/
+
+SbBool
+So@Gui@RenderArea::processSoEvent( // virtual
+  const SoEvent * const event )
+{
+  if ( this->overlayManager->processEvent( event ) )
+    return TRUE;
+  if ( this->normalManager->processEvent( event ) )
+    return TRUE;
+  return FALSE;
+} // processSoEvent()
+
+// *************************************************************************
+
+/*!
+*/
+
+void
+So@Gui@RenderArea::processEvent( // virtual, protected
+  @EVENT@ event )
+{
+  if ( this->invokeAppCB( event ) )
+    return;
+
+  const SoEvent * soevent = getSoEvent( event );
+
+  if ( soevent == (SoEvent *) NULL ||
+       ! this->processSoEvent(soevent) )
+    inherited::processEvent( event );
+} // processEvent()
+
+// *************************************************************************
+
+/*!
+  This method returns an SoEvent * corresponding to the given \a event, or
+  NULL if there are none.
+*/
+
+SoEvent *
+So@Gui@RenderArea::getSoEvent(
+  @EVENT@ event )
+{
+  SoEvent * soevent = NULL;
+
+  if ( this->devices.extra ) {
+    const int numDevices = this->devices.extra->getLength();
+    for ( int i = 0; (i < numDevices) && (soevent == NULL); i++ )
+      soevent =
+        ((So@Gui@Device *)(*this->devices.extra)[i])->translateEvent( event );
+    if ( soevent != NULL )
+      return soevent;
+  }
+  if ( this->devices.mouse != NULL &&
+       (soevent = this->devices.mouse->translateEvent( event )) != NULL )
+    return soevent;
+  if ( this->devices.keyboard != NULL &&
+       (soevent = this->devices.keyboard->translateEvent( event )) != NULL )
+    return soevent;
+
+  return (SoEvent *) NULL;
+} // getSoEvent()
+
+// *************************************************************************
+
+/*!
+  This method sets the window size data in all the connected device classes.
+*/
+
+void
+So@Gui@RenderArea::setDevicesWindowSize(
+  const SbVec2s size )
+{
+  if ( this->devices.extra != NULL ) {
+    const int num = this->devices.extra->getLength();
+    for ( int i = 0; i < num; i++ )
+      ((So@Gui@Device *)(*this->devices.extra)[i])->setWindowSize( size );
+  }
+  if ( this->devices.mouse != NULL )
+    this->devices.mouse->setWindowSize( size );
+  if ( this->devices.keyboard != NULL )
+    this->devices.keyboard->setWindowSize( size );
+} // setDevicesWindowSize()
 
 // *************************************************************************
 
