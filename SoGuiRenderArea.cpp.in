@@ -194,18 +194,22 @@ So@Gui@RenderArea::constructor( // private
   THIS->overlayManager->activate();
   THIS->overlayManager->getGLRenderAction()->setCacheContext(1);
 
-  this->deviceList = (SbPList *) NULL;
+  this->deviceList = new SbPList ;
   this->appEventHandler = NULL;
   this->appEventHandlerData = NULL;
 
   if ( mouseInput ) {
     THIS->devices.mouse = new So@Gui@Mouse;
-    this->registerDevice( THIS->devices.mouse );
+    // FIXME: this does not work
+    // this->registerDevice( THIS->devices.mouse );
+    this->deviceList->append( THIS->devices.mouse );
   }
 
   if ( keyboardInput ) {
     THIS->devices.keyboard = new So@Gui@Keyboard;
-    this->registerDevice( THIS->devices.keyboard );
+    // FIXME: this does not work
+    // this->registerDevice( THIS->devices.keyboard );
+    this->deviceList->append( THIS->devices.keyboard );
   }
 
   if ( ! build ) return;
@@ -306,11 +310,14 @@ void
 So@Gui@RenderArea::registerDevice(
   So@Gui@Device * device )
 {
-  if ( ! this->deviceList )
-    this->deviceList = new SbPList;
-  this->deviceList->append( device );
+  int idx = deviceList->find(device);
+  if (idx == -1)
+    deviceList->append(device);
+
   device->setWindowSize( this->getGLSize() );
-  device->enable( this->getGLWidget(), NULL, NULL );
+  if (idx == -1)
+    device->enable( this->getGLWidget(), 
+      &So@Gui@GLWidget::eventHandler, (void*) this );
 } // registerDevice()
 
 /*!
@@ -1115,7 +1122,7 @@ So@Gui@RenderArea::buildWidget( // protected
     for ( int i = 0; i < num; i++ ) {
       So@Gui@Device * device = (So@Gui@Device *) (*this->deviceList)[i];
       device->enable( this->getGLWidget(),
-        (So@Gui@EventHandlerPtr) inherited::eventHandler, (void *) this );
+        &inherited::eventHandler, (void *) this );
     }
   }
   const SbVec2s glsize = this->getGLSize();
