@@ -1010,6 +1010,7 @@ So@Gui@Viewer::setStereoViewing( // virtual
   SbBool enable )
 {
   this->stereoviewing = enable;
+  this->scheduleRedraw();
 } // setStereoViewing()
 
 // *************************************************************************
@@ -1046,6 +1047,7 @@ So@Gui@Viewer::setStereoOffset( // virtual
   const float dist )
 {
   this->stereooffset = dist;
+  this->scheduleRedraw();
 } // setStereoOffset()
 
 /*!

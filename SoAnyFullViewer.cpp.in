@@ -426,7 +426,6 @@ SoAnyFullViewer::menuSelection( // virtual
   case STEREO_ANAGLYPH_ITEM:
     this->prefmenu->SetMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
     this->viewer->setStereoViewing(TRUE);
-    this->viewer->scheduleRedraw();
     break;
     
   default:
