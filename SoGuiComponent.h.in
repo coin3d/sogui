@@ -51,7 +51,7 @@ class SO@GUI@_DLL_API So@Gui@Component : public So@Gui@Object {
   @COMPONENTHEADER@
 
 public:
-  virtual ~So@Gui@Component(void);
+  virtual ~So@Gui@Component();
 
   virtual void show(void);
   virtual void hide(void);
@@ -69,19 +69,6 @@ public:
   @WIDGET@ getBaseWidget(void) const;
   @WIDGET@ getShellWidget(void) const;
   @WIDGET@ getParentWidget(void) const;
-
-#ifdef __COIN_SOWIN__
-  HWND setFocusProxy(HWND widget);
-  HWND getFocusProxy(void);
-#endif // __COIN_SOWIN__
-#ifdef __COIN_SOXT__
-  Display * getDisplay(void);
-  void fitSize(const SbVec2s size);
-  // FIXME: I guess these should really be part of the common
-  // API. 20011012 mortene.
-  void addWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
-  void removeWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
-#endif // __COIN_SOXT__
 
   void setSize(const SbVec2s size);
   SbVec2s getSize(void) const;
@@ -110,30 +97,6 @@ protected:
   void setClassName(const char * const name);
   void setBaseWidget(@WIDGET@ widget);
 
-#ifdef __COIN_SOWIN__
-  HWND buildFormWidget(HWND parent);
-  virtual void windowCloseAction(void);
-  void setResize(SbBool set);
-  SbBool getResize(void);
-  SbBool realized;
-#endif // __COIN_SOWIN__
-#ifdef __COIN_SOXT__
-  // FIXME: I guess this should perhaps be part of the common API?
-  // 20011012 mortene.
-  virtual void windowCloseAction(void);
-  void invokeVisibilityChangeCallbacks(const SbBool enable) const;
-  void invokeWindowCloseCallbacks(void) const;
-
-  // FIXME: get rid of these two? 20011012 mortene.
-  static char * getlabel(unsigned int what);
-  SbBool firstRealize;
-
-  // FIXME: should this really be protected? Same goes for the other
-  // toolkits' eventHandler() functions. They also have nameclashes
-  // with the static So*GLWidget::eventHandler() function. 20011024 mortene.
-  virtual Boolean sysEventHandler(Widget widget, XEvent * event);
-#endif // __COIN_SOXT__
-
   void registerWidget(@WIDGET@ widget);
   void unregisterWidget(@WIDGET@ widget);
 
@@ -148,32 +111,68 @@ protected:
   void removeVisibilityChangeCallback(So@Gui@ComponentVisibilityCB * const func,
                                       void * const user = NULL);
 
+private:
+  class So@Gui@ComponentP * pimpl;
+  friend class SoGuiComponentP;
+  friend class So@Gui@ComponentP;
+
+  // FIXME: get rid of remaining toolkit specifics below. 20020611 mortene.
+
 #ifdef __COIN_SOQT__
+protected:
   virtual bool eventFilter(QObject * obj, QEvent * e);
-#endif // __COIN_SOQT__
 
-#ifdef __COIN_SOGTK__
-  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
-#endif // __COIN_SOGTK__
-
-
-#ifdef __COIN_SOQT__
 private slots:
   void widgetClosed(void);
 #endif // __COIN_SOQT__
 
-private:
-  class So@Gui@ComponentP * pimpl;
-  // FIXME: get rid of this? Possibly used by SoGtkComponent and
-  // SoWinComponent. 20011012 mortene.
-  friend class So@Gui@ComponentP;
+
+#ifdef __COIN_SOWIN__
+public:
+  HWND setFocusProxy(HWND widget);
+  HWND getFocusProxy(void);
+
+protected:
+  HWND buildFormWidget(HWND parent);
+  virtual void windowCloseAction(void);
+  void setResize(SbBool set);
+  SbBool getResize(void);
+#endif // __COIN_SOWIN__
 
 #ifdef __COIN_SOXT__
+public:
+  Display * getDisplay(void);
+  void fitSize(const SbVec2s size);
+  // FIXME: I guess these should really be part of the common
+  // API. 20011012 mortene.
+  void addWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
+  void removeWindowCloseCallback(SoXtComponentCB * callback, void * closure = NULL);
+
+protected:
+  // FIXME: I guess this should perhaps be part of the common API?
+  // 20011012 mortene.
+  virtual void windowCloseAction(void);
+  void invokeVisibilityChangeCallbacks(const SbBool enable) const;
+  void invokeWindowCloseCallbacks(void) const;
+
+  // FIXME: get rid of these two? 20011012 mortene.
+  static char * getlabel(unsigned int what);
+  SbBool firstRealize;
+
+  // FIXME: should this really be protected? Same goes for the other
+  // toolkits' eventHandler() functions. They also have nameclashes
+  // with the static So*GLWidget::eventHandler() function. 20011024 mortene.
+  virtual Boolean sysEventHandler(Widget widget, XEvent * event);
+
+private:
   // FIXME: get rid of this? 20011012 mortene.
   static void event_handler(Widget, XtPointer, XEvent *, Boolean *);
 #endif // __COIN_SOXT__
 
 #ifdef __COIN_SOGTK__
+protected:
+  virtual SbBool eventFilter(GtkWidget * object, GdkEvent * event);
+private:
   static gint eventHandler(GtkWidget * object, GdkEvent * event, gpointer closure);
 #endif // __COIN_SOGTK__
 };
