@@ -298,6 +298,8 @@ So@Gui@RenderArea::setSceneGraph( // virtual
 /*!
   This method returns a reference to the scene graph root node as set
   by the user.
+
+  \sa So@Gui@RenderArea::getSceneManager()
 */
 SoNode *
 So@Gui@RenderArea::getSceneGraph( // virtual
@@ -908,8 +910,21 @@ So@Gui@RenderArea::setSceneManager(
 
 /*!
   This method returns the normal scene SoSceneManager object.
-*/
 
+  Having a reference to the SoSceneManager instance is useful for
+  getting at the \e real root node of the rendering scenegraph,
+  including camera, headlight and miscellaneous drawstyle nodes.  The
+  getSceneGraph() method will only return the \e user scenegrah for
+  So@Gui@RenderArea subclass So@Gui@Viewer and further subclasses. The
+  reason this is not always what you want is because certain actions
+  (like the SoRayPickAction) needs to traverse a valid camera if it
+  should work as expected.
+
+  If you need to get a pointer to the \e real root node use this
+  method to get the SoSceneManager instance reference used by the
+  So@Gui@RenderArea, then use SoSceneManager::getSceneGraph() to get
+  the root node Coin uses for rendering.
+*/
 SoSceneManager *
 So@Gui@RenderArea::getSceneManager(
   void ) const
