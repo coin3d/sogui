@@ -99,7 +99,8 @@ public:
     VIEW_BBOX,
     VIEW_LOW_RES_LINE,
     VIEW_LOW_RES_POINT,
-    VIEW_SAME_AS_STILL
+    VIEW_SAME_AS_STILL,
+    VIEW_WIREFRAME_OVERLAY
   };
 
   enum DrawType {

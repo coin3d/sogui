@@ -138,6 +138,8 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->setMenuItemTitle( AS_IS_ITEM, _( "as is" ) );
   menu->newMenuItem( "hidden_line", HIDDEN_LINE_ITEM );
   menu->setMenuItemTitle( HIDDEN_LINE_ITEM, _( "hidden line" ) );
+  menu->newMenuItem( "wireframe_overlay", WIREFRAME_OVERLAY_ITEM );
+  menu->setMenuItemTitle( WIREFRAME_OVERLAY_ITEM, _( "wireframe overlay" ) );
   menu->newMenuItem( "no_textures", NO_TEXTURE_ITEM );
   menu->setMenuItemTitle( NO_TEXTURE_ITEM, _( "no texture" ) );
   menu->newMenuItem( "low_resolution", LOW_RESOLUTION_ITEM );
@@ -152,6 +154,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
   menu->newRadioGroup( STILL_GROUP );
   menu->addRadioGroupItem( STILL_GROUP, AS_IS_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, HIDDEN_LINE_ITEM );
+  menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_OVERLAY_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, NO_TEXTURE_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, LOW_RESOLUTION_ITEM );
   menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_ITEM );
@@ -160,6 +163,7 @@ SoAnyFullViewer::setupStandardPopupMenu(
 
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, AS_IS_ITEM );
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM );
+  menu->addMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_OVERLAY_ITEM );
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, NO_TEXTURE_ITEM );
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, LOW_RESOLUTION_ITEM );
   menu->addMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_ITEM );
@@ -426,6 +430,7 @@ SoAnyFullViewer::menuSelection( // virtual
 
   case AS_IS_ITEM:
   case HIDDEN_LINE_ITEM:
+  case WIREFRAME_OVERLAY_ITEM:
   case NO_TEXTURE_ITEM:
   case LOW_RESOLUTION_ITEM:
   case WIREFRAME_ITEM:
@@ -519,6 +524,9 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
       break;
     case So@Gui@Viewer::VIEW_HIDDEN_LINE:
       viewer->prefmenu->setMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
+      break;
+    case So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY:
+      viewer->prefmenu->setMenuItemMarked( WIREFRAME_OVERLAY_ITEM, TRUE );
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
       viewer->prefmenu->setMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
@@ -647,6 +655,9 @@ SoAnyFullViewer::drawstyleActivated(
   case HIDDEN_LINE_ITEM:
     val = So@Gui@Viewer::VIEW_HIDDEN_LINE;
     break;
+  case WIREFRAME_OVERLAY_ITEM:
+    val = So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY;
+    break;
   case NO_TEXTURE_ITEM:
     val = So@Gui@Viewer::VIEW_NO_TEXTURE;
     break;
@@ -698,6 +709,7 @@ SoAnyFullViewer::drawstyleActivated(
   switch ( menuitemid ) {
   case AS_IS_ITEM:
   case HIDDEN_LINE_ITEM:
+  case WIREFRAME_OVERLAY_ITEM:
   case NO_TEXTURE_ITEM:
   case LOW_RESOLUTION_ITEM:
   case WIREFRAME_ITEM:

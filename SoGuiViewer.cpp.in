@@ -208,6 +208,7 @@ public:
   void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
   SbBool drawInteractiveAsStill(void) const;
   SbBool drawAsHiddenLine(void) const;
+  SbBool drawAsWireframeOverlay(void) const;
   So@Gui@Viewer::DrawStyle currentDrawStyle(void) const;
 
   // Automatic setting of clipping planes
@@ -290,6 +291,10 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 */
 /*!
   \var So@Gui@Viewer::DrawStyle So@Gui@Viewer::VIEW_HIDDEN_LINE
+  FIXME: write documentation for enum definition
+*/
+/*!
+  \var So@Gui@Viewer::DrawStyle So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY
   FIXME: write documentation for enum definition
 */
 /*!
@@ -1863,7 +1868,7 @@ So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
 void 
 So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 {
-  if ( this->drawAsHiddenLine() ) {
+  if (this->drawAsHiddenLine()) {
 
     // First pass: render as filled, but with the background color.
 
@@ -1892,6 +1897,38 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 
     return;
   }
+  if ( this->drawAsWireframeOverlay() ) {
+    // First pass: render as-is, with polygon offset
+    
+    this->solightmodel->model.setIgnored( TRUE );
+    this->somaterialbinding->value.setIgnored( TRUE );
+    this->sobasecolor->rgb.setIgnored( TRUE );
+    this->sodrawstyle->style.setIgnored( TRUE ); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored( TRUE ); // as-is rendering space
+    this->socomplexity->value.setIgnored( TRUE ); // as-is complexity on non-simple shapes
+    this->socomplexity->textureQuality.setIgnored(TRUE);
+
+    this->somaterialbinding->value.setIgnored( TRUE ); // override with OVERALL
+    this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
+
+    pub->getSceneManager()->render( clearcol, clearz );
+
+    // Second pass, render wireframe on top.
+    this->sobasecolor->rgb.setValue( SbColor(1.0f, 0.0f, 0.0f) );
+    this->sobasecolor->rgb.setIgnored( FALSE );
+    this->somaterialbinding->value.setIgnored( FALSE ); // override with OVERALL
+
+    this->solightmodel->model.setIgnored( FALSE ); // override as SoLightModel::BASE
+    this->sodrawstyle->style = SoDrawStyle::LINES;
+    this->sodrawstyle->style.setIgnored( FALSE ); // force lines
+    this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
+    this->socomplexity->textureQuality.setIgnored(FALSE);
+    
+    pub->getSceneManager()->render(FALSE, FALSE);
+
+    return;
+  }
+
 
 
   SbBool clearzbuffer = TRUE;
@@ -2263,11 +2300,24 @@ So@Gui@ViewerP::currentDrawStyle(
 */
 
 SbBool
-So@Gui@ViewerP::drawAsHiddenLine(
-  void ) const
+So@Gui@ViewerP::drawAsHiddenLine(void) const
 {
   return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_HIDDEN_LINE) ? TRUE : FALSE);
 } // drawAsHiddenLine()
+
+/*!
+  \internal
+
+  Returns a boolean to indicate if the current drawstyle settings implies
+  wirefram overlay rendering.
+*/
+
+SbBool
+So@Gui@ViewerP::drawAsWireframeOverlay(void) const
+{
+  return ((this->currentDrawStyle() == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY) ? TRUE : FALSE);
+} // drawAsWireframeOverlay()
+
 
 // *************************************************************************
 
@@ -2312,7 +2362,8 @@ So@Gui@ViewerP::changeDrawStyle(
   }
 
   this->drawstyleroot->whichChild = SO_SWITCH_ALL;
-  if (style == So@Gui@Viewer::VIEW_HIDDEN_LINE) {
+  if ((style == So@Gui@Viewer::VIEW_HIDDEN_LINE) || 
+      (style == So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY)) {
     this->hiddenlineroot->whichChild = SO_SWITCH_ALL;
     return;
   } else {
