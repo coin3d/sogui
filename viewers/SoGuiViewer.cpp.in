@@ -1032,16 +1032,34 @@ So@Gui@Viewer::saveHomePosition(void)
 {
   if (! this->camera) return; // probably a scene-less viewer
 
+  // FIXME: the old code here used SoType::isDerivedFrom() to test for
+  // camera type. This caused a crash in SoFieldData::overlay(), line
+  // 235 since the types of the field containers were not equal when
+  // calling copyContents() (I use a camera which is derived from
+  // SoPerspectiveCamera in my application).
+  //
+  // We should probably not use copyContents() to copy the camera
+  // field values, but copy field by field. Also, we should probably
+  // use SoType::createInstance() to store a copy of the camera, not
+  // just assume it's either a perspective or an orthographic camera.
+  //   pederb, 2002-05-27
+
   SoType t = this->camera->getTypeId();
-  if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
+  if (t == SoOrthographicCamera::getClassTypeId()) {
     PRIVATE(this)->storedortho->copyContents(this->camera, FALSE);
     So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)this->camera,
                                              PRIVATE(this)->storedperspective);
   }
-  else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
+  else if (t == SoPerspectiveCamera::getClassTypeId()) {
     PRIVATE(this)->storedperspective->copyContents(this->camera, FALSE);
     So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)this->camera,
                                              PRIVATE(this)->storedortho);
+  }
+  else {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@Viewer::saveHomePosition",
+                              "Only SoPerspectiveCamera and SoOrthographicCamera is supported.");
+#endif // SO@GUI_DEBUG
   }
 }
 
