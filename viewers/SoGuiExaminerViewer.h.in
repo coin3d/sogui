@@ -38,7 +38,6 @@ class So@Gui@ThumbWheel;
 
 class SO@GUI@_DLL_API So@Gui@ExaminerViewer : public So@Gui@FullViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@ExaminerViewer, So@Gui@FullViewer);
-  @COMPONENTHEADER@
 
 public:
   So@Gui@ExaminerViewer(@WIDGET@ parent = NULL,
@@ -91,150 +90,25 @@ protected:
 
   virtual void afterRealizeHook(void);
 
-
 private:
-  void genericConstructor(void);
-  void genericDestructor(void);
-
-  void setGenericAnimationEnabled(const SbBool enable);
-  void setGenericFeedbackSize(const int size);
-  void actualGenericRedraw(void);
-
-  void setMotion3OnCamera(SbBool enable);
-  SbBool getMotion3OnCamera(void) const;
-
-  float rotXWheelMotion(float value, float old);
-  float rotYWheelMotion(float value, float old);
-
-  void reorientCamera(const SbRotation & rotation);
-  void spin(const SbVec2f & mousepos);
-  void pan(const SbVec2f & mousepos, const SbVec2f & prevpos);
-  void zoom(const float diffvalue);
-  void zoomByCursor(const SbVec2f & mousepos, const SbVec2f & prevpos);
-
-  SbVec2f lastmouseposition;
-  SbPlane panningplane;
-
-  SbBool spinanimating;
-  SbBool spinanimatingallowed;
-  SbVec2f lastspinposition;
-  int spinsamplecounter;
-  SbRotation spinincrement;
-  class SbSphereSheetProjector * spinprojector;
-
-  SbRotation spinRotation;
-
-  SbBool axiscrossEnabled;
-  int axiscrossSize;
-
-  void drawAxisCross(void);
-  static void drawArrow(void);
-
-  struct { // tracking mouse movement in a log
-    short size;
-    short historysize;
-    SbVec2s * position;
-    SbTime * time;
-  } log;
-
-  // The Microsoft Visual C++ v6.0 compiler needs a name on this class
-  // to be able to generate a constructor (which it wants to have for
-  // running the the SbVec2s constructors). So don't try to be clever
-  // and make it anonymous.
-  struct Pointer {
-    SbVec2s now, then;
-  } pointer;
-
-  SbBool button1down;
-  SbBool button2down;
-  SbBool button3down;
-  SbBool controldown;
-
-  void clearLog(void);
-  void addToLog(const SbVec2s pos, const SbTime time);
-
-  SbTime prevRedrawTime;
-
-  SbBool motion3OnCamera;
-
-  SbVec2s canvas;
-
-  enum ViewerMode {
-    IDLE,
-    INTERACT,
-    EXAMINE,
-    DRAGGING,
-    WAITING_FOR_SEEK,
-    ZOOMING,
-    WAITING_FOR_PAN,
-    PANNING
-  } mode;
-
-  ViewerMode currentmode;
-  void setMode(const ViewerMode mode);
-
-
+  class So@Gui@ExaminerViewerP * pimpl;
+  friend class SoGuiExaminerViewerP;
+  friend class So@Gui@ExaminerViewerP;
 
 
 //// FIXME!: merge the So*ExaminerViewer defines properly. 20020109 mortene.
-
-#ifdef __COIN_SOQT__
-
-private:
-  QPixmap * orthopixmap, * perspectivepixmap;
-
-  void constructor(SbBool buildNow);
-  void visibilityCallback(SbBool visible);
-  static void visibilityCB(void * data, SbBool visible);
-
-  QTimer * spindetecttimer;
-
-  void setCursorRepresentation(int mode);
-  QCursor * defaultcursor;
-
-  class QPushButton * cameratogglebutton;
-  class QLabel * feedbacklabel1, * feedbacklabel2;
-  SoQtThumbWheel * feedbackwheel;
-  class QLineEdit * feedbackedit;
-  void setEnableFeedbackControls(const SbBool flag);
-
-private slots:
-
-// preferences window:
-  void spinAnimationToggled(bool);
-  void feedbackVisibilityToggle(bool);
-  void feedbackEditPressed(void);
-  void feedbackWheelPressed(void);
-  void feedbackSizeChanged(float val);
-  void feedbackWheelReleased(void);
-
-// viewer buttons row:
-  void cameratoggleClicked(void);
-#endif // ! __COIN_SOQT__
-
 
 #ifdef __COIN_SOWIN__
 protected:
   virtual LRESULT onCommand(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
   virtual void createPrefSheet(void);
-  
-private:
-  void setCursorRepresentation(int mode);
-
-  class SoWinExaminerViewerP * pimpl;
-  friend class SoWinExaminerViewerP;
 #endif // ! __COIN_SOWIN__
 
 
 #ifdef __COIN_SOGTK__
 private:
   void constructor(const SbBool build);
-  void setCursorRepresentation(int mode);
-
-  // friends and family
-  class SoGtkExaminerViewerP * pimpl;
-  friend class SoGtkExaminerViewerP;
 #endif // ! __COIN_SOGTK__
 
 #ifdef __COIN_SOXT__
@@ -263,8 +137,6 @@ private:
 
 private:
   void constructor(const SbBool build);
-
-  void setCursorRepresentation(int mode);
 
   Widget camerabutton;
   struct {
