@@ -1271,9 +1271,13 @@ So@Gui@RenderArea::sizeChanged(const SbVec2s & size)
   this->setViewportRegion(SbViewportRegion(glsize));
   this->setDevicesWindowSize(glsize);
 
+  // FIXME: aren't both these calls unnecessary as we set the full
+  // viewportregion a few lines above this one? 20020103 mortene.
   PRIVATE(this)->normalManager->setWindowSize(glsize);
   PRIVATE(this)->normalManager->setSize(glsize);
 
+  // FIXME: aren't both these calls unnecessary as we set the full
+  // viewportregion a few lines above this one? 20020103 mortene.
   PRIVATE(this)->overlayManager->setWindowSize(glsize);
   PRIVATE(this)->overlayManager->setSize(glsize);
 
