@@ -1399,42 +1399,6 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
   FIXME: write documentation for enum definition
 */
 
-/*!
-  \var SoCamera * So@Gui@Viewer::camera
-
-  Pointer to the viewer camera.
-*/
-
-/*!
-  \var So@Gui@Viewer::Type So@Gui@Viewer::type
-
-  (Just included for compatibility reasons. Can safely be ignored.)
-*/
-
-/*!
-  \var SbBool So@Gui@Viewer::viewingflag
-
-  Whether the viewer is in view mode or not.
-*/
-
-/*!
-  \var SoSeparator * So@Gui@Viewer::sceneroot
-
-  The root of the viewer scene graph.
-*/
-
-/*!
-  \var SoNode * So@Gui@Viewer::scenegraph
-
-  The root of the user scene graph.
-*/
-
-/*!
-  \var SoGetBoundingBoxAction So@Gui@Viewer::autoclipbboxaction
-
-  Action for getting the scene bounding box, for setting the clip planes.
-*/
-
 // *************************************************************************
 
 /*!

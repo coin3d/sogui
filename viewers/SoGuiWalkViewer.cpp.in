@@ -56,6 +56,8 @@
 #define PRIVATE(ptr) ptr->pimpl
 #define PUBLIC(ptr) ptr->pub
 
+#ifndef DOXYGEN_SKIP_THIS
+
 SoGuiWalkViewerP::SoGuiWalkViewerP(So@Gui@WalkViewer * publ)
 {
   PUBLIC(this) = publ;
@@ -97,3 +99,7 @@ SoGuiWalkViewerP::elevateCamera(const float delta) const
   up.normalize();
   camera->position = camera->position.getValue() - up * delta;
 }
+
+#endif // DOXYGEN_SKIP_THIS
+
+// *************************************************************************

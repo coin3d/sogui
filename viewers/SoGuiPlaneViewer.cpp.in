@@ -595,7 +595,10 @@ So@Gui@PlaneViewer::afterRealizeHook(void)
 
 // ************************************************************************
 
-// Remaining code is for the SoGuiPlaneViewerP "private implementation" class.
+#ifndef DOXYGEN_SKIP_THIS
+
+// Remaining code is for the SoGuiPlaneViewerP "private
+// implementation" class.
 
 #define PUBLIC(ptr) (ptr->pub)
 
@@ -991,5 +994,7 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
   this->setCursorRepresentation(newmode);
   this->mode = newmode;
 }
+
+#endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
