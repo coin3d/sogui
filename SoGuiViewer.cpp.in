@@ -111,7 +111,7 @@ public:
   ~So@Gui@ViewerP(void);
 
   SoSeparator * createSuperScene(void);
-  static const char * superSceneGraph[];
+  SoSeparator * createFPSSuperimposition(void);
 
   // Seek functionality
   SoTimerSensor * seeksensor;
@@ -145,6 +145,8 @@ public:
 #endif // HAVE_SOPOLYGONOFFSET
   // Automatic setting of clipping planes
   SbBool adjustclipplanes;
+
+  SoSeparator * fpsRoot;
 
   // Keep track of the frames-per-second counter.
   // Const value trick for old compilers.
@@ -217,13 +219,62 @@ So@Gui@ViewerP::~So@Gui@ViewerP(void)
 SoSeparator *
 So@Gui@ViewerP::createSuperScene(void)
 {
+  static const char * superSceneGraph[] =
+  {
+    "#Inventor V2.1 ascii",
+    "",
+    "Separator {",
+    "  renderCaching OFF",
+    "  renderCulling OFF",
+    "  pickCulling OFF",
+    "  boundingBoxCaching OFF",
+    
+    // Headlight. By inserting this before any scenegraph camera, the
+    // light will always be pointing in the correct direction.
+    "  DEF so@gui@->headlight DirectionalLight {",
+    "    direction 1 -1 -10",
+    "  }",
+    "  DEF so@gui@->drawstyleroot Switch {",
+    "    whichChild -1",
+    "    DEF so@gui@->lightmodel LightModel {",
+    "      model BASE_COLOR",
+    "    }",
+    "    DEF so@gui@->drawstyle DrawStyle {",
+    "      pointSize ~",
+    "      lineWidth ~",
+    "      linePattern ~",
+    "    }",
+    "    DEF so@gui@->complexity Complexity {",
+    "      textureQuality 0.0",
+    "      value 0.1",
+    "    }",
+    "  }",
+    "  DEF so@gui@->hiddenlineroot Switch {",
+    "    whichChild -1",
+    "    DEF so@gui@->basecolor BaseColor { }",
+    "    DEF so@gui@->materialbinding MaterialBinding {",
+    "      value OVERALL",
+    "    }",
+    "    DEF so@gui@->polygonoffsetparent Switch {",
+    "      whichChild -1",
+#if HAVE_SOPOLYGONOFFSET
+    "      DEF so@gui@->polygonoffset PolygonOffset { }",
+#endif // HAVE_SOPOLYGONOFFSET
+    "    }",
+    "  }",
+    "  DEF so@gui@->userscenegraphroot Separator {",
+    "  }",
+    "}",
+    NULL
+  };
+
   int i, bufsize;
-  for (i = bufsize = 0; So@Gui@ViewerP::superSceneGraph[i]; i++ )
-    bufsize += strlen(So@Gui@ViewerP::superSceneGraph[i]) + 1;
+  for (i = bufsize = 0; superSceneGraph[i]; i++ )
+    bufsize += strlen(superSceneGraph[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; So@Gui@ViewerP::superSceneGraph[i]; i++ ) {
-    strcpy(buf + bufsize, So@Gui@ViewerP::superSceneGraph[i]);
-    bufsize += strlen(So@Gui@ViewerP::superSceneGraph[i]);
+  for (i = bufsize = 0; superSceneGraph[i]; i++ ) {
+    strcpy(buf + bufsize, superSceneGraph[i]);
+    bufsize += strlen(superSceneGraph[i]);
     buf[bufsize] = '\n';
     bufsize++;
   }
@@ -290,54 +341,51 @@ So@Gui@ViewerP::createSuperScene(void)
   return (SoSeparator *) root;
 }
 
-const char * So@Gui@ViewerP::superSceneGraph[] =
+SoSeparator *
+So@Gui@ViewerP::createFPSSuperimposition(void)
 {
-  "#Inventor V2.1 ascii",
-  "",
-  "Separator {",
-  "  renderCaching OFF",
-  "  renderCulling OFF",
-  "  pickCulling OFF",
-  "  boundingBoxCaching OFF",
+  static const char * fpsSceneGraph[] =
+  {
+    "#Inventor V2.1 ascii",
+    "",
+    "Separator {",
+    "  renderCaching OFF",
+    "  renderCulling OFF",
+    "  pickCulling OFF",
+    "  boundingBoxCaching OFF",
+    "}",
+    NULL
+  };
 
-  // Headlight. By inserting this before any scenegraph camera, the
-  // light will always be pointing in the correct direction.
-  "  DEF so@gui@->headlight DirectionalLight {",
-  "    direction 1 -1 -10",
-  "  }",
-  "  DEF so@gui@->drawstyleroot Switch {",
-  "    whichChild -1",
-  "    DEF so@gui@->lightmodel LightModel {",
-  "      model BASE_COLOR",
-  "    }",
-  "    DEF so@gui@->drawstyle DrawStyle {",
-  "      pointSize ~",
-  "      lineWidth ~",
-  "      linePattern ~",
-  "    }",
-  "    DEF so@gui@->complexity Complexity {",
-  "      textureQuality 0.0",
-  "      value 0.1",
-  "    }",
-  "  }",
-  "  DEF so@gui@->hiddenlineroot Switch {",
-  "    whichChild -1",
-  "    DEF so@gui@->basecolor BaseColor { }",
-  "    DEF so@gui@->materialbinding MaterialBinding {",
-  "      value OVERALL",
-  "    }",
-  "    DEF so@gui@->polygonoffsetparent Switch {",
-  "      whichChild -1",
-#if HAVE_SOPOLYGONOFFSET
-  "      DEF so@gui@->polygonoffset PolygonOffset { }",
-#endif // HAVE_SOPOLYGONOFFSET
-  "    }",
-  "  }",
-  "  DEF so@gui@->userscenegraphroot Separator {",
-  "  }",
-  "}",
-  NULL
-};
+  int i, bufsize;
+  for (i = bufsize = 0; fpsSceneGraph[i]; i++ )
+    bufsize += strlen(fpsSceneGraph[i]) + 1;
+  char * buf = new char [bufsize + 1];
+  for (i = bufsize = 0; fpsSceneGraph[i]; i++ ) {
+    strcpy(buf + bufsize, fpsSceneGraph[i]);
+    bufsize += strlen(fpsSceneGraph[i]);
+    buf[bufsize] = '\n';
+    bufsize++;
+  }
+  SoInput * input = new SoInput;
+  input->setBuffer(buf, bufsize);
+  SoNode * root = NULL;
+  SbBool ok = SoDB::read(input, root);
+  delete input;
+  delete [] buf;
+  if ( !ok ) {
+    SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
+		       "couldn't create viewer superscene");
+    return NULL;
+  }
+  assert(root->isOfType(SoSeparator::getClassTypeId()));
+  root->ref();
+
+  root->unrefNoDelete();
+  return NULL;
+  return (SoSeparator *) root;
+}
+
 
 #define PRIVATE(ptr) (ptr->pimpl)
 
@@ -639,6 +687,11 @@ So@Gui@Viewer::So@Gui@Viewer(
     this->setBaseWidget( widget );
   }
 
+  PRIVATE(this)->fpsRoot = PRIVATE(this)->createFPSSuperimposition();
+  if ( PRIVATE(this)->fpsRoot ) {
+    this->addSuperimposition(PRIVATE(this)->fpsRoot);
+    this->setSuperimpositionEnabled(PRIVATE(this)->fpsRoot, FALSE);
+  }
   PRIVATE(this)->resetFrameCounter();
 } // So@Gui@Viewer()
 
