@@ -34,6 +34,7 @@ SoGuiNodes::initClasses(void)
   SoGuiTranslation::initClass();
   SoGuiFrame::initClass();
   SoGuiToggleButton::initClass();
+  SoGuiRadioButton::initClass();
   SoGuiClickCounter::initClass();
   SoGuiSlider1::initClass();
   SoGuiSlider2::initClass();
