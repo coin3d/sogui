@@ -72,7 +72,6 @@ protected:
 
   virtual void createViewerButtons(@WIDGET@ parent, SbPList * buttons);
   virtual void openViewerHelpCard(void);
-  virtual void computeSeekFinalOrientation(void);
 
 private:
   void commonConstructor(void);
