@@ -24,6 +24,7 @@
 #define SOANY_FULLVIEWER_H
 
 class SoAnyPopupMenu;
+class So@GUI@FullViewer;
 
 enum SoViewerPopupMenuItem {
   ROOT_MENU = 0,
@@ -74,7 +75,16 @@ enum SoViewerPopupMenuRadioGroup {
 
 class SoAnyFullViewer {
 public:
-  static SoAnyPopupMenu * buildStandardPopupMenu(void);
+  SoAnyFullViewer( So@GUI@FullViewer * container );
+  ~SoAnyFullViewer(void);
+
+  SoAnyPopupMenu * setupStandardPopupMenu(void);
+
+  void menuSelection( int menuitemid );
+  static void menuSelectionCallback( int menuitemid, void * userdata );
+
+private:
+  So@GUI@FullViewer * const viewer;
 
 }; // class SoAnyFullViewer
 

@@ -28,14 +28,38 @@ static const char rcsid[] =
   all the FullViewer components for Coin.
 */
 
+#include <Inventor/errors/SoDebugError.h>
+
 #include <Inventor/@GUI@/So@GUI@Component.h>
 #include <Inventor/@GUI@/widgets/So@GUI@PopupMenu.h>
 #include <Inventor/@GUI@/viewers/SoAnyFullViewer.h>
+#include <Inventor/@GUI@/viewers/So@GUI@FullViewer.h>
+
+// ************************************************************************
+
+/*!
+  Constructor.
+*/
+
+SoAnyFullViewer::SoAnyFullViewer(
+  So@GUI@FullViewer * container )
+: viewer( container )
+{
+} // SoAnyFullViewer()
+
+/*!
+  Destructor.
+*/
+
+SoAnyFullViewer::~SoAnyFullViewer(
+  void )
+{
+} // ~SoAnyFullViewer()
 
 // ************************************************************************
 
 SoAnyPopupMenu *
-SoAnyFullViewer::buildStandardPopupMenu(
+SoAnyFullViewer::setupStandardPopupMenu(
   void )
 {
   SoAnyPopupMenu * menu = new So@GUI@PopupMenu;
@@ -184,7 +208,110 @@ SoAnyFullViewer::buildStandardPopupMenu(
   toggle = menu->NewRadioGroup();
   menu->AddRadioGroupItem( toggle, HEADLIGHT_ITEM );
 
+  menu->AddMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
+    (void *) this );
+
   return menu;
 } // buildPopupMenu()
 
 // ************************************************************************
+
+void
+SoAnyFullViewer::menuSelection( // virtual
+  int menuitemid )
+{
+  switch ( menuitemid ) {
+  case -1:
+    // means no item was selected
+#if SO@uGUI@_DEBUG
+    SoDebugError::postInfo( "So@GUI@FullViewer::menuSelection",
+      "-1 not appropriate on callback usage" );
+#endif // SO@uGUI@_DEBUG
+    break;
+
+  case EXAMINING_ITEM:
+    viewer->setViewing( viewer->isViewing() ? FALSE : TRUE );
+    break;
+  case DECORATION_ITEM:
+    viewer->setDecoration( viewer->isDecoration() ? FALSE : TRUE );
+    break;
+  case HEADLIGHT_ITEM:
+    viewer->setHeadlight( viewer->isHeadlight() ? FALSE : TRUE );
+    break;
+  case PREFERENCES_ITEM:
+    viewer->selectedPrefs();
+    break;
+
+  case HELP_ITEM:
+    viewer->openViewerHelpCard();
+    break;
+  case HOME_ITEM:
+    viewer->resetToHomePosition();
+    break;
+  case SET_HOME_ITEM:
+    viewer->saveHomePosition();
+    break;
+  case VIEW_ALL_ITEM:
+    viewer->viewAll();
+    break;
+  case SEEK_ITEM:
+    viewer->seekbuttonClicked();
+    break;
+  case COPY_VIEW_ITEM:
+    viewer->copyView( SbTime::getTimeOfDay() );
+
+    break;
+  case PASTE_VIEW_ITEM:
+    viewer->pasteView( SbTime::getTimeOfDay() );
+    break;
+
+  case AS_IS_ITEM:
+  case HIDDEN_LINE_ITEM:
+  case NO_TEXTURE_ITEM:
+  case LOW_RESOLUTION_ITEM:
+  case WIREFRAME_ITEM:
+  case POINTS_ITEM:
+  case BOUNDING_BOX_ITEM:
+    viewer->drawstyleActivated( menuitemid );
+    break;
+
+  case MOVE_SAME_AS_STILL_ITEM:
+  case MOVE_NO_TEXTURE_ITEM:
+  case MOVE_LOW_RES_ITEM:
+  case MOVE_WIREFRAME_ITEM:
+  case MOVE_LOW_RES_WIREFRAME_ITEM:
+  case MOVE_POINTS_ITEM:
+  case MOVE_LOW_RES_POINTS_ITEM:
+  case MOVE_BOUNDING_BOX_ITEM:
+    viewer->drawstyleActivated( menuitemid );
+    break;
+
+  case SINGLE_BUFFER_ITEM:
+  case DOUBLE_BUFFER_ITEM:
+  case INTERACTIVE_BUFFER_ITEM:
+    viewer->drawstyleActivated( menuitemid );
+    break;
+
+  default:
+    SoDebugError::postInfo( "So@GUI@FullViewer::eventFilter",
+      "popup menu handling for item %d is not implemented", menuitemid );
+    break;
+  } // switch ( menuitemid )
+} // menuSelection()
+
+
+// ************************************************************************
+
+void
+SoAnyFullViewer::menuSelectionCallback( // static
+  int menuitemid,
+  void * userdata )
+{
+  SoAnyFullViewer * viewer = (SoAnyFullViewer *) userdata;
+  viewer->menuSelection( menuitemid );
+} // menuSelectionCallback()
+
+// ************************************************************************
+
+static const char * getSoAnyFullViewerRCSId(void) { return rcsid; }
+

@@ -24,13 +24,63 @@
 #define SOANY_EXAMINERVIEWER_H
 
 class SoCamera;
+class SoTimerSensor;
+class SbRotation;
+class SbSphereSheetProjector;
+
+class So@GUI@ExaminerViewer;
 
 // ************************************************************************
 
 class SoAnyExaminerViewer {
 public:
+  SoAnyExaminerViewer( So@GUI@ExaminerViewer * viewer );
+  ~SoAnyExaminerViewer(void);
+
+  void setAnimationEnabled( const SbBool enable );
+  SbBool isAnimationEnabled(void) const;
+
+  void stopAnimating(void);
+  SbBool isAnimating(void) const;
+
+  void setFeedbackVisibility( const SbBool enable );
+  SbBool isFeedbackVisible(void) const;
+
+  void setFeedbackSize( const int size );
+  int getFeedbackSize(void) const;
+
+protected:
   static float rotXWheelMotion( float value, float old, SoCamera * camera );
   static float rotYWheelMotion( float value, float old, SoCamera * camera );
+
+  void reorientCamera( const SbRotation & rotation );
+  void spin( const SbVec2f & mousepos );
+  void pan( const SbVec2f & mousepos );
+  void zoom( const float diffvalue );
+  void zoomByCursor( const SbVec2f & mousepos );
+
+  SbVec2f lastmouseposition;
+  SbPlane panningplane;
+
+  SbBool spinanimating;
+  SbBool spinanimatingallowed;
+  SbVec2f lastspinposition;
+  int spinsamplecounter;
+  SbRotation spinincrement;
+  SoTimerSensor * spintimertrigger;
+  SbSphereSheetProjector * spinprojector;
+
+  void spintimertriggeredCallback( SoSensor * sensor );
+  static void spintimertriggeredCB( void * data, SoSensor * sensor );
+
+  SbBool axiscrossEnabled;
+  int axiscrossSize;
+
+  void drawAxisCross(void);
+  static void drawArrow(void);
+
+private:
+  So@GUI@ExaminerViewer * const viewer;
 
 }; // class SoAnyExaminerViewer
 

@@ -30,9 +30,66 @@ static const char rcsid[] =
 
 #include <assert.h>
 
-#include <Inventor/nodes/SoCamera.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif // _WIN32
+#include <GL/gl.h>
 
-#include "SoAnyExaminerViewer.h"
+#include <Inventor/errors/SoDebugError.h>
+#include <Inventor/nodes/SoOrthographicCamera.h>
+#include <Inventor/nodes/SoPerspectiveCamera.h>
+#include <Inventor/sensors/SoTimerSensor.h>
+#include <Inventor/projectors/SbSphereSheetProjector.h>
+
+#include <Inventor/@GUI@/So@GUI@Basic.h>
+#include <Inventor/@GUI@/viewers/So@GUI@ExaminerViewer.h>
+
+// Bitmap representations of an "X", a "Y" and a "Z" for the axis cross.
+static GLubyte xbmp[] = { 0x11,0x11,0x0a,0x04,0x0a,0x11,0x11 };
+static GLubyte ybmp[] = { 0x04,0x04,0x04,0x04,0x0a,0x11,0x11 };
+static GLubyte zbmp[] = { 0x1f,0x10,0x08,0x04,0x02,0x01,0x1f };
+
+// ************************************************************************
+
+/*!
+*/
+
+SoAnyExaminerViewer::SoAnyExaminerViewer(
+  So@GUI@ExaminerViewer * container )
+: viewer( container )
+{
+  this->spinanimatingallowed = TRUE;
+  this->spinanimating = FALSE;
+  this->spinsamplecounter = 0;
+  this->spinincrement = SbRotation::identity();
+  this->lastspinposition = SbVec2f( 0.0f, 0.0f );
+  this->spintimertrigger =
+    new SoTimerSensor( SoAnyExaminerViewer::spintimertriggeredCB, this );
+  // FIXME: should set to vrefresh rate instead? 19990425 mortene.
+  this->spintimertrigger->setInterval( 1.0f / 30.0f );
+
+  // FIXME: use a smaller sphere than the default one to have a larger
+  // area close to the borders that gives us "z-axis rotation"?
+  // 990425 mortene.
+
+  this->spinprojector = new SbSphereSheetProjector;
+  SbViewVolume volume;
+  volume.ortho( -1, 1, -1, 1, -1, 1 );
+  this->spinprojector->setViewVolume( volume );
+
+  this->axiscrossEnabled = FALSE;
+  this->axiscrossSize = 25;
+} // SoAnyExaminerViewer()
+
+/*!
+*/
+
+SoAnyExaminerViewer::~SoAnyExaminerViewer(
+  void )
+{
+  delete this->spinprojector;
+  delete this->spintimertrigger;
+} // ~SoAnyExaminerViewer()
 
 // ************************************************************************
 
@@ -95,3 +152,565 @@ SoAnyExaminerViewer::rotYWheelMotion(
 } // rotYWheelMotion()
 
 // ************************************************************************
+
+/*!
+  Decide if it should be possible to start a spin animation of the model in
+  the viewer by releasing the mouse button while dragging.
+
+  If the \c on flag is \c FALSE and we're currently animating, the spin
+  will be stopped.
+
+  \sa isAnimationEnabled
+*/
+
+void
+SoAnyExaminerViewer::setAnimationEnabled(
+  const SbBool enable )
+{
+  this->spinanimatingallowed = enable;
+  if ( ! enable && this->isAnimating() )
+    this->stopAnimating();
+} // setAnimationEnabled()
+
+// *************************************************************************
+
+/*!
+  Query whether or not it is possible to start a spinning animation by
+  releasing the left mouse button while dragging the mouse.
+
+  \sa setAnimationEnabled
+*/
+
+SbBool
+SoAnyExaminerViewer::isAnimationEnabled(
+  void ) const
+{
+  return this->spinanimatingallowed;
+} // isAnimationEnabled()
+
+// *************************************************************************
+
+/*!
+  Stop the model from spinning.
+*/
+
+void
+SoAnyExaminerViewer::stopAnimating(
+  void )
+{
+  if ( this->spinanimating ) {
+    this->spinanimating = FALSE;
+    this->spintimertrigger->unschedule();
+    viewer->interactiveCountDec();
+  }
+#if SO@uGUI@_DEBUG
+  else
+    SoDebugError::postWarning( "So@GUI@ExaminerViewer::stopAnimating",
+      "not animating" );
+#endif // SO@uGUI@_DEBUG
+} // stopAnimating()
+
+// *************************************************************************
+
+/*!
+  Query if the model in the viewer is currently in spinning mode after
+  a user drag.
+*/
+
+SbBool
+SoAnyExaminerViewer::isAnimating(
+  void ) const
+{
+  return this->spinanimating;
+} // isAnimating()
+
+// ************************************************************************
+
+/*!
+  Set the flag deciding whether or not to show the axis cross.
+
+  \sa isFeedbackVisible, getFeedbackSize, setFeedbackSize
+*/
+
+void
+SoAnyExaminerViewer::setFeedbackVisibility(
+  const SbBool enable )
+{
+  if ( enable == this->axiscrossEnabled ) {
+#if SO@uGUI@_DEBUG
+    SoDebugError::postWarning( "So@GUI@ExaminerViewer::setFeedbackVisibility",
+      "feedback visibility already set to %s", enable ? "TRUE" : "FALSE" );
+#endif // SO$uGUI@_DEBUG
+    return;
+  }
+  this->axiscrossEnabled = enable;
+
+  if ( viewer->isViewing() )
+    viewer->scheduleRedraw();
+} // setFeedbackVisibility()
+
+/*!
+  Check if the feedback axis cross is visible.
+
+  \sa setFeedbackVisibility, getFeedbackSize, setFeedbackSize
+*/
+
+SbBool
+SoAnyExaminerViewer::isFeedbackVisible(
+  void ) const
+{
+  return this->axiscrossEnabled;
+} // isFeedbackVisibility()
+
+// ************************************************************************
+
+/*!
+  Set the size of the feedback axiscross.  The value is interpreted as
+  an approximate percentage chunk of the dimensions of the total canvas.
+
+  \sa getFeedbackSize, isFeedbackVisible, setFeedbackVisibility
+*/
+
+void
+SoAnyExaminerViewer::setFeedbackSize(
+  const int size )
+{
+#if SO@uGUI@_DEBUG
+  if ( size < 1 ) {
+    SoDebugError::postWarning( "So@GUI@ExaminerViewer::setFeedbackSize",
+      "the size setting should be larger than 0" );
+    return;
+  }
+#endif // SO@uGUI@_DEBUG
+
+  this->axiscrossSize = size;
+
+  if ( this->isFeedbackVisible() && viewer->isViewing() )
+    viewer->scheduleRedraw();
+} // setFeedbackSize()
+
+/*!
+  Return the size of the feedback axis cross. Default is 25.
+
+  \sa setFeedbackSize, isFeedbackVisible, setFeedbackVisibility
+*/
+
+int
+SoAnyExaminerViewer::getFeedbackSize(
+  void ) const
+{
+  return this->axiscrossSize;
+} // getFeedbackSize()
+
+// ************************************************************************
+
+void
+SoAnyExaminerViewer::drawAxisCross(
+  void )
+{
+  // Store GL state information for the variables that we modify.
+  glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
+               GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
+  GLfloat depthrange[2];
+  glGetFloatv(GL_DEPTH_RANGE, depthrange);
+  GLdouble projectionmatrix[16];
+  glGetDoublev(GL_PROJECTION_MATRIX, projectionmatrix);
+
+  glDepthFunc(GL_ALWAYS);
+  glDepthMask(GL_TRUE);
+  glDepthRange(0, 0);
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
+
+  // Set the viewport in the OpenGL canvas. Dimensions are calculated
+  // as a percentage of the total canvas size.
+  SbVec2s view = viewer->getGLSize();
+  const int pixelarea =
+    int(float(this->axiscrossSize)/100.0f * So@GUI@Min(view[0], view[1]));
+#if 0 // middle of canvas
+  SbVec2s origin(view[0]/2 - pixelarea/2, view[1]/2 - pixelarea/2);
+#endif // middle of canvas
+#if 1 // lower right of canvas
+  SbVec2s origin(view[0] - pixelarea, 0);
+#endif // lower right of canvas
+  glViewport(origin[0], origin[1], pixelarea, pixelarea);
+
+
+
+  // Set up the projection matrix.
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  const float NEARVAL = 0.1f;
+  const float FARVAL = 10.0f;
+  const float dim = NEARVAL * tan(M_PI/8.0f); // FOV is 45° (45/360 = 1/8)
+  glFrustum(-dim, dim, -dim, dim, NEARVAL, FARVAL);
+
+
+  // Set up the model matrix.
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  SbMatrix mx;
+  mx = viewer->getCamera()->orientation.getValue();
+  mx = mx.inverse();
+  mx[3][2] = -3.5; // Translate away from the projection point (along z axis).
+  glLoadMatrixf((float *)mx);
+
+
+  // Find unit vector end points.
+  SbMatrix px;
+  glGetFloatv(GL_PROJECTION_MATRIX, (float *)px);
+  SbMatrix comb = mx.multRight(px);
+
+  SbVec3f xpos;
+  comb.multVecMatrix(SbVec3f(1,0,0), xpos);
+  xpos[0] = (1 + xpos[0]) * view[0]/2;
+  xpos[1] = (1 + xpos[1]) * view[1]/2;
+  SbVec3f ypos;
+  comb.multVecMatrix(SbVec3f(0,1,0), ypos);
+  ypos[0] = (1 + ypos[0]) * view[0]/2;
+  ypos[1] = (1 + ypos[1]) * view[1]/2;
+  SbVec3f zpos;
+  comb.multVecMatrix(SbVec3f(0,0,1), zpos);
+  zpos[0] = (1 + zpos[0]) * view[0]/2;
+  zpos[1] = (1 + zpos[1]) * view[1]/2;
+
+
+  // Render the cross.
+  {
+    glLineWidth(2.0);
+
+    // FIXME: the code which makes sure we render in the correct order
+    // (which we have to do, as Z-buffering is dysfunctional at this
+    // stage) is _really_ lousy. A virtual beer to the first hacker
+    // who improves this code. 990424 mortene.
+
+    // Bubble sort.. :-}
+    float minval = xpos[2];
+    float midval = ypos[2];
+    float maxval = zpos[2];
+    if (minval > midval) So@GUI@Swap( minval, midval );
+    if (midval > maxval) So@GUI@Swap( midval, maxval );
+    if (minval > midval) So@GUI@Swap( minval, midval );
+    assert((minval <= midval) && (midval <= maxval)); // Just checking..
+    // Find the order of rendering. Furthest away should render first,
+    // so we sort in back-to-front order.
+    int xturn = (xpos[2] == minval) ? 2 : ((xpos[2] == midval) ? 1 : 0);
+    int yturn = (ypos[2] == minval) ? 2 : ((ypos[2] == midval) ? 1 : 0);
+    int zturn = (zpos[2] == minval) ? 2 : ((zpos[2] == midval) ? 1 : 0);
+
+    // In case any of the three planes defined by the axes were
+    // parallel with the viewing plane.
+    if (yturn == xturn) yturn++;
+    if (zturn == xturn) zturn++;
+    if (zturn == yturn) zturn++;
+
+    // The code is uglier than Valgerd Svarstad Haugland, but it'd
+    // be even more embarrassing if it didn't work correctly.
+    assert(xturn != yturn);
+    assert(xturn != zturn);
+    assert(yturn != zturn);
+
+    for (int i=0; i < 3; i++) {
+      glPushMatrix();
+      if (xturn == i) {
+        // X axis.
+        glColor3fv(SbVec3f(0.500f, 0.125f, 0.125f).getValue());
+        this->drawArrow();
+      }
+      else if (yturn == i) {
+        // Y axis.
+        glRotatef(90, 0, 0, 1);
+        glColor3fv(SbVec3f(0.125f, 0.500f, 0.125f).getValue());
+        this->drawArrow();
+      }
+      else {
+        // Z axis.
+        glRotatef(-90, 0, 1, 0);
+        glColor3fv(SbVec3f(0.125f, 0.125f, 0.500f).getValue());
+        this->drawArrow();
+      }
+      glPopMatrix();
+    }
+  }
+
+  // Render axis notation letters ("X", "Y", "Z").
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, view[0], 0, view[1], -1, 1);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  GLint unpack;
+  glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glColor3fv(SbVec3f(0.8f, 0.8f, 0.0f).getValue());
+
+  glRasterPos2d(xpos[0], xpos[1]);
+  glBitmap(8, 7, 0, 0, 0, 0, xbmp);
+  glRasterPos2d(ypos[0], ypos[1]);
+  glBitmap(8, 7, 0, 0, 0, 0, ybmp);
+  glRasterPos2d(zpos[0], zpos[1]);
+  glBitmap(8, 7, 0, 0, 0, 0, zbmp);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, unpack);
+  glPopMatrix();
+
+  // Reset original state.
+  glDepthRange(depthrange[0], depthrange[1]);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(projectionmatrix);
+  glPopAttrib();
+} // drawAxisCross()
+
+/*!
+  \internal
+
+  Draw an arrow for the axis representation directly through OpenGL.
+*/
+
+void
+SoAnyExaminerViewer::drawArrow( // static
+  void )
+{
+  glBegin(GL_LINES);
+  glVertex3f(0, 0, 0);
+  glVertex3f(1, 0, 0);
+  glEnd();
+  glDisable(GL_CULL_FACE);
+  glBegin(GL_TRIANGLES);
+  glVertex3f(1.0, 0, 0);
+  glVertex3f(1.0-1.0/3, +0.5/4, 0);
+  glVertex3f(1.0-1.0/3, -0.5/4, 0);
+  glVertex3f(1.0, 0, 0);
+  glVertex3f(1.0-1.0/3, 0, +0.5/4);
+  glVertex3f(1.0-1.0/3, 0, -0.5/4);
+  glEnd();
+  glBegin(GL_QUADS);
+  glVertex3f(1.0-1.0/3, +0.5/4, 0);
+  glVertex3f(1.0-1.0/3, 0, +0.5/4);
+  glVertex3f(1.0-1.0/3, -0.5/4, 0);
+  glVertex3f(1.0-1.0/3, 0, -0.5/4);
+  glEnd();
+} // drawArrow()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  This is the regularly called code which makes the spin animation run.
+*/
+
+void
+SoAnyExaminerViewer::spintimertriggeredCallback(
+  SoSensor * )
+{
+#if SO@uGUI@_DEBUG && 0
+  SoDebugError::postInfo( "So@GUI@ExaminerViewer::spintimertriggeredCB",
+    "spin samples: %d", this->spinsamplecounter );
+#endif // SO@uGUI@_DEBUG
+
+  if ( this->spinsamplecounter < 2 ) {
+    // FIXME: won't the first check here always equal TRUE? 990501
+    // mortene.
+    if ( this->isAnimating() )
+      this->stopAnimating();
+#if 0 // check hypothesis from above FIXME statement.
+    else
+      this->spintimertrigger->unschedule();
+#else
+    else
+      assert( 0 && "impossible" );
+#endif
+    return;
+  }
+  this->reorientCamera( this->spinincrement );
+} // spintimertriggeredCallback()
+
+/*!
+*/
+
+void
+SoAnyExaminerViewer::spintimertriggeredCB(
+  void * data,
+  SoSensor * sensor )
+{
+  SoAnyExaminerViewer * viewer = (SoAnyExaminerViewer *) data;
+  viewer->spintimertriggeredCallback( sensor );
+} // spintimertriggeredCB()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  Rotate the camera by the given amount, then reposition it so we're still
+  pointing at the same focal point.
+*/
+
+void
+SoAnyExaminerViewer::reorientCamera(
+  const SbRotation & rot )
+{
+  SoCamera * cam = viewer->getCamera();
+  assert( cam != NULL );
+
+  // Find global coordinates of focal point.
+  SbVec3f direction;
+  cam->orientation.getValue().multVec( SbVec3f(0, 0, -1), direction );
+  SbVec3f focalpoint =
+    cam->position.getValue() + cam->focalDistance.getValue() * direction;
+
+  // Set new orientation value by accumulating the new rotation.
+  cam->orientation = rot * cam->orientation.getValue();
+
+  // Reposition camera so we are still pointing at the same old focal
+  // point.
+  cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
+  cam->position = focalpoint - cam->focalDistance.getValue() * direction;
+} // reorientCamera()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  Uses the sphere sheet projector to map the mouseposition unto
+  a 3D point and find a rotation from this and the last calculated point.
+*/
+
+void
+SoAnyExaminerViewer::spin(
+  const SbVec2f & pointerpos )
+{
+  if ( pointerpos == lastspinposition ) return;
+  assert( this->spinprojector != NULL );
+
+  lastspinposition = pointerpos;
+
+  SbRotation r;
+  this->spinprojector->projectAndGetRotation( pointerpos, r);
+#if 0 // debug
+  // FIXME: Trying to track down an annoying (non-critical) bug.
+  // 990501 mortene.
+  if (r == SbRotation::identity()) {
+    SoDebugError::postWarning("SoQtExaminerViewer::spin",
+                              "rotation equals identity");
+  }
+#endif // debug
+  r.invert();
+  this->reorientCamera(r);
+
+  // Calculate an average angle magnitude value to make the transition
+  // to a possible spin animation mode appear smooth.
+
+  SbVec3f dummy_axis, newaxis;
+  float acc_angle, newangle;
+  this->spinincrement.getValue(dummy_axis, acc_angle);
+  acc_angle *= this->spinsamplecounter; // weight
+  r.getValue(newaxis, newangle);
+  acc_angle += newangle;
+
+  this->spinsamplecounter++;
+  acc_angle /= this->spinsamplecounter;
+  // FIXME: accumulate and average axis vectors aswell? 990501 mortene.
+  this->spinincrement.setValue(newaxis, acc_angle);
+
+  // Don't carry too much baggage, as that'll give unwanted results
+  // when the user quickly trigger (as in "click-drag-release") a spin
+  // animation.
+  if (this->spinsamplecounter > 3) this->spinsamplecounter = 3;
+} // spin()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  Move scene parallel with the plane orthogonal to the camera
+  direction vector.
+*/
+
+void
+SoAnyExaminerViewer::pan(
+  const SbVec2f & mousepos )
+{
+  SoCamera * cam = viewer->getCamera();
+  assert( cam != NULL );
+
+  // Find projection points for the last and current mouse
+  // coordinates.
+  SbViewVolume vv = cam->getViewVolume( viewer->getGLAspectRatio() );
+  SbLine line;
+  vv.projectPointToLine( mousepos, line );
+  SbVec3f current_planept;
+  this->panningplane.intersect( line, current_planept );
+  vv.projectPointToLine( viewer->lastmouseposition, line );
+  SbVec3f old_planept;
+  this->panningplane.intersect( line, old_planept );
+
+  // Reposition camera according to the vector difference between the
+  // projected points.
+  cam->position = cam->position.getValue() - (current_planept - old_planept);
+} // pan()
+
+// ************************************************************************
+
+/*!
+  \internal
+
+  Dependent on the camera type this will either shrink or expand
+  the height of the viewport (orthogonal camera) or move the
+  camera closer or further away from the focal point in the scene.
+*/
+
+void
+SoAnyExaminerViewer::zoom(
+  const float diffvalue )
+{
+  SoCamera * cam = viewer->getCamera();
+  assert( cam != NULL );
+  SoType t = cam->getTypeId();
+
+  // This will be in the range of <0, ->>.
+  float multiplicator = exp(diffvalue);
+
+  if ( t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()) ) {
+    SoOrthographicCamera * oc = (SoOrthographicCamera *)cam;
+    oc->height = oc->height.getValue() * multiplicator;
+  } else if ( t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()) ) {
+    float oldfocaldist = cam->focalDistance.getValue();
+    cam->focalDistance = oldfocaldist * multiplicator;
+
+    SbVec3f direction;
+    cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
+    cam->position = cam->position.getValue() +
+      (cam->focalDistance.getValue() - oldfocaldist) * -direction;
+  } else {
+    assert( 0 && "impossible" );
+  }
+} // zoom()
+
+// *************************************************************************
+
+/*!
+  \internal
+
+  Calculate a zoom/dolly factor from the difference of the current
+  cursor position and the last.
+*/
+
+void
+SoAnyExaminerViewer::zoomByCursor(
+  const SbVec2f & mousepos )
+{
+  // There is no "geometrically correct" value, 20 just seems to give
+  // about the right "feel".
+  this->zoom( (mousepos[1] - this->lastmouseposition[1]) * 20.0f );
+} // zoomByCursor()
+
+// *************************************************************************

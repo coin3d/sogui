@@ -31,6 +31,9 @@ inline Type So@GUI@Max( Type a, Type b ) { return (b > a) ? b : a; }
 template <class Type>
 inline Type So@GUI@Min( Type a, Type b ) { return (b < a) ? b : a; }
 
+template <class Type>
+inline void So@GUI@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
+
 // *************************************************************************
 
 #ifdef __FILE__
