@@ -39,7 +39,9 @@ public:
     CUSTOM_BITMAP = -1,
     DEFAULT = 0,
     BUSY,
-    BLANK
+    BLANK,
+    NORMAL,
+    CROSSHAIR
   };
   
   So@Gui@Cursor(void);
