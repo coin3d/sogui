@@ -28,6 +28,7 @@
 void
 SoGuiNodes::initClasses(void)
 {
+  SoGuiSceneTexture2::initClass();
   SoGuiViewportFix::initClass();
   SoGuiPane::initClass();
   SoGuiPosition::initClass();
