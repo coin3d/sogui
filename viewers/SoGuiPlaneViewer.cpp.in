@@ -126,6 +126,16 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
   The public constructor, to be used by application programmers who
   want to instantiate the plain, standard So@Gui@PlaneViewer.
 */
+So@Gui@PlaneViewer::So@Gui@PlaneViewer(QWidget * parent,
+                                       const char * const name,
+                                       SbBool embed,
+                                       So@Gui@FullViewer::BuildFlag flag,
+                                       So@Gui@Viewer::Type type)
+  : inherited(parent, name, embed, flag, type, FALSE)
+{
+  PRIVATE(this) = new So@Gui@PlaneViewerP(this);
+  PRIVATE(this)->constructor(TRUE);
+}
 
 /*!
   \fn So@Gui@PlaneViewer::So@Gui@PlaneViewer(@WIDGET@ parent, const char * const name, SbBool embed, So@Gui@FullViewer::BuildFlag flag, So@Gui@Viewer::Type type, SbBool build)
@@ -133,6 +143,17 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
   A protected constructor, to be used by application programmers who
   want to extend the So@Gui@PlaneViewer.
 */
+So@Gui@PlaneViewer::So@Gui@PlaneViewer(QWidget * parent,
+                                       const char * const name,
+                                       SbBool embed,
+                                       So@Gui@FullViewer::BuildFlag flag,
+                                       So@Gui@Viewer::Type type,
+                                       SbBool build)
+  : inherited(parent, name, embed, flag, type, FALSE)
+{
+  PRIVATE(this) = new So@Gui@PlaneViewerP(this);
+  PRIVATE(this)->constructor(build);
+}
 
 /*!
   \fn So@Gui@PlaneViewer::~So@Gui@PlaneViewer()
@@ -140,6 +161,10 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
   The destructor. Cleans up all internal resources used by the
   So@Gui@PlaneViewer instance.
 */
+So@Gui@PlaneViewer::~So@Gui@PlaneViewer()
+{
+  delete PRIVATE(this);
+}
 
 // ************************************************************************
 
