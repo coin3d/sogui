@@ -1214,7 +1214,7 @@ void
 So@Gui@Viewer::copyView(const SbTime /*eventTime*/)
 {
   // FIXME: not implemented. Needs So@Gui@Clipboard implementation
-  // first. 990507 mortene.
+  // first. 19990507 mortene.
 
   SoDebugError::postInfo("So@Gui@Viewer::copyView",
                          "clipboard support not implemented yet");
@@ -1234,7 +1234,7 @@ void
 So@Gui@Viewer::pasteView(const SbTime /*eventTime*/)
 {
   // FIXME: not implemented. Needs So@Gui@Clipboard implementation
-  // first. 990507 mortene.
+  // first. 19990507 mortene.
 
   SoDebugError::postInfo("So@Gui@Viewer::pasteView",
                          "clipboard support not implemented yet");
@@ -1263,7 +1263,7 @@ So@Gui@Viewer::recomputeSceneSize(
 void
 So@Gui@Viewer::setDecimationStrategy(const So@Gui@Viewer::DecimationStrategy /*strategy*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setDecimationStrategy",
                          "not implemented yet");
 } // setDecimationStrategy()
@@ -1277,7 +1277,7 @@ So@Gui@Viewer::setDecimationStrategy(const So@Gui@Viewer::DecimationStrategy /*s
 So@Gui@Viewer::DecimationStrategy
 So@Gui@Viewer::getDecimationStrategy(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getDecimationStrategy",
                          "not implemented yet");
   return NORMAL;
@@ -1292,7 +1292,7 @@ So@Gui@Viewer::getDecimationStrategy(void) const
 void
 So@Gui@Viewer::setGoalNumberOfTriangles(const int32_t /*goal*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setGoalNumberOfTriangles",
                          "not implemented yet");
 } // setGoalNumberOfTriangles()
@@ -1306,7 +1306,7 @@ So@Gui@Viewer::setGoalNumberOfTriangles(const int32_t /*goal*/)
 int32_t
 So@Gui@Viewer::getGoalNumberOfTriangles(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getGoalNumberOfTriangles",
                          "not implemented yet");
   return -1;
@@ -1321,7 +1321,7 @@ So@Gui@Viewer::getGoalNumberOfTriangles(void) const
 void
 So@Gui@Viewer::setGoalFramesPerSecond(const float /*goal*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setGoalFramesPerSecond",
                          "not implemented yet");
 } // setGoalFramesPerSecond()
@@ -1335,7 +1335,7 @@ So@Gui@Viewer::setGoalFramesPerSecond(const float /*goal*/)
 float
 So@Gui@Viewer::getGoalFramesPerSecond(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getGoalFramesPerSecond",
                          "not implemented yet");
   return 72.0f;
@@ -1350,7 +1350,7 @@ So@Gui@Viewer::getGoalFramesPerSecond(void) const
 void
 So@Gui@Viewer::setFixedPercentage(const float /*percent*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setFixedPercentage",
                          "not implemented yet");
 } // setFixedPercentage()
@@ -1364,7 +1364,7 @@ So@Gui@Viewer::setFixedPercentage(const float /*percent*/)
 float
 So@Gui@Viewer::getFixedPercentage(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getFixedPercentage",
                          "not implemented yet");
   return 100.0f;
@@ -1379,7 +1379,7 @@ So@Gui@Viewer::getFixedPercentage(void) const
 void
 So@Gui@Viewer::enableFullRenderingWhenStill(const SbBool /*on*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::enableFullRenderingWhenStill",
                          "not implemented yet");
 } // enableFullRendering()
@@ -1393,7 +1393,7 @@ So@Gui@Viewer::enableFullRenderingWhenStill(const SbBool /*on*/)
 SbBool
 So@Gui@Viewer::isFullRenderingWhenStill(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::isFullRenderingWhenStill",
                          "not implemented yet");
   return TRUE;
@@ -1406,7 +1406,7 @@ So@Gui@Viewer::isFullRenderingWhenStill(void) const
 SbBool
 So@Gui@Viewer::isStillNow(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::isStillNow",
                          "not implemented yet");
   return this->getInteractiveCount() == 0;
@@ -1421,7 +1421,7 @@ So@Gui@Viewer::isStillNow(void) const
 void
 So@Gui@Viewer::setFramesPerSecondCallback(So@Gui@ViewerFPSCB * /*callback*/, void * /*data*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setFramesPerSecondCallback",
                          "not implemented yet");
 } // setFramesPerSecond()
@@ -1435,7 +1435,7 @@ So@Gui@Viewer::setFramesPerSecondCallback(So@Gui@ViewerFPSCB * /*callback*/, voi
 void
 So@Gui@Viewer::setNumSamples(const int /*numFrames*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setNumSamples",
                          "not implemented yet");
 } // setNumSamples()
@@ -1449,7 +1449,7 @@ So@Gui@Viewer::setNumSamples(const int /*numFrames*/)
 int
 So@Gui@Viewer::getNumSamples(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getNumSamples",
                          "not implemented yet");
   return 10;
@@ -1464,7 +1464,7 @@ So@Gui@Viewer::getNumSamples(void) const
 void
 So@Gui@Viewer::setDecimationPercentageCallback(So@Gui@ViewerDecimationPercentageCB * /*cb*/, void * /*data*/)
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::setDecimationPercentageCallback",
                          "not implemented yet");
 } // setDecimationPercentageCallback()
@@ -1478,7 +1478,7 @@ So@Gui@Viewer::setDecimationPercentageCallback(So@Gui@ViewerDecimationPercentage
 float
 So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 {
-  // FIXME: implement. 990508 mortene.
+  // FIXME: implement. 19990508 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::getCurrentDecimationPercentage",
                          "not implemented yet");
   return 100.0f;
