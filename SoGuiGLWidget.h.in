@@ -1,0 +1,146 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// $Id$
+
+#ifndef SO@GUI@_GLWIDGET_H
+#define SO@GUI@_GLWIDGET_H
+
+#include <Inventor/SbBasic.h>
+#include <Inventor/@Gui@/So@Gui@Basic.h>
+#include <Inventor/@Gui@/So@Gui@Component.h>
+
+#ifdef __COIN_SOQT__
+#include <qgl.h>
+#endif // __COIN_SOQT__
+
+enum GLModes {
+  SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
+  SO_GL_DOUBLE   = 0x02, SO_GLX_DOUBLE   = SO_GL_DOUBLE,
+  SO_GL_ZBUFFER  = 0x04, SO_GLX_ZBUFFER  = SO_GL_ZBUFFER,
+  SO_GL_OVERLAY  = 0x08, SO_GLX_OVERLAY  = SO_GL_OVERLAY,
+  SO_GL_STEREO   = 0x10, SO_GLX_STEREO   = SO_GL_STEREO
+};
+
+// *************************************************************************
+
+class SO@GUI@_DLL_API So@Gui@GLWidget : public So@Gui@Component {
+  SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@GLWidget, So@Gui@Component);
+  @COMPONENTHEADER@
+
+public:
+
+  void setBorder(const SbBool enable);
+  SbBool isBorder(void) const;
+
+  virtual void setDoubleBuffer(const SbBool enable);
+  SbBool isDoubleBuffer(void) const;
+
+  void setDrawToFrontBufferEnable(const SbBool enable);
+  SbBool isDrawToFrontBufferEnable(void) const;
+  
+  void setQuadBufferStereo(const SbBool enable);
+  SbBool isQuadBufferStereo(void) const;
+
+  @WIDGET@ getNormalWidget(void) const;
+  @WIDGET@ getOverlayWidget(void) const;
+
+#ifdef __COIN_SOQT__
+  const QGLContext * getNormalContext(void);
+  const QGLContext * getOverlayContext(void);
+#endif // __COIN_SOQT__
+
+  SbBool hasOverlayGLArea(void) const;
+  SbBool hasNormalGLArea(void) const;
+
+  unsigned long getOverlayTransparentPixel(void);
+
+protected:
+  So@Gui@GLWidget(@WIDGET@ const parent = NULL,
+                  const char * const name = NULL,
+                  const SbBool embed = TRUE,
+                  const int glmodes = SO_GL_RGB,
+                  const SbBool build = TRUE);
+  ~So@Gui@GLWidget();
+
+  virtual void processEvent(@EVENT@ event);
+
+  @WIDGET@ buildWidget(@WIDGET@ parent);
+
+  @WIDGET@ getGLWidget(void) const;
+
+  virtual void redraw(void) = 0;
+  virtual void redrawOverlay(void);
+
+  virtual void initGraphic(void);
+  virtual void initOverlayGraphic(void);
+
+  virtual void sizeChanged(const SbVec2s size);
+  virtual void widgetChanged(@WIDGET@ w);
+
+  void setGLSize(const SbVec2s size);
+  SbVec2s getGLSize(void) const;
+  float getGLAspectRatio(void) const;
+
+  // old aliases
+  void setGlxSize(const SbVec2s size) { this->setGLSize(size); }
+  SbVec2s getGlxSize(void) const { return this->getGLSize(); }
+  float getGlxAspectRatio(void) const { return this->getGLAspectRatio(); }
+  void setStereoBuffer(SbBool flag) { this->setQuadBufferStereo(flag); }
+  // FIXME: is this really correct? 20011012 mortene.
+  SbBool isStereoBuffer(void) const { return this->isQuadBufferStereo(); }
+
+  SbBool isRGBMode(void);
+
+  SbBool waitForExpose;
+  SbBool drawToFrontBuffer;
+
+#ifdef __COIN_SOQT__
+  virtual bool eventFilter(QObject * obj, QEvent * e);
+  static void eventHandler(QWidget *, void *, QEvent *, bool *);
+#endif // __COIN_SOQT__
+
+  void glLockNormal(void);
+  void glUnlockNormal(void);
+
+  void glLockOverlay(void);
+  void glUnlockOverlay(void);
+
+  void glSwapBuffers(void);
+  void glFlushBuffer(void);
+
+  virtual SbBool glScheduleRedraw(void);
+
+#ifdef __COIN_SOQT__
+private slots:
+  void gl_init(void);
+  void gl_reshape(int, int);
+  void gl_exposed(void);
+#endif // __COIN_SOQT__
+
+private:
+  class So@Gui@GLWidgetP * pimpl;
+  void buildGLWidget(void);
+
+}; // class So@Gui@GLWidget
+
+// *************************************************************************
+
+#endif // ! SO@GUI@_GLWIDGET_H
