@@ -26,16 +26,12 @@
 #ifndef SO@GUI@_PLANEVIEWER_H
 #define SO@GUI@_PLANEVIEWER_H
 
-class SbPlaneProjector;
-class SoAnyPlaneViewer;
-
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 
 // ************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@PlaneViewer : public So@Gui@FullViewer {
   SO@GUI@_OBJECT_HEADER(So@Gui@PlaneViewer, So@Gui@FullViewer);
-  @COMPONENTHEADER@
 
 public:
   So@Gui@PlaneViewer(@WIDGET@ parent = NULL,
@@ -128,37 +124,11 @@ private:
   SbBool button2down;
   SbBool button3down;
 
-
-//// FIXME!: merge the So*PlaneViewer definitions. 20020111 mortene. ////
-
-#ifdef __COIN_SOQT__
-
 private:
-  void constructor(SbBool buildNow);
+  class So@Gui@PlaneViewerP * pimpl;
+  friend class So@Gui@PlaneViewerP;
 
-  SbVec2f prevMousePosition;
-
-  SbPlaneProjector * projector;
-
-  struct {
-    class QPushButton * x, * y, * z;
-    class QPushButton * camera;
-  } buttons;
-
-  struct {
-    class QPixmap * orthogonal, * perspective;
-  } pixmaps;
-
-  static void visibilityCB(void * data, SbBool visible);
-
-private slots:
-  void xClicked(void);
-  void yClicked(void);
-  void zClicked(void);
-  void cameraToggleClicked(void);
-
-#endif // ! __COIN_SOQT__
-
+//// FIXME!: merge the remaining So*PlaneViewer definitions. 20020111 mortene.
 
 #ifdef __COIN_SOXT__
 private:
@@ -183,10 +153,6 @@ private:
 #ifdef __COIN_SOGTK__
 private:
   void constructor(const SbBool build);
-
-  // friends and family
-  class SoGtkPlaneViewerP * pimpl;
-  friend class SoGtkPlaneViewerP;
 #endif // ! __COIN_SOGTK__
 
 #ifdef __COIN_SOWIN__
@@ -194,12 +160,7 @@ protected:
   virtual LRESULT onCommand(HWND window,UINT message,
                             WPARAM wparam, LPARAM lparam);
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);  
-
-private:
-  friend class SoWinPlaneViewerP;
-  class SoWinPlaneViewerP * pimpl;
 #endif // ! __COIN_SOWIN__
-
 };
 
 #endif // ! SO@GUI@_PLANEVIEWER_H
