@@ -22,6 +22,7 @@
 \**************************************************************************/
 
 // FIXME: overload the getClassName() type functions
+// FIXME: rewrite more or less as a wrapper for a nodekit
 
 #include <Inventor/SbPList.h>
 #include <Inventor/SoSceneManager.h>
@@ -342,25 +343,98 @@ So@Gui@ColorEditor::So@Gui@ColorEditor(@WIDGET@ parent, const char * name, SbBoo
   }
   if ( PRIVATE(this)->slider_h ) {
     PRIVATE(this)->slider_h->ref();
-    PRIVATE(this)->slider_h->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
     PRIVATE(this)->sensor_h = new SoFieldSensor(ColorEditor::update_h_cb, PRIVATE(this));
     PRIVATE(this)->sensor_h->setPriority(0);
     PRIVATE(this)->sensor_h->attach(&(PRIVATE(this)->slider_h->value));
+
+    SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_h, "surfaceTexture", SoTexture2);
+    assert(texture);
+    SbVec2s size(256, 1);
+    int nc = 3;
+    texture->image.setValue(size, nc, NULL);
+    texture->model.setValue(SoTexture2::DECAL);
+    unsigned char * bytes = texture->image.startEditing(size, nc);
+    int x, y;
+    const float value = 1.0f;
+    const float saturation = 1.0f;
+    for ( x = 0; x < size[0]; x++ ) { 
+      const float hue = (float) x / (float) (size[0] - 1);
+      for ( y = 0; y < size[1]; y++ ) { 
+        float r = 0.0f, g = 0.0f, b = 0.0f;
+        SbColor color(r, g, b); 
+        color.setHSVValue(hue, saturation, value);
+        color.getValue(r, g, b);
+        bytes[(size[0]*y+x)*nc+0] = (unsigned char) (r * 255.0f);
+        bytes[(size[0]*y+x)*nc+1] = (unsigned char) (g * 255.0f);
+        bytes[(size[0]*y+x)*nc+2] = (unsigned char) (b * 255.0f);
+        // if ( nc > 3 ) bytes[(size[0]*y+x)*nc+4] = 255;
+      }
+    }
+    texture->image.finishEditing();
   }
   if ( PRIVATE(this)->slider_s ) {
     PRIVATE(this)->slider_s->ref();
-    PRIVATE(this)->slider_s->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
     PRIVATE(this)->sensor_s = new SoFieldSensor(ColorEditor::update_s_cb, PRIVATE(this));
     PRIVATE(this)->sensor_s->setPriority(0);
     PRIVATE(this)->sensor_s->attach(&(PRIVATE(this)->slider_s->value));
+
+    SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_s, "surfaceTexture", SoTexture2);
+    assert(texture);
+    SbVec2s size(256, 1);
+    int nc = 3;
+    texture->image.setValue(size, nc, NULL);
+    texture->model.setValue(SoTexture2::DECAL);
+    unsigned char * bytes = texture->image.startEditing(size, nc);
+    int x, y;
+    const float hue = 0.0f;
+    const float value = 1.0f;
+    for ( x = 0; x < size[0]; x++ ) { 
+      const float saturation = (float) x / (float) (size[0] - 1);
+      for ( y = 0; y < size[1]; y++ ) { 
+        float r = 0.0f, g = 0.0f, b = 0.0f;
+        SbColor color(r, g, b); 
+        color.setHSVValue(hue, saturation, value);
+        color.getValue(r, g, b);
+        bytes[(size[0]*y+x)*nc+0] = (unsigned char) (r * 255.0f);
+        bytes[(size[0]*y+x)*nc+1] = (unsigned char) (g * 255.0f);
+        bytes[(size[0]*y+x)*nc+2] = (unsigned char) (b * 255.0f);
+        // if ( nc > 3 ) bytes[(size[0]*y+x)*nc+4] = 255;
+      }
+    }
+    texture->image.finishEditing();
   }
   if ( PRIVATE(this)->slider_v ) {
     PRIVATE(this)->slider_v->ref();
-    PRIVATE(this)->slider_v->setSurfaceColor(SbColor(0, 0, 0), SbColor(1, 1, 1));
     PRIVATE(this)->sensor_v = new SoFieldSensor(ColorEditor::update_v_cb, PRIVATE(this));
     PRIVATE(this)->sensor_v->setPriority(0);
     PRIVATE(this)->sensor_v->attach(&(PRIVATE(this)->slider_v->value));
+
+    SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_v, "surfaceTexture", SoTexture2);
+    assert(texture);
+    SbVec2s size(256, 1);
+    int nc = 3;
+    texture->image.setValue(size, nc, NULL);
+    texture->model.setValue(SoTexture2::DECAL);
+    unsigned char * bytes = texture->image.startEditing(size, nc);
+    int x, y;
+    const float hue = 0.0f;
+    const float saturation = 1.0f;
+    for ( x = 0; x < size[0]; x++ ) { 
+      const float value = (float) x / (float) (size[0] - 1);
+      for ( y = 0; y < size[1]; y++ ) { 
+        float r = 0.0f, g = 0.0f, b = 0.0f;
+        SbColor color(r, g, b); 
+        color.setHSVValue(hue, saturation, value);
+        color.getValue(r, g, b);
+        bytes[(size[0]*y+x)*nc+0] = (unsigned char) (r * 255.0f);
+        bytes[(size[0]*y+x)*nc+1] = (unsigned char) (g * 255.0f);
+        bytes[(size[0]*y+x)*nc+2] = (unsigned char) (b * 255.0f);
+        // if ( nc > 3 ) bytes[(size[0]*y+x)*nc+4] = 255;
+      }
+    }
+    texture->image.finishEditing();
   }
+
   if ( PRIVATE(this)->slider_wheel ) {
     SoTexture2 * texture = SO_GET_PART(PRIVATE(this)->slider_wheel, "surfaceTexture", SoTexture2);
     assert(texture);
