@@ -2155,12 +2155,16 @@ So@Gui@Viewer::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   case VIEW_LOW_RES_POINT:
   case VIEW_BBOX:
     this->glLock();
+    // FIXME: shouldn't this be done "lazy", i.e. before we do any
+    // actual rendering? 20001126 mortene.
     glDisable(GL_DEPTH_TEST);
     this->glUnlock();
     break;
     
   default:
     this->glLock();
+    // FIXME: shouldn't this be done "lazy", i.e. before we do any
+    // actual rendering? 20001126 mortene.
     glEnable(GL_DEPTH_TEST);
     this->glUnlock();
     break;
