@@ -131,3 +131,17 @@ NOTE: see also So@Gui@/BUGS.txt.
     20040726 mortene.
 
 =====================================================================
+
+006 Static building of the So* libraries under Windows linking with a
+    staticly built Coin causes Coin to be included within the So*
+    lib-file.
+
+    This will typically cause multiple Coin instances in the final
+    executable, as the user is likely to link with Coin again for the
+    app code. The same problem also probably manifests itself with
+    e.g. SIM Voleon, SIM Aruba, and our other libraries dependent on
+    Coin.
+
+    20041021 mortene.
+
+=====================================================================
