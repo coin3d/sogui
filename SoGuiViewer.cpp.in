@@ -36,7 +36,7 @@ static const char rcsid[] =
 /*!
   \class So@GUI@Viewer Inventor/@GUI@/viewers/So@GUI@Viewer.h
   \brief The So@GUI@Viewer class is the top level base viewer class.
-  \ingroup viewers
+  \ingroup components viewers
 
   TODO: more doc
   ...overview of what this class provides over parent class...

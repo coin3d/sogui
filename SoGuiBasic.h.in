@@ -35,6 +35,10 @@
   \defgroup viewers @Gui@ Viewer Components
 */
 
+/*!
+  \defgroup misc Miscellaneous Classes
+*/
+
 // *************************************************************************
 
 template <class Type>
