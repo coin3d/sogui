@@ -72,8 +72,8 @@ public:
   void setQuadBufferStereo(const SbBool enable);
   SbBool isQuadBufferStereo(void) const;
 
-  void setOverlayPlanes(const SbBool onoff);
-  SbBool isOverlayPlanes(void) const;
+  void setOverlayRender(const SbBool onoff);
+  SbBool isOverlayRender(void) const;
 
   @WIDGET@ getNormalWidget(void) const;
   @WIDGET@ getOverlayWidget(void) const;
@@ -196,8 +196,6 @@ protected:
   SbBool makeNormalCurrent(void);
   SbBool swapNormalBuffers(void);
   SbBool swapOverlayBuffers(void);
-  void setOverlayRender(const SbBool enable);
-  SbBool isOverlayRender(void) const;
 #endif // __COIN_SOWIN__
 #ifdef __COIN_SOMAC__
   // WORK-IN-PROGRESS
