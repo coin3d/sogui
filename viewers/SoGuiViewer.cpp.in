@@ -2457,10 +2457,12 @@ So@Gui@Viewer::computeSeekFinalOrientation(void)
 // *************************************************************************
 
 /*!
-  If the current camera is of perspective type, switch to orthographic,
-  and vice versa.
-*/
+  If the current camera is of perspective type, switch to
+  orthographic, and vice versa.
 
+  Automatically calls So@Gui@Viewer::setCameraType() so the change
+  will immediately take place.
+*/
 void
 So@Gui@Viewer::toggleCameraType(void)
 {

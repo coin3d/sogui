@@ -120,6 +120,8 @@ public:
   virtual void setCameraType(SoType type);
   SoType getCameraType(void) const;
 
+  virtual void toggleCameraType(void);
+
   virtual void viewAll(void);
 
   virtual void saveHomePosition(void);
@@ -225,7 +227,6 @@ protected:
   void setSeekValueAsPercentage(const SbBool on);
   SbBool isSeekValuePercentage(void) const;
 
-  virtual void toggleCameraType(void);
   virtual void changeCameraValues(SoCamera * camera);
 
   void addSuperimposition(SoNode * scene);
