@@ -144,10 +144,12 @@ public:
   SbVec3f tiltup;
 
   SoNode * getSuperimpositionNode(const char * name);
+
+  SbBool processKeyboardEvent( SoKeyboardEvent * evt );
 private:
   So@Gui@FlyViewer * publ;
   int viewermode;
-};
+}; // So@Gui@FlyViewerP
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
 {
@@ -334,7 +336,9 @@ So@Gui@FlyViewerP::dolly(const float delta) const
   SoCamera * const camera = PUBLIC(this)->getCamera();
   if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
-  SbPlane walkplane(PUBLIC(this)->getUpDirection(), camera->position.getValue());
+  SbPlane walkplane(PUBLIC(this)->getUpDirection(), 
+		    camera->position.getValue());
+
   SbVec3f campos = camera->position.getValue();
   SbVec3f camvec;
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
@@ -378,9 +382,159 @@ So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
   return searcher->getPath()->getTail();
 }
 
+SbBool
+So@Gui@FlyViewerP::processKeyboardEvent( SoKeyboardEvent * ke )
+{
+  assert( ke != NULL );
+  switch (ke->getState()) {
+  case SoButtonEvent::UP:
+    switch (ke->getKey()) {
+    case SoKeyboardEvent::U:
+      do {
+	// either to switch to up-vector pick mode, or back to fly
+	// mode if pick-mode already activated (ie cancel the
+	// up-vector pick operation)
+	SbBool uppickmode =
+	  this->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
+	this->setMode(uppickmode ? So@Gui@FlyViewerP::FLYING :
+			       So@Gui@FlyViewerP::WAITING_FOR_UP_PICK);
+	this->maxspeed = 0.0f;
+	this->currentspeed = 0.0f;
+	this->updateSpeedIndicator();
+	PUBLIC(this)->scheduleRedraw();
+	return TRUE;
+      } while (FALSE);
+      break;
+      
+    case SoKeyboardEvent::S:
+      this->maxspeed = 0.0f;
+      this->currentspeed = 0.0f;
+      this->updateSpeedIndicator();
+      PUBLIC(this)->scheduleRedraw();
+      return PUBLIC(this)->inherited::processSoEvent
+	( static_cast<SoEvent*>(ke) );
+      
+    case SoKeyboardEvent::LEFT_SHIFT:
+      this->lshiftdown = FALSE;
+      if (this->lshiftdown < 0) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "left shift key count < 0");
+#endif
+	this->lshiftdown = 0;
+      }
+      break;
+    case SoKeyboardEvent::RIGHT_SHIFT:
+      this->rshiftdown = FALSE;
+      if (this->rshiftdown < 0) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "right shift key count < 0");
+#endif
+	this->rshiftdown = 0;
+      }
+      break;
+    case SoKeyboardEvent::LEFT_CONTROL:
+      this->lctrldown -= 1;
+      if (this->lctrldown < 0) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "left control key count < 0");
+#endif
+	this->lctrldown = 0;
+      }
+      break;
+    case SoKeyboardEvent::RIGHT_CONTROL:
+      this->rctrldown -= 1;
+      if (this->rctrldown < 0) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "right control key count < 0");
+#endif
+	this->rctrldown = 0;
+      }
+      break;
+    default:
+      break;
+    }
+    break;
+  case SoButtonEvent::DOWN:
+    switch (ke->getKey()) {
+    case SoKeyboardEvent::LEFT_SHIFT:
+      this->lshiftdown += 1;
+      if (this->lshiftdown > 2) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "left shift key count > 2");
+#endif
+	this->lshiftdown = 2;
+      }
+      break;
+    case SoKeyboardEvent::RIGHT_SHIFT:
+      this->rshiftdown += 1;
+      if (this->rshiftdown > 2) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "right shift key count > 2");
+#endif
+	this->rshiftdown = 2;
+      }
+      break;
+    case SoKeyboardEvent::LEFT_CONTROL:
+      this->lctrldown += 1;
+      if (this->lctrldown > 2) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "left control key count > 2");
+#endif
+	this->lctrldown = 2;
+      }
+      break;
+    case SoKeyboardEvent::RIGHT_CONTROL:
+      this->rctrldown += 1;
+      if (this->rctrldown > 2) {
+#if SO@GUI@_DEBUG
+	SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
+			   "right control key count > 2");
+#endif
+	this->rctrldown = 2;
+      }
+      break;
+    default:
+      break; 
+    }
+    break;
+  default:
+    break;
+  }
+
+  if ((this->getMode() == So@Gui@FlyViewerP::FLYING) &&
+      (this->lctrldown || this->rctrldown)) {
+    this->setMode(So@Gui@FlyViewerP::TILTING);
+    this->tiltrotation = PUBLIC(this)->getCamera()->orientation.getValue();
+    this->tiltup = PUBLIC(this)->getUpDirection();
+    this->tiltpos = this->mouseloc;
+    this->currentspeed = 0.0f;
+    this->maxspeed = 0.0f;
+    this->updateSpeedIndicator();
+    this->crossswitch->whichChild.setValue(SO_SWITCH_ALL);
+    PUBLIC(this)->scheduleRedraw();
+    // NOTE; this could be optimized to only draw the superimposition in
+    // question if speed is zero.
+  } else if ((this->getMode() == So@Gui@FlyViewerP::TILTING) &&
+	     !this->lctrldown && !this->rctrldown) {
+    this->setMode(So@Gui@FlyViewerP::FLYING);
+    assert(this->crossswitch != NULL);
+    this->crossswitch->whichChild.setValue(SO_SWITCH_NONE);
+    PUBLIC(this)->scheduleRedraw();
+  }
+  return FALSE;
+}
+
 void
 So@Gui@FlyViewerP::superimpositionevent(SoAction * action)
 {
+  // FIXME: Only in fly-mode
   if (!action->isOfType(SoGLRenderAction::getClassTypeId())) return;
   SbViewportRegion vpRegion =
     ((SoGLRenderAction *) action)->getViewportRegion();
@@ -475,7 +629,7 @@ So@Gui@FlyViewerP::updateCursorRepresentation(void)
     assert(0 && "unknown mode");
     break;
   }
-}
+} // SoGuiFlyViewerP::processKeyboardEvent( SoKeyboardEvent * evt )
 
 #endif // DOXYGEN_SKIP_THIS
 
@@ -641,6 +795,8 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
 {
   // Let the end-user toggle between camera-interaction mode
   // ("viewing") and scenegraph-interaction mode with ALT key(s).
+  // FIXME: Allow this to be handled by
+  // PRIVATE(this)->processKeyboardEvent?
   if (event->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
     SoKeyboardEvent * ke = (SoKeyboardEvent *)event;
     switch (ke->getKey()) {
@@ -669,153 +825,28 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
   // which influence the seek mode itself -- these are handled further
   // up the inheritance hierarchy.
   if (this->isSeekMode()) { return inherited::processSoEvent(event); }
-
+  
+  // FIXME: 
+  // <rolvs-2002-Okt-16> The processKeyboardEvent returns
+  // true when the processEvent() method should be done, and bail
+  // out. Default behaviour is that processKeyboardEvent returns
+  // false, and then allows the event to be passed on to
+  // PUBLIC(this)->inherited. 
+  //
+  // There are more parts of the kode in
+  // So@Gui@*FlyViewer::processEvent that should go in to the
+  // processKeyboardEvent function; to be fixed later.
 
   // Keyboard handling
   if (event->isOfType(SoKeyboardEvent::getClassTypeId())) {
-    // FIXME: only in fly mode
-    const SoKeyboardEvent * const ke = (const SoKeyboardEvent *) event;
-    switch (ke->getState()) {
-    case SoButtonEvent::UP:
-      switch (ke->getKey()) {
-      case SoKeyboardEvent::U:
-        do {
-          // either to switch to up-vector pick mode, or back to fly
-          // mode if pick-mode already activated (ie cancel the
-          // up-vector pick operation)
-          SbBool uppickmode =
-            PRIVATE(this)->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
-          PRIVATE(this)->setMode(uppickmode ? So@Gui@FlyViewerP::FLYING :
-                                    So@Gui@FlyViewerP::WAITING_FOR_UP_PICK);
-          PRIVATE(this)->maxspeed = 0.0f;
-          PRIVATE(this)->currentspeed = 0.0f;
-          PRIVATE(this)->updateSpeedIndicator();
-          this->scheduleRedraw();
-          return TRUE;
-        } while (FALSE);
-        break;
+    SbBool result =
+      PRIVATE(this)->processKeyboardEvent
+      ( (SoKeyboardEvent*)(event));
 
-      case SoKeyboardEvent::S:
-          PRIVATE(this)->maxspeed = 0.0f;
-          PRIVATE(this)->currentspeed = 0.0f;
-          PRIVATE(this)->updateSpeedIndicator();
-          this->scheduleRedraw();
-          return inherited::processSoEvent(event);
-
-      case SoKeyboardEvent::LEFT_SHIFT:
-        PRIVATE(this)->lshiftdown = FALSE;
-        if (PRIVATE(this)->lshiftdown < 0) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "left shift key count < 0");
-#endif
-          PRIVATE(this)->lshiftdown = 0;
-        }
-        break;
-      case SoKeyboardEvent::RIGHT_SHIFT:
-        PRIVATE(this)->rshiftdown = FALSE;
-        if (PRIVATE(this)->rshiftdown < 0) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "right shift key count < 0");
-#endif
-          PRIVATE(this)->rshiftdown = 0;
-        }
-        break;
-      case SoKeyboardEvent::LEFT_CONTROL:
-        PRIVATE(this)->lctrldown -= 1;
-        if (PRIVATE(this)->lctrldown < 0) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "left control key count < 0");
-#endif
-          PRIVATE(this)->lctrldown = 0;
-        }
-        break;
-      case SoKeyboardEvent::RIGHT_CONTROL:
-        PRIVATE(this)->rctrldown -= 1;
-        if (PRIVATE(this)->rctrldown < 0) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "right control key count < 0");
-#endif
-          PRIVATE(this)->rctrldown = 0;
-        }
-        break;
-      default:
-        break;
-      }
-      break;
-    case SoButtonEvent::DOWN:
-      switch (ke->getKey()) {
-      case SoKeyboardEvent::LEFT_SHIFT:
-        PRIVATE(this)->lshiftdown += 1;
-        if (PRIVATE(this)->lshiftdown > 2) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "left shift key count > 2");
-#endif
-          PRIVATE(this)->lshiftdown = 2;
-        }
-        break;
-      case SoKeyboardEvent::RIGHT_SHIFT:
-        PRIVATE(this)->rshiftdown += 1;
-        if (PRIVATE(this)->rshiftdown > 2) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "right shift key count > 2");
-#endif
-          PRIVATE(this)->rshiftdown = 2;
-        }
-        break;
-      case SoKeyboardEvent::LEFT_CONTROL:
-        PRIVATE(this)->lctrldown += 1;
-        if (PRIVATE(this)->lctrldown > 2) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "left control key count > 2");
-#endif
-          PRIVATE(this)->lctrldown = 2;
-        }
-        break;
-      case SoKeyboardEvent::RIGHT_CONTROL:
-        PRIVATE(this)->rctrldown += 1;
-        if (PRIVATE(this)->rctrldown > 2) {
-#if SO@GUI@_DEBUG
-          SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
-                             "right control key count > 2");
-#endif
-          PRIVATE(this)->rctrldown = 2;
-        }
-        break;
-      default:
-        break; 
-      }
-      break;
-    default:
-      break;
+    if( result ){
+      return TRUE;
     }
-
-    if ((PRIVATE(this)->getMode() == So@Gui@FlyViewerP::FLYING) &&
-         (PRIVATE(this)->lctrldown || PRIVATE(this)->rctrldown)) {
-      PRIVATE(this)->setMode(So@Gui@FlyViewerP::TILTING);
-      PRIVATE(this)->tiltrotation = this->getCamera()->orientation.getValue();
-      PRIVATE(this)->tiltup = this->getUpDirection();
-      PRIVATE(this)->tiltpos = PRIVATE(this)->mouseloc;
-      PRIVATE(this)->currentspeed = 0.0f;
-      PRIVATE(this)->maxspeed = 0.0f;
-      PRIVATE(this)->updateSpeedIndicator();
-      PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_ALL);
-      this->scheduleRedraw();
-      // NOTE; this could be optimized to only draw the superimposition in
-      // question if speed is zero.
-    } else if ((PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING) &&
-                !PRIVATE(this)->lctrldown && !PRIVATE(this)->rctrldown) {
-      PRIVATE(this)->setMode(So@Gui@FlyViewerP::FLYING);
-      assert(PRIVATE(this)->crossswitch != NULL);
-      PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_NONE);
-      this->scheduleRedraw();
-    }
+    // Else: Do nothing, and proceed as usual
   }
 
   // Mousebutton handling
