@@ -31,6 +31,7 @@ SoGuiNodes::initClasses(void)
   SoGuiPosition::initClass();
   SoGuiTranslation::initClass();
   SoGuiFrame::initClass();
+  SoGuiClickCounter::initClass();
   SoGuiSlider1::initClass();
   // SoGuiSlider2::initClass();
 }

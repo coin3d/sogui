@@ -33,6 +33,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiPosition.h>
 #include <Inventor/@Gui@/nodes/SoGuiTranslation.h>
 #include <Inventor/@Gui@/nodes/SoGuiFrame.h>
+#include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
 // #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
 
