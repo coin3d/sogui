@@ -134,7 +134,7 @@ public:
   static SbBool nextEvent(int appContext, MSG * msg);
   static void setInstance(HINSTANCE instance);
   static HINSTANCE getInstance(void);
-    static void errorHandlerCB(const SoError * error, void * data);
+  static void errorHandlerCB(const class SoError * error, void * data);
   static void doIdleTasks(void);
 #endif // __COIN_SOWIN__
 
@@ -157,6 +157,8 @@ protected:
   static gint componentChange(SoGtkComponent * component);
 #endif // __COIN_SOGTK__
 #ifdef __COIN_SOWIN__
+  friend class SoWinP;
+
   static void registerWindowClass(const char * const className);
   static void unRegisterWindowClass(const char * const className);
 
