@@ -28,8 +28,10 @@ class SoCamera;
 
 class SoAnyPlaneViewer {
 public:
-  static float transYWheelMotion( float value, float old, SoCamera * camera );
-  static float transXWheelMotion( float value, float old, SoCamera * camera );
+  static float transYWheelMotion( const float value, const float oldvalue,
+    SoCamera * const camera );
+  static float transXWheelMotion( const float value, const float oldvalue,
+    SoCamera * const camera );
 
 }; // class SoAnyPlaneViewer
 
