@@ -48,7 +48,7 @@ public:
   static void initClass(void);
   static SoType getClassTypeId(void);
   virtual SoType getTypeId(void) const = 0;
-  SbBool isOfType( SoType type ) const;
+  SbBool isOfType(SoType type) const;
 
   static void init(void);
 
@@ -83,10 +83,10 @@ private:                                                                   \
 
 #define SO@GUI@_OBJECT_ABSTRACT_SOURCE(classname) \
 void classname::initClass(void) {                                          \
-  assert( classname::classTypeId == SoType::badType() );                   \
+  assert(classname::classTypeId == SoType::badType());                   \
   classname::classTypeId =                                                 \
-    SoType::createType( inherited::getClassTypeId(),                       \
-                        SO__QUOTE(classname) );                            \
+    SoType::createType(inherited::getClassTypeId(),                       \
+                        SO__QUOTE(classname));                            \
 }                                                                          \
 SoType classname::getClassTypeId(void) {                                   \
   return classname::classTypeId;                                           \
@@ -98,11 +98,11 @@ SoType classname::classTypeId
 
 #define SO@GUI@_OBJECT_SOURCE(classname) \
 void classname::initClass(void) {                                          \
-  assert( classname::classTypeId == SoType::badType() );                   \
+  assert(classname::classTypeId == SoType::badType());                   \
   classname::classTypeId =                                                 \
-    SoType::createType( inherited::getClassTypeId(),                       \
+    SoType::createType(inherited::getClassTypeId(),                       \
                         SO__QUOTE(classname),                              \
-                        classname::createInstance );                       \
+                        classname::createInstance);                       \
 }                                                                          \
 SoType classname::getClassTypeId(void) {                                   \
   return classname::classTypeId;                                           \

@@ -50,17 +50,17 @@
  */
 
 template <class Type>
-inline Type So@Gui@Min( Type a, Type b ) { return (b < a) ? b : a; }
+inline Type So@Gui@Min(Type a, Type b) { return (b < a) ? b : a; }
 
 template <class Type>
-inline Type So@Gui@Max( Type a, Type b ) { return (b > a) ? b : a; }
+inline Type So@Gui@Max(Type a, Type b) { return (b > a) ? b : a; }
 
 template <class Type>
-inline Type So@Gui@Clamp( Type val, Type min, Type max )
-  { return So@Gui@Max( min, So@Gui@Min( max, val ) ); }
+inline Type So@Gui@Clamp(Type val, Type min, Type max)
+  { return So@Gui@Max(min, So@Gui@Min(max, val)); }
 
 template <class Type>
-inline void So@Gui@Swap( Type & a, Type & b ) { Type t = a; a = b; b = t; }
+inline void So@Gui@Swap(Type & a, Type & b) { Type t = a; a = b; b = t; }
 
 // *************************************************************************
 
@@ -149,8 +149,8 @@ enum So@Gui@ABIError {
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define SO@GUI@_SANITY_CHECK(forward_call)                  \
-  if ( So@Gui@::isDebugLibrary() &&                       \
-       SoDB::isInitialized() )                          \
+  if (So@Gui@::isDebugLibrary() &&                       \
+       SoDB::isInitialized())                          \
     SoDebugError::postWarning("So@Gui@::init",            \
       "unable to verify application linkage sanity "    \
       "because Open Inventor has already been "         \
@@ -162,30 +162,30 @@ enum So@Gui@ABIError {
 
 #define SO@GUI@_RUNTIME_SANITY_CHECK()                    \
   do {                                                  \
-    if ( !So@Gui@::isCompatible(SO@GUI@_MAJOR_VERSION,      \
-                            SO@GUI@_MINOR_VERSION) )      \
+    if (!So@Gui@::isCompatible(SO@GUI@_MAJOR_VERSION,      \
+                            SO@GUI@_MINOR_VERSION))      \
       So@Gui@::abort(SO@GUI@_RUNTIME_MISMATCH);             \
-  } while ( FALSE )
+  } while (FALSE)
 
 #ifdef SO@GUI@_DLL
 #define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
   do {                                                  \
-    if ( So@Gui@::getABIType() != SO@GUI@_DLL_ABI )         \
+    if (So@Gui@::getABIType() != SO@GUI@_DLL_ABI)         \
       So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
-  } while ( FALSE )
+  } while (FALSE)
 #else
 #define SO@GUI@_LINKSTYLE_SANITY_CHECK()                  \
   do {                                                  \
-    if ( So@Gui@::getABIType() != SO@GUI@_LIB_ABI )         \
+    if (So@Gui@::getABIType() != SO@GUI@_LIB_ABI)         \
       So@Gui@::abort(SO@GUI@_LINKSTYLE_MISMATCH);           \
-  } while ( FALSE )
+  } while (FALSE)
 #endif
 
 #define SO@GUI@_LINKTIME_SANITY_CHECK()                   \
   do {                                                  \
-    if ( !SoDB::isInitialized() )                       \
+    if (!SoDB::isInitialized())                       \
       So@Gui@::abort(SO@GUI@_LINKTIME_MISMATCH);            \
-  } while ( FALSE )
+  } while (FALSE)
 #else /* ! MS Windows */
 #define SO@GUI@_SANITY_CHECK(forward_call)                \
   forward_call

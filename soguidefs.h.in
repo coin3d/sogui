@@ -100,7 +100,7 @@ inline int so@gui@_not_null(const void * arg) { return (arg != NULL) ? 1 : 0; }
 #define SO@GUI@_STUB_ONCE() \
   do { \
     static int first = 1; \
-    if ( first ) { \
+    if (first) { \
       SO@GUI@_FUNCTIONIDENTIFIER(s); \
       SoDebugError::postWarning(s.getString(), \
                                 "STUB: functionality not yet completed " \

@@ -57,12 +57,12 @@ static const char rcsid[] =
 */
 
 SoAnyFullViewer::SoAnyFullViewer(
-  So@Gui@FullViewer * const v )
-  : viewer( v ),
-    prefmenu( NULL ),
-    popupmenutitle( _( "Viewer settings" ) )
+  So@Gui@FullViewer * const v)
+  : viewer(v),
+    prefmenu(NULL),
+    popupmenutitle(_("Viewer settings"))
 {
-  assert( v != NULL );
+  assert(v != NULL);
 } // SoAnyFullViewer()
 
 /*!
@@ -70,176 +70,176 @@ SoAnyFullViewer::SoAnyFullViewer(
 */
 
 SoAnyFullViewer::~SoAnyFullViewer(
-  void )
+  void)
 {
 } // ~SoAnyFullViewer()
 
 // ************************************************************************
 
 void
-SoAnyFullViewer::setPopupMenuString( const char * name )
+SoAnyFullViewer::setPopupMenuString(const char * name)
 {
   this->popupmenutitle = name;
-  if (this->prefmenu) { this->prefmenu->setMenuTitle( ROOT_MENU, name ); }
+  if (this->prefmenu) { this->prefmenu->setMenuTitle(ROOT_MENU, name); }
 }
 
 // ************************************************************************
 
 SoAnyPopupMenu *
 SoAnyFullViewer::setupStandardPopupMenu(
-  void )
+  void)
 {
   SoAnyPopupMenu * menu = new So@Gui@PopupMenu;
 
-  menu->newMenu( "rootmenu", ROOT_MENU );
+  menu->newMenu("rootmenu", ROOT_MENU);
   // FIXME: none of the So*-toolkits so far uses the rootmenu title to
   // set up a title string at the top of the root popupmenu. 20010810 mortene.
-  menu->setMenuTitle( ROOT_MENU, this->popupmenutitle.getString() );
+  menu->setMenuTitle(ROOT_MENU, this->popupmenutitle.getString());
 
 #if 0 // OBSOLETED: this looks ugly and confusing for the user. 20010810 mortene.
   // Simple hack for a common / generic way of setting up a title for
   // the popupmenu.
-  menu->newMenuItem( "rootmenutitle", ROOT_MENU_TITLE );
-  menu->setMenuItemTitle( ROOT_MENU_TITLE, this->popupmenutitle.getString() );
-  menu->addMenuItem( ROOT_MENU, ROOT_MENU_TITLE );
-  menu->setMenuItemEnabled( ROOT_MENU_TITLE, FALSE );
-  menu->addSeparator( ROOT_MENU );
+  menu->newMenuItem("rootmenutitle", ROOT_MENU_TITLE);
+  menu->setMenuItemTitle(ROOT_MENU_TITLE, this->popupmenutitle.getString());
+  menu->addMenuItem(ROOT_MENU, ROOT_MENU_TITLE);
+  menu->setMenuItemEnabled(ROOT_MENU_TITLE, FALSE);
+  menu->addSeparator(ROOT_MENU);
 #endif // OBSOLETED
 
-  menu->newMenu( "functionsmenu", FUNCTIONS_MENU );
-  menu->setMenuTitle( FUNCTIONS_MENU, _( "Functions" ) );
-  menu->newMenu( "drawstylesmenu", DRAWSTYLES_MENU );
-  menu->setMenuTitle( DRAWSTYLES_MENU, _( "Draw Styles" ) );
-  menu->newMenu( "stereomenu", STEREO_MENU );
-  menu->setMenuTitle( STEREO_MENU, _( "Stereo Viewing" ) );
-  menu->newMenuItem( "examining", EXAMINING_ITEM );
-  menu->setMenuItemTitle( EXAMINING_ITEM, _( "Viewing" ) );
-  menu->newMenuItem( "decoration", DECORATION_ITEM );
-  menu->setMenuItemTitle( DECORATION_ITEM, _( "Decorations" ) );
-  menu->newMenuItem( "headlight", HEADLIGHT_ITEM );
-  menu->setMenuItemTitle( HEADLIGHT_ITEM, _( "Headlight" ) );
-  menu->newMenuItem( "fullscreen", FULLSCREEN_ITEM );
-  menu->setMenuItemTitle( FULLSCREEN_ITEM, _( "Fullscreen" ) );
-  menu->newMenuItem( "preferences", PREFERENCES_ITEM );
-  menu->setMenuItemTitle( PREFERENCES_ITEM, _( "Preferences..." ) );
+  menu->newMenu("functionsmenu", FUNCTIONS_MENU);
+  menu->setMenuTitle(FUNCTIONS_MENU, _("Functions"));
+  menu->newMenu("drawstylesmenu", DRAWSTYLES_MENU);
+  menu->setMenuTitle(DRAWSTYLES_MENU, _("Draw Styles"));
+  menu->newMenu("stereomenu", STEREO_MENU);
+  menu->setMenuTitle(STEREO_MENU, _("Stereo Viewing"));
+  menu->newMenuItem("examining", EXAMINING_ITEM);
+  menu->setMenuItemTitle(EXAMINING_ITEM, _("Viewing"));
+  menu->newMenuItem("decoration", DECORATION_ITEM);
+  menu->setMenuItemTitle(DECORATION_ITEM, _("Decorations"));
+  menu->newMenuItem("headlight", HEADLIGHT_ITEM);
+  menu->setMenuItemTitle(HEADLIGHT_ITEM, _("Headlight"));
+  menu->newMenuItem("fullscreen", FULLSCREEN_ITEM);
+  menu->setMenuItemTitle(FULLSCREEN_ITEM, _("Fullscreen"));
+  menu->newMenuItem("preferences", PREFERENCES_ITEM);
+  menu->setMenuItemTitle(PREFERENCES_ITEM, _("Preferences..."));
 
-  menu->addMenu( ROOT_MENU, FUNCTIONS_MENU );
-  menu->addMenu( ROOT_MENU, DRAWSTYLES_MENU );
-  menu->addMenu( ROOT_MENU, STEREO_MENU );
-  menu->addMenuItem( ROOT_MENU, EXAMINING_ITEM );
-  menu->addMenuItem( ROOT_MENU, DECORATION_ITEM );
-  menu->addMenuItem( ROOT_MENU, HEADLIGHT_ITEM );
-  menu->addMenuItem( ROOT_MENU, FULLSCREEN_ITEM );
-  menu->addSeparator( ROOT_MENU );
-  menu->addMenuItem( ROOT_MENU, PREFERENCES_ITEM );
+  menu->addMenu(ROOT_MENU, FUNCTIONS_MENU);
+  menu->addMenu(ROOT_MENU, DRAWSTYLES_MENU);
+  menu->addMenu(ROOT_MENU, STEREO_MENU);
+  menu->addMenuItem(ROOT_MENU, EXAMINING_ITEM);
+  menu->addMenuItem(ROOT_MENU, DECORATION_ITEM);
+  menu->addMenuItem(ROOT_MENU, HEADLIGHT_ITEM);
+  menu->addMenuItem(ROOT_MENU, FULLSCREEN_ITEM);
+  menu->addSeparator(ROOT_MENU);
+  menu->addMenuItem(ROOT_MENU, PREFERENCES_ITEM);
 
-  menu->newMenuItem( "help", HELP_ITEM );
-  menu->setMenuItemTitle( HELP_ITEM, _( "Help" ) );
-  menu->newMenuItem( "home", HOME_ITEM );
-  menu->setMenuItemTitle( HOME_ITEM, _( "Home" ) );
-  menu->newMenuItem( "set_home", SET_HOME_ITEM );
-  menu->setMenuItemTitle( SET_HOME_ITEM, _( "Set Home" ) );
-  menu->newMenuItem( "view_all", VIEW_ALL_ITEM );
-  menu->setMenuItemTitle( VIEW_ALL_ITEM, _( "View All" ) );
-  menu->newMenuItem( "seek", SEEK_ITEM );
-  menu->setMenuItemTitle( SEEK_ITEM, _( "Seek" ) );
-  menu->newMenuItem( "copy_view", COPY_VIEW_ITEM );
-  menu->setMenuItemTitle( COPY_VIEW_ITEM, _( "Copy View" ) );
-  menu->newMenuItem( "paste_view", PASTE_VIEW_ITEM );
-  menu->setMenuItemTitle( PASTE_VIEW_ITEM, _( "Paste View" ) );
+  menu->newMenuItem("help", HELP_ITEM);
+  menu->setMenuItemTitle(HELP_ITEM, _("Help"));
+  menu->newMenuItem("home", HOME_ITEM);
+  menu->setMenuItemTitle(HOME_ITEM, _("Home"));
+  menu->newMenuItem("set_home", SET_HOME_ITEM);
+  menu->setMenuItemTitle(SET_HOME_ITEM, _("Set Home"));
+  menu->newMenuItem("view_all", VIEW_ALL_ITEM);
+  menu->setMenuItemTitle(VIEW_ALL_ITEM, _("View All"));
+  menu->newMenuItem("seek", SEEK_ITEM);
+  menu->setMenuItemTitle(SEEK_ITEM, _("Seek"));
+  menu->newMenuItem("copy_view", COPY_VIEW_ITEM);
+  menu->setMenuItemTitle(COPY_VIEW_ITEM, _("Copy View"));
+  menu->newMenuItem("paste_view", PASTE_VIEW_ITEM);
+  menu->setMenuItemTitle(PASTE_VIEW_ITEM, _("Paste View"));
 
-  menu->addMenuItem( FUNCTIONS_MENU, HELP_ITEM );
-  menu->addMenuItem( FUNCTIONS_MENU, HOME_ITEM );
-  menu->addMenuItem( FUNCTIONS_MENU, SET_HOME_ITEM );
-  menu->addMenuItem( FUNCTIONS_MENU, VIEW_ALL_ITEM );
-  menu->addMenuItem( FUNCTIONS_MENU, SEEK_ITEM );
-  menu->addSeparator( FUNCTIONS_MENU );
-  menu->addMenuItem( FUNCTIONS_MENU, COPY_VIEW_ITEM );
-  menu->addMenuItem( FUNCTIONS_MENU, PASTE_VIEW_ITEM );
+  menu->addMenuItem(FUNCTIONS_MENU, HELP_ITEM);
+  menu->addMenuItem(FUNCTIONS_MENU, HOME_ITEM);
+  menu->addMenuItem(FUNCTIONS_MENU, SET_HOME_ITEM);
+  menu->addMenuItem(FUNCTIONS_MENU, VIEW_ALL_ITEM);
+  menu->addMenuItem(FUNCTIONS_MENU, SEEK_ITEM);
+  menu->addSeparator(FUNCTIONS_MENU);
+  menu->addMenuItem(FUNCTIONS_MENU, COPY_VIEW_ITEM);
+  menu->addMenuItem(FUNCTIONS_MENU, PASTE_VIEW_ITEM);
 
-  menu->newMenu( "drawstylesstill", DRAWSTYLES_STILL_MENU );
-  menu->setMenuTitle( DRAWSTYLES_STILL_MENU, _( "Still Drawstyle" ) );
+  menu->newMenu("drawstylesstill", DRAWSTYLES_STILL_MENU);
+  menu->setMenuTitle(DRAWSTYLES_STILL_MENU, _("Still Drawstyle"));
 
-  menu->newMenuItem( "as_is", AS_IS_ITEM );
-  menu->setMenuItemTitle( AS_IS_ITEM, _( "as is" ) );
-  menu->newMenuItem( "hidden_line", HIDDEN_LINE_ITEM );
-  menu->setMenuItemTitle( HIDDEN_LINE_ITEM, _( "hidden line" ) );
-  menu->newMenuItem( "wireframe_overlay", WIREFRAME_OVERLAY_ITEM );
-  menu->setMenuItemTitle( WIREFRAME_OVERLAY_ITEM, _( "wireframe overlay" ) );
-  menu->newMenuItem( "no_textures", NO_TEXTURE_ITEM );
-  menu->setMenuItemTitle( NO_TEXTURE_ITEM, _( "no texture" ) );
-  menu->newMenuItem( "low_resolution", LOW_RESOLUTION_ITEM );
-  menu->setMenuItemTitle( LOW_RESOLUTION_ITEM, _( "low resolution" ) );
-  menu->newMenuItem( "wireframe", WIREFRAME_ITEM );
-  menu->setMenuItemTitle( WIREFRAME_ITEM, _( "wireframe" ) );
-  menu->newMenuItem( "points", POINTS_ITEM );
-  menu->setMenuItemTitle( POINTS_ITEM, _( "points" ) );
-  menu->newMenuItem( "bounding_box", BOUNDING_BOX_ITEM );
-  menu->setMenuItemTitle( BOUNDING_BOX_ITEM, _( "bounding box (no depth)" ) );
+  menu->newMenuItem("as_is", AS_IS_ITEM);
+  menu->setMenuItemTitle(AS_IS_ITEM, _("as is"));
+  menu->newMenuItem("hidden_line", HIDDEN_LINE_ITEM);
+  menu->setMenuItemTitle(HIDDEN_LINE_ITEM, _("hidden line"));
+  menu->newMenuItem("wireframe_overlay", WIREFRAME_OVERLAY_ITEM);
+  menu->setMenuItemTitle(WIREFRAME_OVERLAY_ITEM, _("wireframe overlay"));
+  menu->newMenuItem("no_textures", NO_TEXTURE_ITEM);
+  menu->setMenuItemTitle(NO_TEXTURE_ITEM, _("no texture"));
+  menu->newMenuItem("low_resolution", LOW_RESOLUTION_ITEM);
+  menu->setMenuItemTitle(LOW_RESOLUTION_ITEM, _("low resolution"));
+  menu->newMenuItem("wireframe", WIREFRAME_ITEM);
+  menu->setMenuItemTitle(WIREFRAME_ITEM, _("wireframe"));
+  menu->newMenuItem("points", POINTS_ITEM);
+  menu->setMenuItemTitle(POINTS_ITEM, _("points"));
+  menu->newMenuItem("bounding_box", BOUNDING_BOX_ITEM);
+  menu->setMenuItemTitle(BOUNDING_BOX_ITEM, _("bounding box (no depth)"));
 
-  menu->newRadioGroup( STILL_GROUP );
-  menu->addRadioGroupItem( STILL_GROUP, AS_IS_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, HIDDEN_LINE_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_OVERLAY_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, NO_TEXTURE_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, LOW_RESOLUTION_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, WIREFRAME_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, POINTS_ITEM );
-  menu->addRadioGroupItem( STILL_GROUP, BOUNDING_BOX_ITEM );
+  menu->newRadioGroup(STILL_GROUP);
+  menu->addRadioGroupItem(STILL_GROUP, AS_IS_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, HIDDEN_LINE_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, WIREFRAME_OVERLAY_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, NO_TEXTURE_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, LOW_RESOLUTION_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, WIREFRAME_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, POINTS_ITEM);
+  menu->addRadioGroupItem(STILL_GROUP, BOUNDING_BOX_ITEM);
 
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, AS_IS_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_OVERLAY_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, NO_TEXTURE_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, LOW_RESOLUTION_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, WIREFRAME_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, POINTS_ITEM );
-  menu->addMenuItem( DRAWSTYLES_STILL_MENU, BOUNDING_BOX_ITEM );
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, AS_IS_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, HIDDEN_LINE_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, WIREFRAME_OVERLAY_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, NO_TEXTURE_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, LOW_RESOLUTION_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, WIREFRAME_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, POINTS_ITEM);
+  menu->addMenuItem(DRAWSTYLES_STILL_MENU, BOUNDING_BOX_ITEM);
 
-  menu->newMenu( "drawstylesanimation", DRAWSTYLES_ANIMATING_MENU );
-  menu->setMenuTitle( DRAWSTYLES_ANIMATING_MENU, _( "Animating Drawstyle" ) );
+  menu->newMenu("drawstylesanimation", DRAWSTYLES_ANIMATING_MENU);
+  menu->setMenuTitle(DRAWSTYLES_ANIMATING_MENU, _("Animating Drawstyle"));
 
-  menu->newMenuItem( "move_same_as_still", MOVE_SAME_AS_STILL_ITEM );
-  menu->setMenuItemTitle( MOVE_SAME_AS_STILL_ITEM, _( "same as still" ) );
-  menu->newMenuItem( "move_no_texture", MOVE_NO_TEXTURE_ITEM );
-  menu->setMenuItemTitle( MOVE_NO_TEXTURE_ITEM, _( "no texture" ) );
-  menu->newMenuItem( "move_low_res", MOVE_LOW_RES_ITEM );
-  menu->setMenuItemTitle( MOVE_LOW_RES_ITEM, _( "low resolution" ) );
-  menu->newMenuItem( "move_wireframe", MOVE_WIREFRAME_ITEM );
-  menu->setMenuItemTitle( MOVE_WIREFRAME_ITEM, _( "wireframe" ) );
-  menu->newMenuItem( "move_low_res_wireframe", MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->setMenuItemTitle( MOVE_LOW_RES_WIREFRAME_ITEM,
-    _( "low res wireframe (no depth)" ) );
-  menu->newMenuItem( "move_points", MOVE_POINTS_ITEM );
-  menu->setMenuItemTitle( MOVE_POINTS_ITEM, _( "points" ) );
-  menu->newMenuItem( "move_low_res_points", MOVE_LOW_RES_POINTS_ITEM );
-  menu->setMenuItemTitle( MOVE_LOW_RES_POINTS_ITEM,
-    _( "low res points (no depth)" ) );
-  menu->newMenuItem( "move_bounding_box", MOVE_BOUNDING_BOX_ITEM );
-  menu->setMenuItemTitle( MOVE_BOUNDING_BOX_ITEM, _( "bounding box (no depth)" ) );
+  menu->newMenuItem("move_same_as_still", MOVE_SAME_AS_STILL_ITEM);
+  menu->setMenuItemTitle(MOVE_SAME_AS_STILL_ITEM, _("same as still"));
+  menu->newMenuItem("move_no_texture", MOVE_NO_TEXTURE_ITEM);
+  menu->setMenuItemTitle(MOVE_NO_TEXTURE_ITEM, _("no texture"));
+  menu->newMenuItem("move_low_res", MOVE_LOW_RES_ITEM);
+  menu->setMenuItemTitle(MOVE_LOW_RES_ITEM, _("low resolution"));
+  menu->newMenuItem("move_wireframe", MOVE_WIREFRAME_ITEM);
+  menu->setMenuItemTitle(MOVE_WIREFRAME_ITEM, _("wireframe"));
+  menu->newMenuItem("move_low_res_wireframe", MOVE_LOW_RES_WIREFRAME_ITEM);
+  menu->setMenuItemTitle(MOVE_LOW_RES_WIREFRAME_ITEM,
+    _("low res wireframe (no depth)"));
+  menu->newMenuItem("move_points", MOVE_POINTS_ITEM);
+  menu->setMenuItemTitle(MOVE_POINTS_ITEM, _("points"));
+  menu->newMenuItem("move_low_res_points", MOVE_LOW_RES_POINTS_ITEM);
+  menu->setMenuItemTitle(MOVE_LOW_RES_POINTS_ITEM,
+    _("low res points (no depth)"));
+  menu->newMenuItem("move_bounding_box", MOVE_BOUNDING_BOX_ITEM);
+  menu->setMenuItemTitle(MOVE_BOUNDING_BOX_ITEM, _("bounding box (no depth)"));
 
-  menu->newRadioGroup( MOVE_GROUP );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_SAME_AS_STILL_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_NO_TEXTURE_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_WIREFRAME_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_POINTS_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_LOW_RES_POINTS_ITEM );
-  menu->addRadioGroupItem( MOVE_GROUP, MOVE_BOUNDING_BOX_ITEM );
+  menu->newRadioGroup(MOVE_GROUP);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_SAME_AS_STILL_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_NO_TEXTURE_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_LOW_RES_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_WIREFRAME_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_LOW_RES_WIREFRAME_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_POINTS_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_LOW_RES_POINTS_ITEM);
+  menu->addRadioGroupItem(MOVE_GROUP, MOVE_BOUNDING_BOX_ITEM);
 
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_SAME_AS_STILL_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_NO_TEXTURE_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_WIREFRAME_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_WIREFRAME_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_POINTS_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_POINTS_ITEM );
-  menu->addMenuItem( DRAWSTYLES_ANIMATING_MENU, MOVE_BOUNDING_BOX_ITEM );
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_SAME_AS_STILL_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_NO_TEXTURE_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_WIREFRAME_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_WIREFRAME_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_POINTS_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_LOW_RES_POINTS_ITEM);
+  menu->addMenuItem(DRAWSTYLES_ANIMATING_MENU, MOVE_BOUNDING_BOX_ITEM);
 
-  menu->newMenu( "transparencytype", TRANSPARENCY_TYPE_MENU );
-  menu->setMenuTitle( TRANSPARENCY_TYPE_MENU, _( "Transparency Type" ) );
-  menu->newRadioGroup( TRANSPARENCY_GROUP );
+  menu->newMenu("transparencytype", TRANSPARENCY_TYPE_MENU);
+  menu->setMenuTitle(TRANSPARENCY_TYPE_MENU, _("Transparency Type"));
+  menu->newRadioGroup(TRANSPARENCY_GROUP);
 
   { // Fill in menu items in radiomenu with transparency selections.
 
@@ -249,81 +249,81 @@ SoAnyFullViewer::setupStandardPopupMenu(
     };
 
     struct menutransparencyitem items[] = {
-      { "screen_door", _( "screen door" ), SCREEN_DOOR_TRANSPARENCY_ITEM },
-      { "add", _( "add"), ADD_TRANSPARENCY_ITEM },
-      { "delayed_add", _( "delayed add" ), DELAYED_ADD_TRANSPARENCY_ITEM },
-      { "sorted_object_add", _( "sorted object add" ), SORTED_OBJECT_ADD_TRANSPARENCY_ITEM },
-      { "blend", _( "blend" ), BLEND_TRANSPARENCY_ITEM },
-      { "delayed_blend", _( "delayed blend" ), DELAYED_BLEND_TRANSPARENCY_ITEM },
-      { "sorted_object_blend", _( "sorted object blend" ), SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM }
+      { "screen_door", _("screen door"), SCREEN_DOOR_TRANSPARENCY_ITEM },
+      { "add", _("add"), ADD_TRANSPARENCY_ITEM },
+      { "delayed_add", _("delayed add"), DELAYED_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_add", _("sorted object add"), SORTED_OBJECT_ADD_TRANSPARENCY_ITEM },
+      { "blend", _("blend"), BLEND_TRANSPARENCY_ITEM },
+      { "delayed_blend", _("delayed blend"), DELAYED_BLEND_TRANSPARENCY_ITEM },
+      { "sorted_object_blend", _("sorted object blend"), SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM }
 #ifdef __COIN__ // Coin extensions
       ,
-      { "sorted_object_sorted_triangle_add", _( "sorted object sorted triangle add" ), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
-      { "sorted_object_sorted_triangle_blend", _( "sorted object sorted triangle blend" ), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
+      { "sorted_object_sorted_triangle_add", _("sorted object sorted triangle add"), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_sorted_triangle_blend", _("sorted object sorted triangle blend"), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
 #endif // __COIN__
     };
 
     int nritems = sizeof(items) / sizeof(struct menutransparencyitem);
     for (int i = 0; i < nritems; i++) {
-      menu->newMenuItem( items[i].name, items[i].id );
-      menu->setMenuItemTitle( items[i].id, items[i].title );
-      menu->addRadioGroupItem( TRANSPARENCY_GROUP, items[i].id );
-      menu->addMenuItem( TRANSPARENCY_TYPE_MENU, items[i].id );
+      menu->newMenuItem(items[i].name, items[i].id);
+      menu->setMenuItemTitle(items[i].id, items[i].title);
+      menu->addRadioGroupItem(TRANSPARENCY_GROUP, items[i].id);
+      menu->addMenuItem(TRANSPARENCY_TYPE_MENU, items[i].id);
     }
   }
 
-  menu->newMenuItem( "stereooff", STEREO_OFF_ITEM );
-  menu->newMenuItem( "stereoredcyan", STEREO_ANAGLYPH_ITEM );
-  menu->newMenuItem( "stereoquadbuffer", STEREO_QUADBUFFER_ITEM );
-  menu->setMenuItemTitle( STEREO_OFF_ITEM, _( "Off" ) );
-  menu->setMenuItemTitle( STEREO_ANAGLYPH_ITEM, _( "Red/Cyan" ) );
-  menu->setMenuItemTitle( STEREO_QUADBUFFER_ITEM, _( "Quad buffer" ) );
+  menu->newMenuItem("stereooff", STEREO_OFF_ITEM);
+  menu->newMenuItem("stereoredcyan", STEREO_ANAGLYPH_ITEM);
+  menu->newMenuItem("stereoquadbuffer", STEREO_QUADBUFFER_ITEM);
+  menu->setMenuItemTitle(STEREO_OFF_ITEM, _("Off"));
+  menu->setMenuItemTitle(STEREO_ANAGLYPH_ITEM, _("Red/Cyan"));
+  menu->setMenuItemTitle(STEREO_QUADBUFFER_ITEM, _("Quad buffer"));
 
-  menu->newRadioGroup( STEREO_GROUP );
-  menu->addRadioGroupItem( STEREO_GROUP, STEREO_OFF_ITEM );
-  menu->addRadioGroupItem( STEREO_GROUP, STEREO_ANAGLYPH_ITEM );
-  menu->addRadioGroupItem( STEREO_GROUP, STEREO_QUADBUFFER_ITEM );
+  menu->newRadioGroup(STEREO_GROUP);
+  menu->addRadioGroupItem(STEREO_GROUP, STEREO_OFF_ITEM);
+  menu->addRadioGroupItem(STEREO_GROUP, STEREO_ANAGLYPH_ITEM);
+  menu->addRadioGroupItem(STEREO_GROUP, STEREO_QUADBUFFER_ITEM);
 
-  menu->addMenuItem( STEREO_MENU, STEREO_OFF_ITEM );
-  menu->addMenuItem( STEREO_MENU, STEREO_ANAGLYPH_ITEM );
-  menu->addMenuItem( STEREO_MENU, STEREO_QUADBUFFER_ITEM );
+  menu->addMenuItem(STEREO_MENU, STEREO_OFF_ITEM);
+  menu->addMenuItem(STEREO_MENU, STEREO_ANAGLYPH_ITEM);
+  menu->addMenuItem(STEREO_MENU, STEREO_QUADBUFFER_ITEM);
 
-  menu->newMenu( "renderbuffertype", RENDER_BUFFER_TYPE_MENU );
-  menu->setMenuTitle( RENDER_BUFFER_TYPE_MENU, _( "Render Buffer Type" ) );
+  menu->newMenu("renderbuffertype", RENDER_BUFFER_TYPE_MENU);
+  menu->setMenuTitle(RENDER_BUFFER_TYPE_MENU, _("Render Buffer Type"));
 
-  menu->newMenuItem( "single_buffer", SINGLE_BUFFER_ITEM );
-  menu->setMenuItemTitle( SINGLE_BUFFER_ITEM, _( "single" ) );
-  menu->newMenuItem( "double_buffer", DOUBLE_BUFFER_ITEM );
-  menu->setMenuItemTitle( DOUBLE_BUFFER_ITEM, _( "double" ) );
-  menu->newMenuItem( "interactive_buffer", INTERACTIVE_BUFFER_ITEM );
-  menu->setMenuItemTitle( INTERACTIVE_BUFFER_ITEM, _( "interactive" ) );
+  menu->newMenuItem("single_buffer", SINGLE_BUFFER_ITEM);
+  menu->setMenuItemTitle(SINGLE_BUFFER_ITEM, _("single"));
+  menu->newMenuItem("double_buffer", DOUBLE_BUFFER_ITEM);
+  menu->setMenuItemTitle(DOUBLE_BUFFER_ITEM, _("double"));
+  menu->newMenuItem("interactive_buffer", INTERACTIVE_BUFFER_ITEM);
+  menu->setMenuItemTitle(INTERACTIVE_BUFFER_ITEM, _("interactive"));
 
-  menu->newRadioGroup( BUFFER_GROUP );
-  menu->addRadioGroupItem( BUFFER_GROUP, SINGLE_BUFFER_ITEM );
-  menu->addRadioGroupItem( BUFFER_GROUP, DOUBLE_BUFFER_ITEM );
-  menu->addRadioGroupItem( BUFFER_GROUP, INTERACTIVE_BUFFER_ITEM );
+  menu->newRadioGroup(BUFFER_GROUP);
+  menu->addRadioGroupItem(BUFFER_GROUP, SINGLE_BUFFER_ITEM);
+  menu->addRadioGroupItem(BUFFER_GROUP, DOUBLE_BUFFER_ITEM);
+  menu->addRadioGroupItem(BUFFER_GROUP, INTERACTIVE_BUFFER_ITEM);
 
-  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, SINGLE_BUFFER_ITEM );
-  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, DOUBLE_BUFFER_ITEM );
-  menu->addMenuItem( RENDER_BUFFER_TYPE_MENU, INTERACTIVE_BUFFER_ITEM );
+  menu->addMenuItem(RENDER_BUFFER_TYPE_MENU, SINGLE_BUFFER_ITEM);
+  menu->addMenuItem(RENDER_BUFFER_TYPE_MENU, DOUBLE_BUFFER_ITEM);
+  menu->addMenuItem(RENDER_BUFFER_TYPE_MENU, INTERACTIVE_BUFFER_ITEM);
 
-  menu->addMenu( DRAWSTYLES_MENU, DRAWSTYLES_STILL_MENU );
-  menu->addMenu( DRAWSTYLES_MENU, DRAWSTYLES_ANIMATING_MENU );
-  menu->addMenu( DRAWSTYLES_MENU, TRANSPARENCY_TYPE_MENU );
-  menu->addMenu( DRAWSTYLES_MENU, RENDER_BUFFER_TYPE_MENU );
+  menu->addMenu(DRAWSTYLES_MENU, DRAWSTYLES_STILL_MENU);
+  menu->addMenu(DRAWSTYLES_MENU, DRAWSTYLES_ANIMATING_MENU);
+  menu->addMenu(DRAWSTYLES_MENU, TRANSPARENCY_TYPE_MENU);
+  menu->addMenu(DRAWSTYLES_MENU, RENDER_BUFFER_TYPE_MENU);
 
   int toggle;
   toggle = menu->newRadioGroup();
-  menu->addRadioGroupItem( toggle, EXAMINING_ITEM );
+  menu->addRadioGroupItem(toggle, EXAMINING_ITEM);
   toggle = menu->newRadioGroup();
-  menu->addRadioGroupItem( toggle, DECORATION_ITEM );
+  menu->addRadioGroupItem(toggle, DECORATION_ITEM);
   toggle = menu->newRadioGroup();
-  menu->addRadioGroupItem( toggle, HEADLIGHT_ITEM );
+  menu->addRadioGroupItem(toggle, HEADLIGHT_ITEM);
   toggle = menu->newRadioGroup();
-  menu->addRadioGroupItem( toggle, FULLSCREEN_ITEM );
+  menu->addRadioGroupItem(toggle, FULLSCREEN_ITEM);
 
-  menu->addMenuSelectionCallback( SoAnyFullViewer::menuSelectionCallback,
-    (void *) this );
+  menu->addMenuSelectionCallback(SoAnyFullViewer::menuSelectionCallback,
+    (void *) this);
 
   this->prefmenu = menu;
   return menu;
@@ -332,13 +332,13 @@ SoAnyFullViewer::setupStandardPopupMenu(
 // ************************************************************************
 
 void
-SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
+SoAnyFullViewer::prepareMenu(SoAnyPopupMenu * menu)
 {
   //// Misc. //////////////////////////////////////////////////////////
-  menu->setMenuItemMarked( DECORATION_ITEM, this->viewer->isDecoration() );
-  menu->setMenuItemMarked( EXAMINING_ITEM, this->viewer->isViewing() );
-  menu->setMenuItemMarked( HEADLIGHT_ITEM, this->viewer->isHeadlight() );
-  menu->setMenuItemMarked( FULLSCREEN_ITEM, this->viewer->isFullScreen() );
+  menu->setMenuItemMarked(DECORATION_ITEM, this->viewer->isDecoration());
+  menu->setMenuItemMarked(EXAMINING_ITEM, this->viewer->isViewing());
+  menu->setMenuItemMarked(HEADLIGHT_ITEM, this->viewer->isHeadlight());
+  menu->setMenuItemMarked(FULLSCREEN_ITEM, this->viewer->isFullScreen());
 
   //// Basic drawstyles. //////////////////////////////////////////////
   this->setDrawStyleMenuActivation(So@Gui@FullViewer::STILL,
@@ -347,62 +347,62 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
                                    this->viewer->getDrawStyle(So@Gui@FullViewer::INTERACTIVE));
 
   //// Transparency setting. //////////////////////////////////////////
-  switch ( this->viewer->getTransparencyType() ) {
+  switch (this->viewer->getTransparencyType()) {
   case SoGLRenderAction::SCREEN_DOOR:
-    menu->setMenuItemMarked( SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(SCREEN_DOOR_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::ADD:
-    menu->setMenuItemMarked( ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(ADD_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::DELAYED_ADD:
-    menu->setMenuItemMarked( DELAYED_ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(DELAYED_ADD_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::SORTED_OBJECT_ADD:
-    menu->setMenuItemMarked( SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(SORTED_OBJECT_ADD_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::BLEND:
-    menu->setMenuItemMarked( BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::DELAYED_BLEND:
-    menu->setMenuItemMarked( DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(DELAYED_BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::SORTED_OBJECT_BLEND:
-    menu->setMenuItemMarked( SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
 #ifdef __COIN__  // Coin extensions
   case SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD:
-    menu->setMenuItemMarked( SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM, TRUE);
     break;
   case SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND:
-    menu->setMenuItemMarked( SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM, TRUE );
+    menu->setMenuItemMarked(SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM, TRUE);
     break;
 #endif // __COIN__
-  default: assert( FALSE && "unknown transparency type" );
+  default: assert(FALSE && "unknown transparency type");
   }
 
   //// Stereo viewing. ////////////////////////////////////////////////
   SbBool stereo = this->viewer->isStereoViewing();
   SbBool quadbuffer = this->viewer->isQuadBufferStereo();
- if ( !stereo )
-  menu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
- if ( stereo && !quadbuffer )
-  menu->setMenuItemMarked( STEREO_ANAGLYPH_ITEM, TRUE );
- if ( stereo && quadbuffer )
-  menu->setMenuItemMarked( STEREO_QUADBUFFER_ITEM, TRUE );
+ if (!stereo)
+  menu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
+ if (stereo && !quadbuffer)
+  menu->setMenuItemMarked(STEREO_ANAGLYPH_ITEM, TRUE);
+ if (stereo && quadbuffer)
+  menu->setMenuItemMarked(STEREO_QUADBUFFER_ITEM, TRUE);
 
   //// GL canvas settings. ////////////////////////////////////////////
-  switch ( this->viewer->getBufferingType() ) {
+  switch (this->viewer->getBufferingType()) {
   case So@Gui@Viewer::BUFFER_SINGLE:
-    menu->setMenuItemMarked( SINGLE_BUFFER_ITEM, TRUE );
+    menu->setMenuItemMarked(SINGLE_BUFFER_ITEM, TRUE);
     break;
   case So@Gui@Viewer::BUFFER_DOUBLE:
-    menu->setMenuItemMarked( DOUBLE_BUFFER_ITEM, TRUE );
+    menu->setMenuItemMarked(DOUBLE_BUFFER_ITEM, TRUE);
     break;
   case So@Gui@Viewer::BUFFER_INTERACTIVE:
-    menu->setMenuItemMarked( INTERACTIVE_BUFFER_ITEM, TRUE );
+    menu->setMenuItemMarked(INTERACTIVE_BUFFER_ITEM, TRUE);
     break;
   default:
-    assert( 0 && "unsupported buffer type" );
+    assert(0 && "unsupported buffer type");
     break;
   }
 }
@@ -410,29 +410,29 @@ SoAnyFullViewer::prepareMenu( SoAnyPopupMenu * menu )
 // ************************************************************************
 
 void
-SoAnyFullViewer::menuSelection( // virtual
-  int menuitemid )
+SoAnyFullViewer::menuSelection(// virtual
+  int menuitemid)
 {
-  switch ( menuitemid ) {
+  switch (menuitemid) {
   case -1:
     // means no item was selected
 #if SO@GUI@_DEBUG
-    SoDebugError::postInfo( "So@Gui@FullViewer::menuSelection",
-      "-1 not appropriate on callback usage" );
+    SoDebugError::postInfo("So@Gui@FullViewer::menuSelection",
+      "-1 not appropriate on callback usage");
 #endif // SO@GUI@_DEBUG
     break;
 
   case EXAMINING_ITEM:
-    this->viewer->setViewing( this->viewer->isViewing() ? FALSE : TRUE );
+    this->viewer->setViewing(this->viewer->isViewing() ? FALSE : TRUE);
     break;
   case DECORATION_ITEM:
-    this->viewer->setDecoration( this->viewer->isDecoration() ? FALSE : TRUE );
+    this->viewer->setDecoration(this->viewer->isDecoration() ? FALSE : TRUE);
     break;
   case HEADLIGHT_ITEM:
-    this->viewer->setHeadlight( this->viewer->isHeadlight() ? FALSE : TRUE );
+    this->viewer->setHeadlight(this->viewer->isHeadlight() ? FALSE : TRUE);
     break;
   case FULLSCREEN_ITEM:
-    (void)this->viewer->setFullScreen( this->viewer->isFullScreen() ? FALSE : TRUE );
+    (void)this->viewer->setFullScreen(this->viewer->isFullScreen() ? FALSE : TRUE);
     break;
   case PREFERENCES_ITEM:
     this->viewer->selectedPrefs();
@@ -454,11 +454,11 @@ SoAnyFullViewer::menuSelection( // virtual
     this->viewer->seekbuttonClicked();
     break;
   case COPY_VIEW_ITEM:
-    this->viewer->copyView( SbTime::getTimeOfDay() );
+    this->viewer->copyView(SbTime::getTimeOfDay());
 
     break;
   case PASTE_VIEW_ITEM:
-    this->viewer->pasteView( SbTime::getTimeOfDay() );
+    this->viewer->pasteView(SbTime::getTimeOfDay());
     break;
 
   case AS_IS_ITEM:
@@ -469,7 +469,7 @@ SoAnyFullViewer::menuSelection( // virtual
   case WIREFRAME_ITEM:
   case POINTS_ITEM:
   case BOUNDING_BOX_ITEM:
-    this->drawstyleActivated( menuitemid );
+    this->drawstyleActivated(menuitemid);
     break;
 
   case MOVE_SAME_AS_STILL_ITEM:
@@ -480,7 +480,7 @@ SoAnyFullViewer::menuSelection( // virtual
   case MOVE_POINTS_ITEM:
   case MOVE_LOW_RES_POINTS_ITEM:
   case MOVE_BOUNDING_BOX_ITEM:
-    this->drawstyleActivated( menuitemid );
+    this->drawstyleActivated(menuitemid);
     break;
 
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
@@ -492,14 +492,14 @@ SoAnyFullViewer::menuSelection( // virtual
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
   case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
-    this->drawstyleActivated( menuitemid );
+    this->drawstyleActivated(menuitemid);
     this->viewer->scheduleRedraw();
     break;
 
   case SINGLE_BUFFER_ITEM:
   case DOUBLE_BUFFER_ITEM:
   case INTERACTIVE_BUFFER_ITEM:
-    this->drawstyleActivated( menuitemid );
+    this->drawstyleActivated(menuitemid);
     break;
 
   case STEREO_OFF_ITEM:
@@ -515,27 +515,27 @@ SoAnyFullViewer::menuSelection( // virtual
     this->viewer->setQuadBufferStereo(TRUE);
     if (!this->viewer->isQuadBufferStereo()) {
       this->viewer->setStereoViewing(FALSE);
-      this->prefmenu->setMenuItemMarked( STEREO_OFF_ITEM, TRUE );
+      this->prefmenu->setMenuItemMarked(STEREO_OFF_ITEM, TRUE);
     }
     break;
 
   default:
-    SoDebugError::postInfo( "So@Gui@FullViewer::menuSelection",
-      "popup menu handling for item %d is not implemented", menuitemid );
+    SoDebugError::postInfo("So@Gui@FullViewer::menuSelection",
+      "popup menu handling for item %d is not implemented", menuitemid);
     break;
-  } // switch ( menuitemid )
+  } // switch (menuitemid)
 } // menuSelection()
 
 
 // ************************************************************************
 
 void
-SoAnyFullViewer::menuSelectionCallback( // static
+SoAnyFullViewer::menuSelectionCallback(// static
   int menuitemid,
-  void * userdata )
+  void * userdata)
 {
   SoAnyFullViewer * viewer = (SoAnyFullViewer *) userdata;
-  viewer->menuSelection( menuitemid );
+  viewer->menuSelection(menuitemid);
 } // menuSelectionCallback()
 
 // ************************************************************************
@@ -547,27 +547,27 @@ SoAnyFullViewer::menuSelectionCallback( // static
 void
 SoAnyFullViewer::setDrawStyleMenuActivation(
   So@Gui@Viewer::DrawType type,
-  So@Gui@Viewer::DrawStyle value )
+  So@Gui@Viewer::DrawStyle value)
 {
-  assert( this->viewer->prefmenu != NULL );
+  assert(this->viewer->prefmenu != NULL);
 
-  switch ( type ) {
+  switch (type) {
   case So@Gui@Viewer::STILL:
-    switch ( value ) {
+    switch (value) {
     case So@Gui@Viewer::VIEW_AS_IS:
-      this->viewer->prefmenu->setMenuItemMarked( AS_IS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(AS_IS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_HIDDEN_LINE:
-      this->viewer->prefmenu->setMenuItemMarked( HIDDEN_LINE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(HIDDEN_LINE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_WIREFRAME_OVERLAY:
-      this->viewer->prefmenu->setMenuItemMarked( WIREFRAME_OVERLAY_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(WIREFRAME_OVERLAY_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      this->viewer->prefmenu->setMenuItemMarked( NO_TEXTURE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(NO_TEXTURE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      this->viewer->prefmenu->setMenuItemMarked( LOW_RESOLUTION_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(LOW_RESOLUTION_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
 #if SO@GUI@_DEBUG
@@ -575,7 +575,7 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
                                 "Use VIEW_LINE, not VIEW_LOW_RES_LINE for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_LINE:
-      this->viewer->prefmenu->setMenuItemMarked( WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
 #if SO@GUI@_DEBUG
@@ -583,53 +583,53 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
                                 "Use VIEW_POINT, not VIEW_LOW_RES_POINT for the STILL drawstyle.");
 #endif // debug
     case So@Gui@Viewer::VIEW_POINT:
-      this->viewer->prefmenu->setMenuItemMarked( POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      this->viewer->prefmenu->setMenuItemMarked( BOUNDING_BOX_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
-      assert( 0 && "unsupported default switch-case" );
+      assert(0 && "unsupported default switch-case");
       break;
-    } // switch ( value )
+    } // switch (value)
     break;
 
   case So@Gui@Viewer::INTERACTIVE:
-    switch ( value ) {
+    switch (value) {
     case So@Gui@Viewer::VIEW_SAME_AS_STILL:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_SAME_AS_STILL_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_SAME_AS_STILL_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_NO_TEXTURE:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_NO_TEXTURE_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_NO_TEXTURE_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_COMPLEXITY:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_LOW_RES_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LINE:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_LINE:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_WIREFRAME_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_LOW_RES_WIREFRAME_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_POINT:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_LOW_RES_POINT:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_LOW_RES_POINTS_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_LOW_RES_POINTS_ITEM, TRUE);
       break;
     case So@Gui@Viewer::VIEW_BBOX:
-      this->viewer->prefmenu->setMenuItemMarked( MOVE_BOUNDING_BOX_ITEM, TRUE );
+      this->viewer->prefmenu->setMenuItemMarked(MOVE_BOUNDING_BOX_ITEM, TRUE);
       break;
     default:
-      assert( 0 && "unsupported default switch-case" );
+      assert(0 && "unsupported default switch-case");
       break;
-    } // switch ( value )
+    } // switch (value)
     break;
 
   default:
-    assert( 0 && "unsupported default switch-case" );
+    assert(0 && "unsupported default switch-case");
     break;
-  } // switch ( type )
+  } // switch (type)
 } // setDrawStyleMenuActivation()
 
 // ************************************************************************
@@ -640,58 +640,58 @@ SoAnyFullViewer::setDrawStyleMenuActivation(
 
 void
 SoAnyFullViewer::drawstyleActivated(
-  int menuitemid )
+  int menuitemid)
 {
-  switch ( menuitemid ) {
+  switch (menuitemid) {
   case SINGLE_BUFFER_ITEM:
-    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_SINGLE );
+    this->viewer->setBufferingType(So@Gui@Viewer::BUFFER_SINGLE);
     return;
   case DOUBLE_BUFFER_ITEM:
-    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_DOUBLE );
+    this->viewer->setBufferingType(So@Gui@Viewer::BUFFER_DOUBLE);
     return;
   case INTERACTIVE_BUFFER_ITEM:
-    this->viewer->setBufferingType( So@Gui@Viewer::BUFFER_INTERACTIVE );
+    this->viewer->setBufferingType(So@Gui@Viewer::BUFFER_INTERACTIVE);
     return;
   default:
     break;
-  } // switch ( menuitemid )
+  } // switch (menuitemid)
 
-  switch ( menuitemid ) {
+  switch (menuitemid) {
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::SCREEN_DOOR );
+    this->viewer->setTransparencyType(SoGLRenderAction::SCREEN_DOOR);
     return;
   case ADD_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::ADD );
+    this->viewer->setTransparencyType(SoGLRenderAction::ADD);
     return;
   case DELAYED_ADD_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_ADD );
+    this->viewer->setTransparencyType(SoGLRenderAction::DELAYED_ADD);
     return;
   case SORTED_OBJECT_ADD_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_ADD );
+    this->viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_ADD);
     return;
   case BLEND_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::BLEND );
+    this->viewer->setTransparencyType(SoGLRenderAction::BLEND);
     return;
   case DELAYED_BLEND_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::DELAYED_BLEND );
+    this->viewer->setTransparencyType(SoGLRenderAction::DELAYED_BLEND);
     return;
   case SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_BLEND );
+    this->viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_BLEND);
     return;
 #ifdef __COIN__ // Coin extensions
   case SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD );
+    this->viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_ADD);
     return;
   case SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM:
-    this->viewer->setTransparencyType( SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND );
+    this->viewer->setTransparencyType(SoGLRenderAction::SORTED_OBJECT_SORTED_TRIANGLE_BLEND);
     return;
 #endif // __COIN__
   default:
     break;
-  } // switch ( menuitemid )
+  } // switch (menuitemid)
 
   So@Gui@Viewer::DrawStyle val = So@Gui@Viewer::VIEW_AS_IS;
-  switch ( menuitemid ) {
+  switch (menuitemid) {
   case AS_IS_ITEM:
     val = So@Gui@Viewer::VIEW_AS_IS;
     break;
@@ -743,13 +743,13 @@ SoAnyFullViewer::drawstyleActivated(
     break;
 
   default:
-    assert( 0 );
+    assert(0);
     break;
-  } // switch ( menuitemid )
+  } // switch (menuitemid)
 
   So@Gui@Viewer::DrawType type = So@Gui@Viewer::STILL;
 
-  switch ( menuitemid ) {
+  switch (menuitemid) {
   case AS_IS_ITEM:
   case HIDDEN_LINE_ITEM:
   case WIREFRAME_OVERLAY_ITEM:
@@ -773,37 +773,37 @@ SoAnyFullViewer::drawstyleActivated(
     break;
 
   default:
-    assert( 0 );
+    assert(0);
     break;
-  } // switch ( menuitemid )
+  } // switch (menuitemid)
 
-  this->viewer->setDrawStyle( type, val );
+  this->viewer->setDrawStyle(type, val);
 } // drawstyleActivated()
 
 // ************************************************************************
 
 SbBool
 SoAnyFullViewer::processSoEvent(
-  const SoEvent * const ev )
+  const SoEvent * const ev)
 {
-  if ( ! this->viewer->isViewing() ) // scene event
+  if (! this->viewer->isViewing()) // scene event
     return FALSE;
 
-  const SoType type( ev->getTypeId() );
+  const SoType type(ev->getTypeId());
 
-  if ( type.isDerivedFrom( MOUSEBUTTON_EVENT ) ) {
+  if (type.isDerivedFrom(MOUSEBUTTON_EVENT)) {
     SoMouseButtonEvent * const event = (SoMouseButtonEvent *) ev;
     const int button = event->getButton();
-    if ( (button == SoMouseButtonEvent::BUTTON1) &&
-         this->viewer->isSeekMode() ) {
-      if ( event->getState() == SoButtonEvent::DOWN )
-        this->viewer->seekToPoint( event->getPosition() );
+    if ((button == SoMouseButtonEvent::BUTTON1) &&
+         this->viewer->isSeekMode()) {
+      if (event->getState() == SoButtonEvent::DOWN)
+        this->viewer->seekToPoint(event->getPosition());
       return TRUE;
     }
-    if ( (button == SoMouseButtonEvent::BUTTON2) ) {
-      if ( this->viewer->isPopupMenuEnabled( ) ) {
-        if ( event->getState() == SoButtonEvent::DOWN ) {
-          this->viewer->openPopupMenu( event->getPosition() );
+    if ((button == SoMouseButtonEvent::BUTTON2)) {
+      if (this->viewer->isPopupMenuEnabled()) {
+        if (event->getState() == SoButtonEvent::DOWN) {
+          this->viewer->openPopupMenu(event->getPosition());
         }
         // steal all rmb-events if the viewer uses the popup-menu
         return TRUE;
@@ -812,17 +812,17 @@ SoAnyFullViewer::processSoEvent(
     return FALSE;
   }
 
-  if ( type.isDerivedFrom( KEYBOARD_EVENT ) ) {
+  if (type.isDerivedFrom(KEYBOARD_EVENT)) {
     SoKeyboardEvent * const event = (SoKeyboardEvent *) ev;
-    if ( event->getState() == SoButtonEvent::DOWN ) {
-      if ( event->getKey() == SoKeyboardEvent::S ) {
-        this->viewer->setSeekMode( this->viewer->isSeekMode() ? FALSE : TRUE );
+    if (event->getState() == SoButtonEvent::DOWN) {
+      if (event->getKey() == SoKeyboardEvent::S) {
+        this->viewer->setSeekMode(this->viewer->isSeekMode() ? FALSE : TRUE);
         return TRUE;
       }
       return FALSE;
     }
-    if ( event->getState() == SoButtonEvent::UP ) {
-      if ( event->getKey() == SoKeyboardEvent::S ) return TRUE;
+    if (event->getState() == SoButtonEvent::UP) {
+      if (event->getKey() == SoKeyboardEvent::S) return TRUE;
       return FALSE;
     }
     return FALSE;

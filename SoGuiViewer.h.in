@@ -64,11 +64,11 @@ class SoTimerSensor;
 class So@Gui@Viewer;
 
 typedef void So@Gui@ViewerCB(
-                 void * data, So@Gui@Viewer * viewer );
+                 void * data, So@Gui@Viewer * viewer);
 typedef void So@Gui@ViewerFPSCB(
-                 float fps, void * data, So@Gui@Viewer * viewer );
+                 float fps, void * data, So@Gui@Viewer * viewer);
 typedef void So@Gui@ViewerDecimationPercentageCB(
-                 float percentage, void * data, So@Gui@Viewer * viewer );
+                 float percentage, void * data, So@Gui@Viewer * viewer);
 
 // *************************************************************************
 
@@ -114,10 +114,10 @@ public:
     BUFFER_INTERACTIVE
   };
 
-  virtual void setCamera( SoCamera * camera );
+  virtual void setCamera(SoCamera * camera);
   SoCamera * getCamera(void) const;
 
-  virtual void setCameraType( SoType type );
+  virtual void setCameraType(SoType type);
   SoType getCameraType(void) const;
 
   virtual void viewAll(void);
@@ -125,76 +125,76 @@ public:
   virtual void saveHomePosition(void);
   virtual void resetToHomePosition(void);
 
-  virtual void setHeadlight( SbBool enable );
+  virtual void setHeadlight(SbBool enable);
   SbBool isHeadlight(void) const;
   SoDirectionalLight * getHeadlight(void) const;
 
-  virtual void setDrawStyle( So@Gui@Viewer::DrawType type, So@Gui@Viewer::DrawStyle style);
-  So@Gui@Viewer::DrawStyle getDrawStyle( const So@Gui@Viewer::DrawType type ) const;
+  virtual void setDrawStyle(So@Gui@Viewer::DrawType type, So@Gui@Viewer::DrawStyle style);
+  So@Gui@Viewer::DrawStyle getDrawStyle(const So@Gui@Viewer::DrawType type) const;
 
-  virtual void setBufferingType( So@Gui@Viewer::BufferType type );
+  virtual void setBufferingType(So@Gui@Viewer::BufferType type);
   So@Gui@Viewer::BufferType getBufferingType(void) const;
 
-  virtual void setViewing( SbBool enable );
+  virtual void setViewing(SbBool enable);
   SbBool isViewing(void) const;
 
-  virtual void setCursorEnabled( SbBool enable );
+  virtual void setCursorEnabled(SbBool enable);
   SbBool isCursorEnabled(void) const;
 
-  void setAutoClipping( SbBool enable );
+  void setAutoClipping(SbBool enable);
   SbBool isAutoClipping(void) const;
 
-  virtual void setStereoViewing( SbBool enable );
+  virtual void setStereoViewing(SbBool enable);
   SbBool isStereoViewing(void) const;
 
-  virtual void setStereoOffset( const float dist );
+  virtual void setStereoOffset(const float dist);
   float getStereoOffset(void) const;
 
-  void setDetailSeek( const SbBool enable );
+  void setDetailSeek(const SbBool enable);
   SbBool isDetailSeek(void) const;
 
-  void setSeekTime( const float seconds );
+  void setSeekTime(const float seconds);
   float getSeekTime(void) const;
 
-  void addStartCallback( So@Gui@ViewerCB * func, void * data = NULL );
-  void addFinishCallback( So@Gui@ViewerCB * func, void * data = NULL );
-  void removeStartCallback( So@Gui@ViewerCB * func, void * data = NULL );
-  void removeFinishCallback( So@Gui@ViewerCB * func, void * data = NULL );
+  void addStartCallback(So@Gui@ViewerCB * func, void * data = NULL);
+  void addFinishCallback(So@Gui@ViewerCB * func, void * data = NULL);
+  void removeStartCallback(So@Gui@ViewerCB * func, void * data = NULL);
+  void removeFinishCallback(So@Gui@ViewerCB * func, void * data = NULL);
 
-  void copyView( const SbTime eventTime );
-  void pasteView( const SbTime eventTime );
+  void copyView(const SbTime eventTime);
+  void pasteView(const SbTime eventTime);
 
   virtual void recomputeSceneSize(void);
 
-  void setDecimationStrategy( const DecimationStrategy strategy );
+  void setDecimationStrategy(const DecimationStrategy strategy);
   DecimationStrategy getDecimationStrategy(void) const;
 
-  void setGoalNumberOfTriangles( const int32_t goal );
+  void setGoalNumberOfTriangles(const int32_t goal);
   int32_t getGoalNumberOfTriangles(void) const;
 
   void setGoalFramesPerSecond(const float goal);
   float getGoalFramesPerSecond(void) const;
 
-  void setFixedPercentage( const float percent );
+  void setFixedPercentage(const float percent);
   float getFixedPercentage(void) const;
 
-  void enableFullRenderingWhenStill( const SbBool enable );
+  void enableFullRenderingWhenStill(const SbBool enable);
   SbBool isFullRenderingWhenStill(void) const;
   SbBool isStillNow(void) const;
 
-  void setFramesPerSecondCallback( So@Gui@ViewerFPSCB * callback, void * data );
+  void setFramesPerSecondCallback(So@Gui@ViewerFPSCB * callback, void * data);
 
-  void setNumSamples( const int numFrames );
+  void setNumSamples(const int numFrames);
   int getNumSamples(void) const;
 
   void setDecimationPercentageCallback(
-      So@Gui@ViewerDecimationPercentageCB * cb, void * data = NULL );
+      So@Gui@ViewerDecimationPercentageCB * cb, void * data = NULL);
   float getCurrentDecimationPercentage(void) const;
 
   // Overloaded from parent class.
-  virtual void setDoubleBuffer( const SbBool enable );
+  virtual void setDoubleBuffer(const SbBool enable);
 
-  virtual void setSceneGraph( SoNode * root );
+  virtual void setSceneGraph(SoNode * root);
   virtual SoNode * getSceneGraph(void);
 
 protected:
@@ -203,30 +203,30 @@ protected:
     const char * name,
     SbBool embed,
     Type type,
-    SbBool build );
-  ~So@Gui@Viewer( void );
+    SbBool build);
+  ~So@Gui@Viewer(void);
 
-  virtual void sizeChanged( const SbVec2s size );
-  virtual void setSeekMode( SbBool enable );
+  virtual void sizeChanged(const SbVec2s size);
+  virtual void setSeekMode(SbBool enable);
   SbBool isSeekMode(void) const;
-  SbBool seekToPoint( const SbVec2s screenpos );
-  virtual void computeSeekFinalOrientation( void );
+  SbBool seekToPoint(const SbVec2s screenpos);
+  virtual void computeSeekFinalOrientation(void);
 
   virtual void actualRedraw(void);
-  virtual SbBool processSoEvent( const SoEvent * const event );
-  SbBool processCommonEvents( @EVENT@ event );
+  virtual SbBool processSoEvent(const SoEvent * const event);
+  SbBool processCommonEvents(@EVENT@ event);
 
   void interactiveCountInc(void);
   void interactiveCountDec(void);
   int getInteractiveCount(void) const;
 
-  void setSeekDistance( const float distance );
+  void setSeekDistance(const float distance);
   float getSeekDistance(void) const;
-  void setSeekValueAsPercentage( const SbBool on );
+  void setSeekValueAsPercentage(const SbBool on);
   SbBool isSeekValuePercentage(void) const;
 
   virtual void toggleCameraType(void);
-  virtual void changeCameraValues( SoCamera * camera );
+  virtual void changeCameraValues(SoCamera * camera);
 
   void addSuperimposition(SoNode * scene);
   void removeSuperimposition(SoNode * scene);

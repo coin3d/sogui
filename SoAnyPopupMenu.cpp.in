@@ -52,20 +52,20 @@ static const char rcsid[] =
 */
 
 SoAnyPopupMenu::SoAnyPopupMenu(
-  void )
-: callbacks( NULL )
-, userdata( NULL )
+  void)
+: callbacks(NULL)
+, userdata(NULL)
 {
   this->menuitems = new SbIntList;
   this->radiogroups = new SbIntList;
-  assert( this->menuitems != NULL && this->radiogroups != NULL );
+  assert(this->menuitems != NULL && this->radiogroups != NULL);
 } // SoAnyPopupMenu()
 
 /*!
 */
 
 SoAnyPopupMenu::~SoAnyPopupMenu(
-  void )
+  void)
 {
   delete this->menuitems;
   delete this->radiogroups;
@@ -81,45 +81,45 @@ SoAnyPopupMenu::~SoAnyPopupMenu(
 void
 SoAnyPopupMenu::setMenuItemMarked(
   int itemid,
-  SbBool marked )
+  SbBool marked)
 {
-  int groupid = this->getRadioGroup( itemid );
-  if ( groupid == -1 ) {
-    this->_setMenuItemMarked( itemid, marked );
+  int groupid = this->getRadioGroup(itemid);
+  if (groupid == -1) {
+    this->_setMenuItemMarked(itemid, marked);
     return;
   }
   const int numGroupedItems = this->menuitems->getLength();
   int groupsize = 0;
   int i;
-  for ( i = 0; i < numGroupedItems; i++ ) {
-    if ( ((*this->radiogroups)[i] == groupid) &&
-         ((*this->menuitems)[i] != -1) )
+  for (i = 0; i < numGroupedItems; i++) {
+    if (((*this->radiogroups)[i] == groupid) &&
+         ((*this->menuitems)[i] != -1))
       groupsize++;
   }
-  if ( this->getMenuItemMarked( itemid ) == marked ) {
+  if (this->getMenuItemMarked(itemid) == marked) {
 #if SO@GUI@_DEBUG && 0
-    SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
-      "Marked state already '%s'.", marked ? "on" : "off" );
+    SoDebugError::postWarning("SoAnyPopupMenu::SetMenuItemEnabled",
+      "Marked state already '%s'.", marked ? "on" : "off");
 #endif // SO@GUI@_DEBUG
-  } else if ( groupsize == 0 ) {
-    assert( 0 && "how weird..." );
-  } else if ( groupsize == 1 ) {
-    this->_setMenuItemMarked( itemid, marked );
-  } else if ( (groupsize == 2) ||
-              ((groupsize > 2) && marked) ) {
-    for ( i = 0; i < numGroupedItems; i++ ) {
-      if ( ((*this->radiogroups)[i] == groupid) &&
-           ((*this->menuitems)[i] != -1) ) {
-        this->_setMenuItemMarked( (*this->menuitems)[i],
+  } else if (groupsize == 0) {
+    assert(0 && "how weird...");
+  } else if (groupsize == 1) {
+    this->_setMenuItemMarked(itemid, marked);
+  } else if ((groupsize == 2) ||
+              ((groupsize > 2) && marked)) {
+    for (i = 0; i < numGroupedItems; i++) {
+      if (((*this->radiogroups)[i] == groupid) &&
+           ((*this->menuitems)[i] != -1)) {
+        this->_setMenuItemMarked((*this->menuitems)[i],
           ((*this->menuitems)[i] == itemid) ? marked :
-          ((groupsize == 2) ? (! marked) : FALSE) );
+          ((groupsize == 2) ? (! marked) : FALSE));
       }
     }
   } else {
 #if SO@GUI@_DEBUG
-    SoDebugError::postWarning( "SoAnyPopupMenu::SetMenuItemEnabled",
+    SoDebugError::postWarning("SoAnyPopupMenu::SetMenuItemEnabled",
       "Couldn't handle request.  "
-      "Consider that radio grouping is handled automatically." );
+      "Consider that radio grouping is handled automatically.");
 #endif // SO@GUI@_DEBUG
   }
 } // setMenuItemMarked()
@@ -131,21 +131,21 @@ SoAnyPopupMenu::setMenuItemMarked(
 
 int
 SoAnyPopupMenu::newRadioGroup(
-  int groupid )
+  int groupid)
 {
   const int numGroupedItems = this->radiogroups->getLength();
   int id = groupid;
-  if ( id != -1 ) {
+  if (id != -1) {
     SbBool hit = FALSE;
     int i;
-    for ( i = 0; i < numGroupedItems && hit == FALSE; i++ ) {
-      if ( (*this->radiogroups)[i] == id )
+    for (i = 0; i < numGroupedItems && hit == FALSE; i++) {
+      if ((*this->radiogroups)[i] == id)
         hit = TRUE;
     }
-    if ( hit == TRUE ) {
+    if (hit == TRUE) {
 #if SO@GUI@_DEBUG
-      SoDebugError::postInfo( "SoAnyPopupMenu::NewRadioGroup",
-        "requested group id already taken" );
+      SoDebugError::postInfo("SoAnyPopupMenu::NewRadioGroup",
+        "requested group id already taken");
 #endif // SO@GUI@_DEBUG
       return -1; 
     }
@@ -156,15 +156,15 @@ SoAnyPopupMenu::newRadioGroup(
       id++;
       found = FALSE;
       int i;
-      for ( i = 0; i < numGroupedItems && found == FALSE; i++ ) {
-        if ( (*this->radiogroups)[i] == id )
+      for (i = 0; i < numGroupedItems && found == FALSE; i++) {
+        if ((*this->radiogroups)[i] == id)
           found = TRUE;
       }
-    } while ( found == TRUE );
+    } while (found == TRUE);
   }
   // id is OK here
-  this->menuitems->append( -1 ); // fake menu item
-  this->radiogroups->append( id ); // register id in array
+  this->menuitems->append(-1); // fake menu item
+  this->radiogroups->append(id); // register id in array
   return id;
 } // newRadioGroup()
 
@@ -173,13 +173,13 @@ SoAnyPopupMenu::newRadioGroup(
 
 int
 SoAnyPopupMenu::getRadioGroup(
-  int itemid )
+  int itemid)
 {
-  assert( itemid != -1 );
+  assert(itemid != -1);
   const int numGroupedItems = this->radiogroups->getLength();
   int i;
-  for ( i = 0; i < numGroupedItems; i++ ) {
-    if ( (*this->menuitems)[i] == itemid )
+  for (i = 0; i < numGroupedItems; i++) {
+    if ((*this->menuitems)[i] == itemid)
       return (*this->radiogroups)[i];
   }
   return -1;
@@ -190,14 +190,14 @@ SoAnyPopupMenu::getRadioGroup(
 
 int
 SoAnyPopupMenu::getRadioGroupSize(
-  int groupid )
+  int groupid)
 {
   int count = 0;
   const int numItems = this->radiogroups->getLength();
   int i;
-  for ( i = 0; i < numItems; i++ ) {
-    if ( (*this->radiogroups)[i] == groupid &&
-         (*this->menuitems)[i] != -1 )
+  for (i = 0; i < numItems; i++) {
+    if ((*this->radiogroups)[i] == groupid &&
+         (*this->menuitems)[i] != -1)
       count++;
   }
   return count;
@@ -209,10 +209,10 @@ SoAnyPopupMenu::getRadioGroupSize(
 void
 SoAnyPopupMenu::addRadioGroupItem(
   int groupid,
-  int itemid )
+  int itemid)
 {
-  this->menuitems->append( itemid );
-  this->radiogroups->append( groupid );
+  this->menuitems->append(itemid);
+  this->radiogroups->append(groupid);
 } // addRadioGroupItem()
 
 /*!
@@ -220,13 +220,13 @@ SoAnyPopupMenu::addRadioGroupItem(
 
 void
 SoAnyPopupMenu::removeRadioGroupItem(
-  int itemid )
+  int itemid)
 {
-  assert( itemid != -1 );
+  assert(itemid != -1);
   const int numGroupedItems = this->menuitems->getLength();
   int i;
-  for ( i = 0; i < numGroupedItems; i++ ) {
-    if ( (*this->menuitems)[i] == itemid ) {
+  for (i = 0; i < numGroupedItems; i++) {
+    if ((*this->menuitems)[i] == itemid) {
       this->menuitems->remove(i);
       this->radiogroups->remove(i);
       return;
@@ -236,36 +236,36 @@ SoAnyPopupMenu::removeRadioGroupItem(
 
 void
 SoAnyPopupMenu::setRadioGroupMarkedItem(
-  int itemid )
+  int itemid)
 {
   const int numItems = this->menuitems->getLength();
   int i;
   int groupid = -1;
-  for ( i = 0; i < numItems && groupid == -1; i++ ) {
-    if ( (*this->menuitems)[i] == itemid )
+  for (i = 0; i < numItems && groupid == -1; i++) {
+    if ((*this->menuitems)[i] == itemid)
       groupid = (*this->radiogroups)[i];
   }
-  if ( groupid == -1 )
+  if (groupid == -1)
     return;
-  for ( i = 0; i < numItems; i++ ) {
-    if ( (*this->radiogroups)[i] == groupid ) {
+  for (i = 0; i < numItems; i++) {
+    if ((*this->radiogroups)[i] == groupid) {
       int item = (*this->menuitems)[i];
-      if ( item != -1 && item != itemid )
-        this->setMenuItemMarked( item, FALSE );
+      if (item != -1 && item != itemid)
+        this->setMenuItemMarked(item, FALSE);
     }
   }
 } // setRadioGroupItemEnabled()
 
 int
 SoAnyPopupMenu::getRadioGroupMarkedItem(
-  int groupid )
+  int groupid)
 {
   const int numItems = this->menuitems->getLength();
   int i;
-  for ( i = 0; i < numItems; i++ ) {
-    if ( (*this->radiogroups)[i] == groupid ) {
+  for (i = 0; i < numItems; i++) {
+    if ((*this->radiogroups)[i] == groupid) {
       int item = (*this->menuitems)[i];
-      if ( item != -1 && this->getMenuItemMarked( item ) )
+      if (item != -1 && this->getMenuItemMarked(item))
         return item;
     }
   }
@@ -280,14 +280,14 @@ SoAnyPopupMenu::getRadioGroupMarkedItem(
 void
 SoAnyPopupMenu::addMenuSelectionCallback(
   SoAnyMenuSelectionCallback * callback,
-  void * user )
+  void * user)
 {
-  if ( this->callbacks == NULL ) {
+  if (this->callbacks == NULL) {
     this->callbacks = new SbPList;
     this->userdata = new SbPList;
   }
-  this->callbacks->append( (void *) callback );
-  this->userdata->append( user );
+  this->callbacks->append((void *) callback);
+  this->userdata->append(user);
 } // addMenuSelectionCallback()
 
 /*!
@@ -296,20 +296,20 @@ SoAnyPopupMenu::addMenuSelectionCallback(
 void
 SoAnyPopupMenu::removeMenuSelectionCallback(
   SoAnyMenuSelectionCallback * callback,
-  void * user )
+  void * user)
 {
-  if ( this->callbacks == NULL ) {
+  if (this->callbacks == NULL) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postInfo( "SoAnyPopupMenu::RemoveMenuSelectionCallback",
-      "no callbacks at all" );
+    SoDebugError::postInfo("SoAnyPopupMenu::RemoveMenuSelectionCallback",
+      "no callbacks at all");
 #endif // SO@GUI@_DEBUG
     return;
   }
   int numCallbacks = this->callbacks->getLength();
   int i;
-  for ( i = 0; i < numCallbacks; i++ ) {
-    if ( (*this->callbacks)[i] == (void *) callback &&
-         (*this->userdata)[i] == user ) {
+  for (i = 0; i < numCallbacks; i++) {
+    if ((*this->callbacks)[i] == (void *) callback &&
+         (*this->userdata)[i] == user) {
       this->callbacks->remove(i);
       this->userdata->remove(i);
       i--;
@@ -323,16 +323,16 @@ SoAnyPopupMenu::removeMenuSelectionCallback(
 
 void
 SoAnyPopupMenu::invokeMenuSelection(
-  int itemid )
+  int itemid)
 {
-  if ( this->callbacks == NULL )
+  if (this->callbacks == NULL)
     return;
   const int numCallbacks = this->callbacks->getLength();
   int i;
-  for ( i = 0; i < numCallbacks; i++ ) {
+  for (i = 0; i < numCallbacks; i++) {
     SoAnyMenuSelectionCallback * cb = (SoAnyMenuSelectionCallback *)
       (*this->callbacks)[i];
-    (*cb)( itemid, (*this->userdata)[i] );
+    (*cb)(itemid, (*this->userdata)[i]);
   }
 } // invokeMenuSelection()
 

@@ -47,7 +47,7 @@ public:
   SbVec3f upvechome;
 };
 
-#define PRIVATE( o ) ( o->pimpl )
+#define PRIVATE(o) (o->pimpl)
 
 // ************************************************************************
 
@@ -58,29 +58,29 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@ConstrainedViewer);
 /*!
   Constructor.
 */
-So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
+So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer(// protected
   @WIDGET@ parent,
   const char * const name,
   SbBool embed,
   So@Gui@FullViewer::BuildFlag flag,
   So@Gui@Viewer::Type type,
-  SbBool build )
-: inherited( parent, name, embed, flag, type, FALSE )
+  SbBool build)
+: inherited(parent, name, embed, flag, type, FALSE)
 {
-  PRIVATE( this ) = new So@Gui@ConstrainedViewerP;
+  PRIVATE(this) = new So@Gui@ConstrainedViewerP;
 
-  this->setClassName( "So@Gui@ConstrainedViewer" );
-  this->setLeftWheelString( "Tilt" );
-  this->setBottomWheelString( "Rotate" );
-  this->setRightWheelString( "Dolly" );
+  this->setClassName("So@Gui@ConstrainedViewer");
+  this->setLeftWheelString("Tilt");
+  this->setBottomWheelString("Rotate");
+  this->setRightWheelString("Dolly");
 
   this->sceneHeight = 0.0f;
-  this->upVector = SbVec3f( 0.0f, 1.0f, 0.0f );
-  PRIVATE( this )->upvechome = this->upVector;
+  this->upVector = SbVec3f(0.0f, 1.0f, 0.0f);
+  PRIVATE(this)->upvechome = this->upVector;
 
-  if ( build ) {
-    @WIDGET@ viewer = this->buildWidget( this->getParentWidget() );
-    this->setBaseWidget( viewer );
+  if (build) {
+    @WIDGET@ viewer = this->buildWidget(this->getParentWidget());
+    this->setBaseWidget(viewer);
   }
 }
 
@@ -89,9 +89,9 @@ So@Gui@ConstrainedViewer::So@Gui@ConstrainedViewer( // protected
 /*!
   Virtual destructor.
 */
-So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
+So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer()
 {
-  delete PRIVATE( this );
+  delete PRIVATE(this);
 }
 
 // ************************************************************************
@@ -101,7 +101,7 @@ So@Gui@ConstrainedViewer::~So@Gui@ConstrainedViewer( )
 */
 void
 So@Gui@ConstrainedViewer::setUpDirection(
-  const SbVec3f & dir )
+  const SbVec3f & dir)
 {
   SbRotation change(this->upVector, dir);
   this->upVector = dir;
@@ -119,7 +119,7 @@ So@Gui@ConstrainedViewer::setUpDirection(
   Return up-direction vector for the camera viewpoint.
 */
 const SbVec3f &
-So@Gui@ConstrainedViewer::getUpDirection( void ) const
+So@Gui@ConstrainedViewer::getUpDirection(void) const
 {
   return this->upVector;
 }
@@ -128,10 +128,10 @@ So@Gui@ConstrainedViewer::getUpDirection( void ) const
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::setCamera( // virtual
-  SoCamera * newcam )
+So@Gui@ConstrainedViewer::setCamera(// virtual
+  SoCamera * newcam)
 {
-  inherited::setCamera( newcam );
+  inherited::setCamera(newcam);
   this->checkForCameraUpConstrain();
 }
 
@@ -139,22 +139,22 @@ So@Gui@ConstrainedViewer::setCamera( // virtual
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::saveHomePosition( // virtual
-  void )
+So@Gui@ConstrainedViewer::saveHomePosition(// virtual
+  void)
 {
   inherited::saveHomePosition();
-  PRIVATE( this )->upvechome = this->upVector;
+  PRIVATE(this)->upvechome = this->upVector;
 }
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::resetToHomePosition( // virtual
-  void )
+So@Gui@ConstrainedViewer::resetToHomePosition(// virtual
+  void)
 {
   inherited::resetToHomePosition();
-  this->upVector = PRIVATE( this )->upvechome;
+  this->upVector = PRIVATE(this)->upvechome;
   // should be unnecessary to reset camera position here (camera
   // should have been in a valid state on the last saveHomePosition()
   // call)
@@ -166,8 +166,8 @@ So@Gui@ConstrainedViewer::resetToHomePosition( // virtual
   FIXME: doc
 */
 void
-So@Gui@ConstrainedViewer::recomputeSceneSize( // virtual
-  void )
+So@Gui@ConstrainedViewer::recomputeSceneSize(// virtual
+  void)
 {
   SO@GUI@_STUB();  // FIXME: re-calculate sceneHeight value. 20010907 mortene.
   inherited::recomputeSceneSize();
@@ -180,46 +180,46 @@ So@Gui@ConstrainedViewer::recomputeSceneSize( // virtual
   direction.
 */
 void
-So@Gui@ConstrainedViewer::tiltCamera( // virtual, protected
-  float delta )
+So@Gui@ConstrainedViewer::tiltCamera(// virtual, protected
+  float delta)
 {
   SoCamera * const camera = this->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   SbVec3f camdir;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camdir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camdir);
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( this->getUpDirection().cross( camdir ), delta );
+    SbRotation(this->getUpDirection().cross(camdir), delta);
 }
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::bottomWheelMotion( // virtual, protected
-  float value )
+So@Gui@ConstrainedViewer::bottomWheelMotion(// virtual, protected
+  float value)
 {
-  this->rotateCamera( value - this->getBottomWheelValue() );
-  inherited::bottomWheelMotion( value );
+  this->rotateCamera(value - this->getBottomWheelValue());
+  inherited::bottomWheelMotion(value);
 }
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::leftWheelMotion( // virtual, protected
-  float value )
+So@Gui@ConstrainedViewer::leftWheelMotion(// virtual, protected
+  float value)
 {
-  this->tiltCamera( value - this->getLeftWheelValue() );
-  inherited::leftWheelMotion( value );
+  this->tiltCamera(value - this->getLeftWheelValue());
+  inherited::leftWheelMotion(value);
 }
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
-  SoCamera * camera )
+So@Gui@ConstrainedViewer::changeCameraValues(// virtual, protected
+  SoCamera * camera)
 {
   inherited::changeCameraValues(camera);
   this->checkForCameraUpConstrain();
@@ -233,8 +233,8 @@ So@Gui@ConstrainedViewer::changeCameraValues( // virtual, protected
   picked geometry.
 */
 void
-So@Gui@ConstrainedViewer::findUpDirection( // protected
-  SbVec2s mouselocation )
+So@Gui@ConstrainedViewer::findUpDirection(// protected
+  SbVec2s mouselocation)
 {
   SoRayPickAction rp(this->getViewportRegion());
   rp.setPoint(mouselocation);
@@ -260,8 +260,8 @@ So@Gui@ConstrainedViewer::findUpDirection( // protected
   heeded.
 */
 void
-So@Gui@ConstrainedViewer::checkForCameraUpConstrain( // protected
-  void )
+So@Gui@ConstrainedViewer::checkForCameraUpConstrain(// protected
+  void)
 {
   SoCamera * cam = this->getCamera();
   assert(cam);
@@ -285,13 +285,13 @@ So@Gui@ConstrainedViewer::checkForCameraUpConstrain( // protected
 
 // private
 void
-So@Gui@ConstrainedViewer::rotateCamera( const float delta ) const
+So@Gui@ConstrainedViewer::rotateCamera(const float delta) const
 {
   SoCamera * const camera = this->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( this->getUpDirection(), -delta );
+    SbRotation(this->getUpDirection(), -delta);
 }
 
 // ************************************************************************

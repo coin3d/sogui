@@ -536,21 +536,21 @@ builtin_material_names[] = {
 */
 
 void
-SoAnyMaterialList::setupBuiltinMaterials( // private
-  So@Gui@MaterialDirectory * const index ) const
+SoAnyMaterialList::setupBuiltinMaterials(// private
+  So@Gui@MaterialDirectory * const index) const
 {
-  assert( index != NULL );
+  assert(index != NULL);
   index->numGroups = 0;
   index->groups = NULL;
 #ifdef WITH_STATIC_DEFAULTS
   index->flags |= SO@GUI@_BUILTIN_MATERIALS;
   index->numGroups = 13;
   index->groups = new So@Gui@MaterialGroup * [ 13 ];
-  for ( int i = 0; i < index->numGroups; i++ ) {
+  for (int i = 0; i < index->numGroups; i++) {
     index->groups[i] = new So@Gui@MaterialGroup;
     index->groups[i]->numMaterials = 35;
     index->groups[i]->materials = new So@Gui@Material * [ 35 ];
-    for ( int j = 0; j < 35; j++ ) {
+    for (int j = 0; j < 35; j++) {
       index->groups[i]->materials[j] = new So@Gui@Material;
     }
   }

@@ -166,10 +166,10 @@ public:
   void reallyRedraw(const SbBool clearcol, const SbBool clearz = TRUE);
 
   // Seek functionality
-  static void seeksensorCB( void * data, SoSensor * );
+  static void seeksensorCB(void * data, SoSensor *);
 
   // Drawstyles
-  void changeDrawStyle( So@Gui@Viewer::DrawStyle style );
+  void changeDrawStyle(So@Gui@Viewer::DrawStyle style);
   SbBool drawInteractiveAsStill(void) const;
   SbBool drawAsHiddenLine(void) const;
   SbBool drawAsWireframeOverlay(void) const;
@@ -184,9 +184,9 @@ public:
   void recordFPS(void);
 
   // Misc
-  static void interactivestartCB( void *, So@Gui@Viewer * thisp );
-  static void interactiveendCB( void *, So@Gui@Viewer * thisp );
-  void moveCameraScreen( const SbVec2f & screenpos );
+  static void interactivestartCB(void *, So@Gui@Viewer * thisp);
+  static void interactiveendCB(void *, So@Gui@Viewer * thisp);
+  void moveCameraScreen(const SbVec2f & screenpos);
 
   SoSearchAction * searchaction;
   SbPList * superimpositions;
@@ -195,7 +195,7 @@ public:
 };
 
 So@Gui@ViewerP::So@Gui@ViewerP(
-  So@Gui@Viewer * publ )
+  So@Gui@Viewer * publ)
 {
   this->pub = publ;
   this->searchaction = new SoSearchAction;
@@ -205,7 +205,7 @@ So@Gui@ViewerP::So@Gui@ViewerP(
 
 So@Gui@ViewerP::~So@Gui@ViewerP(void)
 {
-  if ( this->superimpositions ) {
+  if (this->superimpositions) {
     delete this->superimpositions;
     delete this->superimpositionsenabled;
     this->superimpositions = NULL;
@@ -266,10 +266,10 @@ So@Gui@ViewerP::createSuperScene(void)
   };
 
   int i, bufsize;
-  for (i = bufsize = 0; superSceneGraph[i]; i++ )
+  for (i = bufsize = 0; superSceneGraph[i]; i++)
     bufsize += strlen(superSceneGraph[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; superSceneGraph[i]; i++ ) {
+  for (i = bufsize = 0; superSceneGraph[i]; i++) {
     strcpy(buf + bufsize, superSceneGraph[i]);
     bufsize += strlen(superSceneGraph[i]);
     buf[bufsize] = '\n';
@@ -281,7 +281,7 @@ So@Gui@ViewerP::createSuperScene(void)
   SbBool ok = SoDB::read(input, root);
   delete input;
   delete [] buf;
-  if ( !ok ) {
+  if (!ok) {
     SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
 		       "couldn't create viewer superscene");
     return NULL;
@@ -298,16 +298,16 @@ So@Gui@ViewerP::createSuperScene(void)
     member = NULL; \
     this->searchaction->setName(SbName(name)); \
     this->searchaction->apply(root); \
-    if ( this->searchaction->isFound() ) { \
+    if (this->searchaction->isFound()) { \
       SoNode * node = this->searchaction->getPath()->getTail(); \
       assert(node != NULL); \
-      if ( node->isOfType(type::getClassTypeId()) ) \
+      if (node->isOfType(type::getClassTypeId())) \
         member = (type *) node; \
     } else { \
       SoDebugError::post("So@Gui@ViewerP::createSuperScene", \
                          "didn't locate node \"%s\"", name); \
     } \
-  } while ( FALSE )
+  } while (FALSE)
 
   LOCATE_NODE(this->headlight, SoDirectionalLight, "so@gui@->headlight");
   LOCATE_NODE(this->drawstyleroot, SoSwitch, "so@gui@->drawstyleroot");
@@ -321,14 +321,14 @@ So@Gui@ViewerP::createSuperScene(void)
   LOCATE_NODE(this->sodrawstyle, SoDrawStyle, "so@gui@->drawstyle");
   LOCATE_NODE(this->solightmodel, SoLightModel, "so@gui@->lightmodel");
   LOCATE_NODE(this->somaterialbinding, SoMaterialBinding, "so@gui@->materialbinding");
-  if ( this->sobasecolor ) this->sobasecolor->setOverride(TRUE);
-  if ( this->socomplexity ) this->socomplexity->setOverride(TRUE);
-  if ( this->sodrawstyle ) this->sodrawstyle->setOverride(TRUE);
-  if ( this->solightmodel ) this->solightmodel->setOverride(TRUE);
-  if ( this->somaterialbinding ) this->somaterialbinding->setOverride(TRUE);
+  if (this->sobasecolor) this->sobasecolor->setOverride(TRUE);
+  if (this->socomplexity) this->socomplexity->setOverride(TRUE);
+  if (this->sodrawstyle) this->sodrawstyle->setOverride(TRUE);
+  if (this->solightmodel) this->solightmodel->setOverride(TRUE);
+  if (this->somaterialbinding) this->somaterialbinding->setOverride(TRUE);
 #ifdef HAVE_POLYGONOFFSET
   LOCATE_NODE(this->sopolygonoffset, SoPolygonOffset, "so@gui@->polygonoffset");
-  if ( this->sopolygonoffset ) this->sopolygonoffset->setOverride(TRUE);
+  if (this->sopolygonoffset) this->sopolygonoffset->setOverride(TRUE);
 #endif
 
 #undef LOCATE_NODE
@@ -355,10 +355,10 @@ So@Gui@ViewerP::createFPSSuperimposition(void)
   };
 
   int i, bufsize;
-  for (i = bufsize = 0; fpsSceneGraph[i]; i++ )
+  for (i = bufsize = 0; fpsSceneGraph[i]; i++)
     bufsize += strlen(fpsSceneGraph[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; fpsSceneGraph[i]; i++ ) {
+  for (i = bufsize = 0; fpsSceneGraph[i]; i++) {
     strcpy(buf + bufsize, fpsSceneGraph[i]);
     bufsize += strlen(fpsSceneGraph[i]);
     buf[bufsize] = '\n';
@@ -370,7 +370,7 @@ So@Gui@ViewerP::createFPSSuperimposition(void)
   SbBool ok = SoDB::read(input, root);
   delete input;
   delete [] buf;
-  if ( !ok ) {
+  if (!ok) {
     SoDebugError::post("So@Gui@Viewer::So@Gui@Viewer",
 		       "couldn't create viewer superscene");
     return NULL;
@@ -585,7 +585,7 @@ static SoGroup *
 get_parent_of_node(So@Gui@ViewerP * pimpl, SoNode * root, SoNode * node)
 {
   assert(node && root && "get_parent_of_node() called with null argument");
-  if ( pimpl == NULL ) {
+  if (pimpl == NULL) {
     SoSearchAction search;
     search.setSearchingAll(TRUE);
     search.setNode(node);
@@ -632,10 +632,10 @@ So@Gui@Viewer::So@Gui@Viewer(
   const char * name,
   SbBool embed,
   So@Gui@Viewer::Type t,
-  SbBool build )
-: inherited( parent, name, embed, TRUE, TRUE, FALSE )
+  SbBool build)
+: inherited(parent, name, embed, TRUE, TRUE, FALSE)
 {
-  PRIVATE(this) = new So@Gui@ViewerP( this );
+  PRIVATE(this) = new So@Gui@ViewerP(this);
 
   // initialization of protected data
   this->type = t;
@@ -678,14 +678,14 @@ So@Gui@Viewer::So@Gui@Viewer(
   PRIVATE(this)->stereoviewing = FALSE;
   PRIVATE(this)->stereooffset = 0.1f;
 
-  if ( build ) {
-    this->setClassName( "So@Gui@Viewer" );
-    @WIDGET@ widget = this->buildWidget( this->getParentWidget() );
-    this->setBaseWidget( widget );
+  if (build) {
+    this->setClassName("So@Gui@Viewer");
+    @WIDGET@ widget = this->buildWidget(this->getParentWidget());
+    this->setBaseWidget(widget);
   }
 
   PRIVATE(this)->fpsRoot = PRIVATE(this)->createFPSSuperimposition();
-  if ( PRIVATE(this)->fpsRoot ) {
+  if (PRIVATE(this)->fpsRoot) {
     this->addSuperimposition(PRIVATE(this)->fpsRoot);
     this->setSuperimpositionEnabled(PRIVATE(this)->fpsRoot, FALSE);
   }
@@ -699,7 +699,7 @@ So@Gui@Viewer::So@Gui@Viewer(
 */
 
 So@Gui@Viewer::~So@Gui@Viewer(
-  void )
+  void)
 {
   delete this->autoClipBboxAction;
 
@@ -708,10 +708,10 @@ So@Gui@Viewer::~So@Gui@Viewer(
 
   delete PRIVATE(this)->seeksensor;
 
-  if ( this->sceneGraph ) this->setSceneGraph(NULL);
+  if (this->sceneGraph) this->setSceneGraph(NULL);
   this->sceneRoot->unref();
-  if ( PRIVATE(this)->superimpositions != NULL ) {
-    for ( int i = PRIVATE(this)->superimpositions->getLength() - 1; i >= 0; i-- ) {
+  if (PRIVATE(this)->superimpositions != NULL) {
+    for (int i = PRIVATE(this)->superimpositions->getLength() - 1; i >= 0; i--) {
       SoNode * node = (SoNode *) (*PRIVATE(this)->superimpositions)[i];
       node->unref();
     }
@@ -802,8 +802,8 @@ So@Gui@Viewer::setCameraType(SoType t)
   SbBool oldisperspective = PRIVATE(this)->cameratype.isDerivedFrom(perspectivetype);
   SbBool newisperspective = t.isDerivedFrom(perspectivetype);
 
-  if ( ( oldisperspective && newisperspective ) ||
-       ( !oldisperspective && !newisperspective ) ) // Same old, same old..
+  if ((oldisperspective && newisperspective) ||
+       (!oldisperspective && !newisperspective)) // Same old, same old..
     return;
 
 #if SO@GUI@_DEBUG
@@ -811,8 +811,8 @@ So@Gui@Viewer::setCameraType(SoType t)
   if (t == SoType::badType()) valid = FALSE;
   if (valid) {
     valid = FALSE;
-    if ( newisperspective ) valid = TRUE;
-    if ( t.isDerivedFrom( orthotype ) ) valid = TRUE;
+    if (newisperspective) valid = TRUE;
+    if (t.isDerivedFrom(orthotype)) valid = TRUE;
   }
 
   if (!valid) {
@@ -824,27 +824,27 @@ So@Gui@Viewer::setCameraType(SoType t)
   }
 #endif // SO@GUI@_DEBUG
 
-  if ( this->camera != NULL ) {
+  if (this->camera != NULL) {
     SoCamera * newcamera = (SoCamera *)t.createInstance();
-    newcamera->aspectRatio.setValue( this->camera->aspectRatio.getValue() );
-    newcamera->focalDistance.setValue( this->camera->focalDistance.getValue() );
-    newcamera->orientation.setValue( this->camera->orientation.getValue() );
-    newcamera->position.setValue( this->camera->position.getValue() );
-    newcamera->viewportMapping.setValue( this->camera->viewportMapping.getValue() );
+    newcamera->aspectRatio.setValue(this->camera->aspectRatio.getValue());
+    newcamera->focalDistance.setValue(this->camera->focalDistance.getValue());
+    newcamera->orientation.setValue(this->camera->orientation.getValue());
+    newcamera->position.setValue(this->camera->position.getValue());
+    newcamera->viewportMapping.setValue(this->camera->viewportMapping.getValue());
 
     SoPerspectiveCamera * newpcam = NULL, * oldpcam = NULL;
     SoOrthographicCamera * newocam = NULL, * oldocam = NULL;
 
     float focaldist = this->camera->focalDistance.getValue();
 
-    if ( newisperspective ) {
+    if (newisperspective) {
       newpcam = (SoPerspectiveCamera *)newcamera;
       oldocam = (SoOrthographicCamera *)this->camera;
 
       // focalDistance==0.0f happens for empty scenes.
-      if ( focaldist != 0.0f ) {
+      if (focaldist != 0.0f) {
         newpcam->heightAngle =
-          2.0f * atan( oldocam->height.getValue() / 2.0f / focaldist );
+          2.0f * atan(oldocam->height.getValue() / 2.0f / focaldist);
       }
       else {
         newpcam->heightAngle = 0.0f;
@@ -859,12 +859,12 @@ So@Gui@Viewer::setCameraType(SoType t)
 
     SoGroup * cameraparent =
       get_parent_of_node(PRIVATE(this), this->sceneRoot, this->camera);
-    cameraparent->insertChild( newcamera,
-                               cameraparent->findChild( this->camera ) );
+    cameraparent->insertChild(newcamera,
+                               cameraparent->findChild(this->camera));
     SoCamera * oldcamera = !PRIVATE(this)->deletecamera ? this->camera : NULL;
-    this->setCamera( newcamera ); // This will set PRIVATE(this)->cameratype.
+    this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
     PRIVATE(this)->deletecamera = TRUE;
-    if ( oldcamera ) { cameraparent->removeChild( oldcamera ); }
+    if (oldcamera) { cameraparent->removeChild(oldcamera); }
   }
   else { // A camera has not been instantiated for the scene.
     PRIVATE(this)->cameratype = t; // No call to setCamera(), so set type explicitly.
@@ -898,8 +898,8 @@ So@Gui@Viewer::getCameraType(void) const
 void
 So@Gui@Viewer::viewAll(void)
 {
-  if ( this->camera && this->sceneGraph )
-    this->camera->viewAll( this->sceneGraph, this->getViewportRegion() );
+  if (this->camera && this->sceneGraph)
+    this->camera->viewAll(this->sceneGraph, this->getViewportRegion());
 } // viewAll()
 
 // *************************************************************************
@@ -914,7 +914,7 @@ So@Gui@Viewer::viewAll(void)
 void
 So@Gui@Viewer::saveHomePosition(void)
 {
-  if ( ! this->camera ) return; // probably a scene-less viewer
+  if (! this->camera) return; // probably a scene-less viewer
 
   PRIVATE(this)->storedorientation = this->camera->orientation.getValue();
   PRIVATE(this)->storedposition = this->camera->position.getValue();
@@ -941,7 +941,7 @@ So@Gui@Viewer::saveHomePosition(void)
 void
 So@Gui@Viewer::resetToHomePosition(void)
 {
-  if ( ! this->camera ) return; // probably a scene-less viewer
+  if (! this->camera) return; // probably a scene-less viewer
 
   this->camera->orientation = PRIVATE(this)->storedorientation;
   this->camera->position = PRIVATE(this)->storedposition;
@@ -1137,12 +1137,12 @@ So@Gui@Viewer::getBufferingType(void) const
 
 void
 So@Gui@Viewer::setViewing(
-  SbBool enable )
+  SbBool enable)
 {
-  if ( this->viewingFlag == enable ) {
+  if (this->viewingFlag == enable) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postWarning( "So@Gui@Viewer::setViewing",
-                               "unnecessary called" );
+    SoDebugError::postWarning("So@Gui@Viewer::setViewing",
+                               "unnecessary called");
 #endif // SO@GUI@_DEBUG
     return;
   }
@@ -1151,10 +1151,10 @@ So@Gui@Viewer::setViewing(
 
   // Turn off the selection indicators when we go back from picking
   // mode into viewing mode.
-  if ( this->viewingFlag ) {
+  if (this->viewingFlag) {
     SoGLRenderAction * action = this->getGLRenderAction();
-    if ( action != NULL )
-      SoLocateHighlight::turnOffCurrentHighlight( action );
+    if (action != NULL)
+      SoLocateHighlight::turnOffCurrentHighlight(action);
   }
 } // setViewing()
 
@@ -1216,17 +1216,17 @@ So@Gui@Viewer::isCursorEnabled(void) const
 
 void
 So@Gui@Viewer::setAutoClipping(
-  SbBool enable )
+  SbBool enable)
 {
 #if SO@GUI@_DEBUG
-  if ( PRIVATE(this)->adjustclipplanes == enable ) {
+  if (PRIVATE(this)->adjustclipplanes == enable) {
     SoDebugError::postWarning("So@Gui@Viewer::setAutoClipping",
                               "unnecessary called");
     return;
   }
 #endif // SO@GUI@_DEBUG
   PRIVATE(this)->adjustclipplanes = enable;
-  if ( enable ) this->scheduleRedraw();
+  if (enable) this->scheduleRedraw();
 } // setAutoClipping()
 
 // *************************************************************************
@@ -1239,7 +1239,7 @@ So@Gui@Viewer::setAutoClipping(
 
 SbBool
 So@Gui@Viewer::isAutoClipping(
-  void ) const
+  void) const
 {
   return PRIVATE(this)->adjustclipplanes;
 } // isAutoClipping()
@@ -1253,8 +1253,8 @@ So@Gui@Viewer::isAutoClipping(
 */
 
 void
-So@Gui@Viewer::setStereoViewing( // virtual
-  SbBool enable )
+So@Gui@Viewer::setStereoViewing(// virtual
+  SbBool enable)
 {
   PRIVATE(this)->stereoviewing = enable;
   this->scheduleRedraw();
@@ -1274,7 +1274,7 @@ So@Gui@Viewer::setStereoViewing( // virtual
 
 SbBool
 So@Gui@Viewer::isStereoViewing(
-  void ) const
+  void) const
 {
   return PRIVATE(this)->stereoviewing;
 } // setStereoViewing()
@@ -1290,8 +1290,8 @@ So@Gui@Viewer::isStereoViewing(
 */
 
 void
-So@Gui@Viewer::setStereoOffset( // virtual
-  const float dist )
+So@Gui@Viewer::setStereoOffset(// virtual
+  const float dist)
 {
   PRIVATE(this)->stereooffset = dist;
   this->scheduleRedraw();
@@ -1305,7 +1305,7 @@ So@Gui@Viewer::setStereoOffset( // virtual
 
 float
 So@Gui@Viewer::getStereoOffset(
-  void ) const
+  void) const
 {
   return PRIVATE(this)->stereooffset;
 } // getStereoOffset()
@@ -1487,7 +1487,7 @@ So@Gui@Viewer::pasteView(const SbTime eventTime)
 
 void
 So@Gui@Viewer::recomputeSceneSize(
-  void )
+  void)
 {
   // FIXME: implement and use SO@GUI@_OBSOLETED(). 20010815 mortene.
   SoDebugError::postInfo("So@Gui@Viewer::recomputeSceneSize",
@@ -1701,7 +1701,7 @@ So@Gui@Viewer::getCurrentDecimationPercentage(void) const
 */
 
 void
-So@Gui@Viewer::setDoubleBuffer( const SbBool on )
+So@Gui@Viewer::setDoubleBuffer(const SbBool on)
 {
   if (!PRIVATE(this)->localsetbuffertype)
     PRIVATE(this)->buffertype = on ? BUFFER_DOUBLE : BUFFER_SINGLE;
@@ -1729,10 +1729,10 @@ So@Gui@Viewer::setDoubleBuffer( const SbBool on )
 void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
-  if ( root == this->sceneGraph ) {
+  if (root == this->sceneGraph) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postWarning( "So@Gui@Viewer::setSceneGraph",
-                               "called with the same root as already set" );
+    SoDebugError::postWarning("So@Gui@Viewer::setSceneGraph",
+                               "called with the same root as already set");
 #endif // SO@GUI@_DEBUG
     return;
   }
@@ -1743,7 +1743,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   if (!inherited::getSceneGraph())
     inherited::setSceneGraph(this->sceneRoot);
 
-  if ( this->sceneGraph ) {
+  if (this->sceneGraph) {
     if (this->getCamera())
       this->setCamera(NULL);
     // Release the old user-supplied graph.
@@ -1765,7 +1765,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
   PRIVATE(this)->searchaction->apply(this->sceneGraph);
   SoCamera * scenecamera = NULL;
-  if ( PRIVATE(this)->searchaction->isFound() ) {
+  if (PRIVATE(this)->searchaction->isFound()) {
     SoFullPath * fullpath =
       (SoFullPath *) PRIVATE(this)->searchaction->getPath();
     scenecamera = (SoCamera *)fullpath->getTail();
@@ -1785,7 +1785,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     // If type==BROWSER, camera should be inserted in the private
     // viewer "supergraph", if it's equal to EDITOR it should be
     // inserted in the user-supplied scenegraph.
-    if ( this->type == So@Gui@Viewer::BROWSER ) {
+    if (this->type == So@Gui@Viewer::BROWSER) {
       this->sceneRoot->insertChild(scenecamera, 1);
     }
     else { // this->type == So@Gui@Viewer::EDITOR
@@ -1814,17 +1814,13 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
 
 // *************************************************************************
 
-/*!
-  Overloaded from parent class to return the root of the scene graph
-  set by the user, without the extras added by the viewer to control
-  rendering.
-
-  \sa setSceneGraph()
-*/
-
+// doc in super
 SoNode *
 So@Gui@Viewer::getSceneGraph(void)
 {
+  // Overloaded from parent class to return the root of the scene
+  // graph set by the user, without the extras added by the viewer to
+  // control rendering.
   return this->sceneGraph;
 } // getSceneGraph()
 
@@ -1842,16 +1838,16 @@ So@Gui@Viewer::getSceneGraph(void)
 
 void
 So@Gui@Viewer::setSeekMode(
-  SbBool enable )
+  SbBool enable)
 {
 #if SO@GUI@_DEBUG
   // user might have switched mode during seek, so if enable == FALSE,
   // isViewing() is irrelevant.
-  if ( enable )
-    assert( this->isViewing() );
+  if (enable)
+    assert(this->isViewing());
 #endif // SO@GUI@_DEBUG
 
-  if ( ! enable && PRIVATE(this)->seeksensor->isScheduled() ) {
+  if (! enable && PRIVATE(this)->seeksensor->isScheduled()) {
     PRIVATE(this)->seeksensor->unschedule();
     this->interactiveCountDec();
   }
@@ -1885,9 +1881,9 @@ So@Gui@Viewer::isSeekMode(void) const
 */
 
 SbBool
-So@Gui@Viewer::seekToPoint( const SbVec2s screenpos )
+So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 {
-  if ( ! this->camera )
+  if (! this->camera)
     return FALSE;
 
   SoRayPickAction rpaction(this->getViewportRegion());
@@ -1945,55 +1941,55 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 
     // First pass: render as filled, but with the background color.
 
-    this->solightmodel->model.setIgnored( FALSE ); // override as SoLightModel::BASE
-    this->sodrawstyle->style.setIgnored( TRUE ); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored( TRUE ); // as-is rendering space
-    this->socomplexity->value.setIgnored( TRUE ); // as-is complexity on non-simple shapes
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
     // textureQuality field of socomplexity node is always 0.0
 
-    this->sobasecolor->rgb.setValue( pub->getBackgroundColor() );
-    this->sobasecolor->rgb.setIgnored( FALSE );
-    this->somaterialbinding->value.setIgnored( FALSE ); // override with OVERALL
+    this->sobasecolor->rgb.setValue(pub->getBackgroundColor());
+    this->sobasecolor->rgb.setIgnored(FALSE);
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
     this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
-    pub->getSceneManager()->render( clearcol, clearz );
+    pub->getSceneManager()->render(clearcol, clearz);
 
     // Second pass, render wireframe on top.
 
     this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored( FALSE ); // force lines
-    this->sobasecolor->rgb.setIgnored(TRUE ); // use as-is line colors
-    this->somaterialbinding->value.setIgnored( TRUE ); // as-is
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
+    this->sobasecolor->rgb.setIgnored(TRUE); // use as-is line colors
+    this->somaterialbinding->value.setIgnored(TRUE); // as-is
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
 
     pub->getSceneManager()->render(FALSE, FALSE);
 
     return;
   }
-  if ( this->drawAsWireframeOverlay() ) {
+  if (this->drawAsWireframeOverlay()) {
     // First pass: render as-is, with polygon offset
 
-    this->solightmodel->model.setIgnored( TRUE );
-    this->somaterialbinding->value.setIgnored( TRUE );
-    this->sobasecolor->rgb.setIgnored( TRUE );
-    this->sodrawstyle->style.setIgnored( TRUE ); // draw as-is filled/lines/points
-    this->socomplexity->type.setIgnored( TRUE ); // as-is rendering space
-    this->socomplexity->value.setIgnored( TRUE ); // as-is complexity on non-simple shapes
+    this->solightmodel->model.setIgnored(TRUE);
+    this->somaterialbinding->value.setIgnored(TRUE);
+    this->sobasecolor->rgb.setIgnored(TRUE);
+    this->sodrawstyle->style.setIgnored(TRUE); // draw as-is filled/lines/points
+    this->socomplexity->type.setIgnored(TRUE); // as-is rendering space
+    this->socomplexity->value.setIgnored(TRUE); // as-is complexity on non-simple shapes
     this->socomplexity->textureQuality.setIgnored(TRUE);
 
-    this->somaterialbinding->value.setIgnored( TRUE ); // override with OVERALL
+    this->somaterialbinding->value.setIgnored(TRUE); // override with OVERALL
     this->polygonoffsetparent->whichChild = SO_SWITCH_ALL;
 
-    pub->getSceneManager()->render( clearcol, clearz );
+    pub->getSceneManager()->render(clearcol, clearz);
 
     // Second pass, render wireframe on top.
-    this->sobasecolor->rgb.setValue( SbColor(1.0f, 0.0f, 0.0f) );
-    this->sobasecolor->rgb.setIgnored( FALSE );
-    this->somaterialbinding->value.setIgnored( FALSE ); // override with OVERALL
+    this->sobasecolor->rgb.setValue(SbColor(1.0f, 0.0f, 0.0f));
+    this->sobasecolor->rgb.setIgnored(FALSE);
+    this->somaterialbinding->value.setIgnored(FALSE); // override with OVERALL
 
-    this->solightmodel->model.setIgnored( FALSE ); // override as SoLightModel::BASE
+    this->solightmodel->model.setIgnored(FALSE); // override as SoLightModel::BASE
     this->sodrawstyle->style = SoDrawStyle::LINES;
-    this->sodrawstyle->style.setIgnored( FALSE ); // force lines
+    this->sodrawstyle->style.setIgnored(FALSE); // force lines
     this->polygonoffsetparent->whichChild = SO_SWITCH_NONE;
     this->socomplexity->textureQuality.setIgnored(FALSE);
 
@@ -2026,7 +2022,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
 
   SbBool clearzbuffer = TRUE;
   So@Gui@Viewer::DrawStyle style = this->currentDrawStyle();
-  switch ( style ) {
+  switch (style) {
   case So@Gui@Viewer::VIEW_LOW_RES_LINE:
   case So@Gui@Viewer::VIEW_LOW_RES_POINT:
   case So@Gui@Viewer::VIEW_BBOX:
@@ -2035,7 +2031,7 @@ So@Gui@ViewerP::reallyRedraw(const SbBool clearcol, const SbBool clearz)
     break; // Include "default:" case to avoid compiler warning.
   }
 
-  pub->getSceneManager()->render( clearcol, clearzbuffer && clearz );
+  pub->getSceneManager()->render(clearcol, clearzbuffer && clearz);
 }
 
 
@@ -2048,7 +2044,7 @@ void
 So@Gui@Viewer::actualRedraw(void)
 {
   // Recalculate near/far planes.
-  if ( this->isAutoClipping() )
+  if (this->isAutoClipping())
     PRIVATE(this)->setClippingPlanes();
 
   SbBool clearcol = this->isClearBeforeRender();
@@ -2177,13 +2173,13 @@ So@Gui@Viewer::actualRedraw(void)
   }
   else PRIVATE(this)->reallyRedraw(clearcol);
 
-  if ( PRIVATE(this)->superimpositions != NULL ) {
+  if (PRIVATE(this)->superimpositions != NULL) {
     SoGLRenderAction * raaction = this->getSceneManager()->getGLRenderAction();
     SbBool first = TRUE;
     SbBool zWasEnabled = FALSE;
-    for ( int i = 0; i < PRIVATE(this)->superimpositions->getLength(); i++ ) {
-      if ( (*PRIVATE(this)->superimpositionsenabled)[i] != FALSE ) {
-	if ( first ) {
+    for (int i = 0; i < PRIVATE(this)->superimpositions->getLength(); i++) {
+      if ((*PRIVATE(this)->superimpositionsenabled)[i] != FALSE) {
+	if (first) {
 	  // save Z buffer state and disable
           zWasEnabled = glIsEnabled(GL_DEPTH_TEST) ? TRUE : FALSE;
 	  glDisable(GL_DEPTH_TEST);
@@ -2193,10 +2189,10 @@ So@Gui@Viewer::actualRedraw(void)
 	raaction->apply(scene);
       }
     }
-    if ( !first && zWasEnabled ) glEnable(GL_DEPTH_TEST);
+    if (!first && zWasEnabled) glEnable(GL_DEPTH_TEST);
   }
 
-  if ( this->getInteractiveCount() > 0 )
+  if (this->getInteractiveCount() > 0)
     PRIVATE(this)->recordFPS();
 } // actualRedraw()
 
@@ -2272,9 +2268,9 @@ So@Gui@Viewer::interactiveCountDec(void)
 
 #if SO@GUI@_DEBUG
   if (PRIVATE(this)->interactionnesting <= 0) {
-    SoDebugError::postWarning( "So@Gui@Viewer::interactiveCountDec",
+    SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
                                "interaction count nesting went below zero. "
-                               "This is due to an internal So@Gui@ bug." );
+                               "This is due to an internal So@Gui@ bug.");
   }
 #endif // SO@GUI@_DEBUG
 
@@ -2395,8 +2391,8 @@ So@Gui@Viewer::isSeekValuePercentage(void) const
   This method is obsoleted in Coin So@Gui@.
  */
 void
-So@Gui@Viewer::computeSeekFinalOrientation( // virtual, protected
-  void )
+So@Gui@Viewer::computeSeekFinalOrientation(// virtual, protected
+  void)
 {
   SO@GUI@_OBSOLETED();
 }
@@ -2414,8 +2410,8 @@ So@Gui@Viewer::toggleCameraType(void)
   SoType perspectivetype = SoPerspectiveCamera::getClassTypeId();
   SoType orthotype = SoOrthographicCamera::getClassTypeId();
 
-  this->setCameraType( PRIVATE(this)->cameratype.isDerivedFrom( perspectivetype )
-                       ? orthotype : perspectivetype );
+  this->setCameraType(PRIVATE(this)->cameratype.isDerivedFrom(perspectivetype)
+                       ? orthotype : perspectivetype);
 } // toggleCameraType()
 
 // ************************************************************************
@@ -2425,8 +2421,8 @@ So@Gui@Viewer::toggleCameraType(void)
   must be of the same class type.
  */
 void
-So@Gui@Viewer::changeCameraValues( // virtual, protected
-  SoCamera * camera )
+So@Gui@Viewer::changeCameraValues(// virtual, protected
+  SoCamera * camera)
 {
   assert(camera != NULL);
 
@@ -2463,9 +2459,9 @@ SbBool
 So@Gui@ViewerP::drawInteractiveAsStill(void) const
 {
   SbBool moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_SAME_AS_STILL;
-  if ( ! moveasstill )
+  if (! moveasstill)
     moveasstill = this->drawstyles[So@Gui@Viewer::INTERACTIVE] == this->drawstyles[So@Gui@Viewer::STILL];
-  if ( ! moveasstill )
+  if (! moveasstill)
     moveasstill =
       this->drawstyles[So@Gui@Viewer::INTERACTIVE] == So@Gui@Viewer::VIEW_NO_TEXTURE &&
       this->drawstyles[So@Gui@Viewer::STILL] != So@Gui@Viewer::VIEW_AS_IS;
@@ -2482,7 +2478,7 @@ So@Gui@ViewerP::drawInteractiveAsStill(void) const
 
 So@Gui@Viewer::DrawStyle
 So@Gui@ViewerP::currentDrawStyle(
-  void ) const
+  void) const
 {
   SbBool interactivemode = pub->getInteractiveCount() > 0 ? TRUE : FALSE;
 
@@ -2533,7 +2529,7 @@ So@Gui@ViewerP::drawAsWireframeOverlay(void) const
 
 void
 So@Gui@ViewerP::changeDrawStyle(
-  So@Gui@Viewer::DrawStyle style )
+  So@Gui@Viewer::DrawStyle style)
 {
   // Turn on/off Z-buffering based on the style setting.
   switch (style) {
@@ -2689,19 +2685,19 @@ So@Gui@ViewerP::changeDrawStyle(
 
 void
 So@Gui@ViewerP::setClippingPlanes(
-  void )
+  void)
 {
   // This is necessary to avoid a crash in case there is no scene
   // graph specified by the user.
-  if ( pub->camera == NULL ) return;
+  if (pub->camera == NULL) return;
 
-  if ( pub->autoClipBboxAction == NULL )
+  if (pub->autoClipBboxAction == NULL)
     pub->autoClipBboxAction =
-      new SoGetBoundingBoxAction( pub->getViewportRegion() );
+      new SoGetBoundingBoxAction(pub->getViewportRegion());
   else
-    pub->autoClipBboxAction->setViewportRegion( pub->getViewportRegion() );
+    pub->autoClipBboxAction->setViewportRegion(pub->getViewportRegion());
 
-  pub->autoClipBboxAction->apply( pub->sceneRoot );
+  pub->autoClipBboxAction->apply(pub->sceneRoot);
 
   SbXfBox3f xbox = pub->autoClipBboxAction->getXfBoundingBox();
   SbMatrix mat;
@@ -2757,7 +2753,7 @@ So@Gui@ViewerP::setClippingPlanes(
 
 void
 So@Gui@ViewerP::moveCameraScreen(
-  const SbVec2f & screenpos )
+  const SbVec2f & screenpos)
 {
   SoCamera * cam = pub->getCamera();
   assert(cam);
@@ -2771,16 +2767,16 @@ So@Gui@ViewerP::moveCameraScreen(
                          cam->position.getValue()[2]);
 #endif // debug
 
-  SbViewVolume vv = cam->getViewVolume( pub->getGLAspectRatio() );
-  SbPlane panplane = vv.getPlane( cam->focalDistance.getValue() );
+  SbViewVolume vv = cam->getViewVolume(pub->getGLAspectRatio());
+  SbPlane panplane = vv.getPlane(cam->focalDistance.getValue());
 
   SbLine line;
-  vv.projectPointToLine( screenpos + SbVec2f(0.5, 0.5f), line );
+  vv.projectPointToLine(screenpos + SbVec2f(0.5, 0.5f), line);
   SbVec3f current_planept;
-  panplane.intersect( line, current_planept );
-  vv.projectPointToLine( SbVec2f(0.5f, 0.5f), line );
+  panplane.intersect(line, current_planept);
+  vv.projectPointToLine(SbVec2f(0.5f, 0.5f), line);
   SbVec3f old_planept;
-  panplane.intersect( line, old_planept );
+  panplane.intersect(line, old_planept);
 
   // Reposition camera according to the vector difference between the
   // projected points.
@@ -2807,9 +2803,9 @@ void
 So@Gui@ViewerP::interactivestartCB(void *, So@Gui@Viewer * thisp)
 {
   // In interactive buffer mode, doublebuffering is used during interaction.
-  if ( PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
+  if (PRIVATE(thisp)->buffertype == So@Gui@Viewer::BUFFER_INTERACTIVE) {
     PRIVATE(thisp)->localsetbuffertype = TRUE;
-    thisp->So@Gui@RenderArea::setDoubleBuffer( TRUE );
+    thisp->So@Gui@RenderArea::setDoubleBuffer(TRUE);
     PRIVATE(thisp)->localsetbuffertype = FALSE;
   }
 
@@ -2874,9 +2870,9 @@ So@Gui@ViewerP::seeksensorCB(void * data, SoSensor * s)
 // doc in super
 void
 So@Gui@Viewer::sizeChanged(
-  const SbVec2s size )
+  const SbVec2s size)
 {
-  inherited::sizeChanged( size );
+  inherited::sizeChanged(size);
 } // sizeChanged()
 
 // *************************************************************************
@@ -2894,7 +2890,7 @@ void
 So@Gui@ViewerP::resetFrameCounter(void)
 {
   this->framecount = 0;
-  for ( int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++ )
+  for (int i = 0; i < So@Gui@ViewerP::FRAMESARRAY_SIZE; i++)
     this->frames[i] = 0.0;
   this->totalval = 0.0;
   this->currentframetime = 0.0;
@@ -2934,7 +2930,7 @@ static unsigned char fps2dfont[][12] = {
   {  0, 12, 18, 18, 12, 25, 37, 34, 34, 29,  0,  0 }, // &
   { 12, 12, 24,  0,  0,  0,  0,  0,  0,  0,  0,  0 }, // '
   {  0,  6,  8,  8, 16, 16, 16, 16, 16,  8,  8,  6 }, // (
-  {  0, 48,  8,  8,  4,  4,  4,  4,  4,  8,  8, 48 }, // )
+  {  0, 48,  8,  8,  4,  4,  4,  4,  4,  8,  8, 48 }, //)
   {  0,  0,  0,  0,  0,  0,  8, 42, 20, 42,  8,  0 }, // *
   {  0,  0,  0,  8,  8,  8,127,  8,  8,  8,  0,  0 }, // +
   {  0, 24, 12, 12,  0,  0,  0,  0,  0,  0,  0,  0 }, // ,
@@ -3055,17 +3051,17 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 
   glColor3f(0.0, 0.0, 0.0);
   glRasterPos2f(position[0] + 1, position[1]);
-  printString( str );
+  printString(str);
   glRasterPos2f(position[0] - 1, position[1]);
-  printString( str );
+  printString(str);
   glRasterPos2f(position[0], position[1] + 1);
-  printString( str );
+  printString(str);
   glRasterPos2f(position[0], position[1] - 1);
-  printString( str );
+  printString(str);
 
   glColor3f(1.0, 1.0, 0.0);
   glRasterPos2f(position[0], position[1]);
-  printString( str );
+  printString(str);
 
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
@@ -3099,7 +3095,7 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 void
 So@Gui@ViewerP::recordFPS(void)
 {
-  if ( COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR ) {
+  if (COIN_SHOW_FPS_COUNTER == UNINITIALIZED_ENVVAR) {
     char * env = getenv("COIN_SHOW_FPS_COUNTER");
     COIN_SHOW_FPS_COUNTER = env ? atoi(env) : 0;
   }
@@ -3116,7 +3112,7 @@ So@Gui@ViewerP::recordFPS(void)
     else {
       frametime = timeofday - this->lasttimeofday;
       this->lasttimeofday = timeofday;
-      this->addFrametime( frametime );
+      this->addFrametime(frametime);
 
       char buffer[64];
       int nr = sprintf(buffer, "%.1f fps", 1.0 / this->currentframetime);
@@ -3130,36 +3126,36 @@ So@Gui@ViewerP::recordFPS(void)
 
 // doc in super
 SbBool
-So@Gui@Viewer::processSoEvent( // virtual
-  const SoEvent * const event )
+So@Gui@Viewer::processSoEvent(// virtual
+  const SoEvent * const event)
 {
-  const SoType type( event->getTypeId() );
+  const SoType type(event->getTypeId());
 
-  if ( type.isDerivedFrom( SoKeyboardEvent::getClassTypeId() ) ) {
+  if (type.isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
     do {
       SoKeyboardEvent * const keyevent = (SoKeyboardEvent *) event;
 
-      if ( keyevent->getState() != SoButtonEvent::DOWN )
+      if (keyevent->getState() != SoButtonEvent::DOWN)
         break;
 
       // key events for both view and interact mode
 
-      switch ( keyevent->getKey() ) {
+      switch (keyevent->getKey()) {
       case SoKeyboardEvent::ESCAPE:
-        this->setViewing( this->isViewing() ? FALSE : TRUE );
+        this->setViewing(this->isViewing() ? FALSE : TRUE);
         return TRUE;
       default:
         break;
-      } // switch ( keyevent->getKey() )
+      } // switch (keyevent->getKey())
 
-      if ( ! this->isViewing() )
+      if (! this->isViewing())
         break;
 
       // key events just for the view mode
 
-      switch ( keyevent->getKey() ) {
+      switch (keyevent->getKey()) {
       case SoKeyboardEvent::S:
-        this->setSeekMode( this->isSeekMode() ? FALSE : TRUE );
+        this->setSeekMode(this->isSeekMode() ? FALSE : TRUE);
         return TRUE;
       case SoKeyboardEvent::Q:
         this->hide();
@@ -3169,24 +3165,24 @@ So@Gui@Viewer::processSoEvent( // virtual
         this->resetToHomePosition();
         return TRUE;
       case SoKeyboardEvent::LEFT_ARROW:
-        PRIVATE(this)->moveCameraScreen( SbVec2f( -0.1f, 0.0f ) );
+        PRIVATE(this)->moveCameraScreen(SbVec2f(-0.1f, 0.0f));
         return TRUE;
       case SoKeyboardEvent::UP_ARROW:
-        PRIVATE(this)->moveCameraScreen( SbVec2f( 0.0f, 0.1f ) );
+        PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, 0.1f));
         return TRUE;
       case SoKeyboardEvent::RIGHT_ARROW:
-        PRIVATE(this)->moveCameraScreen( SbVec2f( 0.1f, 0.0f ) );
+        PRIVATE(this)->moveCameraScreen(SbVec2f(0.1f, 0.0f));
         return TRUE;
       case SoKeyboardEvent::DOWN_ARROW:
-        PRIVATE(this)->moveCameraScreen( SbVec2f( 0.0f, -0.1f ) );
+        PRIVATE(this)->moveCameraScreen(SbVec2f(0.0f, -0.1f));
         return TRUE;
       default:
         break;
-      } // switch ( keyevent->getKey() )
-    } while ( FALSE );
+      } // switch (keyevent->getKey())
+    } while (FALSE);
   }
 
-  if ( ! this->isViewing() )
+  if (! this->isViewing())
     return inherited::processSoEvent(event);
 
   return FALSE;
@@ -3200,9 +3196,9 @@ So@Gui@Viewer::processSoEvent( // virtual
 
 SbBool
 So@Gui@Viewer::processCommonEvents(
-  @EVENT@ event )
+  @EVENT@ event)
 {
-  if ( this->invokeAppCB(event) ) return TRUE;
+  if (this->invokeAppCB(event)) return TRUE;
   return FALSE;
 } // processCommonEvents()
 
@@ -3217,10 +3213,10 @@ So@Gui@Viewer::processCommonEvents(
 */
 
 void
-So@Gui@Viewer::addSuperimposition( // protected
-  SoNode * scene )
+So@Gui@Viewer::addSuperimposition(// protected
+  SoNode * scene)
 {
-  if ( PRIVATE(this)->superimpositions == NULL ) {
+  if (PRIVATE(this)->superimpositions == NULL) {
     PRIVATE(this)->superimpositions = new SbPList;
     PRIVATE(this)->superimpositionsenabled = new SbIntList;
   }
@@ -3228,7 +3224,7 @@ So@Gui@Viewer::addSuperimposition( // protected
   PRIVATE(this)->searchaction->setType(SoCamera::getClassTypeId());
   PRIVATE(this)->searchaction->setInterest(SoSearchAction::FIRST);
   PRIVATE(this)->searchaction->apply(scene);
-  if ( !PRIVATE(this)->searchaction->isFound() ) {
+  if (!PRIVATE(this)->searchaction->isFound()) {
     // FIXME: set up default environment if there is no camera in the
     // superimposition scene
 #if SO@GUI@_DEBUG
@@ -3249,14 +3245,14 @@ So@Gui@Viewer::addSuperimposition( // protected
 */
 
 void
-So@Gui@Viewer::removeSuperimposition( // protected
-  SoNode * scene )
+So@Gui@Viewer::removeSuperimposition(// protected
+  SoNode * scene)
 {
   assert(scene);
   int idx = -1;
-  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
-  if ( idx == -1 ) goto error;
+  if (idx == -1) goto error;
   assert(PRIVATE(this)->superimpositionsenabled != NULL);
   PRIVATE(this)->superimpositions->remove(idx);
   PRIVATE(this)->superimpositionsenabled->remove(idx);
@@ -3281,14 +3277,14 @@ So@Gui@Viewer::removeSuperimposition( // protected
 */
 
 void
-So@Gui@Viewer::setSuperimpositionEnabled( // protected
+So@Gui@Viewer::setSuperimpositionEnabled(// protected
   SoNode * scene,
-  const SbBool enable )
+  const SbBool enable)
 {
   int idx = -1;
-  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
-  if ( idx == -1 ) goto error;
+  if (idx == -1) goto error;
   (*PRIVATE(this)->superimpositionsenabled)[idx] = enable;
   return;
 
@@ -3309,13 +3305,13 @@ So@Gui@Viewer::setSuperimpositionEnabled( // protected
 */
 
 SbBool
-So@Gui@Viewer::getSuperimpositionEnabled( // protected
-  SoNode * scene ) const
+So@Gui@Viewer::getSuperimpositionEnabled(// protected
+  SoNode * scene) const
 {
   int idx = -1;
-  if ( PRIVATE(this)->superimpositions == NULL ) goto error;
+  if (PRIVATE(this)->superimpositions == NULL) goto error;
   idx = PRIVATE(this)->superimpositions->find(scene);
-  if ( idx == -1 ) goto error;
+  if (idx == -1) goto error;
   return (*PRIVATE(this)->superimpositionsenabled)[idx];
 
  error:

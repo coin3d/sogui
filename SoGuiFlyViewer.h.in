@@ -38,10 +38,10 @@ public:
     const char * name = NULL, 
     SbBool embed = TRUE, 
     So@Gui@FullViewer::BuildFlag flag = BUILD_ALL,
-    So@Gui@Viewer::Type type = BROWSER );
+    So@Gui@Viewer::Type type = BROWSER);
   ~So@Gui@FlyViewer();
 
-  virtual void setViewing(SbBool enable );
+  virtual void setViewing(SbBool enable);
   virtual void viewAll(void);
   virtual void resetToHomePosition(void);
   virtual void setCamera(SoCamera * camera);
@@ -55,17 +55,17 @@ protected:
     SbBool embed, 
     So@Gui@FullViewer::BuildFlag flag, 
     So@Gui@Viewer::Type type, 
-    SbBool build );
+    SbBool build);
 
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
   virtual const char * getDefaultIconTitle(void) const;
 
-  virtual SbBool processSoEvent( const SoEvent * const event );
-  virtual void setSeekMode( SbBool enable );
+  virtual SbBool processSoEvent(const SoEvent * const event);
+  virtual void setSeekMode(SbBool enable);
   virtual void actualRedraw(void);
 
-  virtual void rightWheelMotion( float value );
+  virtual void rightWheelMotion(float value);
 
   virtual void createPrefSheet(void);
   virtual void openViewerHelpCard(void);
@@ -73,7 +73,7 @@ protected:
   virtual void afterRealizeHook(void);
 
 private:
-  void constructor( SbBool build );
+  void constructor(SbBool build);
   class So@Gui@FlyViewerP * pimpl;
 
 }; // class So@Gui@FlyViewer

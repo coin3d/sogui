@@ -37,7 +37,7 @@ class SoSelection;
 
 class So@Gui@Device;
 
-typedef SbBool So@Gui@RenderAreaEventCB( void * closure, @EVENT@ event );
+typedef SbBool So@Gui@RenderAreaEventCB(void * closure, @EVENT@ event);
 
 // *************************************************************************
 
@@ -51,54 +51,54 @@ public:
     const char * name = NULL,
     SbBool embed = TRUE,
     SbBool mouseInput = TRUE,
-    SbBool keyboardInput = TRUE );
+    SbBool keyboardInput = TRUE);
   ~So@Gui@RenderArea(void);
 
-  virtual void setSceneGraph( SoNode * scene );
+  virtual void setSceneGraph(SoNode * scene);
   virtual SoNode * getSceneGraph(void);
-  void setOverlaySceneGraph( SoNode * scene );
+  void setOverlaySceneGraph(SoNode * scene);
   SoNode * getOverlaySceneGraph(void);
 
-  void registerDevice( So@Gui@Device * device );
-  void unregisterDevice( So@Gui@Device * device );
-  void setBackgroundColor( const SbColor & color );
+  void registerDevice(So@Gui@Device * device);
+  void unregisterDevice(So@Gui@Device * device);
+  void setBackgroundColor(const SbColor & color);
   const SbColor & getBackgroundColor(void) const;
-  void setBackgroundIndex( int idx );
+  void setBackgroundIndex(int idx);
   int getBackgroundIndex(void) const;
-  void setOverlayBackgroundIndex( int idx );
+  void setOverlayBackgroundIndex(int idx);
   int getOverlayBackgroundIndex(void) const;
-  void setColorMap( int start, int num, const SbColor * colors );
-  void setOverlayColorMap( int start, int num, const SbColor * colors );
-  void setViewportRegion( const SbViewportRegion & newRegion );
+  void setColorMap(int start, int num, const SbColor * colors);
+  void setOverlayColorMap(int start, int num, const SbColor * colors);
+  void setViewportRegion(const SbViewportRegion & newRegion);
   const SbViewportRegion & getViewportRegion(void) const;
-  void setTransparencyType( SoGLRenderAction::TransparencyType type );
+  void setTransparencyType(SoGLRenderAction::TransparencyType type);
   SoGLRenderAction::TransparencyType getTransparencyType(void) const;
-  void setAntialiasing( SbBool smoothing, int numPasses );
-  void getAntialiasing( SbBool & smoothing, int & numPasses ) const;
-  void setClearBeforeRender( SbBool enable, SbBool zbEnable = TRUE );
+  void setAntialiasing(SbBool smoothing, int numPasses);
+  void getAntialiasing(SbBool & smoothing, int & numPasses) const;
+  void setClearBeforeRender(SbBool enable, SbBool zbEnable = TRUE);
   SbBool isClearBeforeRender(void) const;
   SbBool isClearZBufferBeforeRender(void) const;
-  void setClearBeforeOverlayRender( SbBool enable );
+  void setClearBeforeOverlayRender(SbBool enable);
   SbBool isClearBeforeOverlayRender(void) const;
-  void setAutoRedraw( SbBool enable );
+  void setAutoRedraw(SbBool enable);
   SbBool isAutoRedraw(void) const;
-  void setRedrawPriority( uint32_t priority );
+  void setRedrawPriority(uint32_t priority);
   uint32_t getRedrawPriority(void) const;
   static uint32_t getDefaultRedrawPriority(void);
   void render(void);
   void renderOverlay(void);
   void scheduleRedraw(void);
   void scheduleOverlayRedraw(void);
-  void redrawOnSelectionChange( SoSelection * selection );
-  void redrawOverlayOnSelectionChange( SoSelection * selection );
-  void setEventCallback( So@Gui@RenderAreaEventCB * func, void * user = NULL );
-  void setSceneManager( SoSceneManager * manager );
+  void redrawOnSelectionChange(SoSelection * selection);
+  void redrawOverlayOnSelectionChange(SoSelection * selection);
+  void setEventCallback(So@Gui@RenderAreaEventCB * func, void * user = NULL);
+  void setSceneManager(SoSceneManager * manager);
   SoSceneManager * getSceneManager(void) const;
-  void setOverlaySceneManager( SoSceneManager * manager );
+  void setOverlaySceneManager(SoSceneManager * manager);
   SoSceneManager * getOverlaySceneManager(void) const;
-  void setGLRenderAction( SoGLRenderAction * action );
+  void setGLRenderAction(SoGLRenderAction * action);
   SoGLRenderAction * getGLRenderAction(void) const;
-  void setOverlayGLRenderAction( SoGLRenderAction * action );
+  void setOverlayGLRenderAction(SoGLRenderAction * action);
   SoGLRenderAction * getOverlayGLRenderAction(void) const;
 
 protected:
@@ -108,22 +108,22 @@ protected:
     SbBool embed,
     SbBool mouseInput,
     SbBool keyboardInput,
-    SbBool build );
+    SbBool build);
 
   virtual void redraw(void);
   virtual void actualRedraw(void);
   virtual void redrawOverlay(void);
   virtual void actualOverlayRedraw(void);
 
-  virtual SbBool processSoEvent( const SoEvent * const event );
-  virtual void processEvent( @EVENT@ event );
+  virtual SbBool processSoEvent(const SoEvent * const event);
+  virtual void processEvent(@EVENT@ event);
   virtual void initGraphic(void);
   virtual void initOverlayGraphic(void);
-  virtual void sizeChanged( const SbVec2s size );
-  virtual void widgetChanged( @WIDGET@ widget );
+  virtual void sizeChanged(const SbVec2s size);
+  virtual void widgetChanged(@WIDGET@ widget);
   virtual void afterRealizeHook(void);
 
-  @WIDGET@ buildWidget( @WIDGET@ parent );
+  @WIDGET@ buildWidget(@WIDGET@ parent);
 
   virtual const char * getDefaultWidgetName(void) const;
   virtual const char * getDefaultTitle(void) const;
@@ -131,9 +131,9 @@ protected:
 
   virtual SbBool glScheduleRedraw(void);
 
-  SbBool invokeAppCB( @EVENT@ event );
+  SbBool invokeAppCB(@EVENT@ event);
 
-  const SoEvent * getSoEvent( @EVENT@ event );
+  const SoEvent * getSoEvent(@EVENT@ event);
 
   SbPList * deviceList;
 
@@ -143,10 +143,10 @@ protected:
 private:
   class So@Gui@RenderAreaP * priv;
 
-  void constructor( SbBool mouseInput, SbBool keyboardInput, SbBool build );
-  static void renderCB( void * user, SoSceneManager * manager );
-  static void selection_redraw_cb( void * data, SoSelection * sel );
-  void setDevicesWindowSize( const SbVec2s size );
+  void constructor(SbBool mouseInput, SbBool keyboardInput, SbBool build);
+  static void renderCB(void * user, SoSceneManager * manager);
+  static void selection_redraw_cb(void * data, SoSelection * sel);
+  void setDevicesWindowSize(const SbVec2s size);
 
 }; // class So@Gui@RenderArea
 

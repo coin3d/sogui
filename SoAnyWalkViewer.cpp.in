@@ -52,17 +52,17 @@ static const char rcsid[] =
 */
 
 SoAnyWalkViewer::SoAnyWalkViewer(
-  So@Gui@WalkViewer * const v )
-: viewer( v )
+  So@Gui@WalkViewer * const v)
+: viewer(v)
 {
-  assert( v != NULL );
+  assert(v != NULL);
 } // SoAnyWalkViewer()
 
 /*!
 */
 
 SoAnyWalkViewer::~SoAnyWalkViewer(
-  void )
+  void)
 {
 } // ~SoAnyWalkViewer()
 
@@ -74,19 +74,19 @@ SoAnyWalkViewer::~SoAnyWalkViewer(
 
 void
 SoAnyWalkViewer::dollyCamera(
-  const float delta ) const
+  const float delta) const
 {
   SoCamera * const camera = this->viewer->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
-  SbPlane walkplane( this->viewer->getUpDirection(), camera->position.getValue() );
+  SbPlane walkplane(this->viewer->getUpDirection(), camera->position.getValue());
   SbVec3f campos = camera->position.getValue();
   SbVec3f camvec;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
-  SbLine cross( campos + camvec,
-                campos + camvec + this->viewer->getUpDirection() );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
+  SbLine cross(campos + camvec,
+                campos + camvec + this->viewer->getUpDirection());
   SbVec3f intersect;
-  walkplane.intersect( cross, intersect );
+  walkplane.intersect(cross, intersect);
   SbVec3f dir = intersect - campos;
   dir.normalize();
 
@@ -99,10 +99,10 @@ SoAnyWalkViewer::dollyCamera(
 
 void
 SoAnyWalkViewer::elevateCamera(
-  const float delta ) const
+  const float delta) const
 {
   SoCamera * const camera = this->viewer->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   SbVec3f up = this->viewer->getUpDirection();
   up.normalize();
@@ -113,7 +113,7 @@ SoAnyWalkViewer::elevateCamera(
 
 SbBool
 SoAnyWalkViewer::processSoEvent(
-  const SoEvent * const event )
+  const SoEvent * const event)
 {
   return FALSE;
 } // processSoEvent()

@@ -771,7 +771,7 @@ static int FindXCM (Display *display)
   fprintf(stderr, "win %d atom %d\n", win, atom);
 #endif
 
-  if ( (win != 0) && (atom == 1)) {
+  if ((win != 0) && (atom == 1)) {
       return 1;
   }
   
@@ -964,7 +964,7 @@ int SPW_InputCheckForSpaceball (Display *display,
 #endif
 
   /* check to make sure the corect parameters were passed */
-  if ( (display == NULL) || (window == 0)) {
+  if ((display == NULL) || (window == 0)) {
       return 0;
   }
 
@@ -1108,7 +1108,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
       char *str = clientMessage->data.b; /* data in the passthrough event */
       
       /* check if the pass through event is handshaking from the daemon */
-      if ( ( str[0] == '~') && ( str[1] == '~') ) {
+      if ((str[0] == '~') && (str[1] == '~')) {
         have_handshake = 1;
       }
     }
@@ -1164,7 +1164,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     if (motion->first_axis != 6) {
       for (i = 0; i < 7; i++) {
         spwev->fData[i] = sbData[i];
-        spwev->sData[i] = (short)( (int)sbData[i]);
+        spwev->sData[i] = (short)((int)sbData[i]);
       }
     }
     else {
@@ -1223,7 +1223,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
    *   have sent out SPW_MaxEventCount/shake_delay handshake messages to the
    *   daemon without a response.
    */
-  if ((have_handshake == 0) && ( shake_count < SPW_MaxEventCount)) {
+  if ((have_handshake == 0) && (shake_count < SPW_MaxEventCount)) {
     if ((last_shake + shake_delay) == shake_count) {
       SPW_SendHandshake (display);
       last_shake = shake_count;
@@ -1267,12 +1267,12 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
     spwev->fData[4] *= sbtune[4];
     spwev->fData[5] *= sbtune[5];
     
-    spwev->sData[0] = (int)( spwev->sData[0] * sbtune[0] );
-    spwev->sData[1] = (int)( spwev->sData[1] * sbtune[1] );
-    spwev->sData[2] = (int)( spwev->sData[2] * sbtune[2] );
-    spwev->sData[3] = (int)( spwev->sData[3] * sbtune[3] );
-    spwev->sData[4] = (int)( spwev->sData[4] * sbtune[4] );
-    spwev->sData[5] = (int)( spwev->sData[5] * sbtune[5] );
+    spwev->sData[0] = (int)(spwev->sData[0] * sbtune[0]);
+    spwev->sData[1] = (int)(spwev->sData[1] * sbtune[1]);
+    spwev->sData[2] = (int)(spwev->sData[2] * sbtune[2]);
+    spwev->sData[3] = (int)(spwev->sData[3] * sbtune[3]);
+    spwev->sData[4] = (int)(spwev->sData[4] * sbtune[4]);
+    spwev->sData[5] = (int)(spwev->sData[5] * sbtune[5]);
   }
   
   return 1;
@@ -1726,7 +1726,7 @@ int SPW_InputDispatch (SPW_InputDispatchStruct *ds)
           redraw = 1;
         }
       
-      if ( (all_zero_event != 0) && (motion_events > 1))
+      if ((all_zero_event != 0) && (motion_events > 1))
         {
           for (i = 0; i < 6; i++)
             {
@@ -1952,7 +1952,7 @@ int SPW_InputDispatchEx (SPW_InputDispatchStruct *ds)
           redraw = 1;
         }
 
-      if ( (all_zero_event != 0) && (motion_events > 1) )
+      if ((all_zero_event != 0) && (motion_events > 1))
         {
           for (i = 0; i < 6; i++)
             {

@@ -51,17 +51,17 @@ static const char rcsid[] =
 */
 
 SoAnyConstrainedViewer::SoAnyConstrainedViewer(
-  So@Gui@ConstrainedViewer * const v )
-: viewer( v )
+  So@Gui@ConstrainedViewer * const v)
+: viewer(v)
 {
-  assert( v != NULL );
+  assert(v != NULL);
 } // SoAnyConstrainedViewer()
 
 /*!
 */
 
 SoAnyConstrainedViewer::~SoAnyConstrainedViewer(
-  void )
+  void)
 {
 } // ~SoAnyConstrainedViewer()
 
@@ -73,15 +73,15 @@ SoAnyConstrainedViewer::~SoAnyConstrainedViewer(
 
 void
 SoAnyConstrainedViewer::tiltCamera(
-  const float delta ) const
+  const float delta) const
 {
   SoCamera * const camera = viewer->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   SbVec3f camdir;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camdir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camdir);
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( viewer->getUpDirection().cross( camdir ), delta );
+    SbRotation(viewer->getUpDirection().cross(camdir), delta);
 } // tiltCamera()
 
 /*!
@@ -90,20 +90,20 @@ SoAnyConstrainedViewer::tiltCamera(
 
 void
 SoAnyConstrainedViewer::rotateCamera(
-  const float delta ) const
+  const float delta) const
 {
   SoCamera * const camera = viewer->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
   camera->orientation = camera->orientation.getValue() *
-                        SbRotation( viewer->getUpDirection(), -delta );
+                        SbRotation(viewer->getUpDirection(), -delta);
 } // rotateCamera()
 
 // *************************************************************************
 
 SbBool
 SoAnyConstrainedViewer::processSoEvent(
-  SoEvent * const event )
+  SoEvent * const event)
 {
   return FALSE;
 } // processSoEvent()

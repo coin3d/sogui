@@ -83,7 +83,7 @@ static const char rcsid[] =
 
 class So@Gui@FlyViewerP {
 public:
-  So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
+  So@Gui@FlyViewerP(So@Gui@FlyViewer * owner)
   {
     this->searcher = NULL;
     this->viewer = owner;
@@ -109,10 +109,10 @@ public:
     FLYING, TILTING, WAITING_FOR_SEEK, WAITING_FOR_UP_PICK
   };
 
-  void dolly( const float delta ) const;
-  void updateCursorRepresentation( void ); // in SoNativeFlyViewer.cpp
-  void setMode( ViewerMode newmode );
-  int getMode( void ) { return this->viewermode; }
+  void dolly(const float delta) const;
+  void updateCursorRepresentation(void); // in SoNativeFlyViewer.cpp
+  void setMode(ViewerMode newmode);
+  int getMode(void) { return this->viewermode; }
 
 #define SO@GUI@_MIN_STEP     0.3f
 #define SO@GUI@_INC_FACTOR   1.6f
@@ -149,13 +149,13 @@ private:
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
 {
-  if ( this->searcher )
+  if (this->searcher)
     delete this->searcher;
-  if ( this->lastrender )
+  if (this->lastrender)
     delete this->lastrender;
 }
 
-#define PRIVATE( o ) ( o->pimpl )
+#define PRIVATE(o) (o->pimpl)
 
 // ************************************************************************
 
@@ -166,15 +166,15 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@FlyViewer);
 /*!
   Public constructor.
 */
-So@Gui@FlyViewer::So@Gui@FlyViewer( // public
+So@Gui@FlyViewer::So@Gui@FlyViewer(// public
   @WIDGET@ parent,
   const char * name, 
   SbBool embed, 
   So@Gui@FullViewer::BuildFlag flag,
-  So@Gui@Viewer::Type type )
-: inherited( parent, name, embed, flag, type, FALSE )
+  So@Gui@Viewer::Type type)
+: inherited(parent, name, embed, flag, type, FALSE)
 {
-  this->constructor( TRUE );
+  this->constructor(TRUE);
 } // So@Gui@FlyViewer()
 
 // ************************************************************************
@@ -183,16 +183,16 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // public
   Protected constructor, used by viewer components derived from the
   So@Gui@FlyViewer.
 */
-So@Gui@FlyViewer::So@Gui@FlyViewer( // protected
+So@Gui@FlyViewer::So@Gui@FlyViewer(// protected
   @WIDGET@ parent,
   const char * const name,
   SbBool embed, 
   So@Gui@FullViewer::BuildFlag flag, 
   So@Gui@Viewer::Type type, 
-  SbBool build )
-: inherited( parent, name, embed, flag, type, FALSE )
+  SbBool build)
+: inherited(parent, name, embed, flag, type, FALSE)
 {
-  this->constructor( build );
+  this->constructor(build);
 } // So@Gui@FlyViewer()
 
 /*!
@@ -200,12 +200,12 @@ So@Gui@FlyViewer::So@Gui@FlyViewer( // protected
 */
 
 void
-So@Gui@FlyViewer::constructor( // private
-  SbBool build )
+So@Gui@FlyViewer::constructor(// private
+  SbBool build)
 {
-  PRIVATE( this ) = new So@Gui@FlyViewerP( this );
+  PRIVATE(this) = new So@Gui@FlyViewerP(this);
 
-  this->setClassName( this->getDefaultWidgetName() );
+  this->setClassName(this->getDefaultWidgetName());
 
   static char * superimposed[] = {
     "#Inventor V2.1 ascii",
@@ -317,10 +317,10 @@ So@Gui@FlyViewer::constructor( // private
   };
 
   int i, bufsize;
-  for ( i = bufsize = 0; superimposed[i]; i++ )
+  for (i = bufsize = 0; superimposed[i]; i++)
     bufsize += strlen(superimposed[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for ( i = bufsize = 0; superimposed[i]; i++ ) {
+  for (i = bufsize = 0; superimposed[i]; i++) {
     strcpy(buf + bufsize, superimposed[i]);
     bufsize += strlen(superimposed[i]);
     buf[bufsize] = '\n';
@@ -360,9 +360,9 @@ So@Gui@FlyViewer::constructor( // private
   this->addSuperimposition(PRIVATE(this)->superimposition);
   this->setSuperimpositionEnabled(PRIVATE(this)->superimposition,TRUE);
 
-  if ( build ) {
-    @WIDGET@ viewer = inherited::buildWidget( this->getParentWidget() );
-    this->setBaseWidget( viewer );
+  if (build) {
+    @WIDGET@ viewer = inherited::buildWidget(this->getParentWidget());
+    this->setBaseWidget(viewer);
   }
 } // constructor()
 
@@ -373,26 +373,26 @@ So@Gui@FlyViewer::constructor( // private
 */
 So@Gui@FlyViewer::~So@Gui@FlyViewer()
 {
-  if ( PRIVATE(this)->superimposition != NULL ) {
+  if (PRIVATE(this)->superimposition != NULL) {
     this->removeSuperimposition(PRIVATE(this)->superimposition);
     PRIVATE(this)->superimposition->unref();
     PRIVATE(this)->superimposition = NULL;
   }
-  delete PRIVATE( this );
+  delete PRIVATE(this);
 } // ~So@Gui@FlyViewer()
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@FlyViewer::setViewing( // virtual
-  SbBool enable )
+So@Gui@FlyViewer::setViewing(// virtual
+  SbBool enable)
 {
-  if ( enable != this->isViewing() ) {
+  if (enable != this->isViewing()) {
     PRIVATE(this)->maxspeed = 0.0f;
     PRIVATE(this)->currentspeed = 0.0f;
   }
-  inherited::setViewing( enable );
+  inherited::setViewing(enable);
   this->setSuperimpositionEnabled(PRIVATE(this)->superimposition, enable);
   this->scheduleRedraw();
 } // setViewing()
@@ -401,8 +401,8 @@ So@Gui@FlyViewer::setViewing( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::resetToHomePosition( // virtual
-  void )
+So@Gui@FlyViewer::resetToHomePosition(// virtual
+  void)
 {
   PRIVATE(this)->maxspeed = 0.0f;
   PRIVATE(this)->currentspeed = 0.0f;
@@ -413,8 +413,8 @@ So@Gui@FlyViewer::resetToHomePosition( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::viewAll( // virtual
-  void )
+So@Gui@FlyViewer::viewAll(// virtual
+  void)
 {
   PRIVATE(this)->maxspeed = 0.0f;
   PRIVATE(this)->currentspeed = 0.0f;
@@ -425,12 +425,12 @@ So@Gui@FlyViewer::viewAll( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::setCamera( // virtual
-  SoCamera * camera )
+So@Gui@FlyViewer::setCamera(// virtual
+  SoCamera * camera)
 {
   PRIVATE(this)->maxspeed = 0.0f;
   PRIVATE(this)->currentspeed = 0.0f;
-  inherited::setCamera( camera );
+  inherited::setCamera(camera);
   // FIXME: do something with up-direction?
 } // setCamera()
 
@@ -438,23 +438,23 @@ So@Gui@FlyViewer::setCamera( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::setCursorEnabled( // virtual
-  SbBool enable )
+So@Gui@FlyViewer::setCursorEnabled(// virtual
+  SbBool enable)
 {
-  inherited::setCursorEnabled( enable );
-  PRIVATE( this )->updateCursorRepresentation( );
+  inherited::setCursorEnabled(enable);
+  PRIVATE(this)->updateCursorRepresentation();
 } // setCursorEnabled()
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@FlyViewer::setCameraType( // virtual
-  SoType type )
+So@Gui@FlyViewer::setCameraType(// virtual
+  SoType type)
 {
   PRIVATE(this)->maxspeed = 0.0f;
   PRIVATE(this)->currentspeed = 0.0f;
-  inherited::setCameraType( type );
+  inherited::setCameraType(type);
   // FIXME: what else? 20010907 mortene.
 } // setCameraType()
 
@@ -462,8 +462,8 @@ So@Gui@FlyViewer::setCameraType( // virtual
 
 // doc in super
 const char *
-So@Gui@FlyViewer::getDefaultWidgetName( // virtual
-  void ) const
+So@Gui@FlyViewer::getDefaultWidgetName(// virtual
+  void) const
 {
   static const char defaultWidgetName[] = "So@Gui@FlyViewer";
   return defaultWidgetName;
@@ -473,8 +473,8 @@ So@Gui@FlyViewer::getDefaultWidgetName( // virtual
 
 // doc in super
 const char *
-So@Gui@FlyViewer::getDefaultTitle( // virtual
-  void ) const
+So@Gui@FlyViewer::getDefaultTitle(// virtual
+  void) const
 {
   static const char defaultTitle[] = "Fly Viewer";
   return defaultTitle;
@@ -484,8 +484,8 @@ So@Gui@FlyViewer::getDefaultTitle( // virtual
 
 // doc in super
 const char *
-So@Gui@FlyViewer::getDefaultIconTitle( // virtual
-  void ) const
+So@Gui@FlyViewer::getDefaultIconTitle(// virtual
+  void) const
 {
   static const char defaultIconTitle[] = "Fly Viewer";
   return defaultIconTitle;
@@ -495,34 +495,34 @@ So@Gui@FlyViewer::getDefaultIconTitle( // virtual
 
 // doc in super
 SbBool
-So@Gui@FlyViewer::processSoEvent( // virtual
-  const SoEvent * const event )
+So@Gui@FlyViewer::processSoEvent(// virtual
+  const SoEvent * const event)
 {
-  if ( !this->isViewing() )
+  if (!this->isViewing())
     return inherited::processSoEvent(event);
 
   // Keyboard handling
-  if ( event->isOfType(SoKeyboardEvent::getClassTypeId()) ) {
+  if (event->isOfType(SoKeyboardEvent::getClassTypeId())) {
     // FIXME: only in fly mode
     const SoKeyboardEvent * const ke = (const SoKeyboardEvent *) event;
-    switch ( ke->getState() ) {
+    switch (ke->getState()) {
     case SoButtonEvent::UP:
-      switch ( ke->getKey() ) {
+      switch (ke->getKey()) {
       case SoKeyboardEvent::U:
         do {
           // either to switch to up-vector pick mode, or back to fly
           // mode if pick-mode already activated (ie cancel the
           // up-vector pick operation)
           SbBool uppickmode =
-            PRIVATE( this )->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
-          PRIVATE( this )->setMode( uppickmode ? So@Gui@FlyViewerP::FLYING :
-                                    So@Gui@FlyViewerP::WAITING_FOR_UP_PICK );
+            PRIVATE(this)->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
+          PRIVATE(this)->setMode(uppickmode ? So@Gui@FlyViewerP::FLYING :
+                                    So@Gui@FlyViewerP::WAITING_FOR_UP_PICK);
           PRIVATE(this)->maxspeed = 0.0f;
           PRIVATE(this)->currentspeed = 0.0f;
           PRIVATE(this)->updateSpeedIndicator();
           this->scheduleRedraw();
           return TRUE;
-        } while ( FALSE );
+        } while (FALSE);
         break;
 
       case SoKeyboardEvent::S:
@@ -534,7 +534,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
 
       case SoKeyboardEvent::LEFT_SHIFT:
         PRIVATE(this)->lshiftdown = FALSE;
-        if ( PRIVATE(this)->lshiftdown < 0 ) {
+        if (PRIVATE(this)->lshiftdown < 0) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "left shift key count < 0");
@@ -544,7 +544,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::RIGHT_SHIFT:
         PRIVATE(this)->rshiftdown = FALSE;
-        if ( PRIVATE(this)->rshiftdown < 0 ) {
+        if (PRIVATE(this)->rshiftdown < 0) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "right shift key count < 0");
@@ -554,7 +554,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::LEFT_CONTROL:
         PRIVATE(this)->lctrldown -= 1;
-        if ( PRIVATE(this)->lctrldown < 0 ) {
+        if (PRIVATE(this)->lctrldown < 0) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "left control key count < 0");
@@ -564,7 +564,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::RIGHT_CONTROL:
         PRIVATE(this)->rctrldown -= 1;
-        if ( PRIVATE(this)->rctrldown < 0 ) {
+        if (PRIVATE(this)->rctrldown < 0) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "right control key count < 0");
@@ -577,10 +577,10 @@ So@Gui@FlyViewer::processSoEvent( // virtual
       }
       break;
     case SoButtonEvent::DOWN:
-      switch ( ke->getKey() ) {
+      switch (ke->getKey()) {
       case SoKeyboardEvent::LEFT_SHIFT:
         PRIVATE(this)->lshiftdown += 1;
-        if ( PRIVATE(this)->lshiftdown > 2 ) {
+        if (PRIVATE(this)->lshiftdown > 2) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "left shift key count > 2");
@@ -590,7 +590,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::RIGHT_SHIFT:
         PRIVATE(this)->rshiftdown += 1;
-        if ( PRIVATE(this)->rshiftdown > 2 ) {
+        if (PRIVATE(this)->rshiftdown > 2) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "right shift key count > 2");
@@ -600,7 +600,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::LEFT_CONTROL:
         PRIVATE(this)->lctrldown += 1;
-        if ( PRIVATE(this)->lctrldown > 2 ) {
+        if (PRIVATE(this)->lctrldown > 2) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "left control key count > 2");
@@ -610,7 +610,7 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         break;
       case SoKeyboardEvent::RIGHT_CONTROL:
         PRIVATE(this)->rctrldown += 1;
-        if ( PRIVATE(this)->rctrldown > 2 ) {
+        if (PRIVATE(this)->rctrldown > 2) {
 #if SO@GUI@_DEBUG
           SoDebugError::post("So@Gui@FlyViewer::processSoEvent",
                              "right control key count > 2");
@@ -626,8 +626,8 @@ So@Gui@FlyViewer::processSoEvent( // virtual
       break;
     }
 
-    if ( (PRIVATE(this)->getMode() == So@Gui@FlyViewerP::FLYING) &&
-         (PRIVATE(this)->lctrldown || PRIVATE(this)->rctrldown) ) {
+    if ((PRIVATE(this)->getMode() == So@Gui@FlyViewerP::FLYING) &&
+         (PRIVATE(this)->lctrldown || PRIVATE(this)->rctrldown)) {
       PRIVATE(this)->setMode(So@Gui@FlyViewerP::TILTING);
       PRIVATE(this)->tiltrotation = camera->orientation.getValue();
       PRIVATE(this)->tiltup = this->getUpDirection();
@@ -641,50 +641,50 @@ So@Gui@FlyViewer::processSoEvent( // virtual
       this->scheduleRedraw();
       // NOTE; this could be optimized to only draw the superimposition in
       // question if speed is zero.
-    } else if ( (PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING) &&
-                !PRIVATE(this)->lctrldown && !PRIVATE(this)->rctrldown ) {
+    } else if ((PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING) &&
+                !PRIVATE(this)->lctrldown && !PRIVATE(this)->rctrldown) {
       PRIVATE(this)->setMode(So@Gui@FlyViewerP::FLYING);
-      assert( PRIVATE(this)->crossswitch != NULL );
+      assert(PRIVATE(this)->crossswitch != NULL);
       PRIVATE(this)->crossswitch->whichChild.setValue(SO_SWITCH_NONE);
       this->scheduleRedraw();
     }
   }
 
   // Mousebutton handling
-  else if ( event->isOfType(SoMouseButtonEvent::getClassTypeId()) ) {
+  else if (event->isOfType(SoMouseButtonEvent::getClassTypeId())) {
     // FIXME: only for fly mode
     const SoMouseButtonEvent * const me = (const SoMouseButtonEvent *) event;
-    switch ( PRIVATE(this)->getMode() ) {
+    switch (PRIVATE(this)->getMode()) {
     case So@Gui@FlyViewerP::WAITING_FOR_UP_PICK:
-      if ( (me->getButton() == SoMouseButtonEvent::BUTTON1) &&
-           (me->getState() == SoButtonEvent::DOWN) ) {
-        this->findUpDirection( event->getPosition( ) );
-        PRIVATE(this)->setMode( So@Gui@FlyViewerP::FLYING );
+      if ((me->getButton() == SoMouseButtonEvent::BUTTON1) &&
+           (me->getState() == SoButtonEvent::DOWN)) {
+        this->findUpDirection(event->getPosition());
+        PRIVATE(this)->setMode(So@Gui@FlyViewerP::FLYING);
         return TRUE;
       }
       break;
     case So@Gui@FlyViewerP::FLYING:
-      switch ( me->getButton() ) {
+      switch (me->getButton()) {
       case SoMouseButtonEvent::BUTTON1:
-        switch ( me->getState() ) {
+        switch (me->getState()) {
         case SoButtonEvent::DOWN:
           PRIVATE(this)->button1down = TRUE;
-          if ( PRIVATE(this)->button3down ) {
+          if (PRIVATE(this)->button3down) {
             PRIVATE(this)->currentspeed = 0.0f;
             PRIVATE(this)->maxspeed = 0.0f;
           } else {
-            if ( PRIVATE(this)->maxspeed == 0 )
+            if (PRIVATE(this)->maxspeed == 0)
               PRIVATE(this)->maxspeed = SO@GUI@_MIN_STEP;
-            else if ( (PRIVATE(this)->maxspeed >= -SO@GUI@_MIN_STEP) &&
-                      (PRIVATE(this)->maxspeed < 0.0f) )
+            else if ((PRIVATE(this)->maxspeed >= -SO@GUI@_MIN_STEP) &&
+                      (PRIVATE(this)->maxspeed < 0.0f))
               PRIVATE(this)->maxspeed = 0.0f;
-            else if ( PRIVATE(this)->maxspeed > 0 )
+            else if (PRIVATE(this)->maxspeed > 0)
               PRIVATE(this)->maxspeed *= SO@GUI@_INC_FACTOR;
             else
               PRIVATE(this)->maxspeed /= SO@GUI@_INC_FACTOR;
-            if ( PRIVATE(this)->maxspeed > SO@GUI@_MAX_SPEED )
+            if (PRIVATE(this)->maxspeed > SO@GUI@_MAX_SPEED)
               PRIVATE(this)->maxspeed = SO@GUI@_MAX_SPEED;
-            else if ( PRIVATE(this)->maxspeed < -SO@GUI@_MAX_SPEED )
+            else if (PRIVATE(this)->maxspeed < -SO@GUI@_MAX_SPEED)
               PRIVATE(this)->maxspeed = -SO@GUI@_MAX_SPEED;
           }
           PRIVATE(this)->updateSpeedIndicator();
@@ -698,25 +698,25 @@ So@Gui@FlyViewer::processSoEvent( // virtual
         }
         break;
       case SoMouseButtonEvent::BUTTON3:
-        switch ( me->getState() ) {
+        switch (me->getState()) {
         case SoButtonEvent::DOWN:
           PRIVATE(this)->button3down = TRUE;
-          if ( PRIVATE(this)->button1down ) {
+          if (PRIVATE(this)->button1down) {
             PRIVATE(this)->currentspeed = 0.0f;
             PRIVATE(this)->maxspeed = 0.0f;
           } else {
-            if ( (PRIVATE(this)->maxspeed > 0.0f) &&
-                 (PRIVATE(this)->maxspeed <= SO@GUI@_MIN_STEP) )
+            if ((PRIVATE(this)->maxspeed > 0.0f) &&
+                 (PRIVATE(this)->maxspeed <= SO@GUI@_MIN_STEP))
               PRIVATE(this)->maxspeed = 0.0f;
-            else if ( PRIVATE(this)->maxspeed == 0.0f )
+            else if (PRIVATE(this)->maxspeed == 0.0f)
               PRIVATE(this)->maxspeed = -SO@GUI@_MIN_STEP;
-            else if ( PRIVATE(this)->maxspeed > 0 )
+            else if (PRIVATE(this)->maxspeed > 0)
               PRIVATE(this)->maxspeed /= SO@GUI@_INC_FACTOR;
             else
               PRIVATE(this)->maxspeed *= SO@GUI@_INC_FACTOR;
-            if ( PRIVATE(this)->maxspeed > SO@GUI@_MAX_SPEED )
+            if (PRIVATE(this)->maxspeed > SO@GUI@_MAX_SPEED)
               PRIVATE(this)->maxspeed = SO@GUI@_MAX_SPEED;
-            else if ( PRIVATE(this)->maxspeed < -SO@GUI@_MAX_SPEED )
+            else if (PRIVATE(this)->maxspeed < -SO@GUI@_MAX_SPEED)
               PRIVATE(this)->maxspeed = -SO@GUI@_MAX_SPEED;
           }
           PRIVATE(this)->updateSpeedIndicator();
@@ -737,12 +737,12 @@ So@Gui@FlyViewer::processSoEvent( // virtual
     }
   }
 
-  else if ( event->isOfType(SoLocation2Event::getClassTypeId()) ) {
-    if ( PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING ) {
+  else if (event->isOfType(SoLocation2Event::getClassTypeId())) {
+    if (PRIVATE(this)->getMode() == So@Gui@FlyViewerP::TILTING) {
       SbVec2s newpos = ((SoLocation2Event *) event)->getPosition();
       float dx = newpos[0] - PRIVATE(this)->tiltpos[0];
       float dy = newpos[1] - PRIVATE(this)->tiltpos[1];
-      if ( dx != 0.0f || dy != 0.0f ) {
+      if (dx != 0.0f || dy != 0.0f) {
         SoCamera * camera = this->getCamera();
         assert(camera != NULL);
         SbVec3f up(PRIVATE(this)->tiltup);
@@ -765,15 +765,15 @@ So@Gui@FlyViewer::processSoEvent( // virtual
     return TRUE;
   }
 
-  return inherited::processSoEvent( event );
+  return inherited::processSoEvent(event);
 } // processSoEvent()
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@FlyViewer::setSeekMode( // virtual
-  SbBool enable )
+So@Gui@FlyViewer::setSeekMode(// virtual
+  SbBool enable)
 {
   // Note: this method is almost identical to the setSeekMode() in the
   // So@Gui@ExaminerViewer, so migrate any changes.
@@ -790,23 +790,23 @@ So@Gui@FlyViewer::setSeekMode( // virtual
   // larsa - either stop the seek (on false) or reset timer to two new secs
 
   inherited::setSeekMode(enable);
-  PRIVATE( this )->setMode( enable ? So@Gui@FlyViewerP::WAITING_FOR_SEEK :
-                            So@Gui@FlyViewerP::FLYING );
+  PRIVATE(this)->setMode(enable ? So@Gui@FlyViewerP::WAITING_FOR_SEEK :
+                            So@Gui@FlyViewerP::FLYING);
 } // setSeekMode()
 
 // ************************************************************************
 
 // doc in super
 void
-So@Gui@FlyViewer::actualRedraw( // virtual
-  void )
+So@Gui@FlyViewer::actualRedraw(// virtual
+  void)
 {
-  if ( !this->isViewing() ) {
+  if (!this->isViewing()) {
     inherited::actualRedraw();
     return;
   }
 
-  switch ( PRIVATE(this)->getMode() ) {
+  switch (PRIVATE(this)->getMode()) {
   case So@Gui@FlyViewerP::FLYING:
     do {
       SbVec2s glsize(this->getGLSize());
@@ -816,7 +816,7 @@ So@Gui@FlyViewer::actualRedraw( // virtual
       float yfrac =
         float(mid[1]-PRIVATE(this)->mouseloc[1]) / float(mid[1]);
       float factor = xfrac * xfrac + yfrac * yfrac;
-      if ( factor > 0.99f ) {
+      if (factor > 0.99f) {
         factor = 0.01f;
       } else {
         factor = 1.0f - factor;
@@ -825,11 +825,11 @@ So@Gui@FlyViewer::actualRedraw( // virtual
       SbTime thisrender;
       thisrender.setToTimeOfDay();
       float t = 0.0f;
-      if ( PRIVATE(this)->lastrender ) {
-        if ( PRIVATE(this)->currentspeed == 0.0f )
+      if (PRIVATE(this)->lastrender) {
+        if (PRIVATE(this)->currentspeed == 0.0f)
           PRIVATE(this)->lastrender->setValue(thisrender.getValue()-0.01);
         t = float(thisrender.getMsecValue() - PRIVATE(this)->lastrender->getMsecValue()) / 100.0f;
-        if ( t >= 1.0f ) t = 1.0f;
+        if (t >= 1.0f) t = 1.0f;
       }
       PRIVATE(this)->currentspeed +=
         (((PRIVATE(this)->currentspeed +
@@ -837,16 +837,16 @@ So@Gui@FlyViewer::actualRedraw( // virtual
          - PRIVATE(this)->currentspeed) * t;
 
       // need some lower epsilon since the above may not get down to 0...
-      if ( (PRIVATE(this)->currentspeed <  0.001f) &&
-           (PRIVATE(this)->currentspeed > -0.001f) )
+      if ((PRIVATE(this)->currentspeed <  0.001f) &&
+           (PRIVATE(this)->currentspeed > -0.001f))
         PRIVATE(this)->currentspeed = 0.0f;
         
       PRIVATE(this)->updateSpeedIndicator();
 
-      if ( PRIVATE(this)->currentspeed != 0.0f ) {
-        if ( PRIVATE(this)->lastrender ) {
+      if (PRIVATE(this)->currentspeed != 0.0f) {
+        if (PRIVATE(this)->lastrender) {
           t = float(thisrender.getMsecValue() - PRIVATE(this)->lastrender->getMsecValue()) / 500.0f;
-          if ( t > 0.0f ) {
+          if (t > 0.0f) {
             SoCamera * camera = this->getCamera();
             assert(camera != NULL);
             SbVec3f up(this->getUpDirection());
@@ -861,12 +861,12 @@ So@Gui@FlyViewer::actualRedraw( // virtual
 
             // FIXME: roll instead of turn if either shift button is down
             // if it seems like a good idea
-            if ( xfrac < 0.0f ) xfactor = -xfactor;
+            if (xfrac < 0.0f) xfactor = -xfactor;
             orientation *= SbRotation(this->getUpDirection(), xfactor * t);
 
             // set tilt
             SbRotation tilt = SbRotation(horizon, yfrac * yfrac * 0.002f);
-            if ( yfrac >= 0.0f ) tilt.invert();
+            if (yfrac >= 0.0f) tilt.invert();
             orientation *= tilt;
             SbVec3f newUp;
             tilt.multVec(up, newUp);
@@ -876,13 +876,13 @@ So@Gui@FlyViewer::actualRedraw( // virtual
         }
       }
       inherited::actualRedraw();
-      if ( !PRIVATE(this)->lastrender )
+      if (!PRIVATE(this)->lastrender)
         PRIVATE(this)->lastrender = new SbTime;
       PRIVATE(this)->lastrender->setValue(thisrender.getValue());
-      if ( PRIVATE(this)->currentspeed != 0.0f ||
-           PRIVATE(this)->maxspeed != 0.0f )
+      if (PRIVATE(this)->currentspeed != 0.0f ||
+           PRIVATE(this)->maxspeed != 0.0f)
         this->scheduleRedraw();
-    } while ( FALSE );
+    } while (FALSE);
     break;
   default:
     inherited::actualRedraw();
@@ -894,11 +894,11 @@ So@Gui@FlyViewer::actualRedraw( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::rightWheelMotion( // virtual
-  float value )
+So@Gui@FlyViewer::rightWheelMotion(// virtual
+  float value)
 {
-  PRIVATE( this )->dolly( value - this->getRightWheelValue() );
-  inherited::rightWheelMotion( value );
+  PRIVATE(this)->dolly(value - this->getRightWheelValue());
+  inherited::rightWheelMotion(value);
 } // rightWheelMotion()
 
 // ************************************************************************
@@ -907,8 +907,8 @@ So@Gui@FlyViewer::rightWheelMotion( // virtual
   FIXME: doc
  */
 void
-So@Gui@FlyViewer::createPrefSheet( // virtual
-  void )
+So@Gui@FlyViewer::createPrefSheet(// virtual
+  void)
 {
   SO@GUI@_STUB();
 } // createPrefSheet()
@@ -917,8 +917,8 @@ So@Gui@FlyViewer::createPrefSheet( // virtual
 
 // doc in super
 void
-So@Gui@FlyViewer::openViewerHelpCard( // virtual
-  void )
+So@Gui@FlyViewer::openViewerHelpCard(// virtual
+  void)
 {
   // FIXME: mark obsoleted. 20010907 mortene.
 } // openViewerHelpCard()
@@ -928,19 +928,19 @@ So@Gui@FlyViewer::openViewerHelpCard( // virtual
 // This method dollies the camera back and forth in the scene.
 void
 So@Gui@FlyViewerP::dolly(
-  const float delta ) const
+  const float delta) const
 {
   SoCamera * const camera = this->viewer->getCamera();
-  if ( camera == NULL ) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scenegraph, for instance
 
-  SbPlane walkplane( this->viewer->getUpDirection(), camera->position.getValue() );
+  SbPlane walkplane(this->viewer->getUpDirection(), camera->position.getValue());
   SbVec3f campos = camera->position.getValue();
   SbVec3f camvec;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), camvec );
-  SbLine cross( campos + camvec,
-                campos + camvec + this->viewer->getUpDirection() );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camvec);
+  SbLine cross(campos + camvec,
+                campos + camvec + this->viewer->getUpDirection());
   SbVec3f intersect;
-  walkplane.intersect( cross, intersect );
+  walkplane.intersect(cross, intersect);
   SbVec3f dir = intersect - campos;
   dir.normalize();
 
@@ -951,10 +951,10 @@ So@Gui@FlyViewerP::dolly(
 
 // doc in super
 void
-So@Gui@FlyViewer::afterRealizeHook( // protected virtual
-  void )
+So@Gui@FlyViewer::afterRealizeHook(// protected virtual
+  void)
 {
-  PRIVATE( this )->updateCursorRepresentation( );
+  PRIVATE(this)->updateCursorRepresentation();
   inherited::afterRealizeHook();
 } // afterRealizeHook()
 
@@ -963,16 +963,16 @@ So@Gui@FlyViewer::afterRealizeHook( // protected virtual
 // The viewer is a state machine, and all changes to the current state
 // are made through this call.
 void
-So@Gui@FlyViewerP::setMode( ViewerMode newmode )
+So@Gui@FlyViewerP::setMode(ViewerMode newmode)
 {
-  switch ( newmode ) {
+  switch (newmode) {
     // Assuming interesting things will happen here..
   default:
     break;
   }
 
   this->viewermode = newmode;
-  this->updateCursorRepresentation( );
+  this->updateCursorRepresentation();
 } // setMode()
 
 // ************************************************************************
@@ -984,7 +984,7 @@ So@Gui@FlyViewerP::setMode( ViewerMode newmode )
 SoNode *
 So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
 {
-  if ( ! this->searcher )
+  if (! this->searcher)
     this->searcher = new SoSearchAction;
   searcher->reset();
   searcher->setName(SbName(name));
@@ -999,49 +999,49 @@ So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
 
 void
 So@Gui@FlyViewerP::superimpositionevent(
-  SoAction * action )
+  SoAction * action)
 {
-  if ( !action->isOfType(SoGLRenderAction::getClassTypeId()) ) return;
+  if (!action->isOfType(SoGLRenderAction::getClassTypeId())) return;
   SbViewportRegion vpRegion =
     ((SoGLRenderAction *) action)->getViewportRegion();
   SbVec2s viewport = vpRegion.getViewportSizePixels();
   float aspect = float(viewport[0]) / float(viewport[1]);
   float factorx = 1.0f/float(viewport[1]) * 220.0f;
   float factory = factorx;
-  if ( aspect > 1.0f ) {
+  if (aspect > 1.0f) {
     this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f, 0.0f));
   } else {
     this->stranslation->translation.setValue(SbVec3f(0.0f, -0.4f / aspect, 0.0f));
     factorx /= aspect;
     factory /= aspect;
   }
-  if ( viewport[0] > 500 )
+  if (viewport[0] > 500)
     factorx *= 500.0f / 400.0f;
   else
     factorx *= float(viewport[0]) / 400.0f;
-  this->sscale->scaleFactor.setValue( SbVec3f(factorx, factory, 1.0f) );
+  this->sscale->scaleFactor.setValue(SbVec3f(factorx, factory, 1.0f));
 
-  if ( this->getMode() == TILTING ) {
-    assert( this->crossposition != NULL );
-    assert( this->crossscale != NULL );
+  if (this->getMode() == TILTING) {
+    assert(this->crossposition != NULL);
+    assert(this->crossscale != NULL);
     float tx = float(this->tiltpos[0]-float(viewport[0])/2.0f)/(float(viewport[0]));
     float ty = float(this->tiltpos[1]-float(viewport[1])/2.0f)/(float(viewport[1]));
-    if ( aspect > 1.0f ) tx *= aspect;
+    if (aspect > 1.0f) tx *= aspect;
     else ty /= aspect;
     this->crossposition->translation.setValue(SbVec3f(tx, ty, 0));
 
     float sx = (1.0f/float(viewport[0])) * 15.0f;
     float sy = (1.0f/float(viewport[1])) * 15.0f;
-    if ( aspect > 1.0f ) sx *= aspect;
+    if (aspect > 1.0f) sx *= aspect;
     else sy /= aspect;
     this->crossscale->scaleFactor.setValue(SbVec3f(sx, sy, 0));
   }
 } // superimpositionevent()
 
 void
-So@Gui@FlyViewerP::superimposition_cb( // static
+So@Gui@FlyViewerP::superimposition_cb(// static
   void * closure,
-  SoAction * action )
+  SoAction * action)
 {
   assert(closure != NULL);
   ((So@Gui@FlyViewerP *) closure)->superimpositionevent(action);
@@ -1051,22 +1051,22 @@ So@Gui@FlyViewerP::superimposition_cb( // static
 
 void
 So@Gui@FlyViewerP::updateSpeedIndicator(
-  void )
+  void)
 {
   assert(this->sgeometry != NULL);
   SbVec3f * points = this->sgeometry->point.startEditing();
-  if ( points[10][0] == 0.0f )
+  if (points[10][0] == 0.0f)
     this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
-  if ( points[14][0] == 0.0f )
+  if (points[14][0] == 0.0f)
     this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_ALL);
   points[10][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   points[11][0] = this->maxspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   points[14][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   points[15][0] = this->currentspeed / (SO@GUI@_MAX_SPEED / 0.8f);
   this->sgeometry->point.finishEditing();
-  if ( this->maxspeed == 0.0f )
+  if (this->maxspeed == 0.0f)
     this->smaxspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
-  if ( this->currentspeed == 0.0f )
+  if (this->currentspeed == 0.0f)
     this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
 }
 

@@ -56,26 +56,26 @@ struct So@Gui@MaterialDirectory {
 
 class SoAnyMaterialList {
 public:
-  SoAnyMaterialList( const char * const dir );
+  SoAnyMaterialList(const char * const dir);
   ~SoAnyMaterialList(void);
 
   void addCallback(
-    So@Gui@MaterialListCB * const callback, void * const closure );
+    So@Gui@MaterialListCB * const callback, void * const closure);
   void removeCallback(
-    So@Gui@MaterialListCB * const callback, void * const closure );
-  void invokeCallbacks( SoMaterial * material );
+    So@Gui@MaterialListCB * const callback, void * const closure);
+  void invokeCallbacks(SoMaterial * material);
 
   const char * getMaterialDirectoryPath(void) const;
   So@Gui@MaterialDirectory * getMaterialDirectory(void);
 
 private:
-  void setupBuiltinMaterials( So@Gui@MaterialDirectory * const index ) const;
+  void setupBuiltinMaterials(So@Gui@MaterialDirectory * const index) const;
   void freeMaterialDirectory(void);
 
-  static char ** getNonemptySubdirs( const char * const path );
-  static char ** getRegularFiles( const char * const path );
+  static char ** getNonemptySubdirs(const char * const path);
+  static char ** getRegularFiles(const char * const path);
 
-  static int qsort_comparator( const void * itemA, const void * itemB );
+  static int qsort_comparator(const void * itemA, const void * itemB);
 
 private:
   SbPList * callbacks;

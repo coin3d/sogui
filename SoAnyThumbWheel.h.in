@@ -37,30 +37,30 @@ public:
   SoAnyThumbWheel(void);
   ~SoAnyThumbWheel(void);
 
-  void setSize( const int diameter, const int width );
-  void getSize( int & diameter, int & width ) const;
+  void setSize(const int diameter, const int width);
+  void getSize(int & diameter, int & width) const;
 
-  void setColor( const float red, const float green, const float blue );
-  void getColor( float & red, float & green, float & blue ) const;
-  void setColorFactors( const float light, const float front, const float normal, const float shade );
-  void getColorFactors( float & light, float & front, float & normal, float & shade ) const;
+  void setColor(const float red, const float green, const float blue);
+  void getColor(float & red, float & green, float & blue) const;
+  void setColorFactors(const float light, const float front, const float normal, const float shade);
+  void getColorFactors(float & light, float & front, float & normal, float & shade) const;
 
   int getNumBitmaps(void) const;
-  void drawBitmap( const int number, void * bitmap, Alignment alignment ) const;
-  float calculateValue( const float origValue, const int origPosition, const int deltaPosition ) const;
-  int getBitmapForValue( const float value, const State state ) const;
+  void drawBitmap(const int number, void * bitmap, Alignment alignment) const;
+  float calculateValue(const float origValue, const int origPosition, const int deltaPosition) const;
+  int getBitmapForValue(const float value, const State state) const;
 
-  void setGraphicsByteOrder( const GraphicsByteOrder byteorder );
+  void setGraphicsByteOrder(const GraphicsByteOrder byteorder);
   GraphicsByteOrder getGraphicsByteOrder(void) const;
 
-  void setMovement( const Movement movement );
+  void setMovement(const Movement movement);
   Movement getMovement(void) const;
 
-  void setBoundaryHandling( const BoundaryHandling handling );
+  void setBoundaryHandling(const BoundaryHandling handling);
   BoundaryHandling getBoundaryHandling(void) const;
 
 private:
-  unsigned int swapWord( unsigned int ) const;
+  unsigned int swapWord(unsigned int) const;
 
   int diameter, width;
   // float disabledred, disabledgreen, disabledblue; // not implemented
@@ -78,8 +78,8 @@ private:
   mutable int dirtyVariables;
   mutable float squarelength, squarespacing, shadelength, unistep, numsquares;
 
-  void drawDisabledWheel( const int number, void * bitmap, Alignment alignment ) const;
-  void drawEnabledWheel( const int number, void * bitmap, Alignment alignment ) const;
+  void drawDisabledWheel(const int number, void * bitmap, Alignment alignment) const;
+  void drawEnabledWheel(const int number, void * bitmap, Alignment alignment) const;
 
   void validate(void) const;
 

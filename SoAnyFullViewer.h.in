@@ -109,23 +109,23 @@ enum SoViewerPopupMenuRadioGroup {
 
 class SoAnyFullViewer {
 public:
-  SoAnyFullViewer( So@Gui@FullViewer * const v );
+  SoAnyFullViewer(So@Gui@FullViewer * const v);
   ~SoAnyFullViewer(void);
 
   SoAnyPopupMenu * setupStandardPopupMenu(void);
-  void prepareMenu( SoAnyPopupMenu * menu );
-  void setPopupMenuString( const char * title );
+  void prepareMenu(SoAnyPopupMenu * menu);
+  void setPopupMenuString(const char * title);
 
   void setDrawStyleMenuActivation(
     So@Gui@Viewer::DrawType type,
-    So@Gui@Viewer::DrawStyle value );
+    So@Gui@Viewer::DrawStyle value);
 
-  void drawstyleActivated( int menuitemid );
+  void drawstyleActivated(int menuitemid);
 
-  void menuSelection( int menuitemid );
-  static void menuSelectionCallback( int menuitemid, void * userdata );
+  void menuSelection(int menuitemid);
+  static void menuSelectionCallback(int menuitemid, void * userdata);
 
-  SbBool processSoEvent( const SoEvent * const event );
+  SbBool processSoEvent(const SoEvent * const event);
 
 private:
   So@Gui@FullViewer * const viewer;

@@ -40,37 +40,37 @@ class SoAnyExaminerViewer {
   friend class So@Gui@ExaminerViewer;
 
 public:
-  SoAnyExaminerViewer( So@Gui@ExaminerViewer * const viewer );
+  SoAnyExaminerViewer(So@Gui@ExaminerViewer * const viewer);
   ~SoAnyExaminerViewer(void);
 
-  void setAnimationEnabled( const SbBool enable );
+  void setAnimationEnabled(const SbBool enable);
   SbBool isAnimationEnabled(void) const;
 
   void stopAnimating(void);
   SbBool isAnimating(void) const;
 
-  void setFeedbackVisibility( const SbBool enable );
+  void setFeedbackVisibility(const SbBool enable);
   SbBool isFeedbackVisible(void) const;
 
-  void setFeedbackSize( const int size );
+  void setFeedbackSize(const int size);
   int getFeedbackSize(void) const;
 
-  SbBool processSoEvent( const SoEvent * const event );
+  SbBool processSoEvent(const SoEvent * const event);
 
   void actualRedraw(void);
 
-  void setMotion3OnCamera( SbBool enable );
+  void setMotion3OnCamera(SbBool enable);
   SbBool getMotion3OnCamera(void) const;
 
 protected:
-  float rotXWheelMotion( float value, float old );
-  float rotYWheelMotion( float value, float old );
+  float rotXWheelMotion(float value, float old);
+  float rotYWheelMotion(float value, float old);
 
-  void reorientCamera( const SbRotation & rotation );
-  void spin( const SbVec2f & mousepos );
-  void pan( const SbVec2f & mousepos, const SbVec2f & prevpos );
-  void zoom( const float diffvalue );
-  void zoomByCursor( const SbVec2f & mousepos, const SbVec2f & prevpos );
+  void reorientCamera(const SbRotation & rotation);
+  void spin(const SbVec2f & mousepos);
+  void pan(const SbVec2f & mousepos, const SbVec2f & prevpos);
+  void zoom(const float diffvalue);
+  void zoomByCursor(const SbVec2f & mousepos, const SbVec2f & prevpos);
 
   SbVec2f lastmouseposition;
   SbPlane panningplane;
@@ -111,7 +111,7 @@ protected:
   SbBool controldown;
 
   void clearLog(void);
-  void addToLog( const SbVec2s pos, const SbTime time );
+  void addToLog(const SbVec2s pos, const SbTime time);
 
   SbTime prevRedrawTime;
 
@@ -134,7 +134,7 @@ private:
   } mode;
 
   ViewerMode currentmode;
-  void setMode( const ViewerMode mode );
+  void setMode(const ViewerMode mode);
 
 }; // class SoAnyExaminerViewer
 

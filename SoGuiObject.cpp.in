@@ -63,12 +63,12 @@ SoType So@Gui@Object::classTypeId; // static
 */
 
 void
-So@Gui@Object::initClass( // static
-  void )
+So@Gui@Object::initClass(// static
+  void)
 {
-  assert( So@Gui@Object::classTypeId == SoType::badType() );
+  assert(So@Gui@Object::classTypeId == SoType::badType());
   So@Gui@Object::classTypeId =
-    SoType::createType( SoType::badType(), "So@Gui@Object");
+    SoType::createType(SoType::badType(), "So@Gui@Object");
 } // initClass()
 
 /*!
@@ -77,7 +77,7 @@ So@Gui@Object::initClass( // static
 
 SbBool
 So@Gui@Object::isOfType(
-  SoType type ) const
+  SoType type) const
 {
   return this->getTypeId().isDerivedFrom(type);
 } // isOfType()
@@ -87,8 +87,8 @@ So@Gui@Object::isOfType(
 */
 
 SoType
-So@Gui@Object::getClassTypeId( // static
-  void ) 
+So@Gui@Object::getClassTypeId(// static
+  void) 
 {
   return So@Gui@Object::classTypeId;
 } // getClassTypeId()

@@ -31,12 +31,12 @@ class So@Gui@FlyViewer;
 
 class SoAnyFlyViewer {
 public:
-  SoAnyFlyViewer( So@Gui@FlyViewer * const viewer );
+  SoAnyFlyViewer(So@Gui@FlyViewer * const viewer);
   ~SoAnyFlyViewer(void);
 
-  void dolly( const float delta ) const;
+  void dolly(const float delta) const;
 
-  SbBool processSoEvent( const SoEvent * const event );
+  SbBool processSoEvent(const SoEvent * const event);
 
 private:
   So@Gui@FlyViewer * const viewer;

@@ -78,10 +78,10 @@ static GLubyte zbmp[] = { 0x1f,0x10,0x08,0x04,0x02,0x01,0x1f };
 */
 
 SoAnyExaminerViewer::SoAnyExaminerViewer(
-  So@Gui@ExaminerViewer * const container )
-: viewer( container )
+  So@Gui@ExaminerViewer * const container)
+: viewer(container)
 {
-  assert( container != NULL );
+  assert(container != NULL);
 
   this->currentmode = SoAnyExaminerViewer::EXAMINE;
 
@@ -96,13 +96,13 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   // 19990425 mortene.
   this->spinprojector = new SbSphereSheetProjector;
   SbViewVolume volume;
-  volume.ortho( -1, 1, -1, 1, -1, 1 );
-  this->spinprojector->setViewVolume( volume );
+  volume.ortho(-1, 1, -1, 1, -1, 1);
+  this->spinprojector->setViewVolume(volume);
 
   this->axiscrossEnabled = FALSE;
   this->axiscrossSize = 25;
 
-  this->spinRotation.setValue( SbVec3f( 0, 0, -1 ), 0 );
+  this->spinRotation.setValue(SbVec3f(0, 0, -1), 0);
 
   this->log.size = MOUSEPOSLOGSIZE;
   this->log.position = new SbVec2s [ MOUSEPOSLOGSIZE ];
@@ -112,8 +112,8 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
   this->button2down = FALSE;
   this->button3down = FALSE;
   this->controldown = FALSE;
-  this->pointer.now = SbVec2s( 0, 0 );
-  this->pointer.then = SbVec2s( 0, 0 );
+  this->pointer.now = SbVec2s(0, 0);
+  this->pointer.then = SbVec2s(0, 0);
   this->motion3OnCamera = TRUE;
 } // SoAnyExaminerViewer()
 
@@ -121,7 +121,7 @@ SoAnyExaminerViewer::SoAnyExaminerViewer(
 */
 
 SoAnyExaminerViewer::~SoAnyExaminerViewer(
-  void )
+  void)
 {
   delete this->spinprojector;
   delete[] this->log.position;
@@ -139,21 +139,21 @@ SoAnyExaminerViewer::~SoAnyExaminerViewer(
 float
 SoAnyExaminerViewer::rotXWheelMotion(
   float value,
-  float oldvalue )
+  float oldvalue)
 {
   SoCamera * camera = this->viewer->getCamera();
-  if ( camera == NULL ) return 0.0f; // can happen for empty scenegraph
+  if (camera == NULL) return 0.0f; // can happen for empty scenegraph
 
   SbVec3f dir;
-  camera->orientation.getValue().multVec( SbVec3f( 0, 0, -1 ), dir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
 
   SbVec3f focalpoint = camera->position.getValue() +
     camera->focalDistance.getValue() * dir;
 
-  camera->orientation = SbRotation( SbVec3f( -1, 0, 0 ), value - oldvalue ) *
+  camera->orientation = SbRotation(SbVec3f(-1, 0, 0), value - oldvalue) *
     camera->orientation.getValue();
 
-  camera->orientation.getValue().multVec( SbVec3f(0, 0, -1), dir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
   camera->position = focalpoint - camera->focalDistance.getValue() * dir;
 
   return value;
@@ -168,10 +168,10 @@ SoAnyExaminerViewer::rotXWheelMotion(
 float
 SoAnyExaminerViewer::rotYWheelMotion(
   float value,
-  float oldvalue )
+  float oldvalue)
 {
   SoCamera * camera = this->viewer->getCamera();
-  if ( camera == NULL ) return 0.0f; // can happen for empty scenegraph
+  if (camera == NULL) return 0.0f; // can happen for empty scenegraph
 
   SbVec3f dir;
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
@@ -179,10 +179,10 @@ SoAnyExaminerViewer::rotYWheelMotion(
   SbVec3f focalpoint = camera->position.getValue() +
     camera->focalDistance.getValue() * dir;
 
-  camera->orientation = SbRotation( SbVec3f( 0, 1, 0 ), oldvalue - value ) *
+  camera->orientation = SbRotation(SbVec3f(0, 1, 0), oldvalue - value) *
     camera->orientation.getValue();
 
-  camera->orientation.getValue().multVec( SbVec3f(0, 0, -1), dir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
   camera->position = focalpoint - camera->focalDistance.getValue() * dir;
 
   return value;
@@ -202,10 +202,10 @@ SoAnyExaminerViewer::rotYWheelMotion(
 
 void
 SoAnyExaminerViewer::setAnimationEnabled(
-  const SbBool enable )
+  const SbBool enable)
 {
   this->spinanimatingallowed = enable;
-  if ( ! enable && this->isAnimating() )
+  if (! enable && this->isAnimating())
     this->stopAnimating();
 } // setAnimationEnabled()
 
@@ -220,7 +220,7 @@ SoAnyExaminerViewer::setAnimationEnabled(
 
 SbBool
 SoAnyExaminerViewer::isAnimationEnabled(
-  void ) const
+  void) const
 {
   return this->spinanimatingallowed;
 } // isAnimationEnabled()
@@ -233,16 +233,16 @@ SoAnyExaminerViewer::isAnimationEnabled(
 
 void
 SoAnyExaminerViewer::stopAnimating(
-  void )
+  void)
 {
-  if ( this->spinanimating ) {
+  if (this->spinanimating) {
     this->spinanimating = FALSE;
     viewer->interactiveCountDec();
   }
 #if SO@GUI@_DEBUG
   else
-    SoDebugError::postWarning( "So@Gui@ExaminerViewer::stopAnimating",
-      "not animating" );
+    SoDebugError::postWarning("So@Gui@ExaminerViewer::stopAnimating",
+      "not animating");
 #endif // SO@GUI@_DEBUG
 } // stopAnimating()
 
@@ -255,7 +255,7 @@ SoAnyExaminerViewer::stopAnimating(
 
 SbBool
 SoAnyExaminerViewer::isAnimating(
-  void ) const
+  void) const
 {
   return this->spinanimating;
 } // isAnimating()
@@ -286,7 +286,7 @@ SoAnyExaminerViewer::setMode(const ViewerMode mode)
   case DRAGGING:
     // Set up initial projection point for the projector object when
     // first starting a drag operation.
-    this->spinprojector->project( this->lastmouseposition );
+    this->spinprojector->project(this->lastmouseposition);
     break;
 
   case PANNING:
@@ -317,18 +317,18 @@ SoAnyExaminerViewer::setMode(const ViewerMode mode)
 
 void
 SoAnyExaminerViewer::setFeedbackVisibility(
-  const SbBool enable )
+  const SbBool enable)
 {
-  if ( enable == this->axiscrossEnabled ) {
+  if (enable == this->axiscrossEnabled) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postWarning( "So@Gui@ExaminerViewer::setFeedbackVisibility",
-      "feedback visibility already set to %s", enable ? "TRUE" : "FALSE" );
+    SoDebugError::postWarning("So@Gui@ExaminerViewer::setFeedbackVisibility",
+      "feedback visibility already set to %s", enable ? "TRUE" : "FALSE");
 #endif // SO@GUI@_DEBUG
     return;
   }
   this->axiscrossEnabled = enable;
 
-  if ( viewer->isViewing() )
+  if (viewer->isViewing())
     viewer->scheduleRedraw();
 } // setFeedbackVisibility()
 
@@ -340,7 +340,7 @@ SoAnyExaminerViewer::setFeedbackVisibility(
 
 SbBool
 SoAnyExaminerViewer::isFeedbackVisible(
-  void ) const
+  void) const
 {
   return this->axiscrossEnabled;
 } // isFeedbackVisibility()
@@ -356,19 +356,19 @@ SoAnyExaminerViewer::isFeedbackVisible(
 
 void
 SoAnyExaminerViewer::setFeedbackSize(
-  const int size )
+  const int size)
 {
 #if SO@GUI@_DEBUG
-  if ( size < 1 ) {
-    SoDebugError::postWarning( "So@Gui@ExaminerViewer::setFeedbackSize",
-      "the size setting should be larger than 0" );
+  if (size < 1) {
+    SoDebugError::postWarning("So@Gui@ExaminerViewer::setFeedbackSize",
+      "the size setting should be larger than 0");
     return;
   }
 #endif // SO@GUI@_DEBUG
 
   this->axiscrossSize = size;
 
-  if ( this->isFeedbackVisible() && viewer->isViewing() )
+  if (this->isFeedbackVisible() && viewer->isViewing())
     viewer->scheduleRedraw();
 } // setFeedbackSize()
 
@@ -380,7 +380,7 @@ SoAnyExaminerViewer::setFeedbackSize(
 
 int
 SoAnyExaminerViewer::getFeedbackSize(
-  void ) const
+  void) const
 {
   return this->axiscrossSize;
 } // getFeedbackSize()
@@ -392,7 +392,7 @@ SoAnyExaminerViewer::getFeedbackSize(
 
 void
 SoAnyExaminerViewer::drawAxisCross(
-  void )
+  void)
 {
   // Store GL state.
   glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -476,9 +476,9 @@ SoAnyExaminerViewer::drawAxisCross(
     float minval = xpos[2];
     float midval = ypos[2];
     float maxval = zpos[2];
-    if (minval > midval) So@Gui@Swap( minval, midval );
-    if (midval > maxval) So@Gui@Swap( midval, maxval );
-    if (minval > midval) So@Gui@Swap( minval, midval );
+    if (minval > midval) So@Gui@Swap(minval, midval);
+    if (midval > maxval) So@Gui@Swap(midval, maxval);
+    if (minval > midval) So@Gui@Swap(minval, midval);
     assert((minval <= midval) && (midval <= maxval)); // Just checking..
     // Find the order of rendering. Furthest away should render first,
     // so we sort in back-to-front order.
@@ -501,13 +501,13 @@ SoAnyExaminerViewer::drawAxisCross(
     for (int i=0; i < 3; i++) {
       glPushMatrix();
       if (xturn == i) {                       // X axis.
-        glColor3f( 0.500f, 0.125f, 0.125f );
+        glColor3f(0.500f, 0.125f, 0.125f);
       } else if (yturn == i) {                // Y axis.
         glRotatef(90, 0, 0, 1);
-        glColor3f( 0.125f, 0.500f, 0.125f );
+        glColor3f(0.125f, 0.500f, 0.125f);
       } else {                                // Z axis.
         glRotatef(-90, 0, 1, 0);
-        glColor3f( 0.125f, 0.125f, 0.500f );
+        glColor3f(0.125f, 0.125f, 0.500f);
       }
       this->drawArrow();
       glPopMatrix();
@@ -556,8 +556,8 @@ SoAnyExaminerViewer::drawAxisCross(
 */
 
 void
-SoAnyExaminerViewer::drawArrow( // static
-  void )
+SoAnyExaminerViewer::drawArrow(// static
+  void)
 {
   glBegin(GL_LINES);
   glVertex3f(0, 0, 0);
@@ -591,14 +591,14 @@ SoAnyExaminerViewer::drawArrow( // static
 
 void
 SoAnyExaminerViewer::reorientCamera(
-  const SbRotation & rot )
+  const SbRotation & rot)
 {
   SoCamera * cam = this->viewer->getCamera();
-  if ( cam == NULL ) return;
+  if (cam == NULL) return;
 
   // Find global coordinates of focal point.
   SbVec3f direction;
-  cam->orientation.getValue().multVec( SbVec3f(0, 0, -1), direction );
+  cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
   SbVec3f focalpoint = cam->position.getValue() +
     cam->focalDistance.getValue() * direction;
 
@@ -606,7 +606,7 @@ SoAnyExaminerViewer::reorientCamera(
   cam->orientation = rot * cam->orientation.getValue();
 
   // Reposition camera so we are still pointing at the same old focal point.
-  cam->orientation.getValue().multVec( SbVec3f(0, 0, -1), direction );
+  cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
   cam->position = focalpoint - cam->focalDistance.getValue() * direction;
 } // reorientCamera()
 
@@ -621,21 +621,21 @@ SoAnyExaminerViewer::reorientCamera(
 
 void
 SoAnyExaminerViewer::spin(
-  const SbVec2f & pointerpos )
+  const SbVec2f & pointerpos)
 {
-  if ( this->log.historysize < 2 ) return;
-  assert( this->spinprojector != NULL );
+  if (this->log.historysize < 2) return;
+  assert(this->spinprojector != NULL);
 
-  SbVec2s glsize( viewer->getGLSize() );
+  SbVec2s glsize(viewer->getGLSize());
   SbVec2f lastpos;
   lastpos[0] = float(this->log.position[1][0]) / float(So@Gui@Max((int)(glsize[0]-1), 1));
   lastpos[1] = float(this->log.position[1][1]) / float(So@Gui@Max((int)(glsize[1]-1), 1));
 
-  this->spinprojector->project( lastpos );
+  this->spinprojector->project(lastpos);
   SbRotation r;
-  this->spinprojector->projectAndGetRotation( pointerpos, r );
+  this->spinprojector->projectAndGetRotation(pointerpos, r);
   r.invert();
-  this->reorientCamera( r );
+  this->reorientCamera(r);
 
   // Calculate an average angle magnitude value to make the transition
   // to a possible spin animation mode appear smooth.
@@ -670,32 +670,32 @@ SoAnyExaminerViewer::spin(
 void
 SoAnyExaminerViewer::pan(
   const SbVec2f & thispos,
-  const SbVec2f & prevpos )
+  const SbVec2f & prevpos)
 {
   SoCamera * cam = viewer->getCamera();
-  if ( cam == NULL ) return; // can happen for empty scenegraph
-  if ( thispos == prevpos ) {
+  if (cam == NULL) return; // can happen for empty scenegraph
+  if (thispos == prevpos) {
 #if SO@GUI@_DEBUG
-    SoDebugError::postInfo( "SoAnyExaminerViewer::pan", "useless invokation" );
+    SoDebugError::postInfo("SoAnyExaminerViewer::pan", "useless invokation");
 #endif // SO@GUI@_DEBUG
     return;
   }
 
 #if SO@GUI@_DEBUG && 0
-  SoDebugError::postInfo( "SoAnyExaminerViewer::pan",
-     "was( %.3g, %.3g ) -> now( %.3g, %.3g )",
-     prevpos[0], prevpos[1], thispos[0], thispos[1] );
+  SoDebugError::postInfo("SoAnyExaminerViewer::pan",
+     "was(%.3g, %.3g) -> now(%.3g, %.3g)",
+     prevpos[0], prevpos[1], thispos[0], thispos[1]);
 #endif // SO@GUI@_DEBUG
 
   // Find projection points for the last and current mouse coordinates.
-  SbViewVolume vv = cam->getViewVolume( viewer->getGLAspectRatio() );
+  SbViewVolume vv = cam->getViewVolume(viewer->getGLAspectRatio());
   SbLine line;
-  vv.projectPointToLine( thispos, line );
+  vv.projectPointToLine(thispos, line);
   SbVec3f current_planept;
-  this->panningplane.intersect( line, current_planept );
-  vv.projectPointToLine( prevpos, line );
+  this->panningplane.intersect(line, current_planept);
+  vv.projectPointToLine(prevpos, line);
   SbVec3f old_planept;
-  this->panningplane.intersect( line, old_planept );
+  this->panningplane.intersect(line, old_planept);
 
   // Reposition camera according to the vector difference between the
   // projected points.
@@ -714,19 +714,19 @@ SoAnyExaminerViewer::pan(
 
 void
 SoAnyExaminerViewer::zoom(
-  const float diffvalue )
+  const float diffvalue)
 {
   SoCamera * cam = viewer->getCamera();
-  if ( cam == NULL ) return; // can happen for empty scenegraph
+  if (cam == NULL) return; // can happen for empty scenegraph
   SoType t = cam->getTypeId();
 
   // This will be in the range of <0, ->>.
   float multiplicator = exp(diffvalue);
 
-  if ( t.isDerivedFrom(SoOrthographicCamera::getClassTypeId()) ) {
+  if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
     SoOrthographicCamera * oc = (SoOrthographicCamera *)cam;
     oc->height = oc->height.getValue() * multiplicator;
-  } else if ( t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId()) ) {
+  } else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
     float oldfocaldist = cam->focalDistance.getValue();
     cam->focalDistance = oldfocaldist * multiplicator;
 
@@ -735,7 +735,7 @@ SoAnyExaminerViewer::zoom(
     cam->position = cam->position.getValue() +
       (cam->focalDistance.getValue() - oldfocaldist) * -direction;
   } else {
-    assert( 0 && "impossible" );
+    assert(0 && "impossible");
   }
 } // zoom()
 
@@ -751,11 +751,11 @@ SoAnyExaminerViewer::zoom(
 void
 SoAnyExaminerViewer::zoomByCursor(
   const SbVec2f & thispos,
-  const SbVec2f & prevpos )
+  const SbVec2f & prevpos)
 {
   // There is no "geometrically correct" value, 20 just seems to give
   // about the right "feel".
-  this->zoom( (thispos[1] - prevpos[1]) * 20.0f );
+  this->zoom((thispos[1] - prevpos[1]) * 20.0f);
 } // zoomByCursor()
 
 // *************************************************************************
@@ -767,17 +767,17 @@ SoAnyExaminerViewer::zoomByCursor(
 
 void
 SoAnyExaminerViewer::actualRedraw(
-  void )
+  void)
 {
   SbTime thisRedrawTime = SbTime::getTimeOfDay();
   unsigned long msecs =
     thisRedrawTime.getMsecValue() - this->prevRedrawTime.getMsecValue();
   this->prevRedrawTime = thisRedrawTime;
 
-  if ( this->isAnimating() ) {
+  if (this->isAnimating()) {
     SbRotation deltaRotation = this->spinRotation;
-    deltaRotation.scaleAngle( (float) msecs / 200.0f );
-    this->reorientCamera( deltaRotation );
+    deltaRotation.scaleAngle((float) msecs / 200.0f);
+    this->reorientCamera(deltaRotation);
   }
 } // actualRedraw()
 
@@ -798,26 +798,26 @@ SoAnyExaminerViewer::actualRedraw(
 
 SbBool
 SoAnyExaminerViewer::processSoEvent(
-  const SoEvent * const ev )
+  const SoEvent * const ev)
 {
 #if SO@GUI@_DEBUG && 0 // debug
-  SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent",
+  SoDebugError::postInfo("SoAnyExaminerViewer::processSoEvent",
                           "[invoked], event '%s'",
-                          ev->getTypeId().getName().getString() );
+                          ev->getTypeId().getName().getString());
 #endif // debug
 
-  if ( ! viewer->isViewing() ) // event is for scene graph
+  if (! viewer->isViewing()) // event is for scene graph
     return FALSE;
 
   this->canvas = viewer->getGLSize();
 
-  const SoType type( ev->getTypeId() );
+  const SoType type(ev->getTypeId());
 
   const SbVec2f prevnormalized = this->lastmouseposition;
 
-  const SbVec2s pos( ev->getPosition() );
-  const SbVec2f posn( (float) pos[0] / (float) So@Gui@Max((int)(canvas[0]-1), 1),
-                      (float) pos[1] / (float) So@Gui@Max((int)(canvas[1]-1), 1) );
+  const SbVec2s pos(ev->getPosition());
+  const SbVec2f posn((float) pos[0] / (float) So@Gui@Max((int)(canvas[0]-1), 1),
+                      (float) pos[1] / (float) So@Gui@Max((int)(canvas[1]-1), 1));
 
   this->lastmouseposition = posn;
 
@@ -830,20 +830,20 @@ SoAnyExaminerViewer::processSoEvent(
 
   // Mismatches in state of the Ctrl key happens if the user presses
   // or releases it outside the viewer window.
-  if ( this->controldown != ev->wasCtrlDown() ) {
+  if (this->controldown != ev->wasCtrlDown()) {
     this->controldown = ev->wasCtrlDown();
     processed = TRUE;
   }
 
   // Mouse Button / Spaceball Button handling
 
-  if ( type.isDerivedFrom( MOUSEBUTTON_EVENT_TYPE ) ) {
+  if (type.isDerivedFrom(MOUSEBUTTON_EVENT_TYPE)) {
     const SoMouseButtonEvent * const event = (const SoMouseButtonEvent *) ev;
     const int button = event->getButton();
     const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
 
-    // SoDebugError::postInfo( "processSoEvent", "button = %d", button );
-    switch ( button ) {
+    // SoDebugError::postInfo("processSoEvent", "button = %d", button);
+    switch (button) {
     case SoMouseButtonEvent::BUTTON1:
       this->button1down = press;
       break;
@@ -855,13 +855,13 @@ SoAnyExaminerViewer::processSoEvent(
       break;
     default:
       break;
-    } // switch ( button )
+    } // switch (button)
 
-    if ( press ) {
-      switch ( button ) {
+    if (press) {
+      switch (button) {
       case SoMouseButtonEvent::BUTTON1:
-        if ( ! viewer->isSeekMode() ) {
-          if ( this->isAnimating() ) this->stopAnimating();
+        if (! viewer->isSeekMode()) {
+          if (this->isAnimating()) this->stopAnimating();
           viewer->interactiveCountInc();
           this->clearLog();
           processed = TRUE;
@@ -870,38 +870,38 @@ SoAnyExaminerViewer::processSoEvent(
 
       case SoMouseButtonEvent::BUTTON3:
         {
-          if ( this->isAnimating() ) this->stopAnimating();
+          if (this->isAnimating()) this->stopAnimating();
           viewer->interactiveCountInc();
           SoCamera * const camera = viewer->getCamera();
-          SbViewVolume volume = camera->getViewVolume( viewer->getGLAspectRatio() );
-          this->panningplane = volume.getPlane( camera->focalDistance.getValue() );
+          SbViewVolume volume = camera->getViewVolume(viewer->getGLAspectRatio());
+          this->panningplane = volume.getPlane(camera->focalDistance.getValue());
           processed = TRUE;
         }
         break;
 
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
-        this->zoom( -0.1f );
+        this->zoom(-0.1f);
         processed = TRUE;
         break;
 
       case SoMouseButtonEvent::BUTTON5:
-        this->zoom( 0.1f );
+        this->zoom(0.1f);
         processed = TRUE;
         break;
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
 
       default:
         break;
-      } // switch ( button )
+      } // switch (button)
 
     } else { // ! press
-      switch ( button ) {
+      switch (button) {
       case SoMouseButtonEvent::BUTTON1:
         {
           this->spinanimating = FALSE;
-          if ( ! viewer->isSeekMode() ) {
-            if ( ! this->isAnimationEnabled() || this->log.historysize < 3 ) {
+          if (! viewer->isSeekMode()) {
+            if (! this->isAnimationEnabled() || this->log.historysize < 3) {
               // FIXME: attention: here lies dragons! This will f*ck
               // up the interactioncounter if a mouse release "just
               // happens", as can be the case (dependent on the native
@@ -910,32 +910,32 @@ SoAnyExaminerViewer::processSoEvent(
               viewer->interactiveCountDec();
             }
             else {
-              const SbVec2s glsize( viewer->getGLSize() );
-              SbVec3f from = this->spinprojector->project(SbVec2f( float(this->log.position[2][0]) / float( So@Gui@Max(glsize[0]-1, 1) ),
-                                                                   float(this->log.position[2][1]) / float( So@Gui@Max(glsize[1]-1, 1) )));
-              SbVec3f to = this->spinprojector->project( posn );
-              SbRotation rot = this->spinprojector->getRotation( from, to );
+              const SbVec2s glsize(viewer->getGLSize());
+              SbVec3f from = this->spinprojector->project(SbVec2f(float(this->log.position[2][0]) / float(So@Gui@Max(glsize[0]-1, 1)),
+                                                                   float(this->log.position[2][1]) / float(So@Gui@Max(glsize[1]-1, 1))));
+              SbVec3f to = this->spinprojector->project(posn);
+              SbRotation rot = this->spinprojector->getRotation(from, to);
 
               SbTime stoptime = (event->getTime() - this->log.time[0]);
-              if ( stoptime.getMsecValue() > 100 ) {
+              if (stoptime.getMsecValue() > 100) {
                 viewer->interactiveCountDec();
               }
               else {
                 SbTime delta = (this->log.time[0] - this->log.time[2]);
                 float deltatime = (float) delta.getMsecValue();
-                if ( deltatime == 1.0f ) {
-                  SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
-                                          this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue() );
+                if (deltatime == 1.0f) {
+                  SoDebugError::postInfo("SoAnyExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
+                                          this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue());
                   viewer->interactiveCountDec();
                 }
                 else {
                   rot.invert();
-                  rot.scaleAngle( 200.0f / deltatime );
+                  rot.scaleAngle(200.0f / deltatime);
 
                   SbVec3f axis;
                   float radians;
-                  rot.getValue( axis, radians );
-                  if ( radians < 0.01f || deltatime > 300.0f ) {
+                  rot.getValue(axis, radians);
+                  if (radians < 0.01f || deltatime > 300.0f) {
                     viewer->interactiveCountDec();
                   }
                   else {
@@ -968,43 +968,43 @@ SoAnyExaminerViewer::processSoEvent(
 
       default:
         break;
-      } // switch ( button )
+      } // switch (button)
     }
   }
 
   // Mouse Movement handling
-  if ( type.isDerivedFrom( LOCATION2_EVENT_TYPE ) ) {
+  if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
     const SoLocation2Event * const event = (const SoLocation2Event *) ev;
 
-    if ( this->button1down || this->button3down ) processed = TRUE;
+    if (this->button1down || this->button3down) processed = TRUE;
 
-    if ( (this->button1down && this->button3down) ||
-         (this->button3down && this->controldown) ) {
-      this->zoomByCursor( posn, prevnormalized );
+    if ((this->button1down && this->button3down) ||
+         (this->button3down && this->controldown)) {
+      this->zoomByCursor(posn, prevnormalized);
     }
-    else if ( (this->button1down && this->controldown) || this->button3down ) {
-      this->pan( posn, prevnormalized );
+    else if ((this->button1down && this->controldown) || this->button3down) {
+      this->pan(posn, prevnormalized);
     }
-    else if ( this->button1down ) {
-      this->addToLog( event->getPosition(), event->getTime() );
-      this->spin( posn );
+    else if (this->button1down) {
+      this->addToLog(event->getPosition(), event->getTime());
+      this->spin(posn);
     }
 
   }
 
   // Keyboard handling
-  if ( type.isDerivedFrom( KEYBOARD_EVENT_TYPE ) ) {
+  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
     const SoKeyboardEvent * const event = (const SoKeyboardEvent *) ev;
     const SbBool press = event->getState() == SoButtonEvent::DOWN ? TRUE : FALSE;
-    if ( press ) {
-      if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
-        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
+    if (press) {
+      if (event->getKey() == SoKeyboardEvent::LEFT_CONTROL
+        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL) {
         this->controldown = TRUE;
         processed = TRUE;
       }
     } else {
-      if ( event->getKey() == SoKeyboardEvent::LEFT_CONTROL
-        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL ) {
+      if (event->getKey() == SoKeyboardEvent::LEFT_CONTROL
+        || event->getKey() == SoKeyboardEvent::RIGHT_CONTROL) {
         this->controldown = FALSE;
         processed = TRUE;
       }
@@ -1012,11 +1012,11 @@ SoAnyExaminerViewer::processSoEvent(
   }
 
   // Spaceball & Joystick handling
-  if ( type.isDerivedFrom( MOTION3_EVENT_TYPE ) ) {
+  if (type.isDerivedFrom(MOTION3_EVENT_TYPE)) {
     SoMotion3Event * const event = (SoMotion3Event *) ev;
     SoCamera * const camera = viewer->getCamera();
-    if ( camera ) {
-      if ( this->motion3OnCamera ) {
+    if (camera) {
+      if (this->motion3OnCamera) {
         camera->position =
           camera->position.getValue() + event->getTranslation();
         camera->orientation =
@@ -1025,8 +1025,8 @@ SoAnyExaminerViewer::processSoEvent(
       } else {
         // FIXME: move/rotate model
 #if SO@GUI@_DEBUG
-        SoDebugError::postInfo( "SoAnyExaminerViewer::processSoEvent",
-          "SoMotion3Event for model movement is not implemented yet" );
+        SoDebugError::postInfo("SoAnyExaminerViewer::processSoEvent",
+          "SoMotion3Event for model movement is not implemented yet");
 #endif // SO@GUI@_DEBUG
         processed = TRUE;
       }
@@ -1087,7 +1087,7 @@ SoAnyExaminerViewer::processSoEvent(
 
 void
 SoAnyExaminerViewer::clearLog(
-  void )
+  void)
 {
   this->log.historysize = 0;
 } // clearLog()
@@ -1100,27 +1100,27 @@ SoAnyExaminerViewer::clearLog(
 void
 SoAnyExaminerViewer::addToLog(
   const SbVec2s pos,
-  const SbTime time )
+  const SbTime time)
 {
   // In case someone changes the const size setting at the top of this
   // file too small.
-  assert ( this->log.size > 2 && "mouse log too small!" );
+  assert (this->log.size > 2 && "mouse log too small!");
 
-  if ( this->log.historysize > 0 && pos == this->log.position[0] ) {
+  if (this->log.historysize > 0 && pos == this->log.position[0]) {
 #if SO@GUI@_DEBUG && 0 // debug
     // This can at least happen under SoQt.
-    SoDebugError::postInfo( "SoAnyExaminerViewer::addToLog", "got position already!" );
+    SoDebugError::postInfo("SoAnyExaminerViewer::addToLog", "got position already!");
 #endif // debug
     return;
   }
 
-  for ( int i = this->log.size - 1; i > 0; i-- ) {
+  for (int i = this->log.size - 1; i > 0; i--) {
     this->log.position[i] = this->log.position[i-1];
     this->log.time[i] = this->log.time[i-1];
   }
   this->log.position[0] = pos;
   this->log.time[0] = time;
-  if ( this->log.historysize < this->log.size )
+  if (this->log.historysize < this->log.size)
     this->log.historysize += 1;
 } // addToLog()
 
@@ -1133,7 +1133,7 @@ SoAnyExaminerViewer::addToLog(
 
 void
 SoAnyExaminerViewer::setMotion3OnCamera(
-  const SbBool enable )
+  const SbBool enable)
 {
   this->motion3OnCamera = enable;
 } // setMotion3OnCamera()
@@ -1145,7 +1145,7 @@ SoAnyExaminerViewer::setMotion3OnCamera(
 
 SbBool
 SoAnyExaminerViewer::getMotion3OnCamera(
-  void ) const
+  void) const
 {
   return this->motion3OnCamera;
 } // getMotion3OnCamera()
