@@ -92,7 +92,7 @@ SoAnyFlyViewer::dolly(
 
 SbBool
 SoAnyFlyViewer::processSoEvent(
-  SoEvent * const event )
+  const SoEvent * const event )
 {
   return FALSE;
 } // processSoEvent()

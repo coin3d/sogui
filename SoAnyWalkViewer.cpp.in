@@ -111,7 +111,7 @@ SoAnyWalkViewer::elevateCamera(
 
 SbBool
 SoAnyWalkViewer::processSoEvent(
-  SoEvent * const event )
+  const SoEvent * const event )
 {
   return FALSE;
 } // processSoEvent()

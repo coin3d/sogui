@@ -37,7 +37,7 @@ public:
   void dollyCamera( const float change ) const;
   void elevateCamera( const float change ) const;
 
-  SbBool processSoEvent( SoEvent * const event );
+  SbBool processSoEvent( const SoEvent * const event );
 
 private:
   So@Gui@WalkViewer * const viewer;

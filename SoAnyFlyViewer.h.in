@@ -36,7 +36,7 @@ public:
 
   void dolly( const float delta ) const;
 
-  SbBool processSoEvent( SoEvent * const event );
+  SbBool processSoEvent( const SoEvent * const event );
 
 private:
   So@Gui@FlyViewer * const viewer;
