@@ -145,6 +145,12 @@ So@Gui@FullViewer::leftWheelFinish(void)
   this->interactiveCountDec();
 }
 
+#ifdef __COIN_SOXT__
+#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) SoXtThumbWheelSetValue(wheel, val)
+#else // SoQt, SoGtk, SoWin
+#define SO@GUI@_SETTHUMBWHEEL_VAL(wheel, val) ((So@Gui@ThumbWheel *)wheel)->setValue(val)
+#endif
+
 /*!
   Set a new value for the left thumbwheel.
 */
@@ -152,7 +158,7 @@ void
 So@Gui@FullViewer::setLeftWheelValue(const float value)
 {
   this->leftWheelVal = value;
-  ((So@Gui@ThumbWheel *)this->leftWheel)->setValue(value);
+  SO@GUI@_SETTHUMBWHEEL_VAL(this->leftWheel, value);
 }
 
 /*!
@@ -215,7 +221,7 @@ void
 So@Gui@FullViewer::setBottomWheelValue(const float value)
 {
   this->bottomWheelVal = value;
-  ((So@Gui@ThumbWheel *)this->bottomWheel)->setValue(value);
+  SO@GUI@_SETTHUMBWHEEL_VAL(this->bottomWheel, value);
 }
 
 /*!
@@ -278,7 +284,7 @@ void
 So@Gui@FullViewer::setRightWheelValue(const float value)
 {
   this->rightWheelVal = value;
-  ((So@Gui@ThumbWheel *)this->rightWheel)->setValue(value);
+  SO@GUI@_SETTHUMBWHEEL_VAL(this->rightWheel, value);
 }
 
 /*!
