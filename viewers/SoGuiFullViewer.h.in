@@ -563,7 +563,6 @@ public:
                                        void * data = NULL);
 
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);
-  virtual void destroyPopupMenu(void);
 
   virtual void selectedPrefs(void);
 
