@@ -64,6 +64,20 @@
 
   </ul>
 
+  Note that there is no dragger or manipulator attached to the scene
+  camera.  The camera transform manipulation is calculated in a more
+  direct manner in the non-abstract viewer classes inheriting
+  So@Gui@Viewer by reading mouse and keyboard events and interpreting
+  how these should influence the camera. The calculations results in
+  new values for SoCamera::position, SoCamera::orientation, and the
+  other SoCamera field values for the camera designated to be the
+  viewer viewpoint camera. These values are then inserted directly
+  into the viewer's SoCamera node.
+
+  See e.g. the source code for So@Gui@ExaminerViewer::processSoEvent()
+  for the details.
+
+
 
   The So@Gui@Viewer class automatically adds a headlight to the scene,
   which will always point in the approximate same direction as the
@@ -219,9 +233,7 @@ public:
   SbBool deletecamera;
 
   // Home position storage.
-  SoOrthographicCamera * storedortho;
-  SoPerspectiveCamera * storedperspective;
-  SoCamera * storedfrustum;
+  SoNode * storedcamera;
 
   SoDirectionalLight * headlight;
 
@@ -312,17 +324,7 @@ So@Gui@ViewerP::So@Gui@ViewerP(So@Gui@Viewer * publ)
   this->matrixaction = new SoGetMatrixAction(SbViewportRegion(100,100));
   this->superimpositions = NULL;
 
-  this->storedortho = new SoOrthographicCamera;
-  this->storedortho->ref();
-  this->storedperspective = new SoPerspectiveCamera;
-  this->storedperspective->ref();
-  
-  this->storedfrustum = NULL;
-  SoType frustumtype = SoType::fromName("FrustumCamera");
-  if (!frustumtype.isBad()) {
-    this->storedfrustum = (SoCamera*) frustumtype.createInstance();
-    this->storedfrustum->ref();
-  }
+  this->storedcamera = NULL;
 
   // initialize auto clipping parameters
   this->autoclipstrategy = So@Gui@Viewer::VARIABLE_NEAR_PLANE;
@@ -343,11 +345,7 @@ So@Gui@ViewerP::~So@Gui@ViewerP()
   delete this->searchaction;
   delete this->matrixaction;
 
-  this->storedortho->unref();
-  this->storedperspective->unref();
-  if (this->storedfrustum) {
-    this->storedfrustum->unref();
-  }
+  if (this->storedcamera) { this->storedcamera->unref(); }
 }
 
 SoSeparator *
@@ -1890,33 +1888,25 @@ So@Gui@Viewer::setCameraType(SoType t)
 
     // Store the current home position, as it will be implicitly reset
     // by setCamera().
-    SoOrthographicCamera * homeo = new SoOrthographicCamera;
-    SoPerspectiveCamera * homep = new SoPerspectiveCamera;
-    SoCamera * homef = NULL;
-    homeo->ref();
-    homep->ref();
-    homeo->copyContents(PRIVATE(this)->storedortho, FALSE);
-    homep->copyContents(PRIVATE(this)->storedperspective, FALSE);
-
-    SoType frustumtype = SoType::fromName("FrustumCamera");
-    if (!frustumtype.isBad() && PRIVATE(this)->storedfrustum) {
-      homef = (SoCamera*) frustumtype.createInstance();
-      homef->ref();
-      homef->copyContents(PRIVATE(this)->storedfrustum, FALSE);
+    SoNode * tmpstoredcamera = NULL;
+    if (PRIVATE(this)->storedcamera) {
+      SoType camtype = PRIVATE(this)->storedcamera->getTypeId();
+      assert(camtype.isDerivedFrom(SoNode::getClassTypeId()));
+      assert(camtype.canCreateInstance());
+      tmpstoredcamera = (SoNode *)camtype.createInstance();
+      tmpstoredcamera->copyContents(PRIVATE(this)->storedcamera, FALSE);
+      tmpstoredcamera->ref();
     }
 
     this->setCamera(newcamera); // This will set PRIVATE(this)->cameratype.
 
     // Restore home position.
-    PRIVATE(this)->storedortho->copyContents(homeo, FALSE);
-    PRIVATE(this)->storedperspective->copyContents(homep, FALSE);
-    homeo->unref();
-    homep->unref();
-
-    if (homef) {
-      PRIVATE(this)->storedfrustum->copyContents(homef, FALSE);
-      homef->unref();
+    if (tmpstoredcamera) {
+      assert(PRIVATE(this)->storedcamera);
+      PRIVATE(this)->storedcamera->copyContents(tmpstoredcamera, FALSE);
+      tmpstoredcamera->unref();
     }
+
     PRIVATE(this)->deletecamera = TRUE;
     if (oldcamera) { cameraparent->removeChild(oldcamera); }
   }
@@ -1964,44 +1954,24 @@ So@Gui@Viewer::viewAll(void)
 
   \sa resetToHomePosition()
 */
-
 void
 So@Gui@Viewer::saveHomePosition(void)
 {
   if (! PRIVATE(this)->camera) return; // probably a scene-less viewer
 
-  // FIXME: the old code here used SoType::isDerivedFrom() to test for
-  // camera type. This caused a crash in SoFieldData::overlay(), line
-  // 235 since the types of the field containers were not equal when
-  // calling copyContents() (I use a camera which is derived from
-  // SoPerspectiveCamera in my application).
-  //
-  // We should probably not use copyContents() to copy the camera
-  // field values, but copy field by field. Also, we should probably
-  // use SoType::createInstance() to store a copy of the camera, not
-  // just assume it's either a perspective or an orthographic camera.
-  //   pederb, 2002-05-27
+  // We use SoType::createInstance() to store a copy of the camera,
+  // not just assuming it's either a perspective or an orthographic
+  // camera.
 
   SoType t = PRIVATE(this)->camera->getTypeId();
-  if (t == SoOrthographicCamera::getClassTypeId()) {
-    PRIVATE(this)->storedortho->copyContents(PRIVATE(this)->camera, FALSE);
-    So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)PRIVATE(this)->camera,
-                                             PRIVATE(this)->storedperspective);
-  }
-  else if (t == SoPerspectiveCamera::getClassTypeId()) {
-    PRIVATE(this)->storedperspective->copyContents(PRIVATE(this)->camera, FALSE);
-    So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)PRIVATE(this)->camera,
-                                             PRIVATE(this)->storedortho);
-  }
-  else if (t.getName() == "FrustumCamera" && PRIVATE(this)->storedfrustum) {
-    PRIVATE(this)->storedfrustum->copyContents(PRIVATE(this)->camera, FALSE);
-  }
-  else {
-#if SO@GUI@_DEBUG
-    SoDebugError::postWarning("So@Gui@Viewer::saveHomePosition",
-                              "Only SoPerspectiveCamera and SoOrthographicCamera is supported.");
-#endif // SO@GUI_DEBUG
-  }
+  assert(t.isDerivedFrom(SoNode::getClassTypeId()));
+  assert(t.canCreateInstance());
+
+  if (PRIVATE(this)->storedcamera) { PRIVATE(this)->storedcamera->unref(); }
+
+  PRIVATE(this)->storedcamera = (SoNode *)t.createInstance();
+  PRIVATE(this)->storedcamera->ref();
+  PRIVATE(this)->storedcamera->copyContents(PRIVATE(this)->camera, FALSE);
 }
 
 // *************************************************************************
@@ -2011,22 +1981,34 @@ So@Gui@Viewer::saveHomePosition(void)
 
   \sa saveHomePosition()
 */
-
 void
 So@Gui@Viewer::resetToHomePosition(void)
 {
-  if (! PRIVATE(this)->camera) return; // probably a scene-less viewer
+  if (!PRIVATE(this)->camera) { return; } // probably a scene-less viewer
+  if (!PRIVATE(this)->storedcamera) { return; }
   
   SoType t = PRIVATE(this)->camera->getTypeId();
-  if (t == SoOrthographicCamera::getClassTypeId()) {
-    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedortho, FALSE);
-  }                                                                 
-  else if (t == SoPerspectiveCamera::getClassTypeId()) {
-    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedperspective, FALSE);
+  SoType s = PRIVATE(this)->storedcamera->getTypeId();
+
+  // most common case
+  if (t == s) {
+    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedcamera, FALSE);
   }
-  else if (t.getName() == "FrustumCamera" && PRIVATE(this)->storedfrustum) {
-    PRIVATE(this)->camera->copyContents(PRIVATE(this)->storedfrustum, FALSE);
+  // handle common case #1
+  else if (t == SoOrthographicCamera::getClassTypeId() &&
+           s == SoPerspectiveCamera::getClassTypeId()) {
+    So@Gui@ViewerP::convertPerspective2Ortho((SoPerspectiveCamera *)PRIVATE(this)->storedcamera,
+                                             (SoOrthographicCamera *)PRIVATE(this)->camera);
   }
+  // handle common case #2
+  else if (t == SoPerspectiveCamera::getClassTypeId() &&
+           s == SoOrthographicCamera::getClassTypeId()) {
+    So@Gui@ViewerP::convertOrtho2Perspective((SoOrthographicCamera *)PRIVATE(this)->storedcamera,
+                                             (SoPerspectiveCamera *)PRIVATE(this)->camera);
+  }
+  // otherwise, cameras have changed in ways we don't understand since
+  // the last saveHomePosition() invokation, and so we're just going
+  // to ignore the reset request
 }
 
 // *************************************************************************
