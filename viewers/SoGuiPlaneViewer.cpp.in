@@ -118,7 +118,7 @@
 
 #include <so@gui@defs.h>
 
-#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan()
+#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan() and zoom()
 #include <Inventor/@Gui@/viewers/So@Gui@PlaneViewerP.h>
 
 // *************************************************************************
@@ -280,11 +280,11 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
       case SoMouseButtonEvent::BUTTON4:
-        if (press) PRIVATE(this)->zoom(0.1f);
+        if (press) SoGuiFullViewerP::zoom(this->getCamera(), 0.1f);
         break;
 
       case SoMouseButtonEvent::BUTTON5:
-        if (press) PRIVATE(this)->zoom(-0.1f);
+        if (press) SoGuiFullViewerP::zoom(this->getCamera(), -0.1f);
         break;
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
 
@@ -595,7 +595,7 @@ So@Gui@PlaneViewer::rightWheelMotion(float value)
   // This method set up the right wheel to control camera movement in
   // the inwards direction.
 
-  PRIVATE(this)->zoom(this->getRightWheelValue() - value);
+  SoGuiFullViewerP::zoom(this->getCamera(), this->getRightWheelValue() - value);
   inherited::rightWheelMotion(value);
 }
 
@@ -775,31 +775,6 @@ SoGuiPlaneViewerP::viewPlaneZ(void) const
   camera->position = focalpoint +
     camera->focalDistance.getValue() * SbVec3f(0, 0, 1);
   camera->orientation = SbRotation(SbVec3f(0, 1, 0), 0);
-}
-
-// This method moves the camera inwards and outwards.
-void
-SoGuiPlaneViewerP::zoom(const float difference) const
-{
-  SoCamera * camera = PUBLIC(this)->getCamera();
-  if (! camera) return; // probably a scene-less viewer
-
-  SoType type = camera->getTypeId();
-  float multiplicator = float(exp(difference)); // in the range of <0, ->>
-
-  if (type.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
-    SoOrthographicCamera * orthocam = (SoOrthographicCamera *) camera;
-    orthocam->height = orthocam->height.getValue() * multiplicator;
-  } else if (type.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-    float oldfocaldist = camera->focalDistance.getValue();
-    camera->focalDistance = oldfocaldist * multiplicator;
-    SbVec3f direction;
-    camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
-    camera->position = camera->position.getValue() +
-      (camera->focalDistance.getValue() - oldfocaldist) * -direction;
-  } else {
-    assert(0 && "impossible");
-  }
 }
 
 void

@@ -180,7 +180,7 @@
 
 #include <Inventor/@Gui@/So@Gui@Basic.h>
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
-#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan()
+#include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan() and zoom()
 
 
 static const int MOUSEPOSLOGSIZE = 16;
@@ -428,10 +428,10 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
       break;
 #ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
     case SoMouseButtonEvent::BUTTON4:
-      if (press) PRIVATE(this)->zoom(0.1f);
+      if (press) SoGuiFullViewerP::zoom(this->getCamera(), 0.1f);
       break;
     case SoMouseButtonEvent::BUTTON5:
-      if (press) PRIVATE(this)->zoom(-0.1f);
+      if (press) SoGuiFullViewerP::zoom(this->getCamera(), -0.1f);
       break;
 #endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
     default:
@@ -719,7 +719,7 @@ So@Gui@ExaminerViewer::bottomWheelMotion(float value)
 void
 So@Gui@ExaminerViewer::rightWheelMotion(float value)
 {
-  PRIVATE(this)->zoom(this->getRightWheelValue() - value);
+  SoGuiFullViewerP::zoom(this->getCamera(), this->getRightWheelValue() - value);
   inherited::rightWheelMotion(value);
 }
 
@@ -914,6 +914,24 @@ SoGuiExaminerViewerP::setMode(const ViewerMode newmode)
   default:
     break;
   }
+
+#if SO@GUI@_DEBUG && 1 // debug
+  if (oldmode == ZOOMING) {
+    SbVec3f v = this->getCamera()->position.getValue();
+    SoDebugError::postInfo("So@Gui@ExaminerViewerP::setMode",
+                           "new camera position after zoom: <%e, %e, %e>\n",
+                           v[0], v[1], v[2]);
+  }
+#endif // debug
+
+#if SO@GUI@_DEBUG && 0 // debug
+  if (oldmode == ZOOMING) {
+    SbVec3f v = PUBLIC(this)->getCamera()->position.getValue();
+    SoDebugError::postInfo("So@Gui@ExaminerViewerP::setMode",
+                           "new camera position after zoom: <%e, %e, %e>",
+                           v[0], v[1], v[2]);
+  }
+#endif // debug
 
   this->setCursorRepresentation(newmode);
   this->currentmode = newmode;
@@ -1160,62 +1178,16 @@ SoGuiExaminerViewerP::spin(const SbVec2f & pointerpos)
 
 // ************************************************************************
 
-// Dependent on the camera type this will either shrink or expand the
-// height of the viewport (orthogonal camera) or move the camera
-// closer or further away from the focal point in the scene.
-void
-SoGuiExaminerViewerP::zoom(const float diffvalue)
-{
-  SoCamera * cam = PUBLIC(this)->getCamera();
-  if (cam == NULL) return; // can happen for empty scenegraph
-  SoType t = cam->getTypeId();
-
-  // This will be in the range of <0, ->>.
-  float multiplicator = float(exp(diffvalue));
-
-  if (t.isDerivedFrom(SoOrthographicCamera::getClassTypeId())) {
-
-    // Since there's no perspective, "zooming" in the original sense
-    // of the word won't have any visible effect. So we just increase
-    // or decrease the field-of-view values of the camera instead, to
-    // "shrink" the projection size of the model / scene.
-    SoOrthographicCamera * oc = (SoOrthographicCamera *)cam;
-    oc->height = oc->height.getValue() * multiplicator;
-
-  }
-  else if (t.isDerivedFrom(SoPerspectiveCamera::getClassTypeId())) {
-
-    float oldfocaldist = cam->focalDistance.getValue();
-    cam->focalDistance = oldfocaldist * multiplicator;
-
-    SbVec3f direction;
-    cam->orientation.getValue().multVec(SbVec3f(0, 0, -1), direction);
-    cam->position = cam->position.getValue() +
-      (cam->focalDistance.getValue() - oldfocaldist) * -direction;
-
-  }
-  else {
-    static SbBool first = TRUE;
-    if (first) {
-      SoDebugError::postWarning("SoGuiExaminerViewerP::zoom",
-                                "unknown camera type, "
-                                "attempts to zoom will have no effect");
-      first = FALSE;
-    }
-  }
-}
-
-// *************************************************************************
-
 // Calculate a zoom/dolly factor from the difference of the current
 // cursor position and the last.
 void
 SoGuiExaminerViewerP::zoomByCursor(const SbVec2f & thispos,
-                                     const SbVec2f & prevpos)
+                                   const SbVec2f & prevpos)
 {
   // There is no "geometrically correct" value, 20 just seems to give
   // about the right "feel".
-  this->zoom((thispos[1] - prevpos[1]) * 20.0f);
+  SoGuiFullViewerP::zoom(PUBLIC(this)->getCamera(),
+                         (thispos[1] - prevpos[1]) * 20.0f);
 }
 
 // *************************************************************************

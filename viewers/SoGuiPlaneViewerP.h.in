@@ -51,8 +51,6 @@ public:
   void viewPlaneY(void) const;
   void viewPlaneZ(void) const;
 
-  void zoom(const float difference) const;
-
   void setCanvasSize(const SbVec2s size);
   void setPointerLocation(const SbVec2s location);
   int getPointerXMotion(void) const;
