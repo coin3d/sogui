@@ -26,6 +26,7 @@ static const char rcsid[] =
 #endif // SO@GUI@_DEBUG
 
 #include <assert.h>
+
 #include <math.h>
 #include <stdio.h>
 
@@ -37,7 +38,7 @@ static const char rcsid[] =
 #endif // ! FALSE
 
 #ifndef M_PI
-#define M_PI           3.14159265358979323846
+#define M_PI 3.14159265358979323846f
 #endif // ! M_PI
 
 /*!
@@ -78,32 +79,29 @@ SoAnyThumbWheel::SoAnyThumbWheel(
 : diameter( 0 )
 , width( 0 )
 , byteorder( ABGR )
-, handling( MODULATE )
-, method( AUTHENTIC )
+, boundaryhandling( MODULATE )
+, movement( AUTHENTIC )
 , dirtyTables( TRUE )
 , dirtyVariables( TRUE )
 {
   assert( sizeof(int) == 4 && "FIXME: use int32 datatype instead" );
 
-  disabledred = 255;
-  disabledgreen = 255;
-  disabledblue = 255;
+  this->disabledred = 1.0f;
+  this->disabledgreen = 1.0f;
+  this->disabledblue = 1.0f;
 
-  red = 220;
-  green = 180;
-  blue = 180;
+  this->red = 220;
+  this->green = 180;
+  this->blue = 180;
   
-  light = 1.3f;
-  front = 1.2f;
-  normal = 1.0f;
-  shade = 0.8f;
+  this->light = 1.3f;
+  this->front = 1.2f;
+  this->normal = 1.0f;
+  this->shade = 0.8f;
 
   for ( int i = 0; i < NUMTABLES; i++ )
     this->tables[i] = NULL;
-
 } // SoAnyThumbWheel()
-
-// ************************************************************************
 
 /*!
   Destructor.
@@ -122,9 +120,9 @@ SoAnyThumbWheel::~SoAnyThumbWheel(
 */
 
 void
-SoAnyThumbWheel::SetWheelSize(
-  int diameter,
-  int width )
+SoAnyThumbWheel::setSize(
+  const int diameter,
+  const int width )
 {
   if ( this->diameter != diameter ) {
     this->dirtyTables = TRUE;
@@ -136,21 +134,19 @@ SoAnyThumbWheel::SetWheelSize(
   }
   this->diameter = diameter;
   this->width = width;
-} // SetWheelSize()
-
-// ************************************************************************
+} // setSize()
 
 /*!
 */
 
 void
-SoAnyThumbWheel::GetWheelSize(
+SoAnyThumbWheel::getSize(
   int & diameter,
   int & width ) const
 {
   diameter = this->diameter;
   width = this->width;
-} // GetWheelSize()
+} // getSize()
 
 // ************************************************************************
 
@@ -158,26 +154,24 @@ SoAnyThumbWheel::GetWheelSize(
 */
 
 void
-SoAnyThumbWheel::SetColor(
-  int red,
-  int green,
-  int blue )
+SoAnyThumbWheel::setColor(
+  const float red,
+  const float green,
+  const float blue )
 {
   this->red = red;
   this->green = green;
   this->blue = blue;
-} // SetColor()
-
-// ************************************************************************
+} // setColor()
 
 /*!
 */
 
 void
-SoAnyThumbWheel::GetColor(
-  int & red,
-  int & green,
-  int & blue ) const
+SoAnyThumbWheel::getColor(
+  float & red,
+  float & green,
+  float & blue ) const
 {
   red = this->red;
   green = this->green;
@@ -190,35 +184,33 @@ SoAnyThumbWheel::GetColor(
 */
 
 void
-SoAnyThumbWheel::SetColorFactors(
-  float light,
-  float front,
-  float normal,
-  float shade )
+SoAnyThumbWheel::setColorFactors(
+  const float light,
+  const float front,
+  const float normal,
+  const float shade )
 {
   this->light = light;
   this->front = front;
   this->normal = normal;
   this->shade = shade;
-} // SetColorFactors()
-
-// ************************************************************************
+} // setColorFactors()
 
 /*!
 */
 
 void
-SoAnyThumbWheel::GetColorFactors(
+SoAnyThumbWheel::getColorFactors(
   float & light,
   float & front,
   float & normal,
-  float & shade )
+  float & shade ) const
 {
   light = this->light;
   front = this->front;
   normal = this->normal;
   shade = this->shade;
-} // GetColorFactors()
+} // getColorFactors()
 
 // ************************************************************************
 
@@ -228,11 +220,11 @@ SoAnyThumbWheel::GetColorFactors(
 */
 
 int
-SoAnyThumbWheel::BitmapsRequired(
+SoAnyThumbWheel::getNumBitmaps(
   void ) const
 {
   return this->width - 4 + 2 + 1;
-} // BitmapsRequired()
+} // getNumBitmaps()
 
 // ************************************************************************
 
@@ -242,15 +234,15 @@ SoAnyThumbWheel::BitmapsRequired(
 */
 
 void
-SoAnyThumbWheel::DrawBitmap(
-  int number,
+SoAnyThumbWheel::drawBitmap(
+  const int number,
   void * bitmap,
-  RenderDirection direction )
+  const Alignment alignment ) const
 {
   if ( number == 0 ) {
-    DrawDisabledWheel( number, bitmap, direction );
+    drawDisabledWheel( number, bitmap, alignment );
   } else {
-    DrawEnabledWheel( number, bitmap, direction );
+    drawEnabledWheel( number, bitmap, alignment );
   }
 }
 
@@ -271,17 +263,17 @@ SoAnyThumbWheel::DrawBitmap(
 */
 
 float
-SoAnyThumbWheel::CalculateValue(
-  float origval,
-  int origpos,
-  int deltapos )
+SoAnyThumbWheel::calculateValue(
+  const float origval,
+  const int origpos,
+  const int deltapos ) const
 {
-  this->Validate();
+  this->validate();
 
 //  fprintf( stderr, "calc( %8.4f, %d, %d)\n", origval, origpos, deltapos );
 
   float diff = 0.0f;
-  switch ( this->method ) {
+  switch ( this->movement ) {
   case UNIFORM:
     diff = this->unistep * deltapos;
     break;
@@ -291,9 +283,9 @@ SoAnyThumbWheel::CalculateValue(
     if ( newpos >= diameter ) newpos = diameter - 1;
     diff = this->tables[RAD][newpos] - this->tables[RAD][origpos];
     break;
-  } // switch ( this->method )
+  } // switch ( this->movement )
 
-  switch ( this->handling ) {
+  switch ( this->boundaryhandling ) {
   case MODULATE:
     while ( (origval + diff) < 0.0f          ) diff += 2.0f * M_PI;
     while ( (origval + diff) > (2.0f * M_PI) ) diff -= 2.0f * M_PI;
@@ -305,10 +297,10 @@ SoAnyThumbWheel::CalculateValue(
   case ACCUMULATE:
     // nothing - just add the difference on top of original value
     break;
-  } // switch ( this->handling )
+  } // switch ( this->boundaryhandling )
 
   return origval + diff;
-} // CalculateValue()
+} // calculateValue()
 
 // ************************************************************************
 
@@ -318,11 +310,11 @@ SoAnyThumbWheel::CalculateValue(
 */
 
 int
-SoAnyThumbWheel::GetBitmapForValue(
-  float value,
-  WheelState state )
+SoAnyThumbWheel::getBitmapForValue(
+  const float value,
+  const State state ) const
 {
-  this->Validate();
+  this->validate();
 
   if ( state == DISABLED )
     return 0; // only one disabled bitmap in this implementation
@@ -332,7 +324,7 @@ SoAnyThumbWheel::GetBitmapForValue(
   if ( normalizedmodval < 0.0f ) normalizedmodval += 1.0f;
   int bitmap = 1 + (int) (normalizedmodval * (float) (this->width - 4 + 2));
   return bitmap;
-} // GetBitmapForValue()
+} // getBitmapForValue()
 
 // ************************************************************************
 
@@ -342,23 +334,21 @@ SoAnyThumbWheel::GetBitmapForValue(
 */
 
 void
-SoAnyThumbWheel::SetGraphicsByteOrder(
+SoAnyThumbWheel::setGraphicsByteOrder(
   const GraphicsByteOrder byteorder )
 {
   this->byteorder = byteorder;
-} // SetGraphicsByteOrder()
-
-// ************************************************************************
+} // setGraphicsByteOrder()
 
 /*!
 */
 
 SoAnyThumbWheel::GraphicsByteOrder
-SoAnyThumbWheel::GetGraphicsByteOrder(
+SoAnyThumbWheel::getGraphicsByteOrder(
   void ) const
 {
   return this->byteorder;
-} // GetGraphicsByteOrder()
+} // getGraphicsByteOrder()
 
 // ************************************************************************
 
@@ -366,44 +356,40 @@ SoAnyThumbWheel::GetGraphicsByteOrder(
 */
 
 void
-SoAnyThumbWheel::SetWheelMotionMethod(
-  const WheelMotionMethod method )
+SoAnyThumbWheel::setMovement(
+  const Movement movement )
 {
-  this->method = method;
-} // SetWheelMotionMethod()
-
-// ************************************************************************
+  this->movement = movement;
+} // setMovement()
 
 /*!
 */
 
-SoAnyThumbWheel::WheelMotionMethod
-SoAnyThumbWheel::GetWheelMotionMethod(
+SoAnyThumbWheel::Movement
+SoAnyThumbWheel::getMovement(
   void ) const
 {
-  return this->method;
-} // GetWheelMotionMethod()
+  return this->movement;
+} // getMovement()
 
 // ************************************************************************
 
 void
-SoAnyThumbWheel::SetWheelRangeBoundaryHandling(
-  const WheelRangeBoundaryHandling handling )
+SoAnyThumbWheel::setBoundaryHandling(
+  const BoundaryHandling handling )
 {
-  this->handling = handling;
-} // SetWheelRangeBoundaryHandling()
-
-// ************************************************************************
+  this->boundaryhandling = handling;
+} // setBoundaryHandling()
 
 /*!
 */
 
-SoAnyThumbWheel::WheelRangeBoundaryHandling
-SoAnyThumbWheel::GetWheelRangeBoundaryHandling(
+SoAnyThumbWheel::BoundaryHandling
+SoAnyThumbWheel::getBoundaryHandling(
   void ) const
 {
-  return this->handling;
-} // GetWheelRangeBoundaryHandling()
+  return this->boundaryhandling;
+} // getBoundaryHandling()
 
 // ************************************************************************
 
@@ -414,8 +400,8 @@ SoAnyThumbWheel::GetWheelRangeBoundaryHandling(
 */
 
 void
-SoAnyThumbWheel::Validate( // private
-  void )
+SoAnyThumbWheel::validate( // private
+  void ) const
 {
   int i;
 
@@ -463,30 +449,30 @@ SoAnyThumbWheel::Validate( // private
 
     this->dirtyVariables = FALSE;
   }
-} // Validate()
+} // validate()
 
 // ************************************************************************
 
 inline unsigned int
 SoAnyThumbWheel::swapWord(
-  unsigned int orig) const
+  unsigned int orig ) const
 {
   // orig is RGBA
-  int copy = 0;
-  if (this->byteorder == ABGR) {
+  unsigned int copy;
+  if ( this->byteorder == ABGR ) {
     copy = (orig & 0x000000ff) <<  24;
     copy |= (orig & 0x0000ff00) << 8;
     copy |= (orig & 0x00ff0000) >> 8;
     copy |= (orig & 0xff000000) >> 24;
-  }
-  else if (this->byteorder == ARGB) {
+  } else if ( this->byteorder == ARGB ) {
     copy = orig >> 8;             // RGB
     copy |= (orig & 0xff) << 24;  // A
-  }
-  else if (this->byteorder == BGRA) {
+  } else if ( this->byteorder == BGRA ) {
     copy = orig & 0x00ff00ff;          // G & A
     copy |= (orig & 0x0000ff00) << 16; // B
     copy |= (orig & 0xff000000) >> 16; // R
+  } else {
+    copy = orig; // ?
   }
   return copy;
 } // swapWord()
@@ -496,14 +482,14 @@ SoAnyThumbWheel::swapWord(
 */
 
 void
-SoAnyThumbWheel::DrawDisabledWheel( // private
-  int number,
+SoAnyThumbWheel::drawDisabledWheel( // private
+  const int number,
   void * bitmap,
-  RenderDirection direction )
+  const Alignment alignment ) const
 {
   assert( number == 0 );
 
-  this->Validate();
+  this->validate();
 
   unsigned int * buffer = (unsigned int *) bitmap;
 
@@ -527,7 +513,7 @@ SoAnyThumbWheel::DrawDisabledWheel( // private
       shade  = this->swapWord(  shade );
     }
 
-    if ( direction == SoAnyThumbWheel::VERTICAL ) {
+    if ( alignment == VERTICAL ) {
       buffer[j*this->width] = light;
       for ( int i = 1; i < (width - 1); i++ )
         buffer[(j*this->width)+i] = normal;
@@ -539,7 +525,7 @@ SoAnyThumbWheel::DrawDisabledWheel( // private
       buffer[j+((this->width-1)*this->diameter)] = shade;
     }
   }
-} // DrawDisabledWheel()
+} // drawDisabledWheel()
 
 // ************************************************************************
 
@@ -550,12 +536,12 @@ SoAnyThumbWheel::DrawDisabledWheel( // private
 */
 
 void
-SoAnyThumbWheel::DrawEnabledWheel(
-  int number,
+SoAnyThumbWheel::drawEnabledWheel(
+  const int number,
   void * bitmap,
-  RenderDirection direction )
+  const Alignment alignment ) const
 {
-  this->Validate();
+  this->validate();
 
   int numEnabledBitmaps = this->width - 4 + 2;
   assert( number > 0 && number <= numEnabledBitmaps );
@@ -607,7 +593,7 @@ SoAnyThumbWheel::DrawEnabledWheel(
       }
     }
 
-    if ( direction == SoAnyThumbWheel::VERTICAL ) {
+    if ( alignment == VERTICAL ) {
       buffer[(this->width*j)] = front;
       buffer[(this->width*j)+1] = front;
       if ( flag == TRUE ) buffer[(this->width*j)+2] = front;
@@ -639,7 +625,7 @@ SoAnyThumbWheel::DrawEnabledWheel(
     if ( j < (this->diameter - 1) ) {
       radian += this->tables[RAD][j+1] - this->tables[RAD][j];
       if ( radian > modulo ) {
-        if ( direction == SoAnyThumbWheel::VERTICAL ) {
+        if ( alignment == VERTICAL ) {
           int color = 0;
           if ( j > (this->diameter * 2 / 3) )
             color = light;
@@ -663,11 +649,10 @@ SoAnyThumbWheel::DrawEnabledWheel(
       }
     }
   }
-} // DrawEnabledWheel()
+} // drawEnabledWheel()
 
 // ************************************************************************
 
 #if SO@GUI@_DEBUG
 static const char * getSoAnyThumbWheelRCSId(void) { return rcsid; }
 #endif // SO@GUI@_DEBUG
-
