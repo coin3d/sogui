@@ -59,17 +59,14 @@ public:
   GraphicsByteOrder GetGraphicsByteOrder(void) const;
 
   enum WheelMotionMethod {
-    UNIFORM,
-    AUTHENTIC
+    UNIFORM, AUTHENTIC
   };
 
   void SetWheelMotionMethod( const WheelMotionMethod method );
   WheelMotionMethod GetWheelMotionMethod(void) const;
 
   enum WheelRangeBoundaryHandling {
-    MODULATE,
-    ACCUMULATE,
-    CLAMP
+    MODULATE, ACCUMULATE, CLAMP
   };
 
   void SetWheelRangeBoundaryHandling( const WheelRangeBoundaryHandling handling );
