@@ -754,17 +754,16 @@ So@Gui@ExaminerViewer::zoomByCursor(
 */
 
 void
-So@Gui@ExaminerViewer::actualGenericRedraw(
-  void)
+So@Gui@ExaminerViewer::actualGenericRedraw(void)
 {
-  SbTime thisRedrawTime = SbTime::getTimeOfDay();
-  unsigned long msecs =
-    thisRedrawTime.getMsecValue() - this->prevRedrawTime.getMsecValue();
-  this->prevRedrawTime = thisRedrawTime;
+  SbTime now = SbTime::getTimeOfDay();
+  double secs = now.getValue() -  this->prevRedrawTime.getValue();
+
+  this->prevRedrawTime = now;
 
   if (this->isAnimating()) {
     SbRotation deltaRotation = this->spinRotation;
-    deltaRotation.scaleAngle((float) msecs / 200.0f);
+    deltaRotation.scaleAngle(secs * 5.0);
     this->reorientCamera(deltaRotation);
   }
 } // actualRedraw()
@@ -907,32 +906,25 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
               SbRotation rot = this->spinprojector->getRotation(from, to);
 
               SbTime stoptime = (event->getTime() - this->log.time[0]);
-              if (stoptime.getMsecValue() > 100) {
+              if (stoptime.getValue() > 0.100) {
                 this->interactiveCountDec();
               }
               else {
                 SbTime delta = (this->log.time[0] - this->log.time[2]);
-                float deltatime = (float) delta.getMsecValue();
-                if (deltatime == 1.0f) {
-                  SoDebugError::postInfo("So@Gui@ExaminerViewer::processSoEvent", "time[0] = %ld, time[2] = %ld",
-                                          this->log.time[0].getMsecValue(), this->log.time[2].getMsecValue());
+                double deltatime = delta.getValue();
+                rot.invert();
+                rot.scaleAngle(0.200 / deltatime);
+
+                SbVec3f axis;
+                float radians;
+                rot.getValue(axis, radians);
+                if (radians < 0.01f || deltatime > 0.300) {
                   this->interactiveCountDec();
                 }
                 else {
-                  rot.invert();
-                  rot.scaleAngle(200.0f / deltatime);
-
-                  SbVec3f axis;
-                  float radians;
-                  rot.getValue(axis, radians);
-                  if (radians < 0.01f || deltatime > 300.0f) {
-                    this->interactiveCountDec();
-                  }
-                  else {
-                    this->spinRotation = rot;
-                    this->spinanimating = TRUE;
-                    this->scheduleRedraw();
-                  }
+                  this->spinRotation = rot;
+                  this->spinanimating = TRUE;
+                  this->scheduleRedraw();
                 }
               }
             }

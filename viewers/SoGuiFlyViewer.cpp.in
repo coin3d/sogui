@@ -832,8 +832,8 @@ So@Gui@FlyViewer::actualRedraw(// virtual
       float t = 0.0f;
       if (PRIVATE(this)->lastrender) {
         if (PRIVATE(this)->currentspeed == 0.0f)
-          PRIVATE(this)->lastrender->setValue(thisrender.getValue()-0.01);
-        t = float(thisrender.getMsecValue() - PRIVATE(this)->lastrender->getMsecValue()) / 100.0f;
+          PRIVATE(this)->lastrender->setValue(thisrender.getValue() - 0.01);
+        t = (thisrender.getValue() - PRIVATE(this)->lastrender->getValue()) * 10.0f;
         if (t >= 1.0f) t = 1.0f;
       }
       PRIVATE(this)->currentspeed +=
@@ -850,7 +850,7 @@ So@Gui@FlyViewer::actualRedraw(// virtual
 
       if (PRIVATE(this)->currentspeed != 0.0f) {
         if (PRIVATE(this)->lastrender) {
-          t = float(thisrender.getMsecValue() - PRIVATE(this)->lastrender->getMsecValue()) / 500.0f;
+          t = (thisrender.getValue() - PRIVATE(this)->lastrender->getValue()) * 2.0f;
           if (t > 0.0f) {
             SoCamera * camera = this->getCamera();
             if (camera) { // could be a sceneless viewer
