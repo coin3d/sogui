@@ -185,6 +185,11 @@
   available, or because they are only available in combination with
   other OpenGL context settings that are not wanted (like single
   buffers, non-accellerated rendering, etc).
+
+  If you try to enable accumulation buffers by using this function,
+  you should therefore in succession use the
+  So@Gui@GLWidget::getAccumulationBuffer() to query whether or not an
+  accumulation buffer could actually be set up.
 */
 
 /*!
