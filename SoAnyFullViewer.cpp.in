@@ -249,17 +249,17 @@ SoAnyFullViewer::setupStandardPopupMenu(
     };
 
     struct menutransparencyitem items[] = {
-      { "screen_door", _( "screen_door" ), SCREEN_DOOR_TRANSPARENCY_ITEM },
+      { "screen_door", _( "screen door" ), SCREEN_DOOR_TRANSPARENCY_ITEM },
       { "add", _( "add"), ADD_TRANSPARENCY_ITEM },
-      { "delayed_add", _( "delayed_add" ), DELAYED_ADD_TRANSPARENCY_ITEM },
-      { "sorted_object_add", _( "sorted_object_add" ), SORTED_OBJECT_ADD_TRANSPARENCY_ITEM },
+      { "delayed_add", _( "delayed add" ), DELAYED_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_add", _( "sorted object add" ), SORTED_OBJECT_ADD_TRANSPARENCY_ITEM },
       { "blend", _( "blend" ), BLEND_TRANSPARENCY_ITEM },
-      { "delayed_blend", _( "delayed_blend" ), DELAYED_BLEND_TRANSPARENCY_ITEM },
-      { "sorted_object_blend", _( "sorted_object_blend" ), SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM }
+      { "delayed_blend", _( "delayed blend" ), DELAYED_BLEND_TRANSPARENCY_ITEM },
+      { "sorted_object_blend", _( "sorted object blend" ), SORTED_OBJECT_BLEND_TRANSPARENCY_ITEM }
 #ifdef __COIN__ // Coin extensions
       ,
-      { "sorted_object_sorted_triangle_add", _( "sorted_object_sorted_triangle_add" ), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
-      { "sorted_object_sorted_triangle_blend", _( "sorted_object_sorted_triangle_blend" ), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
+      { "sorted_object_sorted_triangle_add", _( "sorted object sorted triangle add" ), SORTED_OBJECT_SORTED_TRIANGLE_ADD_TRANSPARENCY_ITEM },
+      { "sorted_object_sorted_triangle_blend", _( "sorted object sorted triangle blend" ), SORTED_OBJECT_SORTED_TRIANGLE_BLEND_TRANSPARENCY_ITEM }
 #endif // __COIN__
     };
 
