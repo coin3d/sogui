@@ -877,7 +877,7 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
 #endif // SO@GUI@_DEBUG
 
   if (style == this->getDrawStyle(type)) {
-#if 0 // SO@GUI@_DEBUG
+#if SO@GUI@_DEBUG && 0 // SO@GUI@_DEBUG
     SoDebugError::postWarning("So@Gui@Viewer::setDrawStyle",
                               "drawstyle for type 0x%02x already 0x%02x",
                               type, style);
@@ -985,7 +985,7 @@ So@Gui@Viewer::setViewing(
   if ( this->viewingFlag == enable ) {
 #if SO@GUI@_DEBUG
     SoDebugError::postWarning( "So@Gui@Viewer::setViewing",
-      "unnecessary called" );
+                               "unnecessary called" );
 #endif // SO@GUI@_DEBUG
     return;
   }
@@ -1206,14 +1206,14 @@ So@Gui@Viewer::isDetailSeek(void) const
 void
 So@Gui@Viewer::setSeekTime(const float seconds)
 {
-#if SO@GUI@_DEBUG
   if (seconds < 0.0f) {
+#if SO@GUI@_DEBUG
     SoDebugError::postWarning("So@Gui@Viewer::setSeekTime",
                               "an attempt was made to set a negative seek "
                               "time duration");
+#endif // SO@GUI@_DEBUG
     return;
   }
-#endif // SO@GUI@_DEBUG
   PRIVATE(this)->seekperiod = seconds;
 } // setSeekTime()
 
@@ -1575,7 +1575,7 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
   if ( root == this->sceneGraph ) {
 #if SO@GUI@_DEBUG
     SoDebugError::postWarning( "So@Gui@Viewer::setSceneGraph",
-      "called with the same root as already set" );
+                               "called with the same root as already set" );
 #endif // SO@GUI@_DEBUG
     return;
   }
@@ -2060,8 +2060,9 @@ So@Gui@Viewer::interactiveCountDec(void)
 
 #if SO@GUI@_DEBUG
   if (PRIVATE(this)->interactionnesting <= 0) {
-    SoDebugError::postWarning("So@Gui@Viewer::interactiveCountDec",
-        "interaction count nesting went below zero" );
+    SoDebugError::postWarning( "So@Gui@Viewer::interactiveCountDec",
+                               "interaction count nesting went below zero. "
+                               "This is due to an internal So@Gui@ bug." );
   }
 #endif // SO@GUI@_DEBUG
 
@@ -2108,14 +2109,14 @@ So@Gui@Viewer::getInteractiveCount(void) const
 void
 So@Gui@Viewer::setSeekDistance(const float distance)
 {
-#if SO@GUI@_DEBUG
   if (distance <= 0.0f) {
+#if SO@GUI@_DEBUG
     SoDebugError::postWarning("So@Gui@Viewer::setSeekDistance",
                               "invalid seek distance value: %f",
                               distance);
+#endif // SO@GUI@_DEBUG
     return;
   }
-#endif // SO@GUI@_DEBUG
   PRIVATE(this)->seekdistance = distance;
 } // setSeekDistance()
 
