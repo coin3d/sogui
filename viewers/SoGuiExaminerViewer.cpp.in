@@ -1129,3 +1129,16 @@ So@Gui@ExaminerViewer::getMotion3OnCamera(
 } // getMotion3OnCamera()
 
 // *************************************************************************
+
+/*!
+  Decide whether or not the mouse pointer cursor should be visible in
+  the rendering canvas.
+*/
+void
+So@Gui@ExaminerViewer::setCursorEnabled(SbBool enable)
+{
+  inherited::setCursorEnabled(enable);
+  this->setCursorRepresentation(this->currentmode);
+}
+
+// *************************************************************************
