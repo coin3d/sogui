@@ -31,6 +31,24 @@
 #include <Inventor/@Gui@/So@Gui@GLWidget.h>
 
 /*!
+  \fn @WIDGET@ So@Gui@GLWidget::buildWidget(@WIDGET@ parent)
+
+  This method builds the component contents in the given \a parent
+  widget. For subclasses adding new user interface items, this method
+  is typically overridden in the following manner:
+
+  \code
+  @WIDGET@ MyOwnViewer::buildWidget(@WIDGET@ parent)
+  {
+     @WIDGET@ superw = <superclass>::buildWidget(parent);
+     // [then move superw within MyOwnViewer framework and add own
+     // user interface components]
+  }
+  \endcode
+*/
+
+
+/*!
   This function is provided as a convenience for the application
   programmer to help with acquiring the OpenGL implementation limits
   for rendering points.

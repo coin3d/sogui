@@ -1331,12 +1331,9 @@ So@Gui@RenderArea::widgetChanged(@WIDGET@ widget) // virtual, protected
 
 } // widgetChanged()
 
-/*!
-  This method builds the So@Gui@RenderArea contents in the \a parent
-  widget.
-*/
+// Documented in superclass.
 @WIDGET@
-So@Gui@RenderArea::buildWidget(@WIDGET@ parent) // protected
+So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
 {
   @WIDGET@ widget = inherited::buildWidget(parent);
   if (this->deviceList != NULL) {

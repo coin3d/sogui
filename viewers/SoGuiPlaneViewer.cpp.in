@@ -59,6 +59,9 @@
   <ul>click 'ESC' key to switch to and from 'view' mode and
   'scenegraph interaction' mode (see setViewing() documentation)</ul>
 
+  <ul>hold down the 'ALT' key to temporary toggle from
+  camera-interaction mode to scenegraph-interaction mode</ul>
+
   </li>
 
   Hitting any of the X, Y or Z buttons in the panel on the right side
