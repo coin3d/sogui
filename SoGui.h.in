@@ -48,11 +48,7 @@ class SbPList;
 // *************************************************************************
 
 class SO@GUI@_DLL_API So@Gui@
-#ifdef __COIN_SOQT__
-  : public QObject
-#endif // __COIN_SOQT__
 {
-  @COMPONENTHEADER@
 
 public:
   static @WIDGET@ init(const char * appname, const char * classname = "So@Gui@")
@@ -113,8 +109,11 @@ private:
   // default constructor and the destructor so nobody can instantiate
   // it.
   So@Gui@(void);
-  ~So@Gui@();
-  friend class So@Gui@P; // SoQtP needs this to set up an object for the slots.
+  virtual ~So@Gui@();
+
+#ifndef DOXYGEN_SKIP_THIS // To avoid having it show up in Doxygen doc.
+  friend class So@Gui@P;
+#endif // DOXYGEN_SKIP_THIS
 
   static void sensorQueueChanged(void * cbdata);
 
@@ -182,16 +181,6 @@ protected:
                                        WPARAM wparam, LPARAM lparam);
 
 #endif // __COIN_SOWIN__
-
-#ifdef __COIN_SOQT__
-protected:
-  bool eventFilter(QObject *, class QEvent *);
-
-private slots:
-  void slot_timedOutSensor(void);
-  void slot_idleSensor(void);
-  void slot_delaytimeoutSensor(void);
-#endif // __COIN_SOQT__
 
 #ifdef __COIN_SOGTK__
 public:
