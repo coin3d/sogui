@@ -161,8 +161,6 @@ private:
 
 #ifdef __COIN_SOXT__ // FIXME: get rid of non-templatized code. 20020108 mortene.
 protected:
-  Widget buildAppButtonsForm(Widget parent);
-
   Widget buildFunctionsSubmenu(Widget popup);
   Widget buildDrawStyleSubmenu(Widget popup);
 
