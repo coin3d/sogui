@@ -190,7 +190,9 @@
 // to the value of this)
 #define UNINITIALIZED_ENVVAR -1 // value of envvars before tested
 
-// environment variables
+// Environment variable for debugging purpose: display a running
+// frames-per-second counter. See code comments above
+// So@Gui@ViewerP::recordFPS() function below for more information.
 static int COIN_SHOW_FPS_COUNTER = UNINITIALIZED_ENVVAR;
 
 // *************************************************************************
@@ -1390,6 +1392,35 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 //
 // The methods for recording FPS values are Coin extensions, not
 // available in the original Open Inventor API.
+//
+// The two displayed values can be explained as follows:
+//
+// The first number is the time it takes for the SoGLRenderAction to
+// traverse the scene graph (displayed as Hz / FPS). The second is the
+// interval between each time SoGLRenderAction::apply() is invoked
+// (i.e. the "actual" rendering rate, as experienced by the user).
+//
+// The first number is mainly useful just for internal debugging
+// purposes.
+//
+// The second number will always be <= to the first, because it will
+// also include the time stalling on glFlush() upon releasing the
+// OpenGL context after traversal (glFlush() stalls until the GPU
+// completes all OpenGL commands), and any application-code processing
+// inbetween rendering.
+//
+// There is by the way a useful "trick" to improve application
+// performance implied in that last paragraph above: if
+// application-code processing is interleaved between the completion
+// of the SoGLRenderAction traversal and the release of the OpenGL
+// context, application-code is likely to run on the CPU in parallel
+// with GPU processing OpenGL commands.
+//
+// FIXME: the above optimization trick should be documented in the
+// visible API docs somewhere, with code to show how to do it. The
+// example code would probably involve making an application-specific
+// viewer, and overriding actualRedraw()? Or can it be done by using a
+// callback mechanism somewhere? Ask pederb. 20031009 mortene.
 //
 // \sa resetFrameCounter(), addFrametime()
 void
