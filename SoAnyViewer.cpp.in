@@ -1640,6 +1640,7 @@ So@GUI@Viewer::interactiveCountDec(void)
   if (this->interactionnesting <= 0) {
     SoDebugError::postWarning("SoQtViewer::interactiveCountDec",
         "interaction count nesting went below zero" );
+  }
 #endif // SO@uGUI@_DEBUG
 
   if (--(this->interactionnesting) <= 0) {
