@@ -36,8 +36,6 @@ static const char rcsid[] =
  *
 \**************************************************************************/
 
-#include <assert.h>
-
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/misc/SoBasic.h>
 #include <Inventor/nodes/SoSelection.h>
@@ -74,7 +72,7 @@ static const char rcsid[] =
 
 // *************************************************************************
 
-SO@GUI@_TYPED_OBJECT_SOURCE(So@Gui@RenderArea,So@Gui@GLWidget);
+SO@GUI@_OBJECT_SOURCE(So@Gui@RenderArea);
 
 // *************************************************************************
 

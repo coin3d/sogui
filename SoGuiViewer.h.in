@@ -73,8 +73,7 @@ typedef void So@Gui@ViewerDecimationPercentageCB(
 // *************************************************************************
 
 class SO@GUI@_DLL_EXPORT So@Gui@Viewer : public So@Gui@RenderArea {
-  SO@GUI@_TYPED_ABSTRACT_OBJECT_HEADER(So@Gui@Viewer);
-  typedef So@Gui@RenderArea inherited;
+  SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@Viewer, So@Gui@RenderArea);
   @COMPONENTHEADER@
 
 public:

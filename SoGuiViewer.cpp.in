@@ -40,7 +40,6 @@ static const char rcsid[] =
 #include <config.h> // need to know value of HAVE_SOPOLYGONOFFSET
 #endif // HAVE_CONFIG_H
 
-#include <assert.h>
 #include <math.h>
 
 #ifdef _WIN32
@@ -104,7 +103,7 @@ static const char rcsid[] =
 
 // *************************************************************************
 
-SO@GUI@_TYPED_ABSTRACT_OBJECT_SOURCE(So@Gui@Viewer,So@Gui@RenderArea);
+SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 
 // *************************************************************************
 
