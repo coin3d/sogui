@@ -20,9 +20,8 @@
 
 /*!
   \class So@Gui@Cursor
-  \brief The So@Gui@Cursor class is used to set cursord for GUI components.
+  \brief The So@Gui@Cursor class is used to set cursors for GUI components.
   \ingroup common
-
 */
 
 /*!
@@ -32,17 +31,17 @@
 
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::DEFAULT,
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::DEFAULT
   The Window system's default cursor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::WAIT,
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::WAIT
   A busy cursor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTUM_BITMAP,
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTOM_BITMAP
   A custom cursor.
 */
 
@@ -73,8 +72,10 @@ So@Gui@Cursor::~So@Gui@Cursor()
 }
 
 /*!
-  Returns the shape type. If the cursor has been set to a bitmap,
-  CUSTOM_BITMAP is returned..
+  Returns the shape type.
+
+  If the cursor has been set by the application programmer to a bitmap
+  cursor, So@Gui@Cursor::CUSTOM_BITMAP is returned.
 */
 So@Gui@Cursor::Shape 
 So@Gui@Cursor::getShape(void) const

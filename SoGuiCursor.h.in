@@ -24,11 +24,11 @@
 class So@Gui@Cursor {
 public:
 
+  // FIXME: add more default shapes. 20011119 pederb.
   enum Shape {
-    // FIXME: add more shapes
-    DEFAULT,
-    BUSY,
-    CUSTOM_BITMAP
+    CUSTOM_BITMAP = -1,
+    DEFAULT = 0,
+    BUSY = 1
   };
   
   So@Gui@Cursor(void);
