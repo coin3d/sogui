@@ -17,17 +17,17 @@
  *
 \**************************************************************************/
 
-#ifndef COIN_GL_H
-#define COIN_GL_H
+#ifndef SO@GUI@_GL_H
+#define SO@GUI@_GL_H
 
 /* This header file is supposed to take care of all operating system
  * dependent anomalies connected to the gl.h include file.  It is only
  * for use while building the Coin library, and should not be installed
  * with the rest of the header files (at least not yet).  20010913 larsa */
 
-#ifndef COIN_CONFIGURE_BUILD
+#ifndef SO@GUI@_VERSION
 #error "you must include config.h before including Inventor/system/gl.h"
-#endif /* !COIN_CONFIGURE_BUILD */
+#endif /* !SO@GUI_VERSION */
 
 #ifdef HAVE_WINDOWS_H
 /* on windows, headers do not include their dependencies */
