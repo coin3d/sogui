@@ -40,6 +40,30 @@
 
   All components derived from the So@Gui@RenderArea have got an
   So@Gui@Mouse device attached by default.
+
+  One important note for application programmers: our mappings to
+  SoMouseButtonEvent::BUTTON2 and SoMouseButtonEvent::BUTTON3 do not
+  match the mappings in SGI's InventorXt library or TGS's SoWin
+  library for 3-button mice. They map mouse buttons like this:
+
+  <ul>
+  <li>left button: SoMouseButtonEvent::BUTTON1</li>
+  <li>middle button: SoMouseButtonEvent::BUTTON2</li>
+  <li>right button: SoMouseButtonEvent::BUTTON3</li>
+  </ul>
+
+  While in this SIM So@Gui@ library the mappings are:
+
+  <ul>
+  <li>left button: SoMouseButtonEvent::BUTTON1</li>
+  <li>middle button: SoMouseButtonEvent::BUTTON3</li>
+  <li>right button: SoMouseButtonEvent::BUTTON2</li>
+  </ul>
+
+  This is a conscious design decision we've made.  The reason is that
+  BUTTON2 should be the right mouse button whether you have a 2-button
+  mouse or a 3-button mouse, so you don't have to write conditional
+  code on that particular detail.
 */
 
 // *************************************************************************
