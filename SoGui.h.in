@@ -1,0 +1,96 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+// $Id$
+
+#ifndef SO@GUI@_H
+#define SO@GUI@_H
+
+#include <Inventor/@Gui@/So@Gui@Basic.h>
+
+#ifdef __COIN_SOQT__
+#include <qevent.h>
+#include <qobject.h>
+#endif // __COIN_SOQT__
+
+#include <Inventor/SbBasic.h>
+#include <Inventor/SbLinear.h>
+
+// *************************************************************************
+
+class SO@GUI@_DLL_API So@Gui@
+#ifdef __COIN_SOQT__
+  : public QObject
+#endif // __COIN_SOQT__
+{
+  @COMPONENTHEADER@
+
+public:
+#ifdef __COIN_SOQT__
+  enum CustomEventId { SPACEBALL_EVENT = QEvent::User };
+  static class QApplication * getApplication(void);
+#endif // __COIN_SOQT__
+  
+  static @WIDGET@ init(const char * const appName,
+                       const char * const className = "So@Gui@");
+
+  static @WIDGET@ init(int argc, char ** argv,
+                       const char * const appName,
+                       const char * const className = "So@Gui@");
+
+  static void init(@WIDGET@ const topLevelWidget);
+
+  static void mainLoop(void);
+  static void exitMainLoop(void);
+
+  static @WIDGET@ getTopLevelWidget(void);
+  static @WIDGET@ getShellWidget(const @WIDGET@ const w);
+
+  static void show(@WIDGET@ const widget);
+  static void hide(@WIDGET@ const widget);
+
+  static void setWidgetSize(@WIDGET@ const widget, const SbVec2s size);
+  static SbVec2s getWidgetSize(const @WIDGET@ const widget);
+
+  static void createSimpleErrorDialog(@WIDGET@ const widget,
+                                      const char * const dialogTitle,
+                                      const char * const errorStr1,
+                                      const char * const errorStr2 = NULL);
+
+protected:
+#ifdef __COIN_SOQT__
+  bool eventFilter(QObject *, QEvent *);
+#endif // __COIN_SOQT__
+
+#ifdef __COIN_SOQT__
+private slots:
+  void slot_timedOutSensor(void);
+  void slot_idleSensor(void);
+  void slot_delaytimeoutSensor(void);
+#endif // __COIN_SOQT__
+
+private:
+  static void sensorQueueChanged(void * cbdata);
+
+}; // class So@Gui@
+
+// *************************************************************************
+
+#endif // ! SO@GUI@_H
