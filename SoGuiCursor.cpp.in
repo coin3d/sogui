@@ -38,7 +38,7 @@
 #include <assert.h>
 
 /*!
-  \enum So@Gui@Component::Shape
+  \enum So@Gui@Cursor::Shape
 
   For enumerating built-in shape types, that can be used without
   having to specify cursor graphics. These are mapped to pre-defined
@@ -47,32 +47,32 @@
 
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTOM_BITMAP
+  \var So@Gui@Cursor::Shape So@Gui@Cursor::CUSTOM_BITMAP
 
   Cursor is specified with our own bitmap graphics. The bitmap data
   must be passed into the constructor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::DEFAULT
+  \var So@Gui@Cursor::Shape So@Gui@Cursor::DEFAULT
 
   Using the native Window system's default cursor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::WAIT
+  \var So@Gui@Cursor::Shape So@Gui@Cursor::BUSY
 
   A busy cursor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::CROSSHAIR
+  \var So@Gui@Cursor::Shape So@Gui@Cursor::CROSSHAIR
 
   Two thin lines in a cross.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::UPARROW
+  \var So@Gui@Cursor::Shape So@Gui@Cursor::UPARROW
 
   Thick, upward-pointing arrow.
 */
