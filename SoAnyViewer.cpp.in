@@ -50,6 +50,8 @@ static const char rcsid[] =
 
 #include <assert.h>
 
+#include <GL/gl.h>
+
 #include <Inventor/SoDB.h>
 
 #include <Inventor/nodes/SoBaseColor.h>
@@ -1869,19 +1871,21 @@ void
 So@GUI@Viewer::changeDrawStyle(So@GUI@Viewer::DrawStyle style)
 {
   // Turn on/off Z-buffering based on the style setting.
-  glLock();
   switch (style) {
   case VIEW_LOW_RES_LINE:
   case VIEW_LOW_RES_POINT:
   case VIEW_BBOX:
+    this->glLock();
     glDisable(GL_DEPTH_TEST);
+    this->glUnlock();
     break;
     
   default:
+    this->glLock();
     glEnable(GL_DEPTH_TEST);
+    this->glUnlock();
     break;
   }
-  glUnlock();
 
 
   // Render everything as its supposed to be done, don't override
