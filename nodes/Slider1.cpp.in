@@ -196,33 +196,33 @@ SoGuiSlider1::SoGuiSlider1(void)
 
   SO_KIT_CONSTRUCTOR(SoGuiSlider1);
 
+  SO_KIT_ADD_FIELD(size, (SbVec3f(1.0f, 1.0f, 0.0f)));
   SO_KIT_ADD_FIELD(orientation, (SoGuiSlider1::X));
   SO_KIT_ADD_FIELD(min, (0.0f));
   SO_KIT_ADD_FIELD(max, (1.0f));
   SO_KIT_ADD_FIELD(value, (0.0f));
-  SO_KIT_ADD_FIELD(size, (SbVec3f(1.0f, 1.0f, 0.0f)));
+  SO_KIT_ADD_FIELD(alwaysHook, (TRUE));
 
   SO_KIT_DEFINE_ENUM_VALUE(Orientation, X);
   SO_KIT_DEFINE_ENUM_VALUE(Orientation, Y);
 
   SO_KIT_SET_SF_ENUM_TYPE(orientation, Orientation);
 
-  // FIXME: reverse this list to make it SGI compatible
-  SO_KIT_ADD_CATALOG_ENTRY(topSeparator, SoSeparator, FALSE, this, "", FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceGeometry, SoSeparator, FALSE, topSeparator, knobGeometry, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceMaterial, SoMaterial, TRUE, surfaceGeometry, surfaceTexture, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexture, SoTexture2, TRUE, surfaceGeometry, surfaceTexCoords, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexCoords, SoTextureCoordinate2, FALSE, surfaceGeometry, surfaceCoords, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceCoords, SoCoordinate3, FALSE, surfaceGeometry, surfaceFaceSet, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(surfaceFaceSet, SoIndexedFaceSet, FALSE, surfaceGeometry, "", FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobGeometry, SoSeparator, FALSE, topSeparator, "", FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobCoords, SoCoordinate3, FALSE, knobGeometry, knobMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobMaterial, SoMaterial, FALSE, knobGeometry, knobFaceSet, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobFaceSet, SoIndexedFaceSet, FALSE, knobGeometry, knobShadeMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobShadeMaterial, SoMaterial, FALSE, knobGeometry, knobShadeLineSet, TRUE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobShadeLineSet, SoIndexedLineSet, FALSE, knobGeometry, knobLightMaterial, FALSE);
-  SO_KIT_ADD_CATALOG_ENTRY(knobLightMaterial, SoMaterial, FALSE, knobGeometry, knobLightLineSet, TRUE);
   SO_KIT_ADD_CATALOG_ENTRY(knobLightLineSet, SoIndexedLineSet, FALSE, knobGeometry, "", FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobLightMaterial, SoMaterial, FALSE, knobGeometry, knobLightLineSet, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobShadeLineSet, SoIndexedLineSet, FALSE, knobGeometry, knobLightMaterial, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobShadeMaterial, SoMaterial, FALSE, knobGeometry, knobShadeLineSet, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobFaceSet, SoIndexedFaceSet, FALSE, knobGeometry, knobShadeMaterial, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobMaterial, SoMaterial, FALSE, knobGeometry, knobFaceSet, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobCoords, SoCoordinate3, FALSE, knobGeometry, knobMaterial, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(knobGeometry, SoSeparator, FALSE, topSeparator, "", FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceFaceSet, SoIndexedFaceSet, FALSE, surfaceGeometry, "", FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceCoords, SoCoordinate3, FALSE, surfaceGeometry, surfaceFaceSet, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexCoords, SoTextureCoordinate2, FALSE, surfaceGeometry, surfaceCoords, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceTexture, SoTexture2, TRUE, surfaceGeometry, surfaceTexCoords, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceMaterial, SoMaterial, TRUE, surfaceGeometry, surfaceTexture, TRUE);
+  SO_KIT_ADD_CATALOG_ENTRY(surfaceGeometry, SoSeparator, FALSE, topSeparator, knobGeometry, FALSE);
+  SO_KIT_ADD_CATALOG_ENTRY(topSeparator, SoSeparator, FALSE, this, "", FALSE);
 
   SO_KIT_INIT_INSTANCE();
 
@@ -542,6 +542,29 @@ SoGuiSlider1::handleEvent(SoHandleEventAction * action)
             SbVec3f size = this->size.getValue();
             this->value = this->min.getValue() + ((point[0] / size[0]) * (this->max.getValue() - this->min.getValue()));
             action->setHandled();
+            if ( this->alwaysHook.getValue() ) {
+              PRIVATE(this)->grabbing = TRUE;
+              action->setGrabber(this);
+
+              const SoFullPath * path = (const SoFullPath *) action->getCurPath();
+              int i = path->getLength() - 1;
+              SoNode * node = NULL;
+              for ( ; i >= 0; i-- ) {
+                node = path->getNode(i);
+                if ( node->isOfType(SoGuiPane::getClassTypeId()) ) break;
+                node = NULL;
+              }
+              assert(node != NULL);
+              PRIVATE(this)->pane = (SoGuiPane *) node;
+              PRIVATE(this)->grabval = this->value.getValue();
+              PRIVATE(this)->pickpos = point[0];
+
+              SbVec2f raypos = PRIVATE(this)->pane->getRayPickIntersectionPoint();
+              PRIVATE(this)->grabpos = raypos[0];
+              float realval = ((this->value.getValue() - this->min.getValue()) /
+                (this->max.getValue() - this->min.getValue())) * this->size.getValue()[0];
+              PRIVATE(this)->graboffset = realval - raypos[0];
+            }
           }
         }
       }
