@@ -49,7 +49,6 @@ typedef SbBool So@Gui@RenderAreaEventCB(void * closure, @EVENT@ event);
 
 class SO@GUI@_DLL_API So@Gui@RenderArea : public So@Gui@GLWidget {
   SO@GUI@_OBJECT_HEADER(So@Gui@RenderArea, So@Gui@GLWidget);
-  @COMPONENTHEADER@
 
 public:
   So@Gui@RenderArea(@WIDGET@ parent = NULL,
@@ -64,8 +63,6 @@ public:
   void setOverlaySceneGraph(SoNode * scene);
   SoNode * getOverlaySceneGraph(void);
 
-  void registerDevice(So@Gui@Device * device);
-  void unregisterDevice(So@Gui@Device * device);
   void setBackgroundColor(const SbColor & color);
   const SbColor & getBackgroundColor(void) const;
   void setBackgroundIndex(int idx);
@@ -108,6 +105,10 @@ public:
 
   SbBool sendSoEvent(const SoEvent * event);
 
+  void registerDevice(So@Gui@Device * device);
+  void unregisterDevice(So@Gui@Device * device);
+
+
 protected:
   So@Gui@RenderArea(@WIDGET@ parent,
                     const char * name,
@@ -138,7 +139,7 @@ protected:
   virtual SbBool glScheduleRedraw(void);
 
 private:
-  class So@Gui@RenderAreaP * priv;
+  class So@Gui@RenderAreaP * pimpl;
 #ifndef DOXYGEN_SKIP_THIS
   friend class So@Gui@RenderAreaP;
 #endif // DOXYGEN_SKIP_THIS

@@ -41,6 +41,8 @@
 #include <windows.h>
 #endif // __COIN_SOWIN__
 
+// *************************************************************************
+
 enum GLModes {
   SO_GL_RGB      = 0x01, SO_GLX_RGB      = SO_GL_RGB,
   SO_GL_DOUBLE   = 0x02, SO_GLX_DOUBLE   = SO_GL_DOUBLE,
@@ -53,7 +55,6 @@ enum GLModes {
 
 class SO@GUI@_DLL_API So@Gui@GLWidget : public So@Gui@Component {
   SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@GLWidget, So@Gui@Component);
-  @COMPONENTHEADER@
 
 public:
 
@@ -90,7 +91,6 @@ public:
   // OpenGL query functions.
   void getPointSizeLimits(SbVec2f & range, float & granularity);
   void getLineWidthLimits(SbVec2f & range, float & granularity);
-
 
 protected:
   So@Gui@GLWidget(@WIDGET@ const parent = NULL,
@@ -151,15 +151,6 @@ private:
 public:
   const QGLContext * getNormalContext(void);
   const QGLContext * getOverlayContext(void);
-
-protected:
-  virtual bool eventFilter(QObject * obj, QEvent * e);
-  static void eventHandler(QWidget *, void *, QEvent *, bool *);
-
-private slots:
-  void gl_init(void);
-  void gl_reshape(int, int);
-  void gl_exposed(void);
 #endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
 public:

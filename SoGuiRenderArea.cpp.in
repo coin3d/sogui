@@ -44,6 +44,91 @@
   The So@Gui@RenderArea class is a component that adds scenegraph
   management and input device event handling to the So@Gui@GLWidget
   component.
+
+  So@Gui@RenderArea is the first non-abstract component in it's
+  inheritance hierarchy that you can use directly from client
+  application code to set up a scenegraph viewer canvas.
+
+  For an So@Gui@RenderArea component to properly display your
+  scenegraph, it must contain an SoCamera-derived node and at least
+  one SoLight-derived lightsource node.
+
+  Here's a complete, stand-alone example on how to set up an
+  So@Gui@RenderArea with a scenegraph:
+
+  \code
+  #include <Inventor/@Gui@/So@Gui@.h>
+  #include <Inventor/@Gui@/So@Gui@RenderArea.h>
+  
+  #include <Inventor/nodes/SoCube.h>
+  #include <Inventor/nodes/SoRotor.h>
+  #include <Inventor/nodes/SoArray.h>
+  #include <Inventor/nodes/SoDirectionalLight.h>
+  #include <Inventor/nodes/SoPerspectiveCamera.h>
+  #include <Inventor/nodes/SoSeparator.h>
+  
+  // Set up a simple scenegraph, just for demonstration purposes.
+  static SoSeparator *
+  get_scene_graph(void)
+  {
+    SoSeparator * root = new SoSeparator;
+  
+    SoGroup * group = new SoGroup;
+  
+    SoRotor * rotor = new SoRotor;
+    rotor->rotation = SbRotation(SbVec3f(0.2, 0.5, 0.9), M_PI/4.0);
+    group->addChild(rotor);
+  
+    SoCube * cube = new SoCube;
+    group->addChild(cube);
+  
+    SoArray * array = new SoArray;
+    array->origin = SoArray::CENTER;
+    array->addChild(group);
+    array->numElements1 = 2;
+    array->numElements2 = 2;
+    array->separation1 = SbVec3f(4, 0, 0);
+    array->separation2 = SbVec3f(0, 4, 0);
+  
+    root->addChild(array);
+    return root;
+  }
+  
+  int
+  main(int argc, char ** argv)
+  {
+    @WIDGET@ window = So@Gui@::init(argv[0]);
+  
+    SoSeparator * root = new SoSeparator;
+    root->ref();
+  
+    SoPerspectiveCamera * camera;
+    root->addChild(camera = new SoPerspectiveCamera);
+  
+    root->addChild(new SoDirectionalLight);
+  
+    SoSeparator * userroot = get_scene_graph();
+    root->addChild(userroot);
+  
+    So@Gui@RenderArea * renderarea = new So@Gui@RenderArea(window);
+    camera->viewAll(userroot, renderarea->getViewportRegion());
+    renderarea->setSceneGraph(root);
+    renderarea->setBackgroundColor(SbColor(0.0f, 0.2f, 0.3f));
+    if (argc > 1) {
+      renderarea->setTitle(argv[1]);
+      renderarea->setIconTitle(argv[1]);
+    }
+    renderarea->show();
+  
+    So@Gui@::show(window);
+    So@Gui@::mainLoop();
+  
+    delete renderarea;
+    root->unref();
+  
+    return 0;
+  }
+  \endcode
 */
 
 // *************************************************************************
@@ -52,10 +137,6 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#ifdef SOQT_INTERNAL
-#include <qmetaobject.h>
-#include <moc_SoQtRenderArea.cpp>
-#endif // SOQT_INTERNAL
 #if SOQT_DEBUG // For the "soinfo" debugging backdoor.
 #include <qgl.h>
 #include <qapplication.h>
@@ -81,6 +162,7 @@
 #endif // HAVE_JOYSTICK_LINUX
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
+#include <Inventor/@Gui@/So@Gui@GLWidgetP.h> // for eventHandler()
 #include <Inventor/@Gui@/SoAny.h>
 
 #include <string.h> // strchr()
@@ -115,6 +197,8 @@ public:
   int overlayColormapSize;
   int overlayColormapStart;
 
+  SbPList * devicelist;
+
   struct {
     So@Gui@Keyboard * keyboard;
     So@Gui@Mouse * mouse;
@@ -143,17 +227,13 @@ public:
   SbBool invokeAppCB(@EVENT@ event);
   const SoEvent * getSoEvent(@EVENT@ event);
 
-  SbPList * devicelist;
   So@Gui@RenderAreaEventCB * appeventhandler;
   void * appeventhandlerdata;
 
 private:
   So@Gui@RenderArea * pub; // public interface class
   SbString currentinput; // For the OpenGL info-window hack.
-}; // class So@Gui@RenderAreaP
-
-#define PRIVATE(ptr) (ptr->priv)
-#define PUBLIC(ptr) (ptr->pub)
+};
 
 const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
                                                  SO_GL_ZBUFFER |
@@ -499,29 +579,19 @@ So@Gui@RenderAreaP::constructor(SbBool mouseInput,
   // 20010831 mortene.
   this->overlayManager->getGLRenderAction()->setCacheContext(1);
 
-  this->devicelist = new SbPList;
   this->appeventhandler = NULL;
   this->appeventhandlerdata = NULL;
 
+  this->devicelist = new SbPList;
+
   if (mouseInput) {
     this->devices.mouse = new So@Gui@Mouse;
-
-    // FIXME: somebody debug larsa's head so he learns to write proper
-    // FIXME comments (see below), which _at least_ actually contains
-    // a useful description of what doesn't work / is to be fixed. And
-    // why not throw in the ability to tag the FIXME with a datestamp
-    // and username aswell. Sheesh... 20010831 mortene.
-
-    // FIXME: this does not work
-    // PUBLIC(this)->registerDevice(this->devices.mouse);
-    this->devicelist->append(this->devices.mouse);
+    PUBLIC(this)->registerDevice(this->devices.mouse);
   }
 
   if (keyboardInput) {
     this->devices.keyboard = new So@Gui@Keyboard;
-    // FIXME: this does not work
-    // PUBLIC(this)->registerDevice(this->devices.keyboard);
-    this->devicelist->append(this->devices.keyboard);
+    PUBLIC(this)->registerDevice(this->devices.keyboard);
   }
 
   if (! build) return;
@@ -605,6 +675,54 @@ So@Gui@RenderArea::~So@Gui@RenderArea()
 
 // *************************************************************************
 
+/*!
+  This method adds \a device to the list of devices handling events
+  for this component.
+*/
+void
+So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
+{
+  int idx = PRIVATE(this)->devicelist->find(device);
+  if (idx != -1) {
+#if SO@GUI@_DEBUG
+    SoDebugError::postWarning("So@Gui@RenderArea::registerDevice",
+                              "device already registered");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+  PRIVATE(this)->devicelist->append(device);
+  @WIDGET@ w = this->getGLWidget();
+  if (w != NULL) {
+    device->enable(w, &So@Gui@GLWidgetP::eventHandler, (void *)this);
+    device->setWindowSize(this->getGLSize());
+  }
+}
+
+/*!
+  This method removes \a device from the list of devices handling
+  events for this component.
+*/
+void
+So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
+{
+  assert(PRIVATE(this)->devicelist != NULL);
+  const int idx = PRIVATE(this)->devicelist->find(device);
+  if (idx == -1) {
+#if SO@GUI@_DEBUG
+    SoDebugError::post("So@Gui@RenderArea::unregisterDevice",
+                       "tried to remove nonexisting device");
+#endif // SO@GUI@_DEBUG
+    return;
+  }
+
+  PRIVATE(this)->devicelist->remove(idx);
+  @WIDGET@ w = this->getGLWidget();
+  if (w != NULL) { device->disable(w, NULL, NULL); }
+}
+
+// *************************************************************************
+
 // Documented in superclass.
 void
 So@Gui@RenderArea::afterRealizeHook(void)
@@ -677,47 +795,6 @@ SoNode *
 So@Gui@RenderArea::getOverlaySceneGraph(void)
 {
   return PRIVATE(this)->overlayManager->getSceneGraph();
-}
-
-// *************************************************************************
-
-/*!
-  This method add \a device to the list of devices handling events for
-  this component.
-*/
-void
-So@Gui@RenderArea::registerDevice(So@Gui@Device * device)
-{
-  int idx = PRIVATE(this)->devicelist->find(device);
-  if (idx == -1) {
-    PRIVATE(this)->devicelist->append(device);
-  }
-
-  device->setWindowSize(this->getGLSize());
-  if (idx == -1) {
-    device->enable(this->getGLWidget(), 
-                   &So@Gui@GLWidget::eventHandler, (void*) this);
-  }
-}
-
-/*!
-  This method removes \a device from the list of devices handling
-  events for this component.
-*/
-void
-So@Gui@RenderArea::unregisterDevice(So@Gui@Device * device)
-{
-  assert(PRIVATE(this)->devicelist != NULL);
-  const int idx = PRIVATE(this)->devicelist->find(device);
-  if (idx == -1) {
-#if SO@GUI@_DEBUG
-    SoDebugError::post("So@Gui@RenderArea::unregisterDevice",
-                       "tried to remove nonexisting device");
-#endif // SO@GUI@_DEBUG
-    return;
-  }
-  PRIVATE(this)->devicelist->remove(idx);
-  device->disable(this->getGLWidget(), NULL, NULL);
 }
 
 // *************************************************************************
@@ -1645,7 +1722,7 @@ So@Gui@RenderArea::buildWidget(@WIDGET@ parent)
     for (int i = 0; i < num; i++) {
       So@Gui@Device * device = (So@Gui@Device *) (*PRIVATE(this)->devicelist)[i];
       device->enable(this->getGLWidget(),
-        &inherited::eventHandler, (void *) this);
+                     &So@Gui@GLWidgetP::eventHandler, (void *) this);
     }
   }
   const SbVec2s glsize = this->getGLSize();
