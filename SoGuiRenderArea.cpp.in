@@ -119,8 +119,15 @@ class So@Gui@RenderAreaP {
   SoSelection * normalSelection;
   SoSelection * overlaySelection;
 
+  static const int GL_DEFAULT_MODE;
+
+
   So@Gui@RenderArea * pub; // public interface class
 }; // class So@Gui@RenderAreaP
+
+const int So@Gui@RenderAreaP::GL_DEFAULT_MODE = (SO_GL_RGB |
+                                                 SO_GL_ZBUFFER |
+                                                 SO_GL_DOUBLE );
 
 #define PRIVATE(ptr) (ptr->priv)
 #define PUBLIC(ptr) (ptr->pub)
@@ -146,6 +153,8 @@ class So@Gui@RenderAreaP {
 
 // *************************************************************************
 
+// *************************************************************************
+
 /*!
   Public constructor.
 */
@@ -156,7 +165,7 @@ So@Gui@RenderArea::So@Gui@RenderArea(
   SbBool embed,
   SbBool mouseInput,
   SbBool keyboardInput )
-: inherited( parent, name, embed, SO_GL_DEFAULT_MODE, FALSE )
+: inherited( parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE )
 {
   this->constructor( mouseInput, keyboardInput, TRUE );
 } // So@Gui@RenderArea()
@@ -172,7 +181,7 @@ So@Gui@RenderArea::So@Gui@RenderArea( // protected
   SbBool mouseInput,
   SbBool keyboardInput,
   SbBool build )
-: inherited( parent, name, embed, SO_GL_DEFAULT_MODE, FALSE )
+: inherited( parent, name, embed, So@Gui@RenderAreaP::GL_DEFAULT_MODE, FALSE )
 {
   this->constructor( mouseInput, keyboardInput, build );
 } // So@Gui@RenderArea()
