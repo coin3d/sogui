@@ -75,7 +75,7 @@ SoGuiRadioGroup::inputChanged(SoField * which)
     &(this->in7),
     NULL
   };
-  int i, j;
+  int i;
   for ( i = 0; which != fields[i] && fields[i] != NULL; i++ ) { }
   assert(fields[i] != NULL );
   if ( ((SoSFBool *)which)->getValue() != FALSE ) {

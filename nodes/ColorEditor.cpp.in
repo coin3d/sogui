@@ -525,11 +525,11 @@ ColorEditor::update_wheel_cb(void * closure, SoSensor * sensor)
     me->slider_wheel->value.setValue(reverse);
   }
   float h;
-  if ( value[0] == 0.0f ) h = ((value[1] < 0.0f) ? 3.0f : 1.0f) * M_PI / 2.0f;
+  if ( value[0] == 0.0f ) h = ((value[1] < 0.0f) ? 3.0f : 1.0f) * float(M_PI) / 2.0f;
   else h = (float) atan(value[1] / value[0]);
-  if ( value[0] < 0.0f ) h += M_PI; 
-  if ( h < 0.0f ) h += (2.0 * M_PI);
-  h /= 2.0f * M_PI; 
+  if ( value[0] < 0.0f ) h += float(M_PI); 
+  if ( h < 0.0f ) h += (2.0f * float(M_PI));
+  h /= 2.0f * float(M_PI); 
   float s = So@Gui@Min(value.length(), 1.0f); // float precision bugfix
 
   float a = 0.0f, b = 0.0f, v = 1.0f;
@@ -547,17 +547,17 @@ float
 ColorEditor::calculateHue(float x, float y)
 {
   float hue;
-  if ( x == 0.0f ) hue = ((y < 0.0f) ? 3.0f : 1.0f) * M_PI / 2.0f;
+  if ( x == 0.0f ) hue = ((y < 0.0f) ? 3.0f : 1.0f) * float(M_PI) / 2.0f;
   else hue = (float) atan(y / x);
-  if ( x < 0.0f ) hue += M_PI; 
-  if ( hue < 0.0f ) hue += (2.0 * M_PI);
-  return hue / (2.0f * M_PI); 
+  if ( x < 0.0f ) hue += float(M_PI); 
+  if ( hue < 0.0f ) hue += (2.0f * float(M_PI));
+  return hue / (2.0f * float(M_PI)); 
 }
 
 SbVec2f
 ColorEditor::calculateFromHue(float h, float s, float v)
 {
-  float hue = h * 2.0f * M_PI;
+  float hue = h * 2.0f * float(M_PI);
   return SbVec2f(((float) cos(hue) * s + 1.0f) / 2.0f, ((float) sin(hue) * s + 1.0f) / 2.0f);
 }
 
