@@ -212,7 +212,9 @@
 So@Gui@Component::getShellWidget(void) const
 {
   @WIDGET@ w = this->getWidget();
-  assert(w != NULL && "widget not built yet!");
+  // the below assert disables SoXt, so I've removed it for now
+  // 20030930 larsa
+  // assert(w == NULL && "widget not built yet!");
   return (this->isTopLevelShell() && w) ? So@Gui@::getShellWidget(w) : NULL;
 }
 
