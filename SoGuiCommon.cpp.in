@@ -178,6 +178,16 @@ So@Gui@::init(const char * appname, const char * classname)
   has taken control over the native event loop herself, and is
   therefore not using So@Gui@::mainLoop().
 
+  (Even then it is usually not necessary to call this method, as the
+  operating system should take care of cleaning up resource use when
+  an application exits. This method is mainly provided as a manner to
+  be able to clean up in "unusual" run-time environments, for instance
+  if SoQt is part of a browser plug-in.)
+
+  Nevertheless, it should never be invoked more than \e once, and that
+  is just before application exit, as it deallocates \e static data
+  allocated as "one-off" operations in So@Gui@::init().
+
   NOTE: done() is not present in the original API for SGI's InventorXt
   library.
 */
