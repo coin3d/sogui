@@ -25,6 +25,13 @@
   \class So@Gui@Cursor
   \brief The So@Gui@Cursor class is used to set cursors for GUI components.
   \ingroup misc
+
+  The class provides both a set of pre-defined cursor shapes, aswell
+  as the option to use custom bitmap graphics.
+
+  Instances of this class is usually made for passing in to the
+  So@Gui@Component::setComponentCursor() and
+  So@Gui@Component::setWidgetCursor() methods.
 */
 
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
@@ -32,33 +39,87 @@
 
 /*!
   \enum So@Gui@Component::Shape
-  For enumerating built-in shape types.
+
+  For enumerating built-in shape types, that can be used without
+  having to specify cursor graphics. These are mapped to pre-defined
+  cursor shapes from the underlying toolkit.
 */
 
 
 /*!
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTOM_BITMAP
+
+  Cursor is specified with our own bitmap graphics. The bitmap data
+  must be passed into the constructor.
+*/
+
+/*!
   \var So@Gui@Cursor::Shape So@Cui@Cursor::DEFAULT
-  The Window system's default cursor.
+
+  Using the native Window system's default cursor.
 */
 
 /*!
   \var So@Gui@Cursor::Shape So@Cui@Cursor::WAIT
+
   A busy cursor.
 */
 
 /*!
-  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTOM_BITMAP
-  A custom cursor.
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::CROSSHAIR
+
+  Two thin lines in a cross.
+*/
+
+/*!
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::UPARROW
+
+  Thick, upward-pointing arrow.
 */
 
 /*** Graphic data for the mouse pointer bitmaps. ***********************/
 
-// Dimensions can be up to <32, 32> pixels.
-//
-// B=1 and M=1 == black
-// B=0 and M=1 == white
-// B=0 and M=0 == transparency
-// B=1 and M=0 will give undefined results for some platforms, so avoid.
+/*!
+  \class So@Gui@Cursor::CustomCursor
+  \brief The So@Gui@Cursor::CustomCursor class is used to specify bitmap data for So@Gui@Cursor custom cursors.
+*/
+
+/*!
+  \var SbVec2s So@Gui@Cursor::CustomCursor::dim
+
+  Size of cursor data. Can be anything from 1 pixel wide and high, up
+  to maximum 32 pixels in each dimension.
+*/
+/*!
+  \var SbVec2s So@Gui@Cursor::CustomCursor::hotspot
+
+  Position of cursor hotspot, ie the pixel of the cursor which is
+  considered to be the "pick point" when interacting with the canvas
+  or widgets.
+
+  The hotspot position should be specified relative to the uppermost,
+  leftmost corner (which is position <0, 0>).
+*/
+/*!
+  \var unsigned char * So@Gui@Cursor::CustomCursor::bitmap
+
+  The size of the array of bitmap data should be equal to
+  (width+7)/8*height, as each cursor pixel is specified with just two
+  bits, one in the bitmap array, one in the mask array.
+
+  The bitmap and mask bits should be laid out as follows:
+  \verbatim
+  B=1 and M=1 == black
+  B=0 and M=1 == white
+  B=0 and M=0 == transparency
+  B=1 and M=0 will give undefined results for some platforms, so avoid.
+  \endverbatim
+*/  
+/*!
+  \var unsigned char * So@Gui@Cursor::CustomCursor::mask
+
+  See doc of So@Gui@Cursor::CustomCursor::bitmap.
+*/
 
 /*** zoom-style cursor ******/
 
@@ -157,7 +218,8 @@ So@Gui@Cursor::So@Gui@Cursor(void)
 }
 
 /*!
-  Constructor with Shape argument.
+  Constructor with Shape argument, for setting up the cursor with a
+  pre-defined shape from the underlying native toolkit.
 */
 So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
 { 
@@ -171,6 +233,9 @@ So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
   Note that only a \e shallow copy will be made of the CustomCursor
   bitmap and mask references, so don't deallocate the memory they use
   until the So@Gui@Cursor has been destructed.
+
+  As for the format of the cursor bitmap data, see documentation of
+  So@Gui@Cursor::CustomCursor.
 */
 So@Gui@Cursor::So@Gui@Cursor(const CustomCursor * cc)
 { 

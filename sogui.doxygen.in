@@ -358,7 +358,10 @@ INPUT                  = \
  \
 @sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.h \
 @sogui_src_dir@/src/Inventor/@Gui@/devices/So@Gui@Spaceball.cpp \
-@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@SpaceballCommon.cpp
+@sogui_build_dir@/src/Inventor/@Gui@/devices/So@Gui@SpaceballCommon.cpp \
+ \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.h \
+@sogui_build_dir@/src/Inventor/@Gui@/So@Gui@Cursor.cpp
 
 
 # If the value of the INPUT tag contains directories, you can use the 
