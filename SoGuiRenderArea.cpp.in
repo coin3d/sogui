@@ -682,37 +682,7 @@ void
 So@Gui@RenderArea::render(
   void )
 {
-#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
-  SoDebugError::postInfo("So@Gui@RenderArea::render",
-                         "start (isVisible=%s waitForExpose=%s)",
-                         this->isVisible() ? "TRUE" : "FALSE",
-                         this->waitForExpose ? "TRUE" : "FALSE");
-#endif // debug
-
-  if ( ! this->isVisible() || this->waitForExpose )
-    return;
-
-  this->setOverlayRender( FALSE );
-  this->glLock(); // this makes the GL context "current"
-
-  SbBool drawfront =
-    ! this->isDoubleBuffer() ||
-    this->isDrawToFrontBufferEnable();
-
-  glDrawBuffer( drawfront ? GL_FRONT_LEFT : GL_BACK_LEFT );
-
   this->redraw();
-
-  if ( !drawfront )
-    this->glSwapBuffers();
-  else
-    this->glFlushBuffer();
-
-  this->glUnlock();
-
-#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
-  SoDebugError::postInfo("So@Gui@RenderArea::render", "done");
-#endif // debug
 } // render()
 
 /*!
@@ -723,16 +693,7 @@ void
 So@Gui@RenderArea::renderOverlay(
   void )
 {
-  assert( PRIVATE(this)->overlayManager != NULL );
-
-  if ( ! this->isVisible() || this->waitForExpose )
-    return;
-
-  this->setOverlayRender( TRUE );
-  if ( ! this->isOverlayRender() ) return; // overlay planes not available
-  this->glLock(); // this makes the GL context "current"
   this->redrawOverlay();
-  this->glUnlock();
 } // renderOverlay()
 
 /*!
@@ -950,10 +911,34 @@ So@Gui@RenderArea::redraw( // virtual, protected
   void )
 {
 #if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
-  SoDebugError::postInfo("So@Gui@RenderArea::redraw",
-                         "invoked");
+  SoDebugError::postInfo("So@Gui@RenderArea::render",
+                         "start (isVisible=%s waitForExpose=%s)",
+                         this->isVisible() ? "TRUE" : "FALSE",
+                         this->waitForExpose ? "TRUE" : "FALSE");
 #endif // debug
+
+  if ( ! this->isVisible() || !this->hasNormalGLArea() || this->waitForExpose )
+    return;
+  this->glLockNormal(); // this makes the GL context "current"
+
+  SbBool drawfront =
+    ! this->isDoubleBuffer() ||
+    this->isDrawToFrontBufferEnable();
+
+  glDrawBuffer( drawfront ? GL_FRONT : GL_BACK);
+
   this->actualRedraw();
+
+  if ( !drawfront )
+    this->glSwapBuffers();
+  else {
+    this->glFlushBuffer();
+  }
+  this->glUnlockNormal();
+
+#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS // debug
+  SoDebugError::postInfo("So@Gui@RenderArea::render", "done");
+#endif // debug
 } // redraw()
 
 /*!
@@ -966,13 +951,6 @@ So@Gui@RenderArea::actualRedraw( // virtual, protected
 {
   assert( PRIVATE(this)->normalManager != NULL );
   if ( ! this->isVisible() ) return;
-#if SO@GUI@_DEBUG && 0
-  if ( this->getLockLevel() == 0 ) {
-    SoDebugError::post( "So@Gui@RenderArea::actualRedraw",
-      "invoked without being locked - trace the core dump!" );
-    assert( 0 );
-  }
-#endif
   PRIVATE(this)->normalManager->render( PRIVATE(this)->clear, PRIVATE(this)->clearZBuffer );
 } // actualRedraw()
 
@@ -984,7 +962,12 @@ void
 So@Gui@RenderArea::redrawOverlay( // virtual, protected
   void )
 {
+  if (!this->isVisible() || this->waitForExpose || !this->hasOverlayGLArea()) return;
+  
+  glLockOverlay();
   this->actualOverlayRedraw();
+  this->glFlushBuffer();
+  glUnlockOverlay();
 } // redrawOverlay()
 
 /*!
@@ -997,13 +980,6 @@ So@Gui@RenderArea::actualOverlayRedraw( // virtual, protected
 {
   assert( PRIVATE(this)->overlayManager != NULL );
   if ( ! this->isVisible() ) return;
-#if SO@GUI@_DEBUG && 0
-  if ( this->getLockLevel() == 0 ) {
-    SoDebugError::post( "So@Gui@RenderArea::actualRedraw",
-      "invoked without being locked - trace the core dump!" );
-    assert( 0 );
-  }
-#endif
   PRIVATE(this)->overlayManager->render( PRIVATE(this)->clearOverlay, PRIVATE(this)->clearZBuffer );
 } // actualOverlayRedraw()
 
@@ -1015,10 +991,15 @@ void
 So@Gui@RenderArea::initGraphic( // virtual, protected
   void )
 {
-  SO@GUI@_STUB();
-  // FIXME: method is not invoked
-  // FIXME: this method should probably enable DEPTH_TEST, but preferably
-  // in an indirect way (we want the GL calls / include out of this file)
+  SoSceneManager * mgr = this->getSceneManager();
+  if (mgr) {
+    mgr->reinitialize();
+    mgr->setRGBMode(this->isRGBMode());
+  }
+  // FIXME: should init cache context stuff,
+  // FIXME: if not RGB mode, load colormap
+
+  inherited::initGraphic();
 } // initGraphic()
 
 /*!
@@ -1029,10 +1010,12 @@ void
 So@Gui@RenderArea::initOverlayGraphic( // virtual, protected
   void )
 {
-  SO@GUI@_STUB();
-  // FIXME: method is not invoked
-  // FIXME: this method should probably set up the colormap, but preferable
-  // in an indirect way (we want the GL calls / include out of this file)
+  SoSceneManager * mgr = this->getOverlaySceneManager();
+  if (mgr) {
+    mgr->reinitialize();
+    mgr->setRGBMode(FALSE);
+  }
+  // FIXME: load colormap
 } // initOverlayGraphic()
 
 /*!
@@ -1050,15 +1033,11 @@ So@Gui@RenderArea::sizeChanged( // virtual, protected
 
   if ( size[0] == -1 )
     return;
-  inherited::sizeChanged( size );
-
-  // FIXME: the rest of this method is almost identical to
-  // So@Gui@RenderArea::glReshape() -- looks like terrible design to
-  // me. Investigate. 20001125 mortene.
 
   assert( PRIVATE(this)->normalManager != NULL );
   assert( PRIVATE(this)->overlayManager != NULL );
 
+  this->setGLSize(size);
   const SbVec2s glsize = this->getGLSize();
 
   if ( glsize[0] <= 0 || glsize[1] <= 0 )
@@ -1191,75 +1170,6 @@ So@Gui@RenderArea::invokeAppCB( // protected
 // *************************************************************************
 
 /*!
-  This method is invoked when the GL area is resized.
-*/
-
-void
-So@Gui@RenderArea::glReshape( // virtual, derived
-  int width,
-  int height )
-{
-#if SO@GUI@_DEBUG && RENDERAREA_DEBUG_REDRAWS
-  SoDebugError::postInfo( "So@Gui@RenderArea::glReshape",
-                          "invoked, <%d, %d>", width, height );
-#endif // SO@GUI@_DEBUG
-
-  inherited::glReshape( width, height );
-
-  this->glLock();
-  this->setViewportRegion( SbViewportRegion( width, height ) );
-
-  const SbVec2s glsize = this->getGLSize();
-
-  PRIVATE(this)->normalManager->setWindowSize( glsize );
-  PRIVATE(this)->normalManager->setSize( glsize );
-
-  PRIVATE(this)->overlayManager->setWindowSize( glsize );
-  PRIVATE(this)->overlayManager->setSize( glsize );
-
-  this->setDevicesWindowSize( glsize );
-  this->glUnlock();
-
-  this->setOverlayRender( FALSE );
-  this->glLock();
-  this->actualRedraw();
-  this->glUnlock();
-  this->setOverlayRender( TRUE );
-  if ( ! this->isOverlayRender() ) return; // overlay planes not available
-  this->glLock();
-  this->actualOverlayRedraw();
-  this->glUnlock();
-} // glReshape()
-
-/*!
-  This method is invoked to redraw the GL area.
-*/
-
-void
-So@Gui@RenderArea::glRender( // virtual, derived
-  void )
-{
-  // Do not do immediate redraw on expose events, as there might be a
-  // series of them coming along and it would be wasteful and stupid
-  // to re-render on all of them.
-  this->scheduleRedraw();
-  this->scheduleOverlayRedraw();
-} // glRender()
-
-/*!
-  This method is invoked on initialization of the GL area.
-*/
-
-void
-So@Gui@RenderArea::glInit( // virtual, derived
-  void )
-{
-  inherited::glInit();
-} // glInit()
-
-// *************************************************************************
-
-/*!
   FIXME: write doc
 */
 
@@ -1298,6 +1208,18 @@ So@Gui@RenderArea::processEvent( // virtual, protected
 } // processEvent()
 
 // *************************************************************************
+
+// doc from parent
+SbBool 
+So@Gui@RenderArea::glScheduleRedraw(void)
+{
+  this->scheduleRedraw();
+  if (this->hasOverlayGLArea() && this->getOverlaySceneGraph()) {
+    this->scheduleOverlayRedraw();
+  }
+  return TRUE;
+}
+
 
 /*!
   This method returns an SoEvent * corresponding to the given \a

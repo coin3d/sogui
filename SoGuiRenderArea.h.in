@@ -129,11 +129,9 @@ protected:
   virtual const char * getDefaultTitle(void) const;
   virtual const char * getDefaultIconTitle(void) const;
 
-  SbBool invokeAppCB( @EVENT@ event );
+  virtual SbBool glScheduleRedraw(void);
 
-  virtual void glInit(void);
-  virtual void glReshape( int width, int height );
-  virtual void glRender(void);
+  SbBool invokeAppCB( @EVENT@ event );
 
   const SoEvent * getSoEvent( @EVENT@ event );
 

@@ -2288,19 +2288,19 @@ So@Gui@ViewerP::changeDrawStyle(
   case So@Gui@Viewer::VIEW_LOW_RES_LINE:
   case So@Gui@Viewer::VIEW_LOW_RES_POINT:
   case So@Gui@Viewer::VIEW_BBOX:
-    pub->glLock();
+    pub->glLockNormal();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glDisable(GL_DEPTH_TEST);
-    pub->glUnlock();
+    pub->glUnlockNormal();
     break;
     
   default:
-    pub->glLock();
+    pub->glLockNormal();
     // FIXME: shouldn't this be done "lazy", i.e. before we do any
     // actual rendering? 20001126 mortene.
     glEnable(GL_DEPTH_TEST);
-    pub->glUnlock();
+    pub->glUnlockNormal();
     break;
   }
 
