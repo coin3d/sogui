@@ -46,14 +46,7 @@ class SoGuiSlider2 : public SoBaseKit {
   SO_KIT_CATALOG_ENTRY_HEADER(surfaceTexCoords);
   SO_KIT_CATALOG_ENTRY_HEADER(surfaceCoords);
   SO_KIT_CATALOG_ENTRY_HEADER(surfaceFaceSet);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobGeometry);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobMaterial);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobCoords);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobFaceSet);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobShadeMaterial);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobShadeLineSet);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobLightMaterial);
-  // SO_KIT_CATALOG_ENTRY_HEADER(knobLightLineSet);
+  SO_KIT_CATALOG_ENTRY_HEADER(knobGeometry);
 
 public:
   static void initClass(void);
@@ -69,10 +62,6 @@ public:
   SoSFBool alwaysHook;
 
   virtual void handleEvent(SoHandleEventAction * action);
-
-  virtual void setDefaultOnNonWritingFields(void);
-
-  virtual void setSurfaceColor(const SbColor & value);
 
   void sizeUpdate(void);
   void valueUpdate(void);
