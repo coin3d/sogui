@@ -46,6 +46,8 @@ public:
   void viewPlaneY(void) const;
   void viewPlaneZ(void) const;
 
+  void zoom( const float difference ) const;
+
   void setCanvasSize( const SbVec2s size );
   void setPointerLocation( const SbVec2s location );
   int getPointerXMotion(void) const;
@@ -55,11 +57,21 @@ public:
 
   void drawRotateGraphics(void) const;
 
-  void viewPlaneX( SoCamera * const camera );
-  void viewPlaneY( SoCamera * const camera );
-  void viewPlaneZ( SoCamera * const camera );
-
   SbBool processSoEvent( const SoEvent * const event );
+
+protected:
+  enum PlaneViewerMode {
+    IDLE_MODE,
+
+    DOLLY_MODE,
+    TRANSLATE_MODE,
+
+    ROTZ_WAIT_MODE,
+    ROTZ_MODE,
+
+    SEEK_WAIT_MODE,
+    SEEK_MODE
+  } mode;
 
 private:
   So@Gui@PlaneViewer * const viewer;
@@ -70,6 +82,10 @@ private:
   } pointer;
   SbVec2s canvas;
 
+  SbBool controldown;
+  SbBool button1down;
+  SbBool button2down;
+  SbBool button3down;
 }; // class SoAnyPlaneViewer
 
 // ************************************************************************
