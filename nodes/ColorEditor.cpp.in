@@ -322,7 +322,7 @@ ColorEditor::editorscene[] = {
   "      DEF slider_s SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "      DEF slider_v SoGuiSlider1 { size 200 8 0 = USE slidergeometry.oA }",
   "      DEF slider_translation SoGuiTranslation { translation 0 0 0 = USE slidergeometry.oC }"
-  "      DEF slider_frame SoGuiFrame { areaSize 0 0 0 = USE slidergeometry.oA design EMBOSS }",
+  "      DEF slider_frame SoGuiFrame { size 0 0 0 = USE slidergeometry.oA design EMBOSS }",
   "    }",
   "    DEF sliders_NONE Group {", // in case we search for names once, instead of indexing
   "    }",                        // children directly inside setCurrentSliders()
@@ -556,6 +556,8 @@ ColorEditor::generateSliderTextureR(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_r, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -585,6 +587,8 @@ ColorEditor::generateSliderTextureG(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_g, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -614,6 +618,8 @@ ColorEditor::generateSliderTextureB(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_b, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -644,6 +650,8 @@ ColorEditor::generateSliderTextureH(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_h, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -678,6 +686,8 @@ ColorEditor::generateSliderTextureS(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_s, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -712,6 +722,8 @@ ColorEditor::generateSliderTextureV(const SbColor & current, SbBool wysiwyg)
   }
   SoTexture2 * texture = SO_GET_PART(this->slider_v, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 1);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
@@ -746,6 +758,8 @@ ColorEditor::generateSliderTextureHSV(const SbColor & current, SbBool wysiwyg)
 
   SoTexture2 * texture = SO_GET_PART(this->slider_wheel, "surfaceTexture", SoTexture2);
   assert(texture);
+  texture->wrapS.setValue(SoTexture2::CLAMP);
+  texture->wrapT.setValue(SoTexture2::CLAMP);
   SbVec2s size(256, 256);
   int nc = 3;
   texture->image.setValue(size, nc, NULL);
