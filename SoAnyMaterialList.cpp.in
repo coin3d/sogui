@@ -368,26 +368,29 @@ SoAnyMaterialList::getMaterialDirectory(
     return this->directory;
 
   // get the path to search for materials in
-  SbBool path_allocated = FALSE;
-  const char * path = this->dirpath;
-  if (! path) path = SoAny::si()->getenv("SO_MATERIAL_DIR");
-  if (path == NULL) {
-    path = SoAny::si()->getenv("WALLET");
-    if (! path) path = SoAny::si()->getenv("COIN_HOME");
-    if (path != NULL) {
-      char * buf = new char [ strlen(path) + 12 ];
-      sprintf(buf, "%s/materials", path); // use DIRSEP string?
-      path = buf;
-      path_allocated = TRUE;
+  SbString path;
+  if (this->dirpath) { path = this->dirpath; }
+
+  const char * envvars[] = {
+    // FIXME: where the hell does the "WALLET" env-var come from?
+    // 20020109 mortene.
+    "SO_MATERIAL_DIR", "WALLET", "COIN_HOME"
+  };
+
+  for (unsigned int i=0; i < (sizeof(envvars) / sizeof(char *)); i++) {
+    if (path.getLength() == 0) {
+      const char * p = SoAny::si()->getenv(envvars[i]);
+      if (p) { path = p; }
     }
   }
-  if (! path) {
-    path = SoAny::si()->getenv("OIVHOME");
-    if (path != NULL) {
-      char * buf = new char [ strlen(path) + 15 ];
-      sprintf(buf, "%s/data/materials", path); // use DIRSEP string?
-      path = buf;
-      path_allocated = TRUE;
+
+  if (path.getLength() > 0) { path += "/materials"; }
+  else {
+    const char * p = SoAny::si()->getenv("OIVHOME");
+    if (p) {
+      path = p;
+      // FIXME: use DIRSEP string? ????-??-?? larsa.
+      path += "/data/materials";
     }
   }
 
@@ -395,13 +398,16 @@ SoAnyMaterialList::getMaterialDirectory(
   this->directory->flags = 0;
   this->directory->current = 0;
 
-  if (path != NULL) {
-#if SO@GUI@_DEBUG
+  SbBool founddiskmaterials = FALSE;
+
+  if (path.getLength() > 0) {
+#if SO@GUI@_DEBUG && 0 // debug
     SoDebugError::postInfo("SoAnyMaterialList::getMaterialDirectory",
-      "scanning '%s'", path);
-#endif // SO@GUI@_DEBUG
-    char ** subdirs = getNonemptySubdirs(path);
+                           "scanning '%s'", path.getString());
+#endif // debug
+    char ** subdirs = SoAnyMaterialList::getNonemptySubdirs(path.getString());
     if (subdirs) {
+      founddiskmaterials = TRUE;
       int numsubdirs;
       for (numsubdirs = 0; subdirs[numsubdirs] != NULL; numsubdirs++) { }
       this->directory->numGroups = numsubdirs;
@@ -410,9 +416,9 @@ SoAnyMaterialList::getMaterialDirectory(
         this->directory->groups[subdir] = new So@Gui@MaterialGroup;
         this->directory->groups[subdir]->name = subdirs[subdir];
         char * subdirname =
-          new char [strlen(path) + strlen(subdirs[subdir]) + 2];
-        sprintf(subdirname, "%s/%s", path, subdirs[subdir]);
-        char ** files = getRegularFiles(subdirname);
+          new char [strlen(path.getString()) + strlen(subdirs[subdir]) + 2];
+        sprintf(subdirname, "%s/%s", path.getString(), subdirs[subdir]);
+        char ** files = SoAnyMaterialList::getRegularFiles(subdirname);
         assert(files != NULL);
         int numfiles;
         for (numfiles = 0; files[numfiles] != NULL; numfiles++) { }
@@ -432,16 +438,11 @@ SoAnyMaterialList::getMaterialDirectory(
         delete [] subdirname;
       }
       delete [] subdirs; // actual strings are transfered, don't delete them!
-    } else {
-      if (path_allocated)
-        delete [] path;
-      path = NULL;
     }
   }
 
-  if (path == NULL) // fallback on builtins...
-    this->setupBuiltinMaterials(this->directory);
-
+  // fallback on builtins
+  if (!founddiskmaterials) { this->setupBuiltinMaterials(this->directory); }
   return this->directory;
 } // getMaterialDirectory()
 
