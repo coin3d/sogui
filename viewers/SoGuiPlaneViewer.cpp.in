@@ -31,6 +31,15 @@
   \brief The So@Gui@PlaneViewer class is for examining 3D models by moving the camera in orthogonal planes.
   \ingroup components viewers
 
+  The So@Gui@PlaneViewer is a viewer that is useful for "CAD-style"
+  applications, where you want the end-user to examine your model with
+  the viewpoint set from one of the three principal axes.
+
+  <center>
+  <img src="http://doc.coin3d.org/images/SoLibs/viewers/planeviewer.png">
+  </center>
+
+
   Controls:
   <li>
 
@@ -52,7 +61,10 @@
 
   </li>
 
-  FIXME: complete class doc
+  Hitting any of the X, Y or Z buttons in the panel on the right side
+  of the render canvas will "flip" the current camera direction around
+  it's focal point to point along the selected axis (towards negative
+  infinity).
 */
 
 // *************************************************************************
@@ -119,10 +131,6 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
 
 // ************************************************************************
 
-#define MOUSE_BUTTON_EVENT_TYPE (SoMouseButtonEvent::getClassTypeId())
-#define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
-#define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
-
 // Documented in superclass.
 SbBool
 So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
@@ -135,6 +143,26 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
                          this->isViewing(), this->isSeekMode(),
                          PRIVATE(this)->mode);
 #endif // debug
+
+  // Let the end-user toggle between camera-interaction mode
+  // ("viewing") and scenegraph-interaction mode with ALT key(s).
+  if (ev->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
+    SoKeyboardEvent * ke = (SoKeyboardEvent *)ev;
+    switch (ke->getKey()) {
+    case SoKeyboardEvent::LEFT_ALT:
+    case SoKeyboardEvent::RIGHT_ALT:
+      if (this->isViewing() && (ke->getState() == SoButtonEvent::DOWN)) {
+        this->setViewing(FALSE);
+        return TRUE;
+      }
+      else if (!this->isViewing() && (ke->getState() == SoButtonEvent::UP)) {
+        this->setViewing(TRUE);
+        return TRUE;
+      }
+    default:
+      break;
+    }
+  }
 
   // We're in "interact" mode (ie *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
@@ -159,7 +187,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
   const SbVec2f posn((float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
                      (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
 
-  if (type.isDerivedFrom(MOUSE_BUTTON_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
     processed = TRUE;
     const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
     const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
@@ -202,9 +230,9 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       default:
         break;
     } // switch (event->getButton())
-  }
+  } // SoMouseButtonEvent::getClassTypeId()
 
-  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
     const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
     const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
 
@@ -237,10 +265,10 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       break;
     }
 
-  } // KEYBOARD_EVENT_TYPE
+  } // SoKeyboardEvent::getClassTypeId()
 
 
-  if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
+  if (type.isDerivedFrom(SoLocation2Event::getClassTypeId())) {
     processed = TRUE;
     const SoLocation2Event * event = (const SoLocation2Event *) ev;
     PRIVATE(this)->setPointerLocation(pos);
@@ -268,7 +296,7 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
       }
 
     } while (FALSE);
-  } // LOCATION2_EVENT_TYPE
+  } // SoLocation2Event::getClassTypeId()
 
   SbBool ctrldown = PRIVATE(this)->leftcontroldown || PRIVATE(this)->rightcontroldown;
   SbBool shiftdown = PRIVATE(this)->leftshiftdown || PRIVATE(this)->rightshiftdown;
@@ -354,12 +382,8 @@ So@Gui@PlaneViewer::actualRedraw(void)
 void
 So@Gui@PlaneViewer::setSeekMode(SbBool on)
 {
-  // Note: this method is almost identical to the setSeekMode() in the
-  // So@Gui@FlyViewer and So@Gui@ExaminerViewer, so migrate any
-  // changes.
-
 #if SO@GUI@_DEBUG
-  if (on == this->isSeekMode()) {
+  if (!!on == !!this->isSeekMode()) {
     SoDebugError::postWarning("So@Gui@PlaneViewer::setSeekMode",
                               "seek mode already %sset", on ? "" : "un");
     return;
@@ -401,9 +425,9 @@ So@Gui@PlaneViewer::setViewing(SbBool enable)
 
   inherited::setViewing(enable);
 
-  if (!this->isViewing()) {
-    PRIVATE(this)->changeMode(SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE);
-  }
+  PRIVATE(this)->changeMode(this->isViewing() ? 
+                            SoGuiPlaneViewerP::IDLE_MODE :
+                            SoGuiPlaneViewerP::SCENEGRAPH_INTERACT_MODE);
 }
 
 // ************************************************************************
@@ -592,14 +616,14 @@ SoGuiPlaneViewerP::commonConstructor(void)
     "       0 0 0"
     "      ]"
     "    }"
-    "    BaseColor { rgb 1 1 0 }"
+    "    BaseColor { rgb 1 1 1 }"
     "    DEF so@gui@->style0 DrawStyle { }" // lineWidth set in code
     "    DEF so@gui@->mainline IndexedLineSet {" // fat line (exterior)
     "      coordIndex ["
     "        0, 1, -1, 1, 2, -1, 1, 3, -1"
     "      ]"
     "    }"
-    "    BaseColor { rgb 0 0 0 }"
+    "    BaseColor { rgb 0.5 0.5 0.5 }"
     "    DEF so@gui@->style1 DrawStyle { }" // lineWidth set in code
     "    USE so@gui@->mainline" // thin line (interior)
     "  }"
