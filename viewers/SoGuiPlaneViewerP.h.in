@@ -24,6 +24,8 @@
 #ifndef SOGUIPLANEVIEWERP_H
 #define SOGUIPLANEVIEWERP_H
 
+#include <Inventor/SbLinear.h>
+
 class So@Gui@PlaneViewer;
 
 // ************************************************************************
@@ -35,6 +37,56 @@ class SoGuiPlaneViewerP
 {
 public:
   ~SoGuiPlaneViewerP();
+
+  void commonConstructor(void);
+
+  void translateX(const float delta) const;
+  void translateY(const float delta) const;
+  void rotateZ(const float angle) const;
+
+  void viewPlaneX(void) const;
+  void viewPlaneY(void) const;
+  void viewPlaneZ(void) const;
+
+  void zoom(const float difference) const;
+
+  void setCanvasSize(const SbVec2s size);
+  void setPointerLocation(const SbVec2s location);
+  int getPointerXMotion(void) const;
+  int getPointerYMotion(void) const;
+  float getPointerOrigoAngle(void) const;
+  float getPointerOrigoMotionAngle(void) const;
+
+  void drawRotateGraphics(void) const;
+
+  enum PlaneViewerMode {
+    IDLE_MODE,
+
+    DOLLY_MODE,
+    TRANSLATE_MODE,
+
+    ROTZ_WAIT_MODE,
+    ROTZ_MODE,
+
+    SEEK_WAIT_MODE,
+    SEEK_MODE
+  } mode;
+
+  void setCursorRepresentation(PlaneViewerMode mode);
+
+  struct pointerdata {
+    SbVec2s now;
+    SbVec2s then;
+  } pointer;
+  SbVec2s canvas;
+
+  SbBool leftcontroldown;
+  SbBool rightcontroldown;
+  SbBool leftshiftdown;
+  SbBool rightshiftdown;
+  SbBool button1down;
+  SbBool button2down;
+  SbBool button3down;
 
 protected:
   SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ);

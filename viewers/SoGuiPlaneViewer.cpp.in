@@ -76,21 +76,9 @@
 
 // *************************************************************************
 
-// SoGuiPlaneViewerP "private implementation" class.
+// To access SoGuiPlaneViewerP "private implementation" class.
 
-#define PUBLIC(ptr) (ptr->pub)
 #define PRIVATE(ptr) (ptr->pimpl)
-
-#define THIS (PRIVATE(this))
-
-SoGuiPlaneViewerP::SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ)
-{
-  this->pub = publ;
-}
-
-SoGuiPlaneViewerP::~SoGuiPlaneViewerP()
-{
-}
 
 // *************************************************************************
 
@@ -98,10 +86,345 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@PlaneViewer);
 
 // ************************************************************************
 
-void
-So@Gui@PlaneViewer::commonConstructor(void)
+#define MOUSE_BUTTON_EVENT_TYPE (SoMouseButtonEvent::getClassTypeId())
+#define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
+#define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
+
+// Documented in superclass.
+SbBool
+So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
 {
-  this->mode = So@Gui@PlaneViewer::IDLE_MODE ;
+  if (!this->isViewing()) {
+    // We're in "interact" mode (ie *not* the camera modification
+    // mode), so don't handle the event here. It should either be
+    // forwarded to the scenegraph, or caught by
+    // So@Gui@Viewer::processSoEvent() if it's an ESC press (to switch
+    // modes).
+    return inherited::processSoEvent(ev);
+  }
+
+  SbBool processed = FALSE;
+  SoGuiPlaneViewerP::PlaneViewerMode previousmode = PRIVATE(this)->mode;
+
+  const SoType type(ev->getTypeId());
+
+  const SbVec2s size(this->getGLSize());
+  const SbVec2s pos(ev->getPosition());
+  const SbVec2f posn((float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
+                     (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
+
+  if (type.isDerivedFrom(MOUSE_BUTTON_EVENT_TYPE)) {
+    processed = TRUE;
+    const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
+    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
+
+    if (press) {
+      // Called twice to initialize both "now" (current) and "then"
+      // (previous) pointer location.
+      PRIVATE(this)->setPointerLocation(pos);
+      PRIVATE(this)->setPointerLocation(pos);
+    }
+
+    switch (event->getButton()) {
+      case SoMouseButtonEvent::BUTTON1:
+        PRIVATE(this)->button1down = press;
+
+        if (press && (previousmode == SoGuiPlaneViewerP::SEEK_WAIT_MODE)) {
+          PRIVATE(this)->mode = SoGuiPlaneViewerP::SEEK_MODE;
+          this->seekToPoint(pos); // implicitly calls interactiveCountInc()
+        }
+        break;
+
+      case SoMouseButtonEvent::BUTTON2:
+        PRIVATE(this)->button2down = press;
+        break;
+
+      case SoMouseButtonEvent::BUTTON3:
+        PRIVATE(this)->button3down = press;
+        break;
+
+#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
+      case SoMouseButtonEvent::BUTTON4:
+        if (press) PRIVATE(this)->zoom(0.1f);
+        break;
+
+      case SoMouseButtonEvent::BUTTON5:
+        if (press) PRIVATE(this)->zoom(-0.1f);
+        break;
+#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
+
+      default:
+        break;
+    } // switch (event->getButton())
+  }
+
+  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
+    const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
+    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
+
+    switch (event->getKey()) {
+    case SoKeyboardEvent::LEFT_CONTROL:
+      processed = TRUE;
+      PRIVATE(this)->leftcontroldown = press;
+      break;
+    case SoKeyboardEvent::RIGHT_CONTROL:
+      processed = TRUE;
+      PRIVATE(this)->rightcontroldown = press;
+      break;
+    case SoKeyboardEvent::LEFT_SHIFT:
+      processed = TRUE;
+      PRIVATE(this)->leftshiftdown = press;
+      break;
+    case SoKeyboardEvent::RIGHT_SHIFT:
+      processed = TRUE;
+      PRIVATE(this)->rightshiftdown = press;
+      break;
+
+    default:
+      break;
+    }
+
+  } // KEYBOARD_EVENT_TYPE
+
+
+  if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
+    processed = TRUE;
+    const SoLocation2Event * event = (const SoLocation2Event *) ev;
+    PRIVATE(this)->setPointerLocation(pos);
+    const SbVec2f prevn((float) PRIVATE(this)->pointer.then[0] / (float) So@Gui@Max(size[0], (short int)1),
+                        (float) PRIVATE(this)->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1));
+
+    do {
+      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::ROTZ_MODE) {
+        PRIVATE(this)->rotateZ(PRIVATE(this)->getPointerOrigoMotionAngle());
+        break;
+      }
+
+      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::TRANSLATE_MODE) {
+        if ((posn[0] != prevn[0]) || (posn[1] != prevn[1])) {
+          float dx = (posn[0] - prevn[0]) * 2.5f;
+          float dy = (posn[1] - prevn[1]) * 2.5f;
+          float yvalue = this->getLeftWheelValue() - dy;
+          float xvalue = this->getBottomWheelValue() + dx;
+          this->leftWheelMotion(yvalue);
+          this->setLeftWheelValue(yvalue);
+          this->bottomWheelMotion(xvalue);
+          this->setBottomWheelValue(xvalue);
+        }
+        break;
+      }
+
+      if (PRIVATE(this)->mode == SoGuiPlaneViewerP::DOLLY_MODE) {
+        if (posn[1] != prevn[1]) {
+          float value = this->getRightWheelValue() + (prevn[1] - posn[1]) * 10.0f;
+          this->rightWheelMotion(value);
+          this->setRightWheelValue(value);
+        }
+        break;
+      }
+
+    } while (FALSE);
+  } // LOCATION2_EVENT_TYPE
+
+  SbBool ctrldown = PRIVATE(this)->leftcontroldown || PRIVATE(this)->rightcontroldown;
+  SbBool shiftdown = PRIVATE(this)->leftshiftdown || PRIVATE(this)->rightshiftdown;
+  enum {
+    BUTTON1DOWN = 1 << 0,
+    BUTTON2DOWN = 1 << 1,
+    BUTTON3DOWN = 1 << 2,
+    CTRLDOWN =    1 << 3,
+    SHIFTDOWN =   1 << 4
+  };
+  unsigned int combo =
+    (PRIVATE(this)->button1down ? BUTTON1DOWN : 0) |
+    (PRIVATE(this)->button2down ? BUTTON2DOWN : 0) |
+    (PRIVATE(this)->button3down ? BUTTON3DOWN : 0) |
+    (ctrldown ? CTRLDOWN : 0) |
+    (shiftdown ? SHIFTDOWN : 0);
+
+#if SO@GUI@_DEBUG && 0 // debug
+  SoDebugError::postInfo("So@Gui@PlaneViewer::processSoEvent",
+                         "button1==%d, button2==%d, button3==%d, "
+                         "lctrl==%d, rctrl==%d, lshift==%d, rshift==%d",
+                         PRIVATE(this)->button1down, PRIVATE(this)->button2down, PRIVATE(this)->button3down,
+                         PRIVATE(this)->leftcontroldown, PRIVATE(this)->rightcontroldown,
+                         PRIVATE(this)->leftshiftdown, PRIVATE(this)->rightshiftdown);
+#endif // debug
+  
+
+  switch (combo) {
+  case BUTTON1DOWN:
+  case BUTTON1DOWN|BUTTON3DOWN:
+    PRIVATE(this)->mode = SoGuiPlaneViewerP::DOLLY_MODE;
+    break;
+  case BUTTON3DOWN:
+  case CTRLDOWN|BUTTON1DOWN:
+  case SHIFTDOWN|BUTTON1DOWN:
+    PRIVATE(this)->mode = SoGuiPlaneViewerP::TRANSLATE_MODE;
+    break;
+  case CTRLDOWN|BUTTON3DOWN:
+  case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
+    PRIVATE(this)->mode = SoGuiPlaneViewerP::ROTZ_MODE;
+    break;
+  case CTRLDOWN:
+  case CTRLDOWN|SHIFTDOWN:
+    PRIVATE(this)->mode = SoGuiPlaneViewerP::ROTZ_WAIT_MODE;
+    break;
+  default:
+    PRIVATE(this)->mode = SoGuiPlaneViewerP::IDLE_MODE;
+    break;
+  }
+
+  if (previousmode != PRIVATE(this)->mode) {
+    switch (PRIVATE(this)->mode) {
+    case SoGuiPlaneViewerP::TRANSLATE_MODE:
+    case SoGuiPlaneViewerP::DOLLY_MODE:
+      this->interactiveCountInc();
+      break;
+
+    case SoGuiPlaneViewerP::ROTZ_MODE:
+      this->interactiveCountInc();
+      PRIVATE(this)->setCanvasSize(size);
+      PRIVATE(this)->setPointerLocation(pos);
+      PRIVATE(this)->setPointerLocation(pos);
+      this->scheduleRedraw();
+      break;
+
+    default:
+      break;
+    }
+
+    switch (previousmode) {
+    case SoGuiPlaneViewerP::TRANSLATE_MODE:
+    case SoGuiPlaneViewerP::ROTZ_MODE:
+    case SoGuiPlaneViewerP::DOLLY_MODE:
+      this->interactiveCountDec();
+      break;
+    default:
+      break;
+    }
+
+    PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+  }
+
+  // If not handled in this class, pass on upwards in the inheritance
+  // hierarchy.
+  return processed || inherited::processSoEvent(ev);
+}
+
+// ************************************************************************
+
+// documented in superclass
+void
+So@Gui@PlaneViewer::setSeekMode(SbBool on)
+{
+  // Note: this method is almost identical to the setSeekMode() in the
+  // So@Gui@FlyViewer and So@Gui@ExaminerViewer, so migrate any
+  // changes.
+
+#if SO@GUI@_DEBUG
+  if (on == this->isSeekMode()) {
+    SoDebugError::postWarning("So@Gui@PlaneViewer::setSeekMode",
+                              "seek mode already %sset", on ? "" : "un");
+    return;
+  }
+#endif // SO@GUI@_DEBUG
+
+  inherited::setSeekMode(on);
+  PRIVATE(this)->mode = on ?
+    SoGuiPlaneViewerP::SEEK_WAIT_MODE :
+    SoGuiPlaneViewerP::IDLE_MODE;
+
+  PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::setCursorEnabled(SbBool enable)
+{
+  inherited::setCursorEnabled(enable);
+  PRIVATE(this)->setCursorRepresentation(PRIVATE(this)->mode);
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultWidgetName(void) const
+{
+  return "So@Gui@PlaneViewer";
+}
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultTitle(void) const
+{
+  return "Plane Viewer";
+}
+
+// Documented in superclass.
+const char *
+So@Gui@PlaneViewer::getDefaultIconTitle(void) const
+{
+  return "Plane Viewer";
+}
+
+// ************************************************************************
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::bottomWheelMotion(float value)
+{
+  // This method set up the bottom wheel to control camera translation
+  // in the horizontal direction.
+
+  PRIVATE(this)->translateX(value - this->getBottomWheelValue());
+  inherited::bottomWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::leftWheelMotion(float value)
+{
+  // This method set up the left wheel to control camera translation
+  // in the vertical direction.
+
+  PRIVATE(this)->translateY(value - this->getLeftWheelValue());
+  inherited::leftWheelMotion(value);
+}
+
+// Documented in superclass.
+void
+So@Gui@PlaneViewer::rightWheelMotion(float value)
+{
+  // This method set up the right wheel to control camera movement in
+  // the inwards direction.
+
+  PRIVATE(this)->zoom(this->getRightWheelValue() - value);
+  inherited::rightWheelMotion(value);
+}
+
+// *************************************************************************
+
+// Remaining code is for the SoGuiPlaneViewerP "private implementation" class.
+
+#define PUBLIC(ptr) (ptr->pub)
+
+SoGuiPlaneViewerP::SoGuiPlaneViewerP(So@Gui@PlaneViewer * publ)
+{
+  PUBLIC(this) = publ;
+}
+
+SoGuiPlaneViewerP::~SoGuiPlaneViewerP()
+{
+}
+
+void
+SoGuiPlaneViewerP::commonConstructor(void)
+{
+  this->mode = SoGuiPlaneViewerP::IDLE_MODE;
 
   this->canvas = SbVec2s(0, 0);
   this->pointer.now = SbVec2s(0, 0);
@@ -115,12 +438,10 @@ So@Gui@PlaneViewer::commonConstructor(void)
   this->button3down = FALSE;
 }
 
-// *************************************************************************
-
 void
-So@Gui@PlaneViewer::translateX(const float delta) const
+SoGuiPlaneViewerP::translateX(const float delta) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -130,9 +451,9 @@ So@Gui@PlaneViewer::translateX(const float delta) const
 }
 
 void
-So@Gui@PlaneViewer::translateY(const float delta) const
+SoGuiPlaneViewerP::translateY(const float delta) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -142,9 +463,9 @@ So@Gui@PlaneViewer::translateY(const float delta) const
 }
 
 void
-So@Gui@PlaneViewer::rotateZ(const float angle) const
+SoGuiPlaneViewerP::rotateZ(const float angle) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -153,12 +474,10 @@ So@Gui@PlaneViewer::rotateZ(const float angle) const
     camera->orientation.getValue() * SbRotation(dir, angle);
 }
 
-// *************************************************************************
-
 void
-So@Gui@PlaneViewer::viewPlaneX(void) const
+SoGuiPlaneViewerP::viewPlaneX(void) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -171,9 +490,9 @@ So@Gui@PlaneViewer::viewPlaneX(void) const
 }
 
 void
-So@Gui@PlaneViewer::viewPlaneY(void) const
+SoGuiPlaneViewerP::viewPlaneY(void) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -186,9 +505,9 @@ So@Gui@PlaneViewer::viewPlaneY(void) const
 }
 
 void
-So@Gui@PlaneViewer::viewPlaneZ(void) const
+SoGuiPlaneViewerP::viewPlaneZ(void) const
 {
-  SoCamera * const camera = this->getCamera();
+  SoCamera * const camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SbVec3f dir;
@@ -200,13 +519,11 @@ So@Gui@PlaneViewer::viewPlaneZ(void) const
   camera->orientation = SbRotation(SbVec3f(0, 1, 0), 0);
 }
 
-// *************************************************************************
-
 // This method moves the camera inwards and outwards.
 void
-So@Gui@PlaneViewer::zoom(const float difference) const
+SoGuiPlaneViewerP::zoom(const float difference) const
 {
-  SoCamera * camera = this->getCamera();
+  SoCamera * camera = PUBLIC(this)->getCamera();
   if (! camera) return; // probably a scene-less viewer
 
   SoType type = camera->getTypeId();
@@ -227,35 +544,33 @@ So@Gui@PlaneViewer::zoom(const float difference) const
   }
 }
 
-// *************************************************************************
-
 void
-So@Gui@PlaneViewer::setCanvasSize(const SbVec2s size)
+SoGuiPlaneViewerP::setCanvasSize(const SbVec2s size)
 {
   this->canvas = size;
 }
 
 void
-So@Gui@PlaneViewer::setPointerLocation(const SbVec2s position)
+SoGuiPlaneViewerP::setPointerLocation(const SbVec2s position)
 {
   this->pointer.then = this->pointer.now;
   this->pointer.now = position;
 }
 
 int
-So@Gui@PlaneViewer::getPointerXMotion(void) const
+SoGuiPlaneViewerP::getPointerXMotion(void) const
 {
   return this->pointer.now[0] - this->pointer.then[0];
 }
 
 int
-So@Gui@PlaneViewer::getPointerYMotion(void) const
+SoGuiPlaneViewerP::getPointerYMotion(void) const
 {
   return this->pointer.now[1] - this->pointer.then[1];
 }
 
 float
-So@Gui@PlaneViewer::getPointerOrigoAngle(void) const
+SoGuiPlaneViewerP::getPointerOrigoAngle(void) const
 {
   SbVec2s now = this->pointer.now;
   now[0] -= this->canvas[0] / 2;
@@ -269,7 +584,7 @@ So@Gui@PlaneViewer::getPointerOrigoAngle(void) const
 }
 
 float
-So@Gui@PlaneViewer::getPointerOrigoMotionAngle(void) const
+SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
 {
   if (this->pointer.then == this->pointer.now)
     return 0.0f;
@@ -293,12 +608,10 @@ So@Gui@PlaneViewer::getPointerOrigoMotionAngle(void) const
   return nowradval - thenradval;
 }
 
-// ************************************************************************
-
 // This method draws the rotate mode graphics...
 // FIXME: use Inventor instead of OpenGL...
 void
-So@Gui@PlaneViewer::drawRotateGraphics(void) const
+SoGuiPlaneViewerP::drawRotateGraphics(void) const
 {
   glPushAttrib(GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT|GL_TRANSFORM_BIT|
                GL_VIEWPORT_BIT|GL_LINE_BIT|GL_ENABLE_BIT);
@@ -344,368 +657,44 @@ So@Gui@PlaneViewer::drawRotateGraphics(void) const
   glPopAttrib();
 }
 
-// ************************************************************************
-
-#define MOUSE_BUTTON_EVENT_TYPE (SoMouseButtonEvent::getClassTypeId())
-#define LOCATION2_EVENT_TYPE    (SoLocation2Event::getClassTypeId())
-#define KEYBOARD_EVENT_TYPE     (SoKeyboardEvent::getClassTypeId())
-
-// Documented in superclass.
-SbBool
-So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
-{
-  if (!this->isViewing()) {
-    // We're in "interact" mode (ie *not* the camera modification
-    // mode), so don't handle the event here. It should either be
-    // forwarded to the scenegraph, or caught by
-    // So@Gui@Viewer::processSoEvent() if it's an ESC press (to switch
-    // modes).
-    return inherited::processSoEvent(ev);
-  }
-
-  SbBool processed = FALSE;
-  PlaneViewerMode previousmode = this->mode;
-
-  const SoType type(ev->getTypeId());
-
-  const SbVec2s size(this->getGLSize());
-  const SbVec2s pos(ev->getPosition());
-  const SbVec2f posn((float)pos[0] / (float) So@Gui@Max(size[0], (short int)1),
-                     (float)pos[1] / (float) So@Gui@Max(size[1], (short int)1));
-
-  if (type.isDerivedFrom(MOUSE_BUTTON_EVENT_TYPE)) {
-    processed = TRUE;
-    const SoMouseButtonEvent * event = (const SoMouseButtonEvent *) ev;
-    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
-
-    if (press) {
-      // Called twice to initialize both "now" (current) and "then"
-      // (previous) pointer location.
-      this->setPointerLocation(pos);
-      this->setPointerLocation(pos);
-    }
-
-    switch (event->getButton()) {
-      case SoMouseButtonEvent::BUTTON1:
-        this->button1down = press;
-
-        if (press && (previousmode == SEEK_WAIT_MODE)) {
-          this->mode = SEEK_MODE;
-          this->seekToPoint(pos); // implicitly calls interactiveCountInc()
-        }
-        break;
-
-      case SoMouseButtonEvent::BUTTON2:
-        this->button2down = press;
-        break;
-
-      case SoMouseButtonEvent::BUTTON3:
-        this->button3down = press;
-        break;
-
-#ifdef HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-      case SoMouseButtonEvent::BUTTON4:
-        if (press) this->zoom(0.1f);
-        break;
-
-      case SoMouseButtonEvent::BUTTON5:
-        if (press) this->zoom(-0.1f);
-        break;
-#endif // HAVE_SOMOUSEBUTTONEVENT_BUTTON5
-
-      default:
-        break;
-    } // switch (event->getButton())
-  }
-
-  if (type.isDerivedFrom(KEYBOARD_EVENT_TYPE)) {
-    const SoKeyboardEvent * event = (const SoKeyboardEvent *) ev;
-    const SbBool press = (event->getState() == SoButtonEvent::DOWN) ? TRUE : FALSE;
-
-    switch (event->getKey()) {
-    case SoKeyboardEvent::LEFT_CONTROL:
-      processed = TRUE;
-      this->leftcontroldown = press;
-      break;
-    case SoKeyboardEvent::RIGHT_CONTROL:
-      processed = TRUE;
-      this->rightcontroldown = press;
-      break;
-    case SoKeyboardEvent::LEFT_SHIFT:
-      processed = TRUE;
-      this->leftshiftdown = press;
-      break;
-    case SoKeyboardEvent::RIGHT_SHIFT:
-      processed = TRUE;
-      this->rightshiftdown = press;
-      break;
-
-    default:
-      break;
-    }
-
-  } // KEYBOARD_EVENT_TYPE
-
-
-  if (type.isDerivedFrom(LOCATION2_EVENT_TYPE)) {
-    processed = TRUE;
-    const SoLocation2Event * event = (const SoLocation2Event *) ev;
-    this->setPointerLocation(pos);
-    const SbVec2f prevn((float) this->pointer.then[0] / (float) So@Gui@Max(size[0], (short int)1),
-                        (float) this->pointer.then[1] / (float) So@Gui@Max(size[1], (short int)1));
-
-    do {
-      if (this->mode == ROTZ_MODE) {
-        this->rotateZ(this->getPointerOrigoMotionAngle());
-        break;
-      }
-
-      if (this->mode == TRANSLATE_MODE) {
-        if ((posn[0] != prevn[0]) || (posn[1] != prevn[1])) {
-          float dx = (posn[0] - prevn[0]) * 2.5f;
-          float dy = (posn[1] - prevn[1]) * 2.5f;
-          float yvalue = this->getLeftWheelValue() - dy;
-          float xvalue = this->getBottomWheelValue() + dx;
-          this->leftWheelMotion(yvalue);
-          this->setLeftWheelValue(yvalue);
-          this->bottomWheelMotion(xvalue);
-          this->setBottomWheelValue(xvalue);
-        }
-        break;
-      }
-
-      if (this->mode == DOLLY_MODE) {
-        if (posn[1] != prevn[1]) {
-          float value = this->getRightWheelValue() + (prevn[1] - posn[1]) * 10.0f;
-          this->rightWheelMotion(value);
-          this->setRightWheelValue(value);
-        }
-        break;
-      }
-
-    } while (FALSE);
-  } // LOCATION2_EVENT_TYPE
-
-  SbBool ctrldown = this->leftcontroldown || this->rightcontroldown;
-  SbBool shiftdown = this->leftshiftdown || this->rightshiftdown;
-  enum {
-    BUTTON1DOWN = 1 << 0,
-    BUTTON2DOWN = 1 << 1,
-    BUTTON3DOWN = 1 << 2,
-    CTRLDOWN =    1 << 3,
-    SHIFTDOWN =   1 << 4
-  };
-  unsigned int combo =
-    (this->button1down ? BUTTON1DOWN : 0) |
-    (this->button2down ? BUTTON2DOWN : 0) |
-    (this->button3down ? BUTTON3DOWN : 0) |
-    (ctrldown ? CTRLDOWN : 0) |
-    (shiftdown ? SHIFTDOWN : 0);
-
-#if SO@GUI@_DEBUG && 0 // debug
-  SoDebugError::postInfo("So@Gui@PlaneViewer::processSoEvent",
-                         "button1==%d, button2==%d, button3==%d, "
-                         "lctrl==%d, rctrl==%d, lshift==%d, rshift==%d",
-                         this->button1down, this->button2down, this->button3down,
-                         this->leftcontroldown, this->rightcontroldown,
-                         this->leftshiftdown, this->rightshiftdown);
-#endif // debug
-  
-
-  switch (combo) {
-  case BUTTON1DOWN:
-  case BUTTON1DOWN|BUTTON3DOWN:
-    this->mode = DOLLY_MODE;
-    break;
-  case BUTTON3DOWN:
-  case CTRLDOWN|BUTTON1DOWN:
-  case SHIFTDOWN|BUTTON1DOWN:
-    this->mode = TRANSLATE_MODE;
-    break;
-  case CTRLDOWN|BUTTON3DOWN:
-  case CTRLDOWN|SHIFTDOWN|BUTTON1DOWN:
-    this->mode = ROTZ_MODE;
-    break;
-  case CTRLDOWN:
-  case CTRLDOWN|SHIFTDOWN:
-    this->mode = ROTZ_WAIT_MODE;
-    break;
-  default:
-    this->mode = IDLE_MODE;
-    break;
-  }
-
-  if (previousmode != this->mode) {
-    switch (this->mode) {
-    case TRANSLATE_MODE:
-    case DOLLY_MODE:
-      this->interactiveCountInc();
-      break;
-
-    case ROTZ_MODE:
-      this->interactiveCountInc();
-      this->setCanvasSize(size);
-      this->setPointerLocation(pos);
-      this->setPointerLocation(pos);
-      this->scheduleRedraw();
-      break;
-
-    default:
-      break;
-    }
-
-    switch (previousmode) {
-    case TRANSLATE_MODE:
-    case ROTZ_MODE:
-    case DOLLY_MODE:
-      this->interactiveCountDec();
-      break;
-    default:
-      break;
-    }
-
-    this->setCursorRepresentation(this->mode);
-  }
-
-  // If not handled in this class, pass on upwards in the inheritance
-  // hierarchy.
-  return processed || inherited::processSoEvent(ev);
-}
-
-// ************************************************************************
-
-// documented in superclass
-void
-So@Gui@PlaneViewer::setSeekMode(SbBool on)
-{
-  // Note: this method is almost identical to the setSeekMode() in the
-  // So@Gui@FlyViewer and So@Gui@ExaminerViewer, so migrate any
-  // changes.
-
-#if SO@GUI@_DEBUG
-  if (on == this->isSeekMode()) {
-    SoDebugError::postWarning("So@Gui@PlaneViewer::setSeekMode",
-                              "seek mode already %sset", on ? "" : "un");
-    return;
-  }
-#endif // SO@GUI@_DEBUG
-
-  inherited::setSeekMode(on);
-  this->mode = on ?
-    So@Gui@PlaneViewer::SEEK_WAIT_MODE :
-    So@Gui@PlaneViewer::IDLE_MODE;
-
-  this->setCursorRepresentation(this->mode);
-}
-
-// ************************************************************************
-
-// Documented in superclass.
-void
-So@Gui@PlaneViewer::setCursorEnabled(SbBool enable)
-{
-  inherited::setCursorEnabled(enable);
-  this->setCursorRepresentation(this->mode);
-}
-
-// ************************************************************************
-
 // Set cursor graphics according to mode.
 void
-So@Gui@PlaneViewer::setCursorRepresentation(PlaneViewerMode mode)
+SoGuiPlaneViewerP::setCursorRepresentation(PlaneViewerMode mode)
 {
 #if SO@GUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@Gui@PlaneViewer::setCursorRepresentation",
                          "mode==%d", mode);
 #endif // debug
 
-  assert(this->getGLWidget());
+  assert(PUBLIC(this)->getGLWidget());
 
-  if (!this->isCursorEnabled()) {
-    this->setComponentCursor(So@Gui@Cursor::getBlankCursor());
+  if (!PUBLIC(this)->isCursorEnabled()) {
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getBlankCursor());
     return;
   }
 
   switch (mode) {
-  case So@Gui@PlaneViewer::IDLE_MODE:
-  case So@Gui@PlaneViewer::ROTZ_WAIT_MODE:
-    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
+  case SoGuiPlaneViewerP::IDLE_MODE:
+  case SoGuiPlaneViewerP::ROTZ_WAIT_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::DEFAULT));
     break ;
-  case So@Gui@PlaneViewer::DOLLY_MODE:
-    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
+  case SoGuiPlaneViewerP::DOLLY_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::UPARROW));
     break;
-  case So@Gui@PlaneViewer::ROTZ_MODE:
-    this->setComponentCursor(So@Gui@Cursor::getRotateCursor());
+  case SoGuiPlaneViewerP::ROTZ_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getRotateCursor());
     break;
-  case So@Gui@PlaneViewer::SEEK_WAIT_MODE:
-  case So@Gui@PlaneViewer::SEEK_MODE:
-    this->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
+  case SoGuiPlaneViewerP::SEEK_WAIT_MODE:
+  case SoGuiPlaneViewerP::SEEK_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor(So@Gui@Cursor::CROSSHAIR));
     break;
-  case So@Gui@PlaneViewer::TRANSLATE_MODE:
-    this->setComponentCursor(So@Gui@Cursor::getPanCursor());
+  case SoGuiPlaneViewerP::TRANSLATE_MODE:
+    PUBLIC(this)->setComponentCursor(So@Gui@Cursor::getPanCursor());
     break;
   default:
     assert(0 && "unknown PlaneViewer mode");
     break;
   }
-}
-
-// ************************************************************************
-
-// Documented in superclass.
-const char *
-So@Gui@PlaneViewer::getDefaultWidgetName(void) const
-{
-  return "So@Gui@PlaneViewer";
-}
-
-// Documented in superclass.
-const char *
-So@Gui@PlaneViewer::getDefaultTitle(void) const
-{
-  return "Plane Viewer";
-}
-
-// Documented in superclass.
-const char *
-So@Gui@PlaneViewer::getDefaultIconTitle(void) const
-{
-  return "Plane Viewer";
-}
-
-// ************************************************************************
-
-// Documented in superclass.
-void
-So@Gui@PlaneViewer::bottomWheelMotion(float value)
-{
-  // This method set up the bottom wheel to control camera translation
-  // in the horizontal direction.
-
-  this->translateX(value - this->getBottomWheelValue());
-  inherited::bottomWheelMotion(value);
-}
-
-// Documented in superclass.
-void
-So@Gui@PlaneViewer::leftWheelMotion(float value)
-{
-  // This method set up the left wheel to control camera translation
-  // in the vertical direction.
-
-  this->translateY(value - this->getLeftWheelValue());
-  inherited::leftWheelMotion(value);
-}
-
-// Documented in superclass.
-void
-So@Gui@PlaneViewer::rightWheelMotion(float value)
-{
-  // This method set up the right wheel to control camera movement in
-  // the inwards direction.
-
-  this->zoom(this->getRightWheelValue() - value);
-  inherited::rightWheelMotion(value);
 }
 
 // *************************************************************************
