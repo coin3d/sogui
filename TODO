@@ -1,18 +1,18 @@
 TODO
 ====
 
-* [20000324:larsa]:  Move ThumbWheel to SoAnyThumbWheel to conform with the
-    rest of the system.
+* [20000324:larsa]: Set up all files as .in templates because it's easier
+  to untemplatify them into the build directory than to compile them from
+  this one.
+
+* [20000324:larsa]: Move ThumbWheel to SoAnyThumbWheel to conform with the
+  rest of the system.
 
 
 OTHER
 =====
 
-* common popup menu setup/management API to facilitate common source on all
-  surrounding / related code
-
 * common timer API
 
 * dynamically programmable state-machine for managing the viewer states/modes
-
 
