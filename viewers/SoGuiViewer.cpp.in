@@ -1288,12 +1288,10 @@ static unsigned char fps2dfont[][12] = {
 static void
 printString(const char * s)
 {
-#if defined(__COIN__)
   int i,n;
   n = strlen(s);
   for (i = 0; i < n; i++)
     glBitmap(8, 12, 0.0, 2.0, 10.0, 0.0, fps2dfont[s[i] - 32]);
-#endif
 }
 
 static void
