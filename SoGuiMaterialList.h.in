@@ -67,13 +67,24 @@ protected:
 private:
   void constructor(const char * const dir, const SbBool build);
 
-  // FIXME: remove all this and set it up for use with a SoGuiMaterialListP class.
+  // FIXME: remove all this and set it up for use with a
+  // SoGuiMaterialListP class. 2001???? larsa.
 
   void selectionCallback(int i);
   static void selection_cb(@WIDGET@, void *, void *);
 
   void paletteMenuCallback(@WIDGET@);
   static void palette_menu_cb(@WIDGET@, void *, void *);
+
+
+#ifdef __COIN_SOGTK__
+  void menuactivation(GtkWidget * menuitem);
+  static void menuactivationCB(GtkObject * obj, gpointer closure);
+
+  void itemactivation(int item);
+  static void itemactivationCB(GtkObject * obj, gint row, gint column,
+                               GdkEvent * event, gpointer closure);
+#endif // __COIN_SOGTK__
 
   @WIDGET@ listwidget;
 
