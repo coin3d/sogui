@@ -21,8 +21,6 @@
  *
 \**************************************************************************/
 
-// $Id$
-
 #ifndef SO@GUI@PLANEVIEWER_H
 #define SO@GUI@PLANEVIEWER_H
 
@@ -80,17 +78,12 @@ private:
 
 //// FIXME!: merge the remaining So*PlaneViewer definitions. 20020111 mortene.
 
-#ifdef __COIN_SOGTK__
-private:
-  void constructor(const SbBool build);
-#endif // ! __COIN_SOGTK__
-
 #ifdef __COIN_SOWIN__
 protected:
   virtual LRESULT onCommand(HWND window,UINT message,
                             WPARAM wparam, LPARAM lparam);
   virtual void buildViewerButtonsEx(HWND parent, int x, int y, int size);  
-#endif // ! __COIN_SOWIN__
+#endif // !__COIN_SOWIN__
 };
 
-#endif // ! SO@GUI@PLANEVIEWER_H
+#endif // !SO@GUI@PLANEVIEWER_H
