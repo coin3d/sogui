@@ -72,6 +72,9 @@ public:
   void setQuadBufferStereo(const SbBool enable);
   SbBool isQuadBufferStereo(void) const;
 
+  void setOverlayPlanes(const SbBool onoff);
+  SbBool isOverlayPlanes(void) const;
+
   @WIDGET@ getNormalWidget(void) const;
   @WIDGET@ getOverlayWidget(void) const;
 
