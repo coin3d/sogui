@@ -103,6 +103,12 @@ public:
   static FatalErrorCB * setFatalErrorHandler(So@Gui@::FatalErrorCB * cb,
                                              void * userdata);
 
+protected:
+  static SbBool isDebugLibrary(void);
+  static SbBool isCompatible(unsigned int major, unsigned int minor);
+  static So@Gui@ABIType getABIType(void);
+  static void abort(So@Gui@ABIError error);
+
 private:
   // Since the class consists solely of static functions, hide the
   // default constructor and the destructor so nobody can instantiate
@@ -166,11 +172,6 @@ public:
 
 protected:
   friend class SoWinP;
-
-  static SbBool isDebugLibrary(void);
-  static SbBool isCompatible(unsigned int major, unsigned int minor);
-  static SoWinABIType getABIType(void);
-  static void abort(SoWinABIError error);
 
   static void registerWindowClass(const char * const className);
   static void unRegisterWindowClass(const char * const className);

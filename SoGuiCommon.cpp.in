@@ -226,3 +226,98 @@ So@Gui@::setFatalErrorHandler(So@Gui@::FatalErrorCB * cb, void * userdata)
 }
 
 // *************************************************************************
+
+/*!
+  Returns \c TRUE if this binary version of the So@Gui@ library was
+  compiled with debug settings on.
+
+  This method was not part of the original SGI InventorXt library, but
+  is an extension specific to the Coin project.
+*/
+SbBool
+So@Gui@::isDebugLibrary(void)
+{
+  return SO@GUI@_DEBUG != 0 ? TRUE : FALSE;
+}
+
+/*!
+  Returns \c TRUE if this version of the So@Gui@ library has an
+  Application Binary Interface compatible with the given version.
+
+  This method was not part of the original SGI InventorXt library, but
+  is an extension specific to the Coin project.
+*/
+SbBool
+So@Gui@::isCompatible(unsigned int major, unsigned int minor)
+{
+  if (major != SO@GUI@_MAJOR_VERSION) { return FALSE; }
+  if (minor > SO@GUI@_MINOR_VERSION) { return FALSE; }
+  return TRUE;
+}
+
+/*!
+  Returns an indication on how the library was compiled: as a dynamic
+  library, or as a static library.
+
+  This method was not part of the original SGI InventorXt library, but
+  is an extension specific to the Coin project.
+*/
+So@Gui@ABIType
+So@Gui@::getABIType(void)
+{
+  // FIXME: replace this ugly shit with a configure-check to test if
+  // we're on a DLL-capable platform. 20020118 mortene.
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#ifdef SO@GUI@_MAKE_DLL
+  return SO@GUI@_DLL_ABI;
+#else
+  return SO@GUI@_LIB_ABI;
+#endif
+#endif
+  return SO@GUI@_UNKNOWN_ABI;
+}
+
+/*!
+  Abort the application due to some kind of mismatch in the ABI
+  settings / configuration. This should hopefully help application
+  programmers avoid shooting themselves in the foot by controlling
+  certain run-time parameters in the client application versus what is
+  expected by the So@Gui@ library.
+
+  If you're an application programmer, it is very likely that you only
+  need to consider this an internal library method.
+
+  This method was not part of the original SGI InventorXt library, but
+  is an extension specific to the Coin project.
+*/
+void
+So@Gui@::abort(So@Gui@ABIError error)
+{
+  switch (error) {
+  case SO@GUI@_LINKTIME_MISMATCH:
+    So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
+                                     "Detected linktime mismatch error.");
+    break;
+
+  case SO@GUI@_LINKSTYLE_MISMATCH:
+    So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
+                                     "Detected linkstyle mismatch error (DLL vs. LIB).");
+    break;
+
+  case SO@GUI@_RUNTIME_MISMATCH:
+    So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
+                                     "Detected runtime mismatch error (versioning and ABI compatibility).");
+    break;
+
+  default:
+    // FIXME: shouldn't this rather be an assert? 20020118 mortene.
+    So@Gui@::createSimpleErrorDialog(NULL, "Fatal Error",
+                                     "Unknown error in So@Gui@ :(");
+    break;
+  }
+
+  // FIXME: call fatal error handler in SoAny. 20020118 mortene.
+  exit(-1);
+}
+
+// *************************************************************************
