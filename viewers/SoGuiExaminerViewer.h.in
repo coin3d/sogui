@@ -228,10 +228,6 @@ private:
 
 
 #ifdef __COIN_SOGTK__
-protected:
-  virtual void leftWheelStart(void);
-  virtual void bottomWheelStart(void);
-
 private:
   void constructor(const SbBool build);
   void setCursorRepresentation(int mode);
@@ -242,9 +238,6 @@ private:
 #endif // ! __COIN_SOGTK__
 
 #ifdef __COIN_SOXT__
-  virtual void leftWheelStart(void);
-  virtual void bottomWheelStart(void);
-
   void camerabuttonClicked(void);
   static void camerabuttonCB(Widget, XtPointer, XtPointer);
 
