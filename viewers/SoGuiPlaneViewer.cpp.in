@@ -69,6 +69,18 @@
   it's focal point to point along the selected axis (towards negative
   infinity).
 
+  The So@Gui@PlaneViewer also provides a user decoration's button for
+  toggling between orthographic or perspective camera view volumes and
+  projection methods. This is the bottom-most click button on the
+  right decoration border.
+
+  It also inherits the decoration buttons from the So@Gui@FullViewer:
+  the arrow for switching to "scenegraph interaction" mode, the hand
+  for setting back to "camera interaction" mode, the house for "reset
+  camera to home position", the blueprint house for "set new camera
+  home position", the eye for "zoom camera out to view full scene" and
+  the flashlight for setting "click to seek" mode.
+
   Note that a common faulty assumption about all the viewer-classes is
   that user interaction (in the "examine"-mode, not the
   scenegraph-interaction mode) influences the model or 3D-scene in the

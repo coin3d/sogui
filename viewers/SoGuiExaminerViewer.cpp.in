@@ -34,16 +34,71 @@
   \ingroup components viewers
 
   This class is the viewer considered to be the most "general purpose"
-  viewer, and it is often used in rapid prototyping to examine models
-  and full scene.
+  viewer, and it is often used in rapid prototyping to examine simple
+  models aswell as complete scenes (although for the latter, you might
+  be better off with one of the other viewer classes).
 
   <center>
   <img src="http://doc.coin3d.org/images/SoLibs/viewers/examinerviewer.png">
   </center>
 
-  It has a convenient interface for repositioning and reorientation of
-  the camera, for panning, rotating and zooming it's position. The
-  following controls can be used:
+  Here is a complete, stand-alone example that shows how to set up an
+  So@Gui@ExaminerViewer as a model viewer that loads Inventor and VRML
+  files from disk and places them inside the viewer for the end-user
+  to examine:
+
+  \code
+  #include <Inventor/@Gui@/So@Gui@.h>
+  #include <Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h>
+  #include <Inventor/nodes/SoBaseColor.h>
+  #include <Inventor/nodes/SoCone.h>
+  #include <Inventor/nodes/SoSeparator.h>
+  
+  int
+  main(int argc, char ** argv)
+  {
+    if (argc < 2) {
+      (void)fprintf(stderr, "\n\n\tUsage: %s <modelfilename>\n\n",
+                    argc > 0 ? argv[0] : "viewerapp");
+      exit(1);
+    }
+  
+    // Initialize So@Gui@ and Inventor API libraries. This returns a main
+    // window to use.
+    @WIDGET@ mainwin = So@Gui@::init(argc, argv, argv[0]);
+  
+    // Open the argument file..
+    SoInput in;
+    SbBool ok = in.openFile(argv[1]);
+    if (!ok) { exit(1); }
+  
+    // ..and import it.
+    SoSeparator * root = SoDB::readAll(&in);
+    if (root == NULL) { exit(1); }
+    root->ref();
+  
+    // Use the ExaminerViewer, for a nice interface for 3D model
+    // inspection.
+    So@Gui@ExaminerViewer * viewer = new So@Gui@ExaminerViewer(mainwin);
+    viewer->setSceneGraph(root);
+    viewer->show();
+  
+    // Pop up the main window.
+    So@Gui@::show(mainwin);
+    // Loop until exit.
+    So@Gui@::mainLoop();
+  
+    // Clean up resources.
+    delete viewer;
+    root->unref();
+  
+    return 0;
+  }
+  \endcode
+
+  So@Gui@ExaminerViewer has a convenient interface for repositioning
+  and reorientation of the camera, by panning, rotating and zooming
+  it's position. The following controls can be used:
 
   <ul>
 
@@ -54,30 +109,42 @@
   <li>hold middle mousebutton to pan (or a CTRL-key plus left
   mousebutton, or a SHIFT-key plus left mousebutton)</li>
 
-  <li>hold down CTRL + middle mousebutton to zoom / dolly (or CTRL +
-  SHIFT + the left mousebutton)</li>
+  <li>hold down left + middle mousebutton to zoom / dolly, or CTRL +
+  middle mousebutton, or CTRL + SHIFT + the left mousebutton</li>
 
   <li>click 's', then pick with the left mousebutton to seek</li>
 
-  <li>right mousebutton open the popup menu</li>
+  <li>right mousebutton opens the popup menu</li>
 
-  <li>click 'ESC' key to switch to and from 'view' mode and
-  'scenegraph interaction' mode (see setViewing() documentation)</li>
+  <li>click 'ESC' key to switch to and from 'camera interaction' mode
+  and 'scenegraph interaction' mode (see setViewing()
+  documentation)</li>
 
   <li>hold down the 'ALT' key to temporary toggle from
   camera-interaction mode to scenegraph-interaction mode</li>
 
   </ul>
 
-  The EV provides a user decoration's button for toggling between
-  orthographic or perspective camera view volumes and projection
-  methods. This is the bottom-most click button on the right
-  decoration border.
+  The So@Gui@ExaminerViewer provides a user decoration's button for
+  toggling between orthographic or perspective camera view volumes and
+  projection methods. This is the bottom-most click button on the
+  right decoration border.
 
-  FIXME: more doc
-  ...viewer modes (examine vs interact) w/ explanation of what they are
-  useful for...
-  ...example code...
+  It also inherits the decoration buttons from the So@Gui@FullViewer:
+  the arrow for switching to "scenegraph interaction" mode, the hand
+  for setting back to "camera interaction" mode, the house for "reset
+  camera to home position", the blueprint house for "set new camera
+  home position", the eye for "zoom camera out to view full scene" and
+  the flashlight for setting "click to seek" mode.
+
+  Note that a common faulty assumption about all the viewer-classes is
+  that user interaction (in the "examine"-mode, not the
+  scenegraph-interaction mode) influences the model or 3D-scene in the
+  view. This is not correct, as it is always the viewer's \e camera
+  that is translated and rotated.
+
+  The initial position of the camera is placed such that all of the
+  scenegraph's geometry fits within it's view.
 
   \sa So@Gui@WalkViewer, So@Gui@FlyViewer, So@Gui@PlaneViewer
 */
