@@ -1986,11 +1986,17 @@ So@Gui@Viewer::actualRedraw(void)
     SbRotation rot(cameradir, dir);
     camera->orientation = camerarot * rot;
     if (quadstereo) {
-      glDrawBuffer(GL_BACK_LEFT);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK_LEFT);
+			else
+				glDrawBuffer(GL_FRONT_LEFT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else { // red/cyan
-      glDrawBuffer(GL_BACK);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK);
+			else
+				glDrawBuffer(GL_FRONT);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
       PRIVATE(this)->reallyRedraw(FALSE, FALSE);
@@ -2003,7 +2009,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation = camerarot * rot;
 
     if (quadstereo) {
-      glDrawBuffer(GL_BACK_RIGHT);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK_RIGHT);
+			else
+				glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
     }
     else {
@@ -2018,7 +2027,10 @@ So@Gui@Viewer::actualRedraw(void)
     camera->orientation.enableNotify(orientationstore);
     camera->enableNotify(notifystore);
     if (quadstereo) {
-      glDrawBuffer(GL_BACK);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK);
+			else
+				glDrawBuffer(GL_FRONT);
     }
     else {
       glColorMask(1,1,1,1); // restore GL color mask
@@ -2026,8 +2038,11 @@ So@Gui@Viewer::actualRedraw(void)
 #else // HAVE_SOCAMERA_SETSTEREOMODE
 
     if (!quadstereo) {
-      SoCamera * camera = this->getCamera();  
-      glDrawBuffer(GL_BACK);
+      SoCamera * camera = this->getCamera();
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK);
+			else
+				glDrawBuffer(GL_FRONT);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(1,0,0,1); // draw red-only
       camera->setStereoAdjustment(this->getStereoOffset());
@@ -2041,16 +2056,25 @@ So@Gui@Viewer::actualRedraw(void)
       glColorMask(1,1,1,1); // restore GL color mask
     }
     else {
-      SoCamera * camera = this->getCamera();  
-      glDrawBuffer(GL_BACK_LEFT);
+      SoCamera * camera = this->getCamera();
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK_LEFT);
+			else
+				glDrawBuffer(GL_FRONT_LEFT);
       camera->setStereoAdjustment(this->getStereoOffset());
       camera->setStereoMode(SoCamera::LEFT_VIEW);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::RIGHT_VIEW);
-      glDrawBuffer(GL_BACK_RIGHT);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK_RIGHT);
+			else
+				glDrawBuffer(GL_FRONT_RIGHT);
       PRIVATE(this)->reallyRedraw(clearcol);
       camera->setStereoMode(SoCamera::MONOSCOPIC);
-      glDrawBuffer(GL_BACK);
+			if (this->isDoubleBuffer())
+				glDrawBuffer(GL_BACK);
+			else
+				glDrawBuffer(GL_FRONT);
     }
 #endif // HAVE_SOCAMERA_SETSTEREOMODE
   }
