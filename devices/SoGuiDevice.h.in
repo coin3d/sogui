@@ -31,6 +31,8 @@ class SoEvent;
 
 // *************************************************************************
 
+// Toolkit-specific typedef and include(s).
+
 #ifdef __COIN_SOQT__
 #include <qevent.h>
 typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
@@ -39,6 +41,10 @@ typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
 #include <X11/Intrinsic.h>
 typedef void So@Gui@EventHandler(@WIDGET@, XtPointer, XEvent *, Boolean *);
 #endif // __COIN_SOXT__
+#ifdef __COIN_SOGTK__
+#include <gtk/gtk.h>
+typedef gint So@Gui@EventHandler(@WIDGET@, @EVENT@, gpointer);
+#endif // __COIN_SOGTK__
 
 // *************************************************************************
 
