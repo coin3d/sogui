@@ -1,0 +1,189 @@
+/**************************************************************************
+ *
+ *  Copyright (C) 1999-2000 by Systems in Motion.  All rights reserved.
+ *
+ *  This file is part of the Coin library.
+ *
+ *  This file may be distributed under the terms of the Q Public License
+ *  as defined by Troll Tech AS of Norway and appearing in the file
+ *  LICENSE.QPL included in the packaging of this file.
+ *
+ *  If you want to use Coin in applications not covered by licenses
+ *  compatible with the QPL, you can contact SIM to aquire a
+ *  Professional Edition license for Coin.
+ *
+ *  Systems in Motion AS, Prof. Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ sales@sim.no Voice: +47 22114160 Fax: +47 67172912
+ *
+ **************************************************************************/
+
+static const char rcsid[] =
+  "$Id$";
+
+#include <assert.h>
+
+#include <Inventor/@GUI@/widgets/So@GUI@PopupMenu.h>
+
+#include <Inventor/@GUI@/widgets/SoAnyPopupMenu.h>
+
+/*!
+  \class SoAnyPopupMenu
+  This class is just a common interface for the popup menu classes in the
+  various GUI toolkits.  It just forwards calls.  The point of it is to
+  enable client code to be exactly the same for all GUI libraries, even
+  without being template-based.
+*/
+
+// *************************************************************************
+
+SoAnyPopupMenu::SoAnyPopupMenu(
+  void )
+{
+  this->menu = new So@GUI@PopupMenu( this );
+  assert( this->menu != NULL );
+} // SoAnyPopupMenu()
+
+SoAnyPopupMenu::~SoAnyPopupMenu(
+  void )
+{
+  delete this->menu;
+} // ~SoAnyPopupMenu()
+
+// *************************************************************************
+
+int
+SoAnyPopupMenu::NewMenu(
+  char * name,
+  int menuid )
+{
+  this->menu->NewMenu( name, menuid );
+} // NewMenu()
+
+int
+SoAnyPopupMenu::GetMenu(
+  char * name )
+{
+  this->menu->GetMenu( name );
+} // GetMenu()
+
+void
+SoAnyPopupMenu::SetMenuTitle(
+  int menuid,
+  char * title )
+{
+  this->menu->SetMenuTitle( menuid, title );
+} // SetMenuTitle()
+
+char *
+SoAnyPopupMenu::GetMenuTitle(
+  int menuid )
+{
+  return this->menu->GetMenuTitle( menuid );
+} // GetMenuTitle()
+
+// *************************************************************************
+
+int
+SoAnyPopupMenu::NewMenuItem(
+  char * name, int itemid )
+{
+  this->menu->NewMenuItem( name, itemid );
+} // NewMenuItem()
+
+int
+SoAnyPopupMenu::GetMenuItem(
+  char * name )
+{
+  return this->menu->GetMenuItem( name );
+} // GetMenuItem()
+
+void
+SoAnyPopupMenu::SetMenuItemTitle(
+  int itemid,
+  char * title )
+{
+  this->menu->SetMenuItemTitle( itemid, title );
+} // SetMenuItemTitle()
+
+char *
+SoAnyPopupMenu::GetMenuItemTitle(
+  int itemid )
+{
+  return this->menu->GetMenuItemTitle( itemid );
+} // GetMenuItemTitle()
+
+void
+SoAnyPopupMenu::SetMenuItemEnabled(
+  int itemid,
+  SbBool enabled )
+{
+  this->menu->SetMenuItemEnabled( itemid, enabled );
+} // SetMenuItemEnabled()
+
+SbBool
+SoAnyPopupMenu::GetMenuItemEnabled(
+  int itemid )
+{
+  return this->menu->GetMenuItemEnabled( itemid );
+} // GetMenuItemEnabled()
+
+void
+SoAnyPopupMenu::SetMenuItemMarked(
+  int itemid,
+  SbBool marked )
+{
+  this->menu->SetMenuItemMarked( itemid, marked );
+} // SetMenuItemEnabled()
+
+SbBool
+SoAnyPopupMenu::GetMenuItemMarked(
+  int itemid )
+{
+  return this->menu->GetMenuItemMarked( itemid );
+} // GetMenuItemMarked()
+
+// *************************************************************************
+
+void
+SoAnyPopupMenu::AddMenu(
+  int menuid,
+  int submenuid,
+  int pos )
+{
+  this->menu->AddMenu( menuid, submenuid, pos );
+} // AddMenu()
+
+void
+SoAnyPopupMenu::AddMenuItem(
+  int menuid,
+  int itemid,
+  int pos )
+{
+  this->menu->AddMenuItem( menuid, itemid, pos );
+} // AddMenuItem()
+
+void
+SoAnyPopupMenu::RemoveMenu(
+  int menuid )
+{
+  this->menu->RemoveMenu( menuid );
+} // RemoveMenu()
+
+void
+SoAnyPopupMenu::RemoveMenuItem(
+  int itemid )
+{
+  this->menu->RemoveMenuItem( itemid );
+} // RemoveMenuItem()
+
+// *************************************************************************
+
+int
+SoAnyPopupMenu::PopUp(
+  int screenx,
+  int screeny )
+{
+  this->menu->PopUp( screenx, screeny );
+} // PopUp()
+
+// *************************************************************************
