@@ -1,0 +1,92 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+/*!
+  \class So@Gui@Cursor
+  \brief The So@Gui@Cursor class is used to set cursord for GUI components.
+  \ingroup common
+
+*/
+
+/*!
+  \enum So@Gui@Component::Shape
+  For enumerating built-in shape types.
+*/
+
+
+/*!
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::DEFAULT,
+  The Window system's default cursor.
+*/
+
+/*!
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::WAIT,
+  A busy cursor.
+*/
+
+/*!
+  \var So@Gui@Cursor::Shape So@Cui@Cursor::CUSTUM_BITMAP,
+  A custom cursor.
+*/
+
+
+#include <Inventor/@Gui@/So@Gui@Cursor.h>
+
+/*!
+  Default constructor. Creates a default cursor.
+*/
+So@Gui@Cursor::So@Gui@Cursor(void)
+  : shape(DEFAULT)
+{
+}
+
+/*!
+  Constructor with Shape argument.
+*/
+So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
+  : shape(shape)
+{ 
+}
+
+/*!
+  Destructor
+*/
+So@Gui@Cursor::~So@Gui@Cursor()
+{
+}
+
+/*!
+  Returns the shape type. If the cursor has been set to a bitmap,
+  CUSTOM_BITMAP is returned..
+*/
+So@Gui@Cursor::Shape 
+So@Gui@Cursor::getShape(void) const
+{
+  return this->shape;
+}
+
+/*!
+  Sets the cursor to a predefined shape.
+*/
+void 
+So@Gui@Cursor::setShape(const Shape shape)
+{
+  this->shape = shape;
+}

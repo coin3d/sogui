@@ -44,6 +44,7 @@ class QWidget;
 
 
 class So@Gui@Component;
+class So@Gui@Cursor;
 
 typedef void So@Gui@ComponentCB(void * user, So@Gui@Component * component);
 typedef void So@Gui@ComponentVisibilityCB(void * user, SbBool visible);
@@ -59,6 +60,11 @@ public:
 
   virtual void show(void);
   virtual void hide(void);
+
+#ifdef __COIN_SOQT__
+  void setCursor(const So@Gui@Cursor & cursor);
+  const So@Gui@Cursor & getCursor(void) const;
+#endif // __COIN_SOQT__
 
   SbBool isFullScreen(void) const;
   SbBool setFullScreen(const SbBool onoff);

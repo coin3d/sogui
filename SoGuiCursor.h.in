@@ -1,0 +1,48 @@
+/**************************************************************************
+ *
+ *  This file is part of the Coin GUI binding libraries.
+ *  Copyright (C) 1998-2001 by Systems in Motion.  All rights reserved.
+ *
+ *  The libraries this file is part of is free software; you can
+ *  redistribute them and/or modify them under the terms of the GNU
+ *  Lesser General Public License version 2.1 as published by the
+ *  Free Software Foundation.  See the file LICENSE.LGPL at the root
+ *  directory of the distribution for all the details.
+ *
+ *  If you want to use the Coin GUI binding libraries for applications
+ *  not compatible with the LGPL, contact SIM about acquiring a
+ *  Professional Edition License.
+ *
+ *  Systems in Motion, Prof Brochs gate 6, N-7030 Trondheim, NORWAY
+ *  http://www.sim.no/ support@sim.no Voice: +47 22114160 Fax: +47 22207097
+ *
+ **************************************************************************/
+
+#ifndef SO@GUI@_CURSOR_H
+#define SO@GUI@_CURSOR_H
+
+class So@Gui@Cursor {
+public:
+
+  enum Shape {
+    // FIXME: add more shapes
+    DEFAULT,
+    BUSY,
+    CUSTOM_BITMAP
+  };
+  
+  So@Gui@Cursor(void);
+  So@Gui@Cursor(const Shape shape);
+  ~So@Gui@Cursor();
+
+  // FIXME 2001-11-19, peder. It should be possible to set custom
+  // bitmaps as cursors
+
+  Shape getShape(void) const;
+  void setShape(const Shape shape);
+  
+private:
+  Shape shape;
+};
+
+#endif // ! SO@GUI@_CURSOR_H
