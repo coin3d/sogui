@@ -27,7 +27,10 @@
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
+#include <Inventor/@Gui@/nodes/SoGuiImage.h>
 #include <Inventor/@Gui@/nodes/SoGuiSceneTexture2.h>
+#include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
+
 #include <Inventor/@Gui@/nodes/SoGuiMaterialEditor.h>
 
 // *************************************************************************
@@ -37,6 +40,14 @@ public:
   MaterialEditor(void);
 
   SoGuiMaterialEditor * api;
+
+  SoMaterial * material;
+  SoGuiSlider1 * slider1;
+  SoGuiSlider1 * slider2;
+  SoGuiSlider1 * slider3;
+  SoGuiSlider1 * slider4;
+  SoGuiSlider1 * slider5;
+  SoGuiSlider1 * slider6;
 
   static const char * texturescene[];
   static const char * editorscene[];
@@ -78,25 +89,56 @@ SoGuiMaterialEditor::SoGuiMaterialEditor(void)
   assert(scene->isOfType(SoGuiPane::getClassTypeId()));
   scene->ref();
 
-  SoGuiSceneTexture2 * spheretexture =
-    (SoGuiSceneTexture2 *) SoAny::scanSceneForName(scene, "spheretexture");
-  assert(spheretexture != NULL);
-
-  // initialize sliders
-
+  SoGuiImage * sphereimage =
+    (SoGuiImage *) SoAny::scanSceneForName(scene, "image");
+  assert(sphereimage != NULL);
   scene->unrefNoDelete();
-  this->setAnyPart("root", scene);
+  SbBool ok = this->setAnyPart("root", scene);
+  assert(ok);
 
-  SoNode * texturescene = SoAny::loadSceneGraph(MaterialEditor::texturescene);
-  assert(texturescene != NULL);
-  texturescene->ref();
-  SoMaterial * material = (SoMaterial *) SoAny::scanSceneForName(texturescene, "material");
-  assert(material);
+  PRIVATE(this)->slider1 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider1");
+  PRIVATE(this)->slider2 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider2");
+  PRIVATE(this)->slider3 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider3");
+  PRIVATE(this)->slider4 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider4");
+  PRIVATE(this)->slider5 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider5");
+  PRIVATE(this)->slider6 = (SoGuiSlider1 *) SoAny::scanSceneForName(scene, "slider6");
+  assert(PRIVATE(this)->slider1);
+  assert(PRIVATE(this)->slider2);
+  assert(PRIVATE(this)->slider3);
+  assert(PRIVATE(this)->slider4);
+  assert(PRIVATE(this)->slider5);
+  assert(PRIVATE(this)->slider6);
+  PRIVATE(this)->slider1->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
+  PRIVATE(this)->slider2->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
+  PRIVATE(this)->slider3->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
+  PRIVATE(this)->slider4->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
+  PRIVATE(this)->slider5->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
+  PRIVATE(this)->slider6->setSurfaceColor(SbColor(0,0,0), SbColor(1,1,1));
 
-  spheretexture->scene.setValue(texturescene);
+  SoNode * textureroot = SoAny::loadSceneGraph(MaterialEditor::texturescene);
+  assert(textureroot != NULL);
+  assert(textureroot->isOfType(SoSeparator::getClassTypeId()));
+  SoNode * texture = ((SoSeparator *) textureroot)->getChild(0);
+  assert(texture != NULL);
+  assert(texture->isOfType(SoGuiSceneTexture2::getClassTypeId()));
 
-  texturescene->unrefNoDelete();
+  SoNode * subscene = ((SoGuiSceneTexture2 *) texture)->scene.getValue();
+  assert(subscene);
+  subscene->ref();
+  PRIVATE(this)->material = (SoMaterial *) SoAny::scanSceneForName(subscene, "material");
+  subscene->unrefNoDelete();
+  assert(PRIVATE(this)->material);
 
+  ok = sphereimage->setPart("texture", texture);
+  assert(ok);
+
+  PRIVATE(this)->slider5->value.connectFrom(&(PRIVATE(this)->material->shininess));
+  PRIVATE(this)->slider5->value.getValue();
+  PRIVATE(this)->material->shininess.connectFrom(&(PRIVATE(this)->slider5->value));
+
+  PRIVATE(this)->slider6->value.connectFrom(&(PRIVATE(this)->material->transparency));
+  PRIVATE(this)->slider6->value.getValue();
+  PRIVATE(this)->material->transparency.connectFrom(&(PRIVATE(this)->slider6->value));
   // sensors
 }
 
@@ -129,59 +171,38 @@ MaterialEditor::texturescene[] =
 {
   "#Inventor V2.1 ascii",
   "",
-  "Separator {",
-  "  OrthographicCamera {",
-  "    position 0 0 2",
-  "    nearDistance 1",
-  "    farDistance 3",
-  "    height 2",
-  "  }",
-  "  LightModel {",
-  "    model BASE_COLOR",
-  "  }",
-  "  BaseColor {",
-  "    rgb [",
-  "      0.3 0.3 0.3,",
-  "      0.6 0.6 0.6,",
-  "      0.6 0.6 0.6,",
-  "      0.3 0.3 0.3",
-  "    ]",
-  "  }",
-  "  MaterialBinding {",
-  "    value PER_FACE",
-  "  }",
-  "  Coordinate3 {",
-  "    point [",
-  "      -3  3  0,",
-  "       0  3  0,",
-  "       3  3  0,",
-  "      -3  0  0,",
-  "       0  0  0,",
-  "       3  0  0,",
-  "      -3 -3  0,",
-  "       0 -3  0,",
-  "       3 -3  0",
-  "    ]",
-  "  }",
-  "  QuadMesh {",
-  "    verticesPerColumn 3",
-  "    verticesPerRow 3",
-  "  }",
-  "  LightModel {",
-  "    model PHONG",
-  "  }",
-  "  DirectionalLight {",
-  "    direction 0.556 -0.623 -0.551",
-  "  }",
-  "  DirectionalLight {",
-  "    direction -0.556 -0.623 -0.551",
-  "  }",
-  "  DEF material Material { }",
-  "  Complexity {",
-  "    value 0.8",
-  "  }",
-  "  Sphere {",
-  "    radius 0.85",
+  "SoGuiSceneTexture2 {",
+  "  scene",
+  "    Separator {",
+  "      OrthographicCamera {",
+  "        position 0 0 2",
+  "        nearDistance 1",
+  "        farDistance 3",
+  "        height 2",
+  "      }",
+  "      LightModel { model BASE_COLOR }",
+  "      BaseColor {",
+  "        rgb [ 0.3 0.3 0.3,  0.6 0.6 0.6,  0.6 0.6 0.6,  0.3 0.3 0.3 ]",
+  "      }",
+  "      MaterialBinding { value PER_FACE }",
+  "      Coordinate3 {",
+  "        point [",
+  "          -3  3  0,  0  3  0,  3  3  0,",
+  "          -3  0  0,  0  0  0,  3  0  0,",
+  "          -3 -3  0,  0 -3  0,  3 -3  0",
+  "        ]",
+  "      }",
+  "      QuadMesh {",
+  "        verticesPerColumn 3",
+  "        verticesPerRow 3",
+  "      }",
+  "      LightModel { model PHONG }",
+  "      DirectionalLight { direction  0.556 -0.623 -0.551 }",
+  "      DirectionalLight { direction -0.556 -0.623 -0.551 }",
+  "      DEF material Material { }",
+  "      Complexity { value 0.8 }",
+  "      Sphere { radius 0.85 }",
+  "    }",
   "  }",
   "}",
   NULL
@@ -194,61 +215,202 @@ MaterialEditor::editorscene[] =
   "",
   "DEF pane SoGuiPane {",
   "  worldSize 1 1 0",
-  "  objectSize 400 300 0",
-  "  Separator {",
-  "    DEF spheretexture SoGuiSceneTexture2 { }",
-  "    Coordinate3 {",
-  "      point [",
-  "         10  10 0,",
-  "        290  10 0,",
-  "        290 290 0,",
-  "         10 290 0",
-  "      ]",
-  "    }",
-  "    TextureCoordinate2 {",
-  "      point [",
-  "        0 0, 1 0, 1 1, 0 1",
-  "      ]",
-  "    }",
-  "    IndexedFaceSet {",
-  "      coordIndex [",
-  "        0 1 2 -1",
-  "        0 2 3 -1",
-  "      ]",
-  "      textureCoordIndex [",
-  "        0 1 2 -1",
-  "        0 2 3 -1",
-  "      ]",
-  "    }",
-  "  }", // 
+  "  objectSize 550 300 0",
   "  SoGuiPosition {",
-  "    position 300 10 0",
+  "    position 0 0 0",
+  "    = DEF wm Calculator {",
+  "      A 0 0 0 = USE pane.objectSize",
+  "      expression [",
+  "        \"ta = (A[0] / 2 < A[1]) ? (A[0]/2)-20 : A[1]-20\"",
+  "        \"tb = (A[1] - ta) / 2\"",
+  "        \"oA = vec3f(10, tb, 0)\"", // image position
+  "        \"oB = vec3f(ta, ta, 0)\"", // image size
+  "        \"oC = vec3f(ta + 30, A[1] - 20, 0)\"", // radio1 position
+  "        \"oD = vec3f(0, -30, 0)\"", // ratio translation
+  "      ]",
+  "    } . oA",
   "  }",
-  "  DEF button1 SoGuiRadioButton {",
+  "  DEF image SoGuiImage { size 0 0 0 = USE wm.oB }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE image.size",
+  "    design EMBOSS",
+  "    width 2",
+  "    complement TRUE",
+  "  }",
+  "  SoGuiPosition { position 0 0 0 = USE wm.oC }",
+  "  DEF rbutton1 SoGuiRadioButton {",
   "    size 10 10 0",
   "    on FALSE",
-  "    = DEF buttons SoGuiRadioGroup {",
-  "      in0 FALSE = USE button1.on",
-  "      in1 FALSE = DEF button2 SoGuiRadioButton { size 10 10 0 on FALSE = USE buttons.out1 } . on",
-  "      in2 FALSE = DEF button3 SoGuiRadioButton { size 10 10 0 on FALSE = USE buttons.out2 } . on",
+  "    = DEF rbuttons SoGuiRadioGroup {",
+  "      in0 FALSE = USE rbutton1.on",
+  "      in1 FALSE = DEF rbutton2 SoGuiRadioButton { size 10 10 0 on FALSE = USE rbuttons.out1 } . on",
+  "      in2 FALSE = DEF rbutton3 SoGuiRadioButton { size 10 10 0 on FALSE = USE rbuttons.out2 } . on",
+  "      in3 FALSE = DEF rbutton4 SoGuiRadioButton { size 10 10 0 on FALSE = USE rbuttons.out3 } . on",
   "    } . out0",
   "  }",
   "  SoGuiFrame {",
-  "    size 0 0 0 = USE button1.size",
-  "    complement FALSE = USE button1.on",
+  "    size 0 0 0 = USE rbutton1.size",
+  "    width 2",
+  "    complement FALSE = USE rbutton1.on",
   "  }",
-  "  SoGuiPosition { position 300 30 0 }",
-  "  USE button2",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE rbutton2",
   "  SoGuiFrame {",
-  "    size 0 0 0 = USE button2.size",
-  "    complement FALSE = USE button2.on",
+  "    size 0 0 0 = USE rbutton2.size",
+  "    width 2",
+  "    complement FALSE = USE rbutton2.on",
   "  }",
-  "  SoGuiPosition { position 300 50 0 }",
-  "  USE button3",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE rbutton3",
   "  SoGuiFrame {",
-  "    size 0 0 0 = USE button3.size",
-  "    complement FALSE = USE button3.on",
+  "    size 0 0 0 = USE rbutton3.size",
+  "    width 2",
+  "    complement FALSE = USE rbutton3.on",
   "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE rbutton4",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE rbutton4.size",
+  "    width 2",
+  "    complement FALSE = USE rbutton4.on",
+  "  }",
+  "  SoGuiPosition {",
+  "    position 0 0 0",
+  "    = DEF wm2 Calculator {",
+  "      A 0 0 0 = USE pane.objectSize",
+  "      expression [",
+  "        \"ta = (A[0] / 2 < A[1]) ? (A[0]/2)-20 : A[1]-20\"",
+  "        \"oA = vec3f(ta + 60, A[1] - 20, 0)\"",
+  "        \"oB = vec3f(ta + 90, A[1] - 20, 0)\"",
+  "        \"oC = vec3f(ta - 90, 10, 0)\"",
+  "      ]",
+  "    } . oA",
+  "  }",
+  "  DEF tbutton1 SoGuiToggleButton {",
+  "    size 10 10 0"
+  "    on FALSE = USE rbuttons.out0",
+  "  }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE tbutton1.size",
+  "    width 2",
+  "    complement FALSE = USE tbutton1.on",
+  "    design EMBOSS",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF tbutton2 SoGuiToggleButton {",
+  "    size 10 10 0"
+  "    on FALSE = USE rbuttons.out1",
+  "  }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE tbutton2.size",
+  "    width 2",
+  "    complement FALSE = USE tbutton2.on",
+  "    design EMBOSS",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF tbutton3 SoGuiToggleButton {",
+  "    size 10 10 0"
+  "    on FALSE = USE rbuttons.out2",
+  "  }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE tbutton3.size",
+  "    width 2",
+  "    complement FALSE = USE tbutton3.on",
+  "    design EMBOSS",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF tbutton4 SoGuiToggleButton {",
+  "    size 10 10 0"
+  "    on FALSE = USE rbuttons.out3",
+  "  }",
+  "  SoGuiFrame {",
+  "    size 0 0 0 = USE tbutton4.size",
+  "    width 2",
+  "    complement FALSE = USE tbutton4.on",
+  "    design EMBOSS",
+  "  }",
+  "  SoGuiPosition { position 0 0 0 = USE wm2.oB }",
+  "  DEF frame1 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider1 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame1.size",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF frame2 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider2 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame2.size",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF frame3 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider3 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame3.size",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF frame4 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider4 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame4.size",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF frame5 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider5 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame5.size",
+  "  }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  DEF frame6 SoGuiFrame {",
+  "    size 0 0 0 = USE wm2.oC",
+  "    width 2",
+  "    complement TRUE",
+  "    design EMBOSS",
+  "  }",
+  "  DEF slider6 SoGuiSlider1 {",
+  "    size 0 0 0 = USE frame6.size",
+  "  }",
+
+  "  SoGuiPosition { position 0 0 0 = USE pane.objectSize }",
+  "  SoGuiTranslation { translation -30 -20 0 }",
+  "  DEF labelframe SoGuiFrame { size 20 10 0 width 2 design EMBOSS complement TRUE }",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider1.value } . output }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE labelframe",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider2.value } . output }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE labelframe",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider3.value } . output }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE labelframe",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider4.value } . output }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE labelframe",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider5.value } . output }",
+  "  SoGuiTranslation { translation 0 0 0 = USE wm.oD }",
+  "  USE labelframe",
+  "  SoGuiLabel { text \"\" = SoGuiFormat { format \"%4.2f\" float1 0 = USE slider6.value } . output }",
   "}",
   NULL
 };
@@ -256,6 +418,12 @@ MaterialEditor::editorscene[] =
 MaterialEditor::MaterialEditor(void)
 {
   this->api = NULL;
+  this->slider1 = NULL;
+  this->slider2 = NULL;
+  this->slider3 = NULL;
+  this->slider4 = NULL;
+  this->slider5 = NULL;
+  this->slider6 = NULL;
 }
 
 #undef PUBLIC
