@@ -49,7 +49,7 @@ public:
   // use the singleton design pattern for access
   static SoAny * si(void);
 
-  const char * getenv(const char * e);
+  static const char * getenv(const char * e);
 
   void * getSharedGLContext(void * display, void * screen);
   void registerGLContext(void * context, void * display, void * screen);
