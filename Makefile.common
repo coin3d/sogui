@@ -98,7 +98,7 @@ SoGui_src_Inventor_BuiltMetaFiles =
 SoGui_src_Inventor_Gui_BuiltMetaFiles = \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@P.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Object.cpp \
-  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Component.cpp \
+  $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidget.cpp \
   $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@RenderArea.cpp
 
@@ -432,10 +432,10 @@ $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Object.cpp: $(top_builddi
 	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@Object.cpp src/Inventor/@Gui@/So@Gui@Object.h"; \
 	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@Object.cpp src/Inventor/@Gui@/So@Gui@Object.h )
 
-$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@Component.cpp: $(top_builddir)/src/Inventor/@Gui@/So@Gui@Component.h $(top_builddir)/config.status
+$(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp: $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \
-	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@Component.cpp src/Inventor/@Gui@/So@Gui@Component.h"; \
-	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@Component.cpp src/Inventor/@Gui@/So@Gui@Component.h )
+	echo "$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp src/Inventor/@Gui@/So@Gui@ComponentP.h"; \
+	$(MOC) -o src/Inventor/@Gui@/@meta_prefix@So@Gui@ComponentP.cpp `$(UNIX2WINPATH) $(top_srcdir)/src/Inventor/@Gui@/So@Gui@ComponentP.h` )
 
 $(top_builddir)/src/Inventor/@Gui@/@meta_prefix@So@Gui@GLWidget.cpp: $(top_builddir)/src/Inventor/@Gui@/So@Gui@GLWidget.h $(top_builddir)/config.status
 	@( cd $(top_builddir); \

@@ -48,7 +48,6 @@ typedef void So@Gui@ComponentVisibilityCB(void * user, SbBool visible);
 
 class SO@GUI@_DLL_API So@Gui@Component : public So@Gui@Object {
   SO@GUI@_OBJECT_ABSTRACT_HEADER(So@Gui@Component, So@Gui@Object);
-  @COMPONENTHEADER@
 
 public:
   virtual ~So@Gui@Component();
@@ -117,15 +116,6 @@ private:
   friend class So@Gui@ComponentP;
 
   // FIXME: get rid of remaining toolkit specifics below. 20020611 mortene.
-
-#ifdef __COIN_SOQT__
-protected:
-  virtual bool eventFilter(QObject * obj, QEvent * e);
-
-private slots:
-  void widgetClosed(void);
-#endif // __COIN_SOQT__
-
 
 #ifdef __COIN_SOWIN__
 public:
