@@ -2255,10 +2255,14 @@ So@Gui@Viewer::setClippingPlanes(
   // Scene is completely behind us.
   if (farval < SLACK) return;
 
-  // Disallow negative near clipping plane distance, and make sure the
-  // z-buffer depth utilization is kept below a certain threshold.
+
   float farslack = SLACK * farval;
-  nearval = farslack > nearval ? farslack : nearval;
+  
+  if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
+    // Disallow negative near clipping plane distance, and make sure the
+    // z-buffer depth utilization is kept below a certain threshold.
+    nearval = farslack > nearval ? farslack : nearval;
+  }
 
   // Give a bit of slack to avoid artifacts when scene fits exactly
   // inside bounding box.
