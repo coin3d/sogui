@@ -110,8 +110,8 @@ SoGuiClickCounter::SoGuiClickCounter(void)
   surfacefaceset->textureCoordIndex.setValues(0, 8, surfaceindices);
   surfacefaceset->coordIndex.setValues(0, 8, surfaceindices);
 
-  SoMaterial * surfacematerial = SO_GET_ANY_PART(this, "surfaceMaterial", SoMaterial);
-  surfacematerial->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
+  // SoMaterial * surfacematerial = SO_GET_ANY_PART(this, "surfaceMaterial", SoMaterial);
+  // surfacematerial->diffuseColor.setValue(SbColor(0.0f, 0.0f, 0.0f));
 
   this->sizeUpdate();
 
