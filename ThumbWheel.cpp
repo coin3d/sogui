@@ -20,23 +20,61 @@
 static const char rcsid[] =
   "$Id$";
 
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "ThumbWheel.h"
 
+/*!
+  \class ThumbWheel ThumbWheel.h
+  \brief The ThumbWheel class is a helper class for managing thumb wheel
+  GUI widgets.
+  \internal
+*/
+
+/*!
+  \var bool ThumbWheel::dirtyTables
+  If this flag is set, the internal tables needs to be recalculated.
+*/
+
+/*!
+  \var bool ThumbWheel::dirtyVariables
+  If this flag is set, the internal variables that are calculated from the
+  tables and wheel settings need to be recalculated.
+*/
+
+inline
+int
+int8clamp( float f ) {
+  assert( f >= 0.0f );
+  if ( f >= 255.0f )
+    return 255;
+  return (int) floor( f );
+} // int8clamp()
+
 // ************************************************************************
+
+/*!
+  Constructor.
+*/
 
 ThumbWheel::ThumbWheel(
   void )
-: authentic( false )
-, modulate( true )
-, invalid( true )
-, sines( NULL )
-, cosines( NULL )
-, radians( NULL )
-, metrics( NULL )
+: diameter( 0 )
+, width( 0 )
+, byteorder( ABGR )
+, handling( MODULATE )
+, method( AUTHENTIC )
+, dirtyTables( true )
+, dirtyVariables( true )
 {
+  assert( sizeof(int) == 4 && "FIXME: use int32 datatype instead" );
+
+  disabledred = 255;
+  disabledgreen = 255;
+  disabledblue = 255;
+
   red = 180;
   green = 180;
   blue = 220;
@@ -45,34 +83,51 @@ ThumbWheel::ThumbWheel(
   front = 1.2f;
   normal = 1.0f;
   shade = 0.8f;
-  diameter = 0;
-  width = 0;
+
+  for ( int i = 0; i < NUMTABLES; i++ )
+    this->tables[i] = NULL;
+
 } // ThumbWheel()
 
 // ************************************************************************
 
+/*!
+  Destructor.
+*/
+
 ThumbWheel::~ThumbWheel(
   void )
 {
-  if (  this->sines != NULL  ) delete [] this->sines;
-  if ( this->cosines != NULL ) delete [] this->cosines;
-  if ( this->radians != NULL ) delete [] this->radians;
-  if ( this->metrics != NULL ) delete [] this->metrics;
+  for ( int i = 0; i < NUMTABLES; i++ )
+    delete [] this->tables[i];
 } // ~ThumbWheel()
 
 // ************************************************************************
+
+/*!
+*/
 
 void
 ThumbWheel::SetWheelSize(
   int diameter,
   int width )
 {
-  if ( this->diameter != diameter || this->width != width ) {
-    this->diameter = diameter;
-    this->width = width;
-    this->invalid = true;
+  if ( this->diameter != diameter ) {
+    this->dirtyTables = true;
+    this->dirtyVariables = true;
+  } else if ( this->width != width ) {
+    this->dirtyVariables = true; // embossed squares grows...
+  } else {
+    return;
   }
+  this->diameter = diameter;
+  this->width = width;
 } // SetWheelSize()
+
+// ************************************************************************
+
+/*!
+*/
 
 void
 ThumbWheel::GetWheelSize(
@@ -83,19 +138,10 @@ ThumbWheel::GetWheelSize(
   width = this->width;
 } // GetWheelSize()
 
-int
-ThumbWheel::GetDiameter(
-  void ) const
-{
-  return this->diameter;
-} // GetDiameter()
+// ************************************************************************
 
-int
-ThumbWheel::GetWidth(
-  void ) const
-{
-  return this->width;
-} // GetWidth()
+/*!
+*/
 
 void
 ThumbWheel::SetColor(
@@ -108,6 +154,11 @@ ThumbWheel::SetColor(
   this->blue = blue;
 } // SetColor()
 
+// ************************************************************************
+
+/*!
+*/
+
 void
 ThumbWheel::GetColor(
   int & red,
@@ -119,8 +170,13 @@ ThumbWheel::GetColor(
   blue = this->blue;
 } // GetColor()
 
+// ************************************************************************
+
+/*!
+*/
+
 void
-ThumbWheel::SetFactors(
+ThumbWheel::SetColorFactors(
   float light,
   float front,
   float normal,
@@ -130,10 +186,15 @@ ThumbWheel::SetFactors(
   this->front = front;
   this->normal = normal;
   this->shade = shade;
-} // SetFactors()
+} // SetColorFactors()
+
+// ************************************************************************
+
+/*!
+*/
 
 void
-ThumbWheel::GetFactors(
+ThumbWheel::GetColorFactors(
   float & light,
   float & front,
   float & normal,
@@ -143,38 +204,358 @@ ThumbWheel::GetFactors(
   front = this->front;
   normal = this->normal;
   shade = this->shade;
-} // GetFactors()
+} // GetColorFactors()
 
 // ************************************************************************
 
-inline int int8c( float f ) {
-  if ( f >= 256.0 )
-    return 255;
-  return (int) floor( f );
-}
+/*!
+  This method returns the number of bitmaps required to represent all the
+  possible rotations of the thumb wheel.
+*/
+
+int
+ThumbWheel::BitmapsRequired(
+  void ) const
+{
+  return this->width - 4 + 2 + 1;
+} // BitmapsRequired()
+
+// ************************************************************************
 
 /*!
-  This method draws the thumbwheel, using a platform-independent GUIPencil
-  interface object.  Shading/lighting aliasing can still be done better...
+  This method draws thumb wheel bitmap number num.
+*/
+
+void
+ThumbWheel::DrawBitmap(
+  int number,
+  void * bitmap,
+  bool vertical )
+{
+  if ( number == 0 ) {
+    DrawDisabledWheel( number, bitmap, vertical );
+  } else {
+    DrawEnabledWheel( number, bitmap, vertical );
+  }
+}
+
+// ************************************************************************
+
+/*!
+  This method calculates the thumb wheel value based on the users mouse
+  interaction.  origpos and origval is the mouseposition at the moment of
+  pressing the button, and origval is the thumbwheels original value at
+  that point.  deltapos is the number of pixels the mouse has moved since
+  pressing the button.
+  
+  The point in doing it this way is that the thumbwheel can easily be made
+  to behave like an authentic wheel when all of these parameters are known.
+
+  After doing a CalculateValue, you should redraw the wheel if the value has
+  changed (since last time, not compared to origval).
+*/
+
+float
+ThumbWheel::CalculateValue(
+  float origval,
+  int origpos,
+  int deltapos )
+{
+  this->Validate();
+
+//  fprintf( stderr, "calc( %8.4f, %d, %d)\n", origval, origpos, deltapos );
+
+  float diff = 0.0f;
+  switch ( this->method ) {
+  case UNIFORM:
+    diff = this->unistep * deltapos;
+    break;
+  case AUTHENTIC:
+    int newpos = origpos + deltapos;
+    if ( newpos < 0 ) newpos = 0;
+    if ( newpos >= diameter ) newpos = diameter - 1;
+    diff = this->tables[RAD][newpos] - this->tables[RAD][origpos];
+    break;
+  } // switch ( this->method )
+
+  switch ( this->handling ) {
+  case MODULATE:
+    while ( (origval + diff) < 0.0f          ) diff += 2.0f * M_PI;
+    while ( (origval + diff) > (2.0f * M_PI) ) diff -= 2.0f * M_PI;
+    break;
+  case CLAMP:
+    if    ( (origval + diff) < 0.0f          ) diff = 0.0f - origval;
+    if    ( (origval + diff) > (2.0f * M_PI) ) diff = (2.0f * M_PI) - origval;
+    break;
+  case ACCUMULATE:
+    // nothing - just add the difference on top of original value
+    break;
+  } // switch ( this->handling )
+
+  return origval + diff;
+} // CalculateValue()
+
+// ************************************************************************
+
+/*!
+  This method returns the bitmap you need to display to represent a thumb
+  wheel with the given value and active state.
+*/
+
+int
+ThumbWheel::GetBitmapForValue(
+  float value,
+  bool enabled )
+{
+  this->Validate();
+
+  if ( enabled == false )
+    return 0; // only one disabled bitmap in this implementation
+
+//  float numsquares = 
+  float squarerange = (2.0f * M_PI) / (float) numsquares;
+  float normalizedmodval = fmod( value, squarerange ) / squarerange;
+  int bitmap = 1 + (int) floor( normalizedmodval * (float) (this->width - 4 + 2));
+//  return 1 + (squaresize + 2) * fmod( value, (2.0f*M_PI) / numsquares );
+//  fprintf( stderr, "bitmap = %d\n", bitmap );
+  return bitmap;
+} // GetBitmapForValue()
+
+// ************************************************************************
+
+/*!
+  This method sets whether to set up uints in ARGB or BGRA mode before
+  storing them in the 32-bit frame buffer.
+*/
+
+void
+ThumbWheel::SetGraphicsByteOrder(
+  const GraphicsByteOrder byteorder )
+{
+  this->byteorder = byteorder;
+} // SetGraphicsByteOrder()
+
+// ************************************************************************
+
+/*!
+*/
+
+ThumbWheel::GraphicsByteOrder
+ThumbWheel::GetGraphicsByteOrder(
+  void ) const
+{
+  return this->byteorder;
+} // GetGraphicsByteOrder()
+
+// ************************************************************************
+
+/*!
+*/
+
+void
+ThumbWheel::SetWheelMotionMethod(
+  const WheelMotionMethod method )
+{
+  this->method = method;
+} // SetWheelMotionMethod()
+
+// ************************************************************************
+
+/*!
+*/
+
+ThumbWheel::WheelMotionMethod
+ThumbWheel::GetWheelMotionMethod(
+  void ) const
+{
+  return this->method;
+} // GetWheelMotionMethod()
+
+// ************************************************************************
+
+void
+ThumbWheel::SetWheelRangeBoundaryHandling(
+  const WheelRangeBoundaryHandling handling )
+{
+  this->handling = handling;
+} // SetWheelRangeBoundaryHandling()
+
+// ************************************************************************
+
+/*!
+*/
+
+ThumbWheel::WheelRangeBoundaryHandling
+ThumbWheel::GetWheelRangeBoundaryHandling(
+  void ) const
+{
+  return this->handling;
+} // GetWheelRangeBoundaryHandling()
+
+// ************************************************************************
+
+/*!
+  This method validates the ThumbWheel object, recalculating the tables and
+  state variables if necessary.  If object is already valid, no calculations
+  are performed.
+*/
+
+void
+ThumbWheel::Validate( // private
+  void )
+{
+  if ( this->dirtyTables != false ) {
+    assert( this->dirtyVariables != false );
+    for ( int i = 0; i < NUMTABLES; i++ ) {
+      if ( this->tables[i] ) delete [] this->tables[i];
+      this->tables[i] = new float [ this->diameter ];
+    }
+
+    float radius = ((float) this->diameter - 1.0f) / 2.0f;
+    float range = 2.0f * M_PI;
+    float acos0times2 = 2.0f*acos( 0.0f );
+
+    for ( int i = 0; i < this->diameter; i++ ) {
+      if ( (float) i <= radius ) {
+        this->tables[COS][i] = (radius - (float) i) / radius;
+        this->tables[RAD][i] = acos( this->tables[COS][i] );
+      } else {
+        this->tables[COS][i] = ((float) i - radius) / radius;
+        this->tables[RAD][i] = acos0times2 - acos(this->tables[COS][i]);
+      }
+      this->tables[SIN][i] = sqrt( 1.0f - this->tables[COS][i] * this->tables[COS][i] );
+    }
+
+    this->dirtyTables = false;
+  }
+
+  if ( this->dirtyVariables != false ) {
+    assert( this->dirtyTables == false );
+    if ( (this->diameter % 2) == 0)
+      this->unistep = this->tables[RAD][this->diameter/2] -
+                      this->tables[RAD][(this->diameter/2)-1];
+    else
+      this->unistep = (this->tables[RAD][(this->diameter/2)+1] -
+                       this->tables[RAD][(this->diameter/2)-1]) / 2.0f;
+
+    this->squarespacing = 2.0f * this->unistep;
+    this->shadelength = this->unistep; // remove?
+
+    int squares = (int) floor(((2.0f * M_PI) /
+                         ((((float) width - 4.0f) * this->unistep) + this->squarespacing)) + 0.5f);
+    this->numsquares = squares;
+    this->squarelength = ((2.0f * M_PI) / (float) squares) - this->squarespacing;
+
+    this->dirtyVariables = false;
+  }
+} // Validate()
+
+// ************************************************************************
+
+/*!
+  This method draws a wheel that has been disabled from being rotated.
+*/
+
+void
+ThumbWheel::DrawDisabledWheel( // private
+  int number,
+  void * bitmap,
+  bool vertical )
+{
+  assert( number == 0 );
+
+  this->Validate();
+
+  unsigned int * buffer = (unsigned int *) bitmap;
+
+  for ( int j = 0; j < this->diameter; j++ ) {
+    unsigned int light, normal, shade;
+    light  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 1.15f) );
+    normal = (unsigned int) floor(255.0f * this->tables[SIN][j]);
+    shade  = (unsigned int) floor(255.0f * this->tables[SIN][j] * 0.85f);
+    if ( this->byteorder == ABGR ) {
+      // FIXME: use disabledblue / disabledgreen / disabledred;
+      light  =  light |  (light << 8) |  (light << 16);
+      normal = normal | (normal << 8) | (normal << 16);
+      shade  =  shade |  (shade << 8) |  (shade << 16);
+    } else {
+      light  =  (light << 24) |  (light << 16) |  (light << 8);
+      normal = (normal << 24) | (normal << 16) | (normal << 8);
+      shade  =  (shade << 24) |  (shade << 16) |  (shade << 8);
+    }
+    if ( vertical == true ) {
+      buffer[j*this->width] = light;
+      for ( int i = 1; i < (width - 1); i++ )
+        buffer[(j*this->width)+i] = normal;
+      buffer[(j*this->width)+(this->width-1)] = shade;
+    } else {
+      buffer[j] = light;
+      for ( int i = 1; i < (this->width-1); i++ )
+        buffer[j+(i*this->diameter)] = normal;
+      buffer[j+((this->width-1)*this->diameter)] = shade;
+    }
+  }
+} // DrawDisabledWheel()
+
+// ************************************************************************
+
+/*
+  This method draws the thumb wheel.
+  Shading/lighting aliasing can still be done better...
   Can also optimize the drawing to use less computing power...
 */
 
+void
+ThumbWheel::DrawEnabledWheel(
+  int number,
+  void * bitmap,
+  bool vertical )
+{
+  this->Validate();
+
+  int numEnabledBitmaps = this->width - 4 + 2;
+  assert( number > 0 && number <= numEnabledBitmaps );
+
+  float modulo = (2.0f * M_PI) / numsquares;
+  float radian = modulo - (((2.0f * M_PI) / (float) numsquares) * (((float) (number - 1)) / (float) numEnabledBitmaps));
+//  fprintf( stderr, "radoffset = %8.4f\n", radoffset );
+//  DrawDisabledWheel( 0, bitmap, vertical );
+
+  bool newsquare = true;
+  unsigned int * buffer = (unsigned int *) bitmap;
+  for ( int j = 0; j < this->diameter; j++ ) {
+    unsigned int light, normal, shade;
+    light  = (unsigned int) int8clamp( floor(255.0f * this->tables[SIN][j] * 1.15f) );
+    normal = (unsigned int) floor(255.0f * this->tables[SIN][j]);
+    shade  = (unsigned int) floor(255.0f * this->tables[SIN][j] * 0.85f);
+
+    if ( newsquare ) {
+      normal = 0x00000000;
+      newsquare = false;
+    } else {
+      normal = 0x00ffffff;
+    }
+
+    if ( vertical == true ) {
+      for ( int i = 0; i < (this->width); i++ )
+        buffer[(j*this->width)+i] = normal;
+    } else {
+      for ( int i = 0; i < (this->width); i++ )
+        buffer[j+(i*this->diameter)] = normal;
+    }
+ 
+
+
+    if ( j < (this->diameter - 1) ) {
+      radian += this->tables[RAD][j+1] - this->tables[RAD][j];
+      if ( radian > modulo ) {
+        radian = fmod( radian, modulo );
+        newsquare = true;
+      }
+    }
+
+  }
 /*
-void
-ThumbWheel::Draw(
-  GUIPencil * const pencil )
-{
-  Draw( pencil, this->val );
-} // Draw()
-
-void
-ThumbWheel::Draw(
-  GUIPencil * const pencil,
-  float value )
-{
-  pencil->Save();
-  precalc();
-
   enum LineMode {
     LINE_SQUARE,
     LINE_SHADE_ALIAS,
@@ -190,9 +571,9 @@ ThumbWheel::Draw(
   for ( int i = 0; i < this->diameter; i++ ) {
     // bright edges
     float factor = front * sines[i];
-    pencil->SetColor( int8c(factor*red), int8c(factor*green), int8c(factor*blue) );
-    pencil->StrokeLine( 0, i, 1, i );
-    pencil->StrokeLine( width - 1, i, width, i );
+    SetColor( int8c(factor*red), int8c(factor*green), int8c(factor*blue) );
+    StrokeLine( 0, i, 1, i );
+    StrokeLine( width - 1, i, width, i );
 
     // sunken-square pattern
     float pixpos = metrics[i] + fmod( -value, totlen );
@@ -227,193 +608,11 @@ ThumbWheel::Draw(
         mode = LINE_LIGHT;
     }
 
-    pencil->SetColor( int8c(factor*red), int8c(factor*green), int8c(factor*blue) );
-    pencil->StrokeLine( 2, i, this->width - 2, i );
+    SetColor( int8clamp(factor*red), int8clamp(factor*green), int8clamp(factor*blue) );
+    StrokeLine( 2, i, this->width - 2, i );
   }
-  pencil->Restore();
-} // Draw()
 */
+} // DrawEnabledWheel()
 
 // ************************************************************************
 
-void
-ThumbWheel::SetRange(
-  float min,
-  float max )
-{
-  if ( this->min != min || this->max != max ) {
-    this->min = min;
-    this->max = max;
-    this->invalid = true;
-  }
-} // SetRange()
-
-void
-ThumbWheel::GetRange(
-  float & min,
-  float & max ) const
-{
-  min = this->min;
-  max = this->max;
-} // GetRange()
-
-float
-ThumbWheel::GetRangeMin(
-  void ) const
-{
-  return this->min;
-} // GetRangeMin()
-
-float
-ThumbWheel::GetRangeMax(
-  void ) const
-{
-  return this->max;
-} // GetRangeMax()
-
-void
-ThumbWheel::SetValue(
-  float val )
-{
-  this->val = val;
-} // SetValue()
-
-float
-ThumbWheel::GetValue(
-  void ) const
-{
-  return this->val;
-} // GetValue()
-
-void
-ThumbWheel::SetModulate(
-  bool modulate )
-{
-  this->modulate = modulate;
-} // SetModulate()
-
-bool
-ThumbWheel::GetModulate(
-  void ) const
-{
-  return this->modulate;
-} // GetModulate()
-
-void
-ThumbWheel::SetAuthentic(
-  bool authentic )
-{
-  this->authentic = authentic;
-} // SetAuthentic()
-
-bool
-ThumbWheel::GetAuthentic(
-  void ) const
-{
-  return this->authentic;
-} // GetAuthentic()
-
-/*!
-  This method adjusts the thumbwheel value based on the users mouse
-  interaction.  origpos and origval is the mouseposition at the moment of
-  pressing the button, and origval is the thumbwheels original value at
-  that point.  deltapos is the number of pixels the mouse has moved since
-  pressing the button.
-  
-  The point in doing it this way is that the thumbwheel can easily be made
-  to behave like an authentic wheel when all of these parameters are known.
-
-  After doing an Adjust, you should redraw the wheel if the value has
-  changed (since last time, not compared to origval).
-*/
-
-float
-ThumbWheel::Adjust(
-  int origpos,
-  float origval,
-  int deltapos )
-{
-  float diff;
-  if ( authentic == false ) {
-    diff = unistep * deltapos;
-  } else {
-    int newpos = origpos + deltapos;
-    if ( newpos < 0 ) newpos = 0;
-    if ( newpos >= diameter ) newpos = diameter - 1;
-    diff = metrics[newpos] - metrics[origpos];
-  }
-  if ( modulate == true ) {
-    while ( (origval + diff) < min ) diff += (max - min);
-    while ( (origval + diff) > max ) diff -= (max - min);
-  } else {
-    if ( (origval + diff) < min ) diff = min - origval;
-    else if ( (origval + diff) > max ) diff = max - origval;
-  }
-  val = origval + diff;
-  return origval + diff;
-} // Adjust()
-
-// ************************************************************************
-
-void
-ThumbWheel::precalc(
-  void )
-{
-  if ( this->invalid == true ) {
-    if ( this->sines != NULL ) delete [] this->sines;
-    this->sines = new float [this->diameter];
-    if ( this->cosines != NULL ) delete [] this->cosines;
-    this->cosines = new float [this->diameter];
-    if ( this->radians != NULL ) delete [] this->radians;
-    this->radians = new float [this->diameter];
-    if ( this->metrics != NULL ) delete [] this->metrics;
-    this->metrics = new float [this->diameter];
-
-    float radius = (float(this->diameter) - 1.0f) / 2.0f;
-
-    for ( int i = 0; i < this->diameter; i++ ) {
-      if ( float(i) <= radius ) {
-        this->cosines[i] = (radius - float(i)) / radius;
-        this->radians[i] = acos(this->cosines[i]);
-      } else {
-        this->cosines[i] = (float(i) - radius) / radius;
-        this->radians[i] = (2.0f * acos(0.0f)) - acos(this->cosines[i]);
-      }
-      this->sines[i] = sqrt( 1.0f - this->cosines[i] * this->cosines[i] );
-      this->metrics[i] = ((this->max - this->min) / (2.0f*3.1415926535f)) * this->radians[i];
-    }
-
-    if ( (this->diameter % 2) == 0)
-      unistep = metrics[diameter/2] - metrics[(diameter/2)-1];
-    else
-      unistep = (metrics[(diameter/2)+1] - metrics[(diameter/2)-1]) / 2.0f;
-
-    squarespacing = 2.0 * unistep;
-    shadelength = unistep;
-
-    int squares = (int) ((max-min) /
-                         (((float(width)-4.0f) * unistep) + squarespacing));
-    squarelength = ((max-min) / float(squares)) - squarespacing;
-
-    this->invalid = false;
-  }
-} // precalc()
-
-// ************************************************************************
-
-void
-ThumbWheel::dump(
-  void )
-{
-  precalc();
-  printf("dump()\n");
-  printf( "N\tcosine\t\tsine\t\tradian\t\tmetrics\n" );
-  printf( "=\t======\t\t====\t\t======\t\t=======\n" );
-  for ( int i = 0; i < this->diameter; i++ )
-    printf( "%03i\t%f\t%f\t%f\t%f\n", i, this->cosines[i], this->sines[i],
-            this->radians[i], this->metrics[i] );
-  printf( "unistep:  %f\nsquarelength:  %f  spacing: %f\n",
-    this->unistep, this->squarelength, this->squarespacing );
-} // dump()
-
-// ************************************************************************

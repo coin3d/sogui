@@ -29,53 +29,70 @@ public:
   ThumbWheel(void);
   ~ThumbWheel(void);
 
-// visual
-  void SetWheelSize(int diameter, int width);
-  void GetWheelSize(int & diameter, int & width) const;
-  int GetDiameter(void) const;
-  int GetWidth(void) const;
-  void SetColor(int red, int green, int blue);
-  void GetColor(int & red, int & green, int & blue) const;
-  void SetFactors(float light, float front, float normal, float shade);
-  void GetFactors(float & light, float & front, float & normal, float & shade);
+  void SetWheelSize( int diameter, int width );
+  void GetWheelSize( int & diameter, int & width ) const;
 
-//  void Draw(GUIPencil * const pencil);
+  void SetColor( int red, int green, int blue );
+  void GetColor( int & red, int & green, int & blue ) const;
+  void SetColorFactors( float light, float front, float normal, float shade );
+  void GetColorFactors( float & light, float & front, float & normal, float & shade );
 
-// operational
-  void SetRange(float min, float max);
-  void GetRange(float & min, float & max) const;
-  float GetRangeMin(void) const;
-  float GetRangeMax(void) const;
-  void SetValue(float val);
-  float GetValue(void) const;
+  int BitmapsRequired(void) const;
+  void DrawBitmap( int number, void * bitmap, bool vertical );
+  float CalculateValue( float origValue, int origPosition, int deltaPosition );
+  int GetBitmapForValue( float value, bool enabled );
 
-  void SetModulate(bool modulate);
-  bool GetModulate(void) const;
-  void SetAuthentic(bool authentic);
-  bool GetAuthentic(void) const;
+  enum GraphicsByteOrder {
+    ABGR,
+    RGBA
+  };
 
-  float Adjust(int origpos, float origval, int deltapos);
+  void SetGraphicsByteOrder( const GraphicsByteOrder byteorder );
+  GraphicsByteOrder GetGraphicsByteOrder(void) const;
 
-  void dump(void);
+  enum WheelMotionMethod {
+    UNIFORM,
+    AUTHENTIC
+  };
+
+  void SetWheelMotionMethod( const WheelMotionMethod method );
+  WheelMotionMethod GetWheelMotionMethod(void) const;
+
+  enum WheelRangeBoundaryHandling {
+    MODULATE,
+    ACCUMULATE,
+    CLAMP
+  };
+
+  void SetWheelRangeBoundaryHandling( const WheelRangeBoundaryHandling handling );
+  WheelRangeBoundaryHandling GetWheelRangeBoundaryHandling(void) const;
 
 private:
   int diameter, width;
+  int disabledred, disabledgreen, disabledblue;
   int red, green, blue;
   float light, front, normal, shade;
 
-  float min, max, val;
-  bool authentic, modulate;
+  GraphicsByteOrder           byteorder;
+  WheelRangeBoundaryHandling  handling;
+  WheelMotionMethod           method;
 
-//  void Draw(GUIPencil * const pencil, float value);
-  
-  void precalc(void);
-  // precalculated tables and values based on pixel offsets into wheel picture
-  float * sines, * cosines, * radians, * metrics;
-  float squarelength; // length of "sunken squares" in wheel
-  float squarespacing; // space between squares (two pixels)
-  float shadelength;
-  float unistep; // uniform steplength
-  bool invalid;
+  void Validate(void);
+
+  enum Tables {
+    SIN,
+    COS,
+    RAD,
+    NUMTABLES
+  };
+
+  float * tables[NUMTABLES];
+  bool dirtyTables;
+  bool dirtyVariables;
+  float squarelength, squarespacing, shadelength, unistep, numsquares;
+
+  void DrawDisabledWheel( int number, void * bitmap, bool vertical );
+  void DrawEnabledWheel( int number, void * bitmap, bool vertical );
 }; // class ThumbWheel
 
 // ************************************************************************
