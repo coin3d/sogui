@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_HELP_XPM
+#define COIN_PIXMAP_HELP_XPM
+
 /* XPM */
 static const char * help_xpm[] = {
 "24 24 234 2",
@@ -259,3 +262,5 @@ static const char * help_xpm[] = {
 ". = ! p.j.@ i.i.D 7+k.k.< V.V.[.d d #+g 5.E.Y . ",
 ". 0.0.= }+X 0+0+0+f f 3+3+>.>.>.>.>.: 1+#.k '.. ",
 ". . . . . . . . . . . . . . . . . . . . . . . . "};
+
+#endif /* !COIN_PIXMAP_HELP_XPM /

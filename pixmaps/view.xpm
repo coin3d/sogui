@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_VIEW_XPM
+#define COIN_PIXMAP_VIEW_XPM
+
 /* XPM */
 static const char * view_xpm[] = {
 "24 24 11 1",
@@ -36,3 +39,5 @@ static const char * view_xpm[] = {
 "       .@$$$@.@$$$@.    ",
 "       .....# #.....    ",
 "                        "};
+
+#endif /* !COIN_PIXMAP_VIEW_XPM */

@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_ORTHO_XPM
+#define COIN_PIXMAP_ORTHO_XPM
+
 /* XPM */
 static const char * ortho_xpm[] = {
 "24 24 15 1",
@@ -40,3 +43,5 @@ static const char * ortho_xpm[] = {
 "                        ",
 "                        ",
 "                        "};
+
+#endif /* !COIN_PIXMAP_ORTHO_XPM */

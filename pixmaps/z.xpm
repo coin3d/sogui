@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_Z_XPM
+#define COIN_PIXMAP_Z_XPM
+
 /* XPM */
 static const char * z_xpm[] = {
 "24 24 131 2",
@@ -156,3 +159,5 @@ static const char * z_xpm[] = {
 ". ^ =.=.=.=.=.h h h h '.+ 4 { g @.9 {.| [.z ^.. ",
 ". ^ ^ =.=.=.=.=.h h h h h |.} } Y &.@.*.v :.f . ",
 ". . . . . . . . . . . . . . . . . . . . . . . . "};
+
+#endif /* !COIN_PIXMAP_Z_XPM */

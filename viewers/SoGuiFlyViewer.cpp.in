@@ -1267,3 +1267,7 @@ So@Gui@FlyViewer::afterRealizeHook(void)
 }
 
 // ************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+

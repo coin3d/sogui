@@ -103,3 +103,7 @@ SoGuiWalkViewerP::elevateCamera(const float delta) const
 #endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+

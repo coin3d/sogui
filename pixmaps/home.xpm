@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_HOME_XPM
+#define COIN_PIXMAP_HOME_XPM
+
 /* XPM */
 static const char * home_xpm[] = {
 "24 24 11 1",
@@ -36,3 +39,5 @@ static const char * home_xpm[] = {
 "                        ",
 "                        ",
 "                        "};
+
+#endif /* !COIN_PIXMAP_HOME_XPM */

@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_Y_XPM
+#define COIN_PIXMAP_Y_XPM
+
 /* XPM */
 static const char * y_xpm[] = {
 "24 24 135 2",
@@ -160,3 +163,5 @@ static const char * y_xpm[] = {
 "              . } } } } } } b.c..               ",
 "              . } } } } } } y d..               ",
 "              . . . . . . . . . .               "};
+
+#endif /* !COIN_PIXMAP_Y_XPM */

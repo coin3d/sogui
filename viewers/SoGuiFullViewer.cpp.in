@@ -1622,3 +1622,7 @@ SoGuiFullViewerP::zoom(SoCamera * cam, const float diffvalue)
 // ************************************************************************
 
 #endif // DOXYGEN_SKIP_THIS
+
+#undef PRIVATE
+#undef PUBLIC
+

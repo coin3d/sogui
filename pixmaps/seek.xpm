@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_SEEK_XPM
+#define COIN_PIXMAP_SEEK_XPM
+
 /* XPM */
 static const char * seek_xpm[] = {
 "24 24 12 1",
@@ -37,3 +40,5 @@ static const char * seek_xpm[] = {
 "                        ",
 "                        ",
 "                        "};
+
+#endif /* !COIN_PIXMAP_SEEK_XPM */

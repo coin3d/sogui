@@ -1,3 +1,6 @@
+#ifndef COIN_PIXMAP_PERSPECTIVE_XPM
+#define COIN_PIXMAP_PERSPECTIVE_XPM
+
 /* XPM */
 static const char * perspective_xpm[] = {
 "24 24 17 1",
@@ -42,3 +45,5 @@ static const char * perspective_xpm[] = {
 "              ..        ",
 "                        ",
 "                        "};
+
+#endif /* !COIN_PIXMAP_PERSPECTIVE_XPM */

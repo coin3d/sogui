@@ -199,6 +199,8 @@
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
 #include <Inventor/@Gui@/viewers/SoGuiFullViewerP.h> // for pan() and zoom()
 
+#define PRIVATE(obj) ((obj)->pimpl)
+#define PUBLIC(obj) ((obj)->pub)
 
 static const int MOUSEPOSLOGSIZE = 16;
 
@@ -1303,3 +1305,7 @@ SoGuiExaminerViewerP::setCursorRepresentation(int modearg)
 #endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+

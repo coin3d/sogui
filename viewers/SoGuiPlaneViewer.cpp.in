@@ -992,3 +992,7 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
 #endif // DOXYGEN_SKIP_THIS
 
 // *************************************************************************
+
+#undef PRIVATE
+#undef PUBLIC
+
