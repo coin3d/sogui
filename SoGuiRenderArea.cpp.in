@@ -573,9 +573,9 @@ So@Gui@RenderAreaP::constructor(SbBool mouseInput,
                                 SbBool keyboardInput,
                                 SbBool build)
 {
-  this->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+  this->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, PUBLIC(this));
   this->normalManager->activate();
-  this->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+  this->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, PUBLIC(this));
   this->overlayManager->activate();
   // FIXME: what is this magic number doing here - shouldn't we use
   // SoGLCacheContextElement::getUniqueCacheContext() for Coin, and
