@@ -31,6 +31,7 @@
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 #include <Inventor/@Gui@/widgets/So@Gui@PopupMenu.h>
+#include <Inventor/@Gui@/widgets/So@Gui@ThumbWheel.h>
 #include <so@gui@defs.h>
 
 #include <Inventor/events/SoMouseButtonEvent.h>
@@ -39,6 +40,8 @@
 
 // ************************************************************************
 
+// Note: the following function documentation block will also be used
+// for all the miscellaneous viewer subclasses, so keep it general.
 /*!
   \fn void So@Gui@FullViewer::createViewerButtons(@WIDGET@ parent, SbPList * buttonlist)
 
@@ -96,6 +99,234 @@
 
 // ************************************************************************
 
+// Note: the following function documentation blocks for thumbwheel
+// handling will also be used for all the miscellaneous viewer
+// subclasses, so keep'em general.
+
+/*!
+  Called when the user start to drag the thumbwheel in the left
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa leftWheelMotion(), leftWheelFinish()
+  \sa bottomWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::leftWheelStart(void)
+{
+  this->interactiveCountInc();
+}
+
+/*!
+  Called repeatedly as the user drags the thumbwheel in the left
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa leftWheelStart(), leftWheelFinish()
+  \sa bottomWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::leftWheelMotion(float value)
+{
+  this->leftWheelVal = value;
+}
+
+/*!
+  Called as the user let go of the thumbwheel in the left frame
+  after a drag operation. Override this method in subclassed viewers
+  to provide your own functionality on the thumbwheel.
+
+  \sa leftWheelStart(), leftWheelMotion()
+  \sa bottomWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::leftWheelFinish(void)
+{
+  this->interactiveCountDec();
+}
+
+/*!
+  Set a new value for the left thumbwheel.
+*/
+void
+So@Gui@FullViewer::setLeftWheelValue(const float value)
+{
+  this->leftWheelVal = value;
+  ((So@Gui@ThumbWheel *)this->leftWheel)->setValue(value);
+}
+
+/*!
+  Get current value of the left thumbwheel.
+
+  \sa leftWheelMotion()
+*/
+float
+So@Gui@FullViewer::getLeftWheelValue(void) const
+{
+  return this->leftWheelVal;
+}
+
+/*!
+  Called when the user start to drag the thumbwheel in the bottom
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa bottomWheelMotion(), bottomWheelFinish()
+  \sa leftWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::bottomWheelStart(void)
+{
+  this->interactiveCountInc();
+}
+
+/*!
+  Called repeatedly as the user drags the thumbwheel in the bottom
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa bottomWheelStart(), bottomWheelFinish()
+  \sa leftWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::bottomWheelMotion(float value)
+{
+  this->bottomWheelVal = value;
+}
+
+/*!
+  Called as the user let go of the thumbwheel in the bottom frame
+  after a drag operation. Override this method in subclassed viewers
+  to provide your own functionality on the thumbwheel.
+
+  \sa bottomWheelStart(), bottomWheelMotion()
+  \sa leftWheelStart(), rightWheelStart()
+*/
+void
+So@Gui@FullViewer::bottomWheelFinish(void)
+{
+  this->interactiveCountDec();
+}
+
+/*!
+  Set a new value for the bottom thumbwheel.
+*/
+void
+So@Gui@FullViewer::setBottomWheelValue(const float value)
+{
+  this->bottomWheelVal = value;
+  ((So@Gui@ThumbWheel *)this->bottomWheel)->setValue(value);
+}
+
+/*!
+  Get current value of the bottom thumbwheel.
+
+  \sa bottomWheelMotion()
+*/
+float
+So@Gui@FullViewer::getBottomWheelValue(void) const
+{
+  return this->bottomWheelVal;
+}
+
+/*!
+  Called when the user start to drag the thumbwheel in the right
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa rightWheelMotion(), rightWheelFinish()
+  \sa leftWheelStart(), bottomWheelStart()
+*/
+void
+So@Gui@FullViewer::rightWheelStart(void)
+{
+  this->interactiveCountInc();
+}
+
+/*!
+  Called repeatedly as the user drags the thumbwheel in the right
+  frame.  Override this method in subclassed viewers to provide your
+  own functionality on the thumbwheel.
+
+  \sa rightWheelStart(), rightWheelFinish()
+  \sa leftWheelStart(), bottomWheelStart()
+*/
+void
+So@Gui@FullViewer::rightWheelMotion(float value)
+{
+  this->rightWheelVal = value;
+}
+
+/*!
+  Called as the user let go of the thumbwheel in the right frame
+  after a drag operation. Override this method in subclassed viewers
+  to provide your own functionality on the thumbwheel.
+
+  \sa rightWheelStart(), rightWheelMotion()
+  \sa leftWheelStart(), bottomWheelStart()
+*/
+void
+So@Gui@FullViewer::rightWheelFinish(void)
+{
+  this->interactiveCountDec();
+}
+
+/*!
+  Set a new value for the right thumbwheel.
+*/
+void
+So@Gui@FullViewer::setRightWheelValue(const float value)
+{
+  this->rightWheelVal = value;
+  ((So@Gui@ThumbWheel *)this->rightWheel)->setValue(value);
+}
+
+/*!
+  Get current value of the right thumbwheel.
+
+  \sa rightWheelMotion()
+*/
+float
+So@Gui@FullViewer::getRightWheelValue(void) const
+{
+  return this->rightWheelVal;
+}
+
+// *************************************************************************
+
+/*!
+  This method returns the native widget for the label below the left
+  thumb wheel.
+*/
+
+@WIDGET@
+So@Gui@FullViewer::getLeftWheelLabelWidget(void) const
+{
+  return this->leftWheelLabel;
+}
+
+/*!
+  This method returns the native widget for the label below the right thumb
+  wheel.
+*/
+@WIDGET@
+So@Gui@FullViewer::getRightWheelLabelWidget(void) const
+{
+  return this->rightWheelLabel;
+}
+
+/*!
+  This method returns the native widget for the label beside the
+  bottom thumb wheel.
+*/
+@WIDGET@
+So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
+{
+  return this->bottomWheelLabel;
+}
+
+// ************************************************************************
+
 /*!
   Set title of popup menu.
 */
@@ -109,8 +340,7 @@ So@Gui@FullViewer::setPopupMenuString(const char * name)
 // ************************************************************************
 
 So@Gui@PopupMenu *
-So@Gui@FullViewer::setupStandardPopupMenu(
-  void)
+So@Gui@FullViewer::setupStandardPopupMenu(void)
 {
   So@Gui@PopupMenu * menu = So@Gui@PopupMenu::createInstance();
 
@@ -350,7 +580,7 @@ So@Gui@FullViewer::setupStandardPopupMenu(
 
   this->prefmenu = menu;
   return menu;
-} // buildPopupMenu()
+}
 
 // ************************************************************************
 
@@ -433,8 +663,7 @@ So@Gui@FullViewer::prepareMenu(So@Gui@PopupMenu * menu)
 // ************************************************************************
 
 void
-So@Gui@FullViewer::menuSelection(// virtual
-  int menuitemid)
+So@Gui@FullViewer::menuSelection(int menuitemid)
 {
   switch (menuitemid) {
   case -1:
@@ -547,20 +776,19 @@ So@Gui@FullViewer::menuSelection(// virtual
                            "popup menu handling for item %d is not implemented", 
                            menuitemid);
     break;
-  } // switch (menuitemid)
-} // menuSelection()
+  }
+}
 
 
 // ************************************************************************
 
 void
-So@Gui@FullViewer::menuSelectionCallback(// static
-  int menuitemid,
-  void * userdata)
+So@Gui@FullViewer::menuSelectionCallback(int menuitemid,
+                                         void * userdata)
 {
   So@Gui@FullViewer * viewer = (So@Gui@FullViewer *) userdata;
   viewer->menuSelection(menuitemid);
-} // menuSelectionCallback()
+}
 
 // ************************************************************************
 
@@ -569,9 +797,8 @@ So@Gui@FullViewer::menuSelectionCallback(// static
 */
 
 void
-So@Gui@FullViewer::setDrawStyleMenuActivation(
-  So@Gui@Viewer::DrawType type,
-  So@Gui@Viewer::DrawStyle value)
+So@Gui@FullViewer::setDrawStyleMenuActivation(So@Gui@Viewer::DrawType type,
+                                              So@Gui@Viewer::DrawStyle value)
 {
   assert(this->prefmenu != NULL);
 
@@ -615,7 +842,7 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(
     default:
       assert(0 && "unsupported default switch-case");
       break;
-    } // switch (value)
+    }
     break;
 
   case So@Gui@Viewer::INTERACTIVE:
@@ -647,14 +874,14 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(
     default:
       assert(0 && "unsupported default switch-case");
       break;
-    } // switch (value)
+    }
     break;
 
   default:
     assert(0 && "unsupported default switch-case");
     break;
-  } // switch (type)
-} // setDrawStyleMenuActivation()
+  }
+}
 
 // ************************************************************************
 
@@ -663,8 +890,7 @@ So@Gui@FullViewer::setDrawStyleMenuActivation(
 */
 
 void
-So@Gui@FullViewer::drawstyleActivated(
-  int menuitemid)
+So@Gui@FullViewer::drawstyleActivated(int menuitemid)
 {
   switch (menuitemid) {
   case SINGLE_BUFFER_ITEM:
@@ -678,7 +904,7 @@ So@Gui@FullViewer::drawstyleActivated(
     return;
   default:
     break;
-  } // switch (menuitemid)
+  }
 
   switch (menuitemid) {
   case SCREEN_DOOR_TRANSPARENCY_ITEM:
@@ -712,7 +938,7 @@ So@Gui@FullViewer::drawstyleActivated(
 #endif // __COIN__
   default:
     break;
-  } // switch (menuitemid)
+  }
 
   So@Gui@Viewer::DrawStyle val = So@Gui@Viewer::VIEW_AS_IS;
   switch (menuitemid) {
@@ -769,7 +995,7 @@ So@Gui@FullViewer::drawstyleActivated(
   default:
     assert(0);
     break;
-  } // switch (menuitemid)
+  }
 
   So@Gui@Viewer::DrawType type = So@Gui@Viewer::STILL;
 
@@ -799,10 +1025,10 @@ So@Gui@FullViewer::drawstyleActivated(
   default:
     assert(0);
     break;
-  } // switch (menuitemid)
+  }
 
   this->setDrawStyle(type, val);
-} // drawstyleActivated()
+}
 
 // ************************************************************************
 
@@ -871,39 +1097,6 @@ So@Gui@FullViewer::setComponentCursor(const So@Gui@Cursor & cursor)
   // decorations stuff.
 
   So@Gui@Component::setWidgetCursor(this->getGLWidget(), cursor);
-}
-
-// *************************************************************************
-
-/*!
-  This method returns the native widget for the label below the left
-  thumb wheel.
-*/
-
-@WIDGET@
-So@Gui@FullViewer::getLeftWheelLabelWidget(void) const
-{
-  return this->leftWheelLabel;
-}
-
-/*!
-  This method returns the native widget for the label below the right thumb
-  wheel.
-*/
-@WIDGET@
-So@Gui@FullViewer::getRightWheelLabelWidget(void) const
-{
-  return this->rightWheelLabel;
-}
-
-/*!
-  This method returns the native widget for the label beside the
-  bottom thumb wheel.
-*/
-@WIDGET@
-So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
-{
-  return this->bottomWheelLabel;
 }
 
 // *************************************************************************
