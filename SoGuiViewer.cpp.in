@@ -109,6 +109,50 @@ static int COIN_SHOW_FPS_COUNTER = -1;
 
 // *************************************************************************
 
+static char normal_scene_graph[] =
+  "#Inventor V2.1\n"
+  "\n"
+  "Separator {\n"
+    "renderCaching = OFF\n"
+    "renderCulling = OFF\n"
+    "Switch {\n"
+      "whichChild = -1\n"
+      "LightModel {\n"
+        "override = TRUE\n"
+        "model = BASE_COLOR\n"
+      "}\n"
+      "DrawStyle {\n"
+        "override = TRUE\n"
+        "pointSize = IGNORED\n"
+        "lineWidth = IGNORED\n"
+        "linePattern = IGNORED\n"
+      "}\n"
+      "Complexity {\n"
+        "override = TRUE\n"
+        "textureQuality = 0.0\n"
+        "value = 1.0\n"
+      "}\n"
+    "}\n"
+    "Switch {\n"
+      "whichChild = -1\n"
+      "BaseColor {"
+        "override = TRUE\n"
+      "}\n"
+      "MaterialBinding {\n"
+        "override = TRUE\n"
+        "value = OVERALL\n"
+      "}\n"
+      "Switch {\n"
+        "whichChild = -1\n"
+        "PolygonOffset {\n"
+          "override = TRUE\n"
+        "}\n"
+      "}\n"
+    "}\n"
+  "}";
+
+// *************************************************************************
+
 // The private data for the So@Gui@Viewer.
 class SoGuiViewerP {
 public:
@@ -389,7 +433,6 @@ So@Gui@Viewer::So@Gui@Viewer(
   THIS->seekperiod = 2.0f;
   THIS->inseekmode = FALSE;
   THIS->seeksensor = new SoTimerSensor(So@Gui@Viewer::seeksensorCB, this);
-
 
   this->sceneRoot = new SoSeparator;
   this->sceneRoot->ref();
