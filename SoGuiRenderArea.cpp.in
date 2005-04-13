@@ -1081,6 +1081,17 @@ So@Gui@RenderArea::getTransparencyType(void) const
 
 /*!
   This method sets the antialiasing used for the scene.
+
+  The \a smoothing flag signifies whether or not line and point
+  aliasing should be turned on. See documentation of
+  SoGLRenderAction::setSmoothing(), which will be called from this
+  function.
+
+  \a numPasses gives the number of re-renderings to do of the scene,
+  blending together the results from slight "jitters" of the camera
+  view, into the OpenGL accumulation buffer. For further information,
+  see documentation of SoGLRenderAction::setNumPasses() and
+  So@Gui@GLWidget::setAccumulationBuffer().
 */
 void
 So@Gui@RenderArea::setAntialiasing(SbBool smoothing, int numPasses)
