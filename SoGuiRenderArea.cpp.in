@@ -573,7 +573,8 @@ So@Gui@RenderAreaP::offScreenGrab(void)
   static const char fallback_name[] = "coingrab%03d.rgb";
 
   /*
-    TODO:
+    FIXME:
+
     - schedule a regular render-pass and hook into the render
       pipe-line to check all the interesting GL context features that
       might need to be enabled for the offscreen renderer context.
@@ -584,6 +585,8 @@ So@Gui@RenderAreaP::offScreenGrab(void)
     - check if we might be able to hook up the on-screen pre-render
       callback to the offscreen renderer as well, if any point.
     - disable accidentally enabled seek mode again (from typing 'osgrab').
+
+    20050606 larsa.
   */
 
   counter++;
@@ -624,10 +627,10 @@ So@Gui@RenderAreaP::offScreenGrab(void)
     float offscaspect = float(maxwidth) / float(maxheight);
 
     osvp[1] = maxheight;
-    osvp[0] = maxheight * onscaspect;
+    osvp[0] = short(maxheight * onscaspect);
     if ( osvp[0] > maxwidth ) {
       osvp[0] = maxwidth;
-      osvp[1] = maxwidth * (1.0f / onscaspect);
+      osvp[1] = short(maxwidth * (1.0f / onscaspect));
     }
   }
 
