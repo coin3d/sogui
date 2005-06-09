@@ -645,9 +645,9 @@ So@Gui@RenderAreaP::offScreenGrab(void)
     os.writeToRGB(fname2.getString());
   }
 
-  // SoDebugError::postInfo("So@Gui@RenderAreaP::offScreenGrab",
-  //                        "wrote image #%d, %dx%d",
-  //                        counter, osvp[0], osvp[1]);
+  SoDebugError::postInfo("So@Gui@RenderAreaP::offScreenGrab",
+                         "wrote image #%d, %dx%d",
+                         counter, osvp[0], osvp[1]);
 #endif // DEBUGGING_EGGS
 }
 
