@@ -425,6 +425,9 @@ So@Gui@ViewerP::createSuperScene(void)
     "    }",
     "  }",
     "  DEF so@gui@->userscenegraphroot Separator {",
+    // turn off caching to make it possible for users to disable
+    // caching in their scene graphs.
+    "    renderCaching OFF\n", 
     "  }",
     "}",
     NULL
