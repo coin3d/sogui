@@ -48,6 +48,10 @@
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
 
+#ifndef SO@GUI@_INTERNAL
+#include <Inventor/events/SoKeyboardEvent.h>
+#endif // SO@GUI@_INTERNAL
+
 class SoCallbackList;
 class SoBaseColor;
 class SoCamera;
