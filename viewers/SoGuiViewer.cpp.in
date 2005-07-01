@@ -3150,6 +3150,19 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
     hitpoint = bbox.getCenter();
   }
 
+  this->seekToPoint(hitpoint);
+  return TRUE;
+}
+
+/*!
+  Call this method to initiate a seek action towards the give 3D world
+  coordinate point in the scene, \a scenepos.
+*/
+void
+So@Gui@Viewer::seekToPoint(const SbVec3f & scenepos)
+{
+  SbVec3f hitpoint(scenepos);
+
   PRIVATE(this)->camerastartposition = PRIVATE(this)->camera->position.getValue();
   PRIVATE(this)->camerastartorient = PRIVATE(this)->camera->orientation.getValue();
 
@@ -3186,9 +3199,9 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
   PRIVATE(this)->seeksensor->setBaseTime(SbTime::getTimeOfDay());
   PRIVATE(this)->seeksensor->schedule();
   this->interactiveCountInc();
-
-  return TRUE;
 }
+
+// *************************************************************************
 
 void
 So@Gui@ViewerP::setStereoEye(SoCamera * thecamera,
