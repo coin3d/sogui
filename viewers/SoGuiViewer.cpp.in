@@ -2951,8 +2951,13 @@ So@Gui@Viewer::setDoubleBuffer(const SbBool on)
 void
 So@Gui@Viewer::setSceneGraph(SoNode * root)
 {
-  // Called with the same root as already set?
-  if ((root != NULL) && (root == PRIVATE(this)->scenegraph)) { return; }
+  if ((root != NULL) && (root == PRIVATE(this)->scenegraph)) {
+    if (SO@GUI@_DEBUG) {
+      SoDebugError::postWarning("So@Gui@Viewer::setSceneGraph",
+                                "called with the same root as already set");
+    }
+    return;
+  }
 
   // If the So@Gui@RenderArea hasn't yet set up its pointer to the
   // So@Gui@Viewer "viewer root" (i.e. the viewer-generated root above
