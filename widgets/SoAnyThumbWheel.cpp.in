@@ -23,6 +23,7 @@
 
 // @configure_input@
 
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif // HAVE_CONFIG_H
@@ -30,12 +31,14 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+
+#include <so@gui@defs.h>
+#include <Inventor/@Gui@/So@Gui@Object.h> // for __COIN_SOQT__
+#include <Inventor/@Gui@/widgets/SoAnyThumbWheel.h>
+
 #ifdef __COIN_SOQT__
 #include <qglobal.h> // for Q_WS_MAC
 #endif
-
-#include <so@gui@defs.h>
-#include <Inventor/@Gui@/widgets/SoAnyThumbWheel.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
