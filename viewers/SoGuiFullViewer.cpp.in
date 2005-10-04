@@ -1019,6 +1019,7 @@ SoGuiFullViewerP::setupStandardPopupMenu(void)
   menu->addMenuSelectionCallback(SoGuiFullViewerP::menuSelectionCallback,
                                  (void *) this);
 
+  // FIXME: Mem leak - it looks like the menu is never freed. kintel 20051004.
   PUBLIC(this)->prefmenu = menu;
   return menu;
 }
