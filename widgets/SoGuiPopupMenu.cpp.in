@@ -109,6 +109,7 @@ So@Gui@PopupMenu::~So@Gui@PopupMenu()
 {
   delete PRIVATE(this)->callbacks;
   delete PRIVATE(this)->userdata;
+  delete PRIVATE(this);
 } // ~So@Gui@PopupMenu()
 
 // *************************************************************************
