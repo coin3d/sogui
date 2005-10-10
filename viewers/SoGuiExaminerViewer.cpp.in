@@ -362,7 +362,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
                           ev->getTypeId().getName().getString());
 #endif // debug
 
-#ifdef __COIN_SOQT__
+#if 0
   // 20050202 larsa: I have disabled the below functionality because it
   // caused "alt" to stick - the release never got sent to the scene - the
   // alt key was rendered useless for the Coin envronment  - and I don't
@@ -373,11 +373,6 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   // InventorXt, which is then reversed when the ALT key is
   // released. So this functionality shouldn't simply be disabled, but
   // rather debugged and fixed.
-  //
-  // UPDATE 20051006 kyrah: ALT is indeed supposed to allow switching 
-  // between modes on the fly, and SoQt seems not to exhibit the
-  // broken behaviour reported by larsa. Therefore I re-enabled the 
-  // code in question for the SoQt case. 
 
   // Let the end-user toggle between camera-interaction mode
   // ("viewing") and scenegraph-interaction mode with ALT key(s).
@@ -398,7 +393,7 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
       break;
     }
   }
-#endif // __COIN_SOQT__ - alt-key
+#endif // 0 - alt-key
 
   // We're in "interact" mode (ie *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
