@@ -146,7 +146,7 @@ So@Gui@PopupMenu::newRadioGroup(
       if (PRIVATE(this)->radiogroups[i] == id)
         hit = TRUE;
     }
-    if (hit == TRUE) {
+    if (hit) {
 #if SO@GUI@_DEBUG
       SoDebugError::postInfo("So@Gui@PopupMenu::NewRadioGroup",
         "requested group id already taken");
@@ -164,7 +164,7 @@ So@Gui@PopupMenu::newRadioGroup(
         if (PRIVATE(this)->radiogroups[i] == id)
           found = TRUE;
       }
-    } while (found == TRUE);
+    } while (found);
   }
   // id is OK here
   PRIVATE(this)->menuitems.append(-1); // fake menu item
