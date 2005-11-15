@@ -148,3 +148,14 @@ NOTE: see also So@Gui@/BUGS.txt.
     SmallChange.  WIll fix for those and remove this item RSN.
 
 =====================================================================
+
+007 Catch GL errors in a proper manner.
+
+    glGetError() should always be called in a loop, i.e. as we do in
+    Coin with the coin_catch_gl_errors() call in src/glue/gl.c.
+
+    Audit and fix all code in the So* libraries in this regard.
+
+    20051115 mortene.
+
+=====================================================================
