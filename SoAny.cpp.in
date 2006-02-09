@@ -149,6 +149,8 @@ int soany_cache_context::oiv_counter = 0;
 
 // *************************************************************************
 
+static void soany_atexit_cleanup(void);
+
 void
 SoAny::init()
 {
@@ -156,6 +158,8 @@ SoAny::init()
   So@Gui@Cursor::initClass();
   SoGuiNodes::initClasses();
   SoGuiEngines::initClasses();
+  sogui_atexit((sogui_atexit_f*)soany_atexit_cleanup, 0);
+  sogui_atexit((sogui_atexit_f*)SoAny::cleanup_si, 0);
 }
 
 // private constructor
@@ -179,13 +183,9 @@ SoAny::~SoAny()
 SoAny * 
 SoAny::si(void)
 {
-  if (single_instance == NULL) {
-    single_instance = new SoAny;
-    sogui_atexit((sogui_atexit_f*)cleanup_si, 0);
-  }
+  if (single_instance == NULL) single_instance = new SoAny;
   return single_instance;
 }
-
 
 //  Free memory/resources used by the singleton object. Will be called
 //  automatically on exit.
@@ -194,9 +194,9 @@ SoAny::cleanup_si(void)
 {
   delete single_instance;
   single_instance = NULL;
-  if ( SoAny::finder ) {
-    delete finder;
-    finder = NULL;
+  if (SoAny::finder) {
+    delete SoAny::finder;
+    SoAny::finder = NULL;
   }
 }
 
@@ -390,28 +390,12 @@ struct envvar_data {
 };
 
 static void
-envlist_cleanup(void)
-{
-  struct envvar_data * ptr = envlist_head;
-  while (ptr != NULL) {
-    struct envvar_data * tmp = ptr;
-    free(ptr->name);
-    free(ptr->val);
-    ptr = ptr->next;
-    free(tmp);
-  }
-  envlist_head = NULL;
-  envlist_tail = NULL;
-}
-
-static void
 envlist_append(struct envvar_data * item)
 {
   item->next = NULL;
   if (envlist_head == NULL) {
     envlist_head = item;
     envlist_tail = item;
-    sogui_atexit((sogui_atexit_f*)envlist_cleanup, 0);
   }
   else {
     envlist_tail->next = item;
@@ -527,9 +511,9 @@ typedef HANDLE (WINAPI * CreateToolhelp32Snapshot_t)(DWORD, DWORD);
 typedef BOOL (WINAPI * Module32First_t)(HANDLE, LPMODULEENTRY32);
 typedef BOOL (WINAPI * Module32Next_t)(HANDLE, LPMODULEENTRY32);
 
-static CreateToolhelp32Snapshot_t funCreateToolhelp32Snapshot;
-static Module32First_t funModule32First;
-static Module32Next_t funModule32Next;
+static CreateToolhelp32Snapshot_t funCreateToolhelp32Snapshot = NULL;
+static Module32First_t funModule32First = NULL;
+static Module32Next_t funModule32Next = NULL;
 
 
 void
@@ -660,6 +644,27 @@ SoAny::scanSceneForName(SoNode * scene, const char * name, SbBool searchAll)
   SoAny::finder->apply(scene);
   path = SoAny::finder->getPath();
   return path ? path->getTail() : NULL;
+}
+
+static void
+soany_atexit_cleanup(void)
+{
+  struct envvar_data * ptr = envlist_head;
+  while (ptr != NULL) {
+    struct envvar_data * tmp = ptr;
+    free(ptr->name);
+    free(ptr->val);
+    ptr = ptr->next;
+    free(tmp);
+  }
+  envlist_head = NULL;
+  envlist_tail = NULL;
+
+#if defined(HAVE_WIN32_LOADLIBRARY) && defined(HAVE_TLHELP32_H)
+  funCreateToolhelp32Snapshot = NULL;
+  funModule32First = NULL;
+  funModule32Next = NULL;
+#endif
 }
 
 /**************************************************************************/
