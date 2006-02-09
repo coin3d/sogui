@@ -561,8 +561,8 @@ SoGuiP::abort(SoGuiP::ABIError error)
 
 // *************************************************************************
 
-// FIXME: Dummy implementation of soqt_atexit(). Replace with real
+// FIXME: Dummy implementation of sogui_atexit(). Replace with real
 // implementation. kintel 20060209
-void soqt_atexit(soqt_atexit_f * fp, int32_t priority) {
+void sogui_atexit(sogui_atexit_f * fp, int32_t priority) {
   atexit(fp);
 }
