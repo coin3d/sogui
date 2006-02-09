@@ -143,6 +143,6 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 // implementation. kintel 20060209
 #include <stdlib.h>
 typedef void sogui_atexit_f(void);
-void sogui_atexit(sogui_atexit_f * fp, int32_t priority);
+void sogui_atexit(sogui_atexit_f * fp, int priority);
 
 #endif // ! SO@GUI@_BASIC_H
