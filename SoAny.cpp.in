@@ -152,7 +152,7 @@ int soany_cache_context::oiv_counter = 0;
 void
 SoAny::init()
 {
-  SoQtObject::init();
+  So@Gui@Object::init();
   So@Gui@Cursor::initClass();
   SoGuiNodes::initClasses();
   SoGuiEngines::initClasses();
