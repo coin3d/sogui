@@ -50,6 +50,10 @@
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/SoInput.h>
 #include <Inventor/SoDB.h>
+#include <Inventor/@Gui@/So@Gui@Object.h>
+#include <Inventor/@Gui@/So@Gui@Cursor.h>
+#include <Inventor/@Gui@/nodes/SoGuiNodes.h>
+#include <Inventor/@Gui@/engines/SoGuiEngines.h>
 
 #include <Inventor/@Gui@/SoAny.h>
 
@@ -145,6 +149,15 @@ int soany_cache_context::oiv_counter = 0;
 
 // *************************************************************************
 
+void
+SoAny::init()
+{
+  SoQtObject::init();
+  So@Gui@Cursor::initClass();
+  SoGuiNodes::initClasses();
+  SoGuiEngines::initClasses();
+}
+
 // private constructor
 SoAny::SoAny(void) 
   : fatalcb(NULL)
@@ -168,7 +181,7 @@ SoAny::si(void)
 {
   if (single_instance == NULL) {
     single_instance = new SoAny;
-    soqt_atexit((soqt_atexit_f*)cleanup_si, 0);
+    sogui_atexit((sogui_atexit_f*)cleanup_si, 0);
   }
   return single_instance;
 }
@@ -398,7 +411,7 @@ envlist_append(struct envvar_data * item)
   if (envlist_head == NULL) {
     envlist_head = item;
     envlist_tail = item;
-    soqt_atexit((soqt_atexit_f*)envlist_cleanup, 0);
+    sogui_atexit((sogui_atexit_f*)envlist_cleanup, 0);
   }
   else {
     envlist_tail->next = item;
