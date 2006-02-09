@@ -139,4 +139,12 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 
 // *************************************************************************
 
+// FIXME: Dummy soqt_atexit(). Replace with real
+// implementation. kintel 20060209
+#include <stdlib.h>
+typedef void soqt_atexit_f(void);
+void soqt_atexit(soqt_atexit_f * fp, int32_t priority) {
+  atexit(fp);
+}
+
 #endif // ! SO@GUI@_BASIC_H
