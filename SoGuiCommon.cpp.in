@@ -567,5 +567,8 @@ SoGuiP::abort(SoGuiP::ABIError error)
 // implementation. kintel 20060209
 void sogui_atexit(sogui_atexit_f * fp, int priority)
 {
-  atexit(fp);
+  // disabled this, as it is not safe to clean up So@Gui@ after Coin
+  // has been cleaned up. -mortene
+  //
+  // atexit(fp);
 }
