@@ -2120,7 +2120,7 @@ So@Gui@RenderArea::processEvent(@EVENT@ event)
   const SoEvent * soevent = PRIVATE(this)->getSoEvent(event);
 
   if (soevent != NULL) {
-#if SO@GUI@_DEBUG
+#if SO@GUI@_DEBUG || defined(DEBUGGING_EGGS)
     // Undocumented feature: there are several "magic" sequences of
     // keys when tapped into the rendering canvas which'll pop up a
     // dialog box with information about that particular feature.
