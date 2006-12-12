@@ -769,11 +769,34 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
   if (this->currentspeed == 0.0f)
     this->lastrender->setValue(thisrender.getValue() - 0.01);
 
+  // We've had a report on Coin-support that floats may have too low
+  // precision for the subtraction of these two values (ie it becomes
+  // zero), so don't cast to float.
+  //
+  // FIXME: it doesn't sound likely that this was the real cause of
+  // the problem. First of all, it seems improbably that precision
+  // could be so bad for floats, as the time between render frames
+  // should almost be guaranteed to be milliseconds, at least.  It is
+  // suspicious that the error only shows up with the Intel C++
+  // compiler, and not when the reported built with MSVC++ instead.
+  //
+  // Second, the fix is not sufficient. What if the
+  // SbTime::getTimeOfDay() resolution is too low on the particular
+  // system, so we often get zero difference here? That case must be
+  // handled, and from the original bug report, it sounds like it
+  // isn't, which is a separate bug in itself.
+  //
+  // Third, what's up with that magic multiplication factor of 10?
+  // That doesn't seem to make sense.
+  //
+  // 20061212 mortene.
   double t = (thisrender.getValue() - this->lastrender->getValue()) * 10.0;
 
   if (t >= 1.0) 
     t = 1.0;
 
+  // FIXME: sloppy internal interface design. Pass around doubles, if
+  // doubles are the naturally correct type. 20061212 mortene.
   return float(t);
 }
 
@@ -1210,6 +1233,13 @@ So@Gui@FlyViewer::actualRedraw(void)
       thisrender.setToTimeOfDay();
 
       if (PRIVATE(this)->currentspeed != 0.0f) {
+        // We've had a report on Coin-support that floats may have too
+        // low precision for the subtraction of these two values (ie
+        // it becomes zero), so don't cast to float.
+        // 
+        // Note: there's some additional information about this, see
+        // the FIXME comment in the
+        // So@Gui@FlyViewerP::calculateChangeInTime() function.
         double t = (thisrender.getValue() -
                     PRIVATE(this)->lastrender->getValue()) * 2.0;
         if (t > 0.0) {
