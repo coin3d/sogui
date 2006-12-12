@@ -790,6 +790,11 @@ double So@Gui@FlyViewerP::calculateChangeInTime()
   // That doesn't seem to make sense.
   //
   // 20061212 mortene.
+
+  // This is only a problem on release builds which makes it sound
+  // like it's just some value that is not properly
+  // initialized. (20061212 frodo)
+
   double t = (thisrender.getValue() - this->lastrender->getValue()) * 10.0;
 
   if (t >= 1.0) 
