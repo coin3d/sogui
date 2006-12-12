@@ -136,8 +136,8 @@ public:
                                 float d_tilt, 
                                 float d_pan, 
                                 float dt );
-  float calculateChangeInTime();
-  void  updateCurrentSpeed( float dt );
+  double calculateChangeInTime();
+  void  updateCurrentSpeed(double dt);
 
 
   // Current keyboard state.
@@ -761,7 +761,7 @@ So@Gui@FlyViewerP::updateSpeedIndicator(void)
     this->scurrentspeedswitch->whichChild.setValue(SO_SWITCH_NONE);
 }
 
-float So@Gui@FlyViewerP::calculateChangeInTime()
+double So@Gui@FlyViewerP::calculateChangeInTime()
 {
   SbTime thisrender; 
   thisrender.setToTimeOfDay();
@@ -795,12 +795,10 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
   if (t >= 1.0) 
     t = 1.0;
 
-  // FIXME: sloppy internal interface design. Pass around doubles, if
-  // doubles are the naturally correct type. 20061212 mortene.
-  return float(t);
+  return t;
 }
 
-void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
+void So@Gui@FlyViewerP::updateCurrentSpeed(double dt)
 {
   float curveSpeedReductionFactor = 
     1.0f - (this->pan_increment * this->pan_increment 
@@ -822,7 +820,6 @@ void So@Gui@FlyViewerP::updateCameraPosition( SoCamera * camera,
                                               float dt )
 {
   assert( camera != NULL );
-
   SbRotation orientation = camera->orientation.getValue();
   SbVec3f dir;
   camera->orientation.getValue().multVec( SbVec3f(0,0,-1), dir );
@@ -891,8 +888,8 @@ void So@Gui@FlyViewerP::updateSpeedScalingFactor()
 
 void So@Gui@FlyViewerP::stopMoving()
 {
-  maxspeed = 0;
-  currentspeed = 0; 
+  maxspeed = 0.0f;
+  currentspeed = 0.0f; 
   max_speed_factor = 0;
 }
 
@@ -1224,9 +1221,7 @@ So@Gui@FlyViewer::actualRedraw(void)
   switch (PRIVATE(this)->getMode()) {
   case So@Gui@FlyViewerP::FLYING:
     {
-      float dt = PRIVATE(this)->calculateChangeInTime();
-      PRIVATE(this)->updateCurrentSpeed( dt );
-
+      PRIVATE(this)->updateCurrentSpeed(PRIVATE(this)->calculateChangeInTime());
       PRIVATE(this)->updateSpeedIndicator();
 
       SbTime thisrender; 
