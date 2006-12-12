@@ -181,15 +181,15 @@ public:
   // FIXME: Refactor event handlers and PUBLIC(this)->processSoEvent
   // in a way similar to that in SoGuiExaminerViewer, where only
   // internal state is red/set. 20021017 rolvs
-  SbBool processKeyboardEvent( const SoKeyboardEvent * const kevt );
-  SbBool processMouseButtonEvent( const SoMouseButtonEvent * const mevt );
-  SbBool processLocation2Event( const SoLocation2Event * const levt );
+  SbBool processKeyboardEvent(const SoKeyboardEvent * const kevt);
+  SbBool processMouseButtonEvent(const SoMouseButtonEvent * const mevt);
+  SbBool processLocation2Event(const SoLocation2Event * const levt);
 private:
   So@Gui@FlyViewer * publ;
   ViewerMode viewermode;
 };
 
-So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
+So@Gui@FlyViewerP::So@Gui@FlyViewerP(So@Gui@FlyViewer * owner)
 {
   this->searcher = NULL;
   this->publ = owner;
@@ -207,8 +207,8 @@ So@Gui@FlyViewerP::So@Gui@FlyViewerP( So@Gui@FlyViewer * owner )
   this->lshiftdown = FALSE;
   this->rshiftdown = FALSE;
   this->lastrender = new SbTime;
-  this->tilt_increment = 0;
-  this->pan_increment = 0;
+  this->tilt_increment = 0.0f;
+  this->pan_increment = 0.0f;
 }
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
@@ -438,7 +438,7 @@ So@Gui@FlyViewerP::getSuperimpositionNode(const char * name)
 }
 
 SbBool
-So@Gui@FlyViewerP::processKeyboardEvent( const SoKeyboardEvent * const ke )
+So@Gui@FlyViewerP::processKeyboardEvent(const SoKeyboardEvent * const ke)
 {
   assert( ke != NULL );
   switch (ke->getState()) {
@@ -659,7 +659,7 @@ So@Gui@FlyViewerP::processMouseButtonEvent( const SoMouseButtonEvent * const me 
 }
 
 SbBool
-So@Gui@FlyViewerP::processLocation2Event( const SoLocation2Event * const lev )
+So@Gui@FlyViewerP::processLocation2Event(const SoLocation2Event * const lev)
 {  
   this->mouseloc = lev->getPosition();
 
@@ -805,102 +805,102 @@ double So@Gui@FlyViewerP::calculateChangeInTime()
 
 void So@Gui@FlyViewerP::updateCurrentSpeed(double dt)
 {
-  float curveSpeedReductionFactor = 
+  float speedscale = 
     1.0f - (this->pan_increment * this->pan_increment 
-            + this->tilt_increment * this->tilt_increment);  
-
+            + this->tilt_increment * this->tilt_increment);
+  
   // NOTE: I don't believe that this boundary condition could ever
   // happen. 20021022 rolvs
-  if( curveSpeedReductionFactor < 0 )
-    curveSpeedReductionFactor = 0;
-
+  if (speedscale < 0.0f)
+    speedscale = 0.0f;
+  
   this->currentspeed +=
     (((this->currentspeed +
-      this->maxspeed * curveSpeedReductionFactor) / 2.0f) - 
+       this->maxspeed * speedscale) / 2.0f) - 
      this->currentspeed) * dt;
 }
 
-void So@Gui@FlyViewerP::updateCameraPosition( SoCamera * camera, 
-                                              float current_speed,
-                                              float dt )
+void So@Gui@FlyViewerP::updateCameraPosition(SoCamera * camera, 
+                                             float current_speed,
+                                             float dt)
 {
-  assert( camera != NULL );
-  SbRotation orientation = camera->orientation.getValue();
+  assert(camera != NULL);
   SbVec3f dir;
-  camera->orientation.getValue().multVec( SbVec3f(0,0,-1), dir );
+  camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), dir);
   dir.normalize();
   camera->position.setValue(camera->position.getValue() +
-                            dir * (current_speed * dt ));
+                            dir * (current_speed * dt));
 }
  
-void So@Gui@FlyViewerP::updateCameraOrientation( SoCamera * camera, 
-                                                 float d_tilt, 
-                                                 float d_pan, 
-                                                 float dt )
+void So@Gui@FlyViewerP::updateCameraOrientation(SoCamera * camera, 
+                                                float d_tilt, 
+                                                float d_pan, 
+                                                float dt)
 {
-  assert( camera != NULL );
+  assert(camera != NULL);
   // FIXME: Make sure that the angle between direction and up-vector
   // stays larger than zero, or else it gets 'locked' in an undefined
   // state and starts to act weird. This should probably be done in
   // parent class. 20021017 rolvs
-  PUBLIC( this )->tiltCamera( d_tilt*dt );
-
+  PUBLIC(this)->tiltCamera(d_tilt * dt);
+  
   camera->orientation = camera->orientation.getValue() *
-    SbRotation( PUBLIC(this)->getUpDirection(), d_pan*dt );
+    SbRotation(PUBLIC(this)->getUpDirection(), d_pan * dt);
 }
 
 void
-So@Gui@FlyViewerP::incrementMaxSpeed()
+So@Gui@FlyViewerP::incrementMaxSpeed(void)
 {
   this->max_speed_factor++;
-  updateMaxSpeed();
+  this->updateMaxSpeed();
 }
 
 
 void
-So@Gui@FlyViewerP::decrementMaxSpeed()
+So@Gui@FlyViewerP::decrementMaxSpeed(void)
 {	
   this->max_speed_factor--;
-  updateMaxSpeed();
+  this->updateMaxSpeed();
 }
 
 
-void So@Gui@FlyViewerP::updateSpeedScalingFactor()
+void 
+So@Gui@FlyViewerP::updateSpeedScalingFactor(void)
 {
-  SoNode *n = PUBLIC(this)->getSceneGraph();
-  if( n == NULL )
+  SoNode * n = PUBLIC(this)->getSceneGraph();
+  if(n == NULL)
     return; // Scenegraph not set yet?
 
-  SoGetBoundingBoxAction bbact( PUBLIC(this)->getViewportRegion() );
-  bbact.apply( n );  
+  SoGetBoundingBoxAction bbact(PUBLIC(this)->getViewportRegion());
+  bbact.apply(n);
   
   SbBox3f bbox = bbact.getBoundingBox();
   float bbox_diagonal = (bbox.getMax() - bbox.getMin()).length();
 
   // FIXME: It should be possible to create a simple scaling function,
   // based on some logaritmic evaluation. 20021017 rolvs.
-  if( bbox_diagonal>100 )
+  if (bbox_diagonal > 100)
     this->speed_scaling_factor = 1.0f; // log(bbox_diagonal);
-  else if( bbox_diagonal>10 && bbox_diagonal < 100 )
+  else if (bbox_diagonal > 10 && bbox_diagonal < 100)
     this->speed_scaling_factor = 0.4f; 
-  else if( bbox_diagonal>1 && bbox_diagonal<10 )
+  else if (bbox_diagonal > 1 && bbox_diagonal < 10)
     this->speed_scaling_factor = 0.3f; 
-  else if( bbox_diagonal>0.1 && bbox_diagonal<1)
+  else if (bbox_diagonal > 0.1 && bbox_diagonal < 1)
     this->speed_scaling_factor = 0.1f; 
   else
-    this->speed_scaling_factor = 0.1f*bbox_diagonal;
+    this->speed_scaling_factor = 0.1f * bbox_diagonal;
 }
 
-void So@Gui@FlyViewerP::stopMoving()
+void So@Gui@FlyViewerP::stopMoving(void)
 {
-  maxspeed = 0.0f;
-  currentspeed = 0.0f; 
-  max_speed_factor = 0;
+  this->maxspeed = 0.0f;
+  this->currentspeed = 0.0f; 
+  this->max_speed_factor = 0;
 }
 
-void So@Gui@FlyViewerP::updateMaxSpeed()
+void So@Gui@FlyViewerP::updateMaxSpeed(void)
 {
-  if( this->max_speed_factor == 0 ){
+  if (this->max_speed_factor == 0) {
     this->stopMoving();
     return;
   }
@@ -911,13 +911,13 @@ void So@Gui@FlyViewerP::updateMaxSpeed()
 
   this->maxspeed = 
     this->max_speed_factor 
-    * float(pow( SO@GUI@_INC_FACTOR, abs( this->max_speed_factor ) ))
+    * float(pow(SO@GUI@_INC_FACTOR, abs( this->max_speed_factor)))
     * this->speed_scaling_factor;
 
-  if( this->maxspeed > SO@GUI@_MAX_SPEED )
+  if (this->maxspeed > SO@GUI@_MAX_SPEED)
     this->maxspeed = SO@GUI@_MAX_SPEED;
-  else if( this->maxspeed < -1*SO@GUI@_MAX_SPEED )
-    this->maxspeed = -1*SO@GUI@_MAX_SPEED;
+  else if (this->maxspeed < -1*SO@GUI@_MAX_SPEED)
+    this->maxspeed = -1 * SO@GUI@_MAX_SPEED;
 }
 
 
