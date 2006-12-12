@@ -766,16 +766,15 @@ float So@Gui@FlyViewerP::calculateChangeInTime()
   SbTime thisrender; 
   thisrender.setToTimeOfDay();
 
-  float t = 0.0f;
-
   if (this->currentspeed == 0.0f)
     this->lastrender->setValue(thisrender.getValue() - 0.01);
 
-  t = float(thisrender.getValue() - this->lastrender->getValue()) * 10.0f;
+  double t = (thisrender.getValue() - this->lastrender->getValue()) * 10.0;
 
-  if (t >= 1.0f) 
-    t = 1.0f;
-  return t; 
+  if (t >= 1.0) 
+    t = 1.0;
+
+  return float(t);
 }
 
 void So@Gui@FlyViewerP::updateCurrentSpeed( float dt )
@@ -1211,9 +1210,9 @@ So@Gui@FlyViewer::actualRedraw(void)
       thisrender.setToTimeOfDay();
 
       if (PRIVATE(this)->currentspeed != 0.0f) {
-        float t = float(thisrender.getValue() -
-                        PRIVATE(this)->lastrender->getValue()) * 2.0f;
-        if (t > 0.0f) {
+        double t = (thisrender.getValue() -
+                    PRIVATE(this)->lastrender->getValue()) * 2.0;
+        if (t > 0.0) {
           SoCamera * camera = this->getCamera();
 
           if (camera){ // could be a sceneless viewer
