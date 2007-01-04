@@ -227,6 +227,7 @@ protected:
 private:
   class So@Gui@ViewerP * pimpl;
   friend class So@Gui@ViewerP;
+  friend class So@Gui@PlaneViewer;
 };
 
 // *************************************************************************
