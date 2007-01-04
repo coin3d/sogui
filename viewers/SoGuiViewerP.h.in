@@ -28,9 +28,34 @@
 #error this is a private header file
 #endif /* !SO@GUI@_INTERNAL */
 
-#include <Inventor/@Gui@/common/SbGuiList.h>
+#include <Inventor/SbRotation.h>
+#include <Inventor/SbVec3f.h>
 
-class So@Gui@Viewer;
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#include <Inventor/@Gui@/common/gl.h>
+#include <Inventor/@Gui@/common/SbGuiList.h>
+#include <Inventor/@Gui@/viewers/So@Gui@Viewer.h>
+
+class SoSeparator;
+class SoCamera;
+class SoOrthographicCamera;
+class SoPerspectiveCamera;
+class SoGetBoundingBoxAction;
+class SoNode;
+class SoTimerSensor;
+class SoDirectionalLight;
+class SoSwitch;
+class SoBaseColor;
+class SoDrawStyle;
+class SoLightModel;
+class SoMaterialBinding;
+class SoPolygonOffset;
+class SoComplexity;
+class SoSearchAction;
+class SoGetMatrixAction;
 
 class So@Gui@ViewerP {
 public:
@@ -90,7 +115,7 @@ public:
   float totalcoin, totaldraw;
   double lastgettimeofday;
   int framecount;
-
+  
   // Stereo-related
   SbBool stereoviewing, stereotypesetexplicit;
   float stereooffset;
