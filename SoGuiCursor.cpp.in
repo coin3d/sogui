@@ -35,6 +35,7 @@
 */
 
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
+#include <Inventor/@Gui@/SoAny.h>
 #include <assert.h>
 
 /*!
@@ -250,7 +251,7 @@ So@Gui@Cursor::initClass(void)
   soguicursor_pancursor = new So@Gui@Cursor(&pan);
   soguicursor_rotatecursor = new So@Gui@Cursor(&rotate);
   soguicursor_blankcursor = new So@Gui@Cursor(&blank);
-  sogui_atexit((sogui_atexit_f*)soguicursor_atexit_cleanup, 0);
+  SoAny::atexit((SoAny::atexit_f*)soguicursor_atexit_cleanup, 0);
 }
 
 /*!

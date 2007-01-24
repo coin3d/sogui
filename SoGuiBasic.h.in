@@ -137,12 +137,4 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 # define SO@GUI@_DLL_API
 #endif /* !SO@GUI@_DLL_API */
 
-// *************************************************************************
-
-// FIXME: Dummy sogui_atexit(). Replace with real
-// implementation. kintel 20060209
-#include <stdlib.h>
-typedef void sogui_atexit_f(void);
-void sogui_atexit(sogui_atexit_f * fp, int priority);
-
 #endif // ! SO@GUI@_BASIC_H
