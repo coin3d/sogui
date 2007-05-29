@@ -733,12 +733,8 @@ So@Gui@RenderAreaP::renderCB(void * closure, SoSceneManager * manager)
     SoDebugError::post("So@Gui@RenderAreaP::renderCB",
                        "invoked for unknown SoSceneManager (%p)", manager);
 #endif // SO@GUI@_DEBUG
-    manager->setRenderCallback(NULL, NULL);
     return;
   }
-
-  if (!thisptr->isAutoRedraw())
-    manager->setRenderCallback(NULL, NULL);
 }
 
 // Callback for automatic redraw on SoSelection changes.
@@ -1344,18 +1340,13 @@ void
 So@Gui@RenderArea::setAutoRedraw(SbBool enable)
 {
   if (enable) {
-    PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
-    PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
+    PRIVATE(this)->normalManager->activate();
+    PRIVATE(this)->overlayManager->activate();
   }
   else {
-    PRIVATE(this)->normalManager->setRenderCallback(NULL, NULL);
-    PRIVATE(this)->overlayManager->setRenderCallback(NULL, NULL);
+    PRIVATE(this)->normalManager->deactivate();
+    PRIVATE(this)->overlayManager->deactivate();
   }
-
-  // We can not use the render callback ptr as a flag, as the render
-  // callback pointer will be set upon expose events and forced
-  // redraws -- and autoRedraw is then used to remember that the
-  // pointer should be set back to NULL again after redraw.
   PRIVATE(this)->autoRedraw = enable;
 }
 
@@ -1428,11 +1419,8 @@ So@Gui@RenderArea::scheduleRedraw(void)
   SoDebugError::postInfo("So@Gui@RenderArea::scheduleRedraw",
                          "invoked");
 #endif // debug
-
+  
   assert(PRIVATE(this)->normalManager != NULL);
-  // In case autoRedraw is OFF. The callback pointer will be reset to
-  // NULL in renderCB() if autoRedraw is OFF.
-  PRIVATE(this)->normalManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
   PRIVATE(this)->normalManager->scheduleRedraw(); // Redraw when idle.
 }
 
@@ -1443,9 +1431,6 @@ void
 So@Gui@RenderArea::scheduleOverlayRedraw(void)
 {
   assert(PRIVATE(this)->overlayManager != NULL);
-  // In case autoRedraw is OFF. The callback pointer will be reset to
-  // NULL in renderCB() if autoRedraw is OFF.
-  PRIVATE(this)->overlayManager->setRenderCallback(So@Gui@RenderAreaP::renderCB, this);
   PRIVATE(this)->overlayManager->scheduleRedraw(); // Redraw when idle.
 }
 
