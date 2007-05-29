@@ -138,11 +138,14 @@ So@Gui@::init(const char * appname, const char * classname)
     buf[appname_len] = '\0';
   }
 
+  // FIXME: Both SoGui_init_argc/argv need to be static to workaround
+  // a compiler optimization memory corruption bug (observed with gcc
+  // 4.1.1 using -O2 in combination with qt-4.2.x), which would lead
+  // to a segfault. 20070528 tamer.
+
   // Fake argc and argv setup, forward to real init routine.
-  // FIXME: By the beauty of Gargamel and his cat Azrael, this code
-  // needs a different approach... 20070528 tamer.
   static int SoGui_init_argc = (buf != NULL) ? 1 : 0;
-  static char *SoGui_init_argv[2]; // use static array to avoid memory corruption in Qt
+  static char * SoGui_init_argv[2]; // use static array to avoid memory corruption in Qt
   SoGui_init_argv[0] = buf;
   SoGui_init_argv[1] = NULL;
 
