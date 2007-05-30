@@ -1,6 +1,8 @@
 #ifndef SOGUI_MOUSEP_H
 #define SOGUI_MOUSEP_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

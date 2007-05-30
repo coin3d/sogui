@@ -1,6 +1,8 @@
 #ifndef SOGUI_SPACEBALLP_H
 #define SOGUI_SPACEBALLP_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

@@ -1,3 +1,8 @@
+#ifndef SPWINPUT_WIN32_H
+#define SPWINPUT_WIN32_H
+
+/* @configure_input@ */
+
 /*----------------------------------------------------------------------
  * (C) 1998-2001 3Dconnexion. All rights reserved. 
  * Permission to use, copy, modify, and distribute this software for all
@@ -7,9 +12,6 @@
  * approved by 3Dconnexion.
  *
  */
-
-#ifndef SPWINPUT_WIN32_H
-#define SPWINPUT_WIN32_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

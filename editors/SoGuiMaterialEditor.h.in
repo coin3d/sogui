@@ -1,6 +1,8 @@
 #ifndef COIN_SO@GUI@MATERIALEDITOR_H
 #define COIN_SO@GUI@MATERIALEDITOR_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

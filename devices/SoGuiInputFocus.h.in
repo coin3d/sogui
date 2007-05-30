@@ -1,3 +1,8 @@
+#ifndef SO@GUI@_INPUTFOCUS_H
+#define SO@GUI@_INPUTFOCUS_H
+
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.
@@ -20,9 +25,6 @@
  *  <URL:http://www.sim.no/>.
  *
 \**************************************************************************/
-
-#ifndef SO@GUI@_INPUTFOCUS_H
-#define SO@GUI@_INPUTFOCUS_H
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 

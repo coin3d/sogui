@@ -1,6 +1,8 @@
 #ifndef COIN_SOGUISCENETEXTURE2_H
 #define COIN_SOGUISCENETEXTURE2_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

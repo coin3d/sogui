@@ -1,6 +1,8 @@
 #ifndef SOGUIWALKVIEWERP_H
 #define SOGUIWALKVIEWERP_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

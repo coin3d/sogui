@@ -1,6 +1,8 @@
 #ifndef SOGUIGLWIDGETP_H
 #define SOGUIGLWIDGETP_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

@@ -1,6 +1,8 @@
 #ifndef COIN_SOGUIMATERIALEDITOR_H
 #define COIN_SOGUIMATERIALEDITOR_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

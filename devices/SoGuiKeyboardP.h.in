@@ -1,6 +1,8 @@
 #ifndef SOGUI_KEYBOARDP_H
 #define SOGUI_KEYBOARDP_H
 
+// @configure_input@
+
 /**************************************************************************\
  *
  *  This file is part of the Coin 3D visualization library.

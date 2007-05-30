@@ -1,3 +1,8 @@
+#ifndef COIN_SPWINPUT_H
+#define COIN_SPWINPUT_H
+
+/* @configure_input@ */
+
 /*----------------------------------------------------------------------
  * (C) 1999 Spacetec IMC Corporation ("Spacetec").
  *
@@ -8,9 +13,6 @@
  * approved by Spacetec.
  *
  */
-
-#ifndef COIN_SPWINPUT_H
-#define COIN_SPWINPUT_H
 
 #define SPW_INPUT_MAJOR    7
 #define SPW_INPUT_MINOR    6
