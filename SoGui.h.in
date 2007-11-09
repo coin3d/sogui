@@ -90,6 +90,7 @@ public:
                              int * minor = NULL,
                              int * micro = NULL);
   static const char * getVersionString(void);
+  static const char * getVersionToolkitString(void);
 
   enum FatalErrors {
     UNSPECIFIED_ERROR = 0,

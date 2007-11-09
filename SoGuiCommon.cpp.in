@@ -282,6 +282,19 @@ So@Gui@::getVersionString(void)
   return version;
 }
 
+/*!
+  This method returns a string containing the version id of the
+  @Gui@ toolkit the So@Gui@ library is linked against.
+
+  This method is not part of the original InventorXt API from SGI.
+*/
+const char *
+So@Gui@::getVersionToolkitString(void)
+{
+  static const char toolkit_version[] = GUI_TOOLKIT_VERSION;
+  return toolkit_version;
+}
+
 // *************************************************************************
 
 /*!
