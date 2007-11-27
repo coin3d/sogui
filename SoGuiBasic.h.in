@@ -80,10 +80,6 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 #undef SO@GUI@_VERSION
 #endif /* ! SO@GUI@_VERSION */
 
-#if ! defined(GUI_TOOLKIT_VERSION)
-#undef GUI_TOOLKIT_VERSION
-#endif /* ! GUI_TOOLKIT_VERSION */
-
 // *************************************************************************
 
 /* Precaution to avoid an error easily made by the application programmer. */
@@ -140,5 +136,9 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 #ifndef SO@GUI@_DLL_API
 # define SO@GUI@_DLL_API
 #endif /* !SO@GUI@_DLL_API */
+
+#ifndef GUI_TOOLKIT_VERSION
+#define GUI_TOOLKIT_VERSION ""
+#endif /* GUI_TOOLKIT_VERSION */
 
 #endif // ! SO@GUI@_BASIC_H
