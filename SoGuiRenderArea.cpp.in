@@ -168,6 +168,7 @@
 #include <Inventor/nodes/SoCamera.h>
 #include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoOffscreenRenderer.h>
+#include <Inventor/SbColor4f.h>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Basic.h>
@@ -1053,7 +1054,12 @@ const SbColor &
 So@Gui@RenderArea::getBackgroundColor(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
+#if HAVE_SBCOLOR4F_GETBACKGROUNDCOLOR
+  SbColor4f bgcol = PRIVATE(this)->normalManager->getBackgroundColor();
+  return SbColor(bgcol[0], bgcol[1], bgcol[2]);
+#else
   return PRIVATE(this)->normalManager->getBackgroundColor();
+#endif
 }
 
 // *************************************************************************

@@ -169,6 +169,7 @@
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
+#include <Inventor/SbColor4f.h>
 #include <Inventor/sensors/SoTimerSensor.h>
 
 #ifdef HAVE_SOPOLYGONOFFSET
@@ -3261,8 +3262,11 @@ So@Gui@Viewer::actualRedraw(void)
   const So@Gui@Viewer::StereoType stereotype = this->getStereoType();
 
   if (stereotype != So@Gui@Viewer::STEREO_NONE) {
-    const SbColor bgcol = this->getSceneManager()->getBackgroundColor();
-
+#if HAVE_SBCOLOR4F_GETBACKGROUNDCOLOR
+    const SbColor4f bgcol = this->getSceneManager()->getBackgroundColor();
+#else
+    const SbColor4f bgcol(this->getSceneManager()->getBackgroundColor(), 0.0f);
+#endif
     SoCamera * camera = this->getCamera();
     So@Gui@ViewerP::StereoData tmpstorage;
 

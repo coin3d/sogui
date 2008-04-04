@@ -58,6 +58,7 @@ class SoPolygonOffset;
 class SoComplexity;
 class SoSearchAction;
 class SoGetMatrixAction;
+class SoAlarmSensor;
 
 class So@Gui@ViewerP {
 public:
@@ -187,6 +188,8 @@ public:
   float autoclipvalue;
   So@Gui@AutoClippingCB * autoclipcb;
   void * autoclipuserdata;
+
+  SoAlarmSensor * redrawalarm;
 };
 
 #endif // SOGUIVIEWERP_H
