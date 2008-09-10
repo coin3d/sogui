@@ -86,10 +86,8 @@ public:
   } pointer;
   SbVec2s canvas;
 
-  SbBool leftcontroldown;
-  SbBool rightcontroldown;
-  SbBool leftshiftdown;
-  SbBool rightshiftdown;
+  SbBool ctrldown;
+  SbBool shiftdown;
   SbBool button1down;
   SbBool button3down;
 

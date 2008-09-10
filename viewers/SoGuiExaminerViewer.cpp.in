@@ -368,46 +368,10 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
                           ev->getTypeId().getName().getString());
 #endif // debug
 
-#if 0
-  // 20050202 larsa: I have disabled the below functionality because it
-  // caused "alt" to stick - the release never got sent to the scene - the
-  // alt key was rendered useless for the Coin envronment  - and I don't
-  // think this is compatible behaviour with SGI SoXt either.  end larsa.
-  //
-  // UPDATE 20050310 mortene: IIRC, pressing the ALT key is a way to
-  // temporarily switch between examine mode and view mode in SGI's
-  // InventorXt, which is then reversed when the ALT key is
-  // released. So this functionality shouldn't simply be disabled, but
-  // rather debugged and fixed.
-  //
-  // Note: All changes made here should also be applied to
-  // common/viewers/SoGuiPlaneViewer.cpp.in
-
-  // Let the end-user toggle between camera-interaction mode
-  // ("viewing") and scenegraph-interaction mode with ALT key(s).
-  if (ev->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
-    SoKeyboardEvent * ke = (SoKeyboardEvent *)ev;
-    switch (ke->getKey()) {
-    case SoKeyboardEvent::LEFT_ALT:
-    case SoKeyboardEvent::RIGHT_ALT:
-      if (this->isViewing() && (ke->getState() == SoButtonEvent::DOWN)) {
-        this->setViewing(FALSE);
-        return TRUE;
-      }
-      else if (!this->isViewing() && (ke->getState() == SoButtonEvent::UP)) {
-        this->setViewing(TRUE);
-        return TRUE;
-      }
-    default:
-      break;
-    }
-  }
-#endif // 0 - alt-key
-
   // We're in "interact" mode (ie *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
   // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
-  // it's an ESC press (to switch modes).
+  // it's an ESC or ALT press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
     
   // Events when in "ready-to-seek" mode are ignored, except those
@@ -434,14 +398,8 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
   const SoGuiExaminerViewerP::ViewerMode currentmode = PRIVATE(this)->currentmode;
   SoGuiExaminerViewerP::ViewerMode newmode = currentmode;
 
-  // Mismatches in state of the modifier keys happens if the user
-  // presses or releases them outside the viewer window.
-  if (PRIVATE(this)->ctrldown != ev->wasCtrlDown()) {
-    PRIVATE(this)->ctrldown = ev->wasCtrlDown();
-  }
-  if (PRIVATE(this)->shiftdown != ev->wasShiftDown()) {
-    PRIVATE(this)->shiftdown = ev->wasShiftDown();
-  }
+  PRIVATE(this)->ctrldown = ev->wasCtrlDown();
+  PRIVATE(this)->shiftdown = ev->wasShiftDown();
 
   // Mouse Button / Spaceball Button handling
 

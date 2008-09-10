@@ -75,6 +75,7 @@ public:
   SoCamera * camera;
   So@Gui@Viewer::Type type;
   SbBool viewingflag;
+  SbBool altdown;
   SoGetBoundingBoxAction * autoclipbboxaction;
   SoSeparator * sceneroot;
   SoNode * scenegraph;

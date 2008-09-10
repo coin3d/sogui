@@ -1592,6 +1592,7 @@ So@Gui@Viewer::So@Gui@Viewer(@WIDGET@ parent,
   // initialization of protected data
   PRIVATE(this)->type = t;
   PRIVATE(this)->viewingflag = TRUE;
+  PRIVATE(this)->altdown = FALSE;
   PRIVATE(this)->camera = NULL;
   PRIVATE(this)->scenegraph = NULL;
 
@@ -3651,11 +3652,33 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 
   if (type.isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
     keyevent = (SoKeyboardEvent *) event;
+    switch (keyevent->getKey()) {
+    
     // the ESC key switches between view and interact mode
-    if (keyevent->getKey() == SoKeyboardEvent::ESCAPE &&
-        keyevent->getState() == SoButtonEvent::DOWN) {
-      this->setViewing(this->isViewing() ? FALSE : TRUE);
-      return TRUE;
+    case SoKeyboardEvent::ESCAPE:
+      if (keyevent->getState() == SoButtonEvent::DOWN) {
+        this->setViewing(this->isViewing() ? FALSE : TRUE);
+        return TRUE;
+      }
+      break;
+
+    // Let the end-user toggle between camera-interaction mode
+    // ("viewing") and scenegraph-interaction mode with ALT key(s).
+    case SoKeyboardEvent::LEFT_ALT:
+    case SoKeyboardEvent::RIGHT_ALT:
+      if (!this->isViewing() && (keyevent->getState() == SoButtonEvent::DOWN)) {
+        PRIVATE(this)->altdown = TRUE;
+        this->setViewing(TRUE);
+        return TRUE;
+      }
+      else if (PRIVATE(this)->altdown && (keyevent->getState() == SoButtonEvent::UP)) {
+        this->setViewing(FALSE);
+        PRIVATE(this)->altdown = FALSE;
+        return TRUE;
+      }
+      break;
+    default:
+      break;
     }
   }
 
@@ -3669,10 +3692,6 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
     switch (keyevent->getKey()) {
     case SoKeyboardEvent::S:
       this->setSeekMode(this->isSeekMode() ? FALSE : TRUE);
-      return TRUE;
-    case SoKeyboardEvent::Q:
-      this->hide();
-      So@Gui@::exitMainLoop();
       return TRUE;
     case SoKeyboardEvent::HOME:
       this->resetToHomePosition();

@@ -1116,32 +1116,10 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
   // strategy as in So@Gui@ExaminerViewer, where the event-handler
   // only checks the state and the mode from that. 20021016 rolvs.
 
-  // Let the end-user toggle between camera-interaction mode
-  // ("viewing") and scenegraph-interaction mode with ALT key(s).
-  // FIXME: Allow this to be handled by processKeyboardEvent? 
-  // 20021016 rolvs.
-  if (event->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
-    SoKeyboardEvent * ke = (SoKeyboardEvent *)event;
-    switch (ke->getKey()) {
-    case SoKeyboardEvent::LEFT_ALT:
-    case SoKeyboardEvent::RIGHT_ALT:
-      if (this->isViewing() && (ke->getState() == SoButtonEvent::DOWN)) {
-        this->setViewing(FALSE);
-        return TRUE;
-      }
-      else if (!this->isViewing() && (ke->getState() == SoButtonEvent::UP)) {
-        this->setViewing(TRUE);
-        return TRUE;
-      }
-    default:
-      break;
-    }
-  }
-
   // We're in "interact" mode (ie *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
   // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
-  // it's an ESC press (to switch modes).
+  // it's an ESC and ALT press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(event); }
 
   // Events when in "ready-to-seek" mode are ignored, except those
