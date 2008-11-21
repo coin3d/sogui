@@ -98,18 +98,49 @@
   \sa So@Gui@Component
 */
 
+// *************************************************************************
+
 #include <stdlib.h>
 #include <string.h>
+
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/SoGuiP.h>
 #include <Inventor/@Gui@/SoAny.h>
 
+#include <Inventor/SoDB.h>
+#include <Inventor/SoInteraction.h>
+#include <Inventor/nodekits/SoNodeKit.h>
+
+// *************************************************************************
 
 // Default constructor and the destructor is private (So@Gui@ class
 // consists solely of static functions).
 So@Gui@::So@Gui@(void) { }
 So@Gui@::~So@Gui@() { }
 
+// *************************************************************************
+
+cc_mutex * SoGuiP::gllockmutex = NULL;
+
+// *************************************************************************
+
+void
+SoGuiP::commonInit(void)
+{
+  SoDB::init();
+  SoNodeKit::init();
+  SoInteraction::init();
+
+  SoAny::init();
+
+  SoGuiP::gllockmutex = cc_mutex_construct();
+}
+
+void
+SoGuiP::commonCleanup(void)
+{
+  cc_mutex_destruct(SoGuiP::gllockmutex);
+}
 
 // *************************************************************************
 
@@ -293,6 +324,43 @@ So@Gui@::getVersionToolkitString(void)
 {
   static const char toolkit_version[] = GUI_TOOLKIT_VERSION;
   return toolkit_version;
+}
+
+// *************************************************************************
+
+/*!
+  This method locks other threads out from a code section until the
+  caller thread invokes So@Gui@::unlockGL().
+
+  It is meant to protect several threads invoking OpenGL calls in
+  parallell, in case the underlying OpenGL implementation is not
+  multi-thread safe.
+
+  For convenience, the function can be invoked through the
+  SO@GUI@_ENTER_GL_SECTION().
+
+  This method is not part of the original InventorXt API from SGI.
+*/
+void
+So@Gui@::lockGL(void)
+{
+  assert(SoGuiP::gllockmutex);
+
+  cc_mutex_lock(SoGuiP::gllockmutex);
+}
+
+/*!
+  See documentation for So@Gui@::lockGL().
+
+  For convenience, the function can be invoked through the
+  SO@GUI@_LEAVE_GL_SECTION().
+
+  This method is not part of the original InventorXt API from SGI.
+*/
+void
+So@Gui@::unlockGL(void)
+{
+  cc_mutex_unlock(SoGuiP::gllockmutex);
 }
 
 // *************************************************************************

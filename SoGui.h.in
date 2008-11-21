@@ -108,6 +108,9 @@ public:
   enum ABIType { DLL, LIB, UNKNOWN };
   static ABIType getABIType(void);
 
+  static void lockGL(void);
+  static void unlockGL(void);
+
 private:
   // Since the class consists solely of static functions, hide the
   // default constructor and the destructor so nobody can instantiate
@@ -179,6 +182,14 @@ private:
   static SbPList * component_callbacks;
 #endif // __COIN_SOGTK__
 };
+
+// *************************************************************************
+// Here's something InventorWin provides for convenience. Belongs more
+// in the application code domain, imo, but we provide these macros
+// for better compile time compatibility with InventorWin.  -mortene
+
+#define SO@GUI@_ENTER_GL_SECTION() do { So@Gui@::lockGL(); } while(FALSE)
+#define SO@GUI@_LEAVE_GL_SECTION() do { So@Gui@::unlockGL(); } while(FALSE)
 
 // *************************************************************************
 
