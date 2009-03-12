@@ -110,6 +110,9 @@ public:
   void setOverlayRender(const SbBool onoff);
   SbBool isOverlayRender(void) const;
 
+  void setSampleBuffers(const int numsamples);
+  int getSampleBuffers(void) const;
+
   void setStealFocus(SbBool enable);
   SbBool isStealFocus(void) const;
 

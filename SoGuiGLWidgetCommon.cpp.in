@@ -511,6 +511,22 @@
   \since So@Gui@ 1.3.0
 */
 
+
+/*! 
+  \fn void So@Gui@GLWidget::setSampleBuffers(const int numsamples)
+  
+  Set the number of samples use when enabling multisample buffer contexts.
+  Multisampling will be enabled when numsamples > 1.
+  
+*/
+
+/*! 
+  \fn int So@Gui@GLWidget::getSampleBuffers(void) const
+  
+  Returns the number of samples used for multisampling. Returns 1 if
+  multisampling is disabled.
+*/
+
 // Documented in common/SoGuiGLWidgetCommon.cpp.in.
 void
 So@Gui@GLWidget::setStealFocus(SbBool enable)
