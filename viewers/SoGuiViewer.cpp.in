@@ -1388,8 +1388,8 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 
   So if you want to avoid having the So@Gui@Viewer class muck about
   with your supplied scenegraph, set the type-flag to
-  So@Gui@Viewer::BROWSER instead, which inserts a camera into the
-  viewer's own "wrapper" scene graph.
+  So@Gui@Viewer::BROWSER instead, which makes an inserted camera node
+  go into the viewer's own "wrapper" scene graph instead.
 */
 
 /*!
