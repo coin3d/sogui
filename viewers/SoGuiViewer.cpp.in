@@ -1381,14 +1381,15 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::EDITOR
 
-  If a user-supplied scenegraph passed into the setSceneGraph)
+  If a user-supplied scenegraph passed into the setSceneGraph()
   function does not contain a camera, setting the viewer type to
   EDITOR will make the viewer in that case automatically set up a
   camera \e in the user-supplied scene.
 
   So if you want to avoid having the So@Gui@Viewer class muck about
   with your supplied scenegraph, set the type-flag to
-  So@Gui@Viewer::BROWSER instead.
+  So@Gui@Viewer::BROWSER instead, which inserts a camera into the
+  viewer's own "wrapper" scene graph.
 */
 
 /*!
