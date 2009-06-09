@@ -175,7 +175,6 @@
 #include <Inventor/@Gui@/So@Gui@.h>
 #include <Inventor/@Gui@/devices/So@Gui@Keyboard.h>
 #include <Inventor/@Gui@/devices/So@Gui@Mouse.h>
-#include <Inventor/@Gui@/devices/So@Gui@Spaceball.h>
 #ifdef HAVE_JOYSTICK_LINUX
 #include <Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h>
 #endif // HAVE_JOYSTICK_LINUX
@@ -971,8 +970,6 @@ So@Gui@RenderArea::afterRealizeHook(void)
     this->registerDevice(new So@Gui@LinuxJoystick);
 #endif // HAVE_JOYSTICK_LINUX
 
-  if (So@Gui@Spaceball::exists())
-    this->registerDevice(new So@Gui@Spaceball);
 }
 
 /*!

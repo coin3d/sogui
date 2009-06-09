@@ -110,6 +110,7 @@ protected:
   void setBottomWheelString(const char * const name);
   @WIDGET@ getBottomWheelLabelWidget(void) const;
   void setRightWheelString(const char * const name);
+  const char * getRightWheelString() const;
   @WIDGET@ getRightWheelLabelWidget(void) const;
 
   virtual SbBool processSoEvent(const SoEvent * const event);
