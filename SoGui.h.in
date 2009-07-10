@@ -32,7 +32,7 @@
 // 20020613 mortene.
 
 #ifdef __COIN_SOQT__
-#include <qobject.h>
+#include <QtCore/QObject>
 #endif // __COIN_SOQT__
 #ifdef __COIN_SOXT__
 #include <X11/Intrinsic.h>
