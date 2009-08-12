@@ -405,19 +405,8 @@ So@Gui@ViewerP::getCameraCoordinateSystem(SoCamera * cameraarg,
   this->searchaction->reset();
 }
 
-// FIXME: this code is really not applying the correct solution,
-// trying to convert between SoOrthographic::height and
-// SoPerspectiveCamera::heightAngle.
-//
-// Conversion from a perspective camera to an orthographic camera, and
-// vice versa, makes a "best guess" at how information from one or the
-// other can be represented.
-//
-// The current code which does this may accumulate small errors upon
-// each conversion from one type to the other, and eventually the
-// errors gets large enough that the camera starts acting weird.
-//
-// What we should really try to do is:
+
+// These functions do this:
 //
 //       * when going from orthocam -> perspectivecam: set the
 //       heightAngle field to its default value (45°), and move
@@ -440,16 +429,19 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
   out->position.setValue(in->position.getValue());
   out->viewportMapping.setValue(in->viewportMapping.getValue());
   
-  float focaldist = in->focalDistance.getValue();
+  SbRotation camrot = in->orientation.getValue();
 
-  // focalDistance==0.0f happens for empty scenes.
-  if (focaldist != 0.0f) {
-    out->heightAngle = 2.0f * (float)atan(in->height.getValue() / 2.0 / focaldist);
-  }
-  else {
-    // 45° is the default value of this field in SoPerspectiveCamera.
+  float focaldist = in->height.getValue() / (2.0*tan(M_PI / 8.0));
+  
+  SbVec3f offset(0,0,focaldist-in->focalDistance.getValue());
+
+  camrot.multVec(offset,offset);
+  out->position.setValue(offset+in->position.getValue());
+
+  out->focalDistance.setValue(focaldist);
+  
+  // 45° is the default value of this field in SoPerspectiveCamera.
     out->heightAngle = (float)(M_PI / 4.0);
-  }
 
 #if SO@GUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@Gui@ViewerP::convertOrtho2Perspective",
