@@ -111,6 +111,8 @@
 #include <Inventor/SoInteraction.h>
 #include <Inventor/nodekits/SoNodeKit.h>
 
+#include <string>
+
 // *************************************************************************
 
 // Default constructor and the destructor is private (So@Gui@ class
@@ -322,8 +324,8 @@ So@Gui@::getVersionString(void)
 const char *
 So@Gui@::getVersionToolkitString(void)
 {
-  static const char toolkit_version[] = GUI_TOOLKIT_VERSION;
-  return toolkit_version;
+  static std::string toolkit_version = GUI_TOOLKIT_VERSION;
+  return toolkit_version.c_str();
 }
 
 // *************************************************************************

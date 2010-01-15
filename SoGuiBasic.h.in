@@ -35,6 +35,8 @@
  *   So@Gui@Swap(Val1, Val2)      - swaps the two values (no return value)
  */
 
+@BASIC_HEADER_TOP@
+
 template <class Type>
 inline Type So@Gui@Abs(Type Val) {
   return (Val < 0) ? -Val : Val;
