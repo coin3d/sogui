@@ -130,16 +130,6 @@
 */
 
 /*!
-  \fn void So@Gui@Component::setBaseWidget(@WIDGET@ widget)
-
-  Set the core widget for this So@Gui@ component. It is important that
-  subclasses get this correct, as the widget set here will be the
-  widget returned from query methods.
-
-  \sa baseWidget()
-*/
-
-/*!
   \fn void So@Gui@Component::show(void)
 
   This will show the widget, de-iconifiying and raising it if
