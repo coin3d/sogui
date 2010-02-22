@@ -321,10 +321,20 @@ So@Gui@::getVersionString(void)
 
   This method is not part of the original InventorXt API from SGI.
 */
+#ifdef SOWIN_INTERNAL
+namespace Win32 {
+  std::string GUI_TOOLKIT_VERSION;
+};
+#endif
+
 const char *
 So@Gui@::getVersionToolkitString(void)
 {
+#ifdef SOWIN_INTERNAL
+  static std::string toolkit_version = Win32::GUI_TOOLKIT_VERSION;
+#else
   static std::string toolkit_version = GUI_TOOLKIT_VERSION;
+#endif
   return toolkit_version.c_str();
 }
 
