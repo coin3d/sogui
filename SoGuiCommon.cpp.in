@@ -323,7 +323,7 @@ So@Gui@::getVersionString(void)
 */
 #ifdef SOWIN_INTERNAL
 namespace Win32 {
-  std::string GUI_TOOLKIT_VERSION;
+  std::string GetOSDisplayString();
 };
 #endif
 
@@ -331,7 +331,7 @@ const char *
 So@Gui@::getVersionToolkitString(void)
 {
 #ifdef SOWIN_INTERNAL
-  static std::string toolkit_version = Win32::GUI_TOOLKIT_VERSION;
+  static std::string toolkit_version = Win32::GetOSDisplayString();
 #else
   static std::string toolkit_version = GUI_TOOLKIT_VERSION;
 #endif
