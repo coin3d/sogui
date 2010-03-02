@@ -2226,8 +2226,9 @@ So@Gui@Viewer::isCursorEnabled(void) const
   in caches. The bounding box caches are then used by the
   SoGLRenderAction traversal for view frustum culling operations. With
   no bounding box caches, the rendering will not do culling, which can
-  cause much worse performance. Systems in Motion are working on
-  correcting this problem properly from within the Coin library.
+  cause much worse performance. Kongsberg Oil & Gas Technologies are
+  working on correcting this problem properly from within the Coin
+  library.
 
   On a minor note, be aware that notifications will be temporarily
   turned off for the scene's SoCamera when changing the near and far
