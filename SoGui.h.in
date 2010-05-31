@@ -131,6 +131,11 @@ private:
   // FIXME!: audit and remove as much as possible of the remaining
   // toolkit specific parts below. 20020117 mortene.
 
+#ifdef __COIN_SOWIN__
+public:
+  static void doIdleTasks(void);
+#endif // __COIN_SOWIN__
+
 #ifdef __COIN_SOXT__
 public:
   static void nextEvent(XtAppContext, XEvent *);
