@@ -84,6 +84,7 @@
     // Clean up resources.
     delete eviewer;
     root->unref();
+    So@Gui@::done();
 
     return 0;
   }
@@ -216,6 +217,9 @@ So@Gui@::init(const char * appname, const char * classname)
   Cleans up all static data allocated by the So@Gui@ library on
   initialization.
 
+  This functions calls SoDB::finish() which means that no Coin classes
+  should be used after it has been called.
+
   <!-- (Disabled: see FIXME in SoQt.cpp:855)
   Is called implicitly from the end of So@Gui@::mainLoop(), so the
   application programmer should not call it explicitly unless she
@@ -232,7 +236,7 @@ So@Gui@::init(const char * appname, const char * classname)
   It should never be invoked more than \e once, and that
   is just before application exit, as it deallocates \e static data
   allocated as "one-off" operations in So@Gui@::init().
-
+  
   NOTE: done() is not present in the original API for SGI's InventorXt
   library.
 */
@@ -245,7 +249,11 @@ So@Gui@::init(const char * appname, const char * classname)
   It doesn't return until application exit is somehow forced, either
   programmatically from the relevant API-call of the native toolkit,
   or when the user closes the application's main widget.
+  
+  After the main loop has finished execution, call So@Gui@::done() to clean 
+  up static data.
 
+  <!-- (Disabled: see FIXME in SoQt.cpp:855)
   An important note: be careful about how you handle
   So@Gui@Component-derived objects after the application control returns
   from mainLoop(), as So@Gui@ will then have been "cleaned up" with
@@ -262,6 +270,7 @@ So@Gui@::init(const char * appname, const char * classname)
   \e Deleting a component after mainLoop() returns is allowed, though,
   and also necessary to avoid getting reports of possible memory leaks
   from memleak checkers.
+  -->
 */
 
 /*!
