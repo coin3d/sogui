@@ -839,7 +839,8 @@ So@Gui@ViewerP::setClippingPlanes(void)
   // (to handle it). 20020116 mortene.
 
   // Check if scene is completely behind us.
-  if (farval <= 0.0f) { return; }
+  // Do NOT check for orthographic cameras.
+  if (farval <= 0.0f && !this->camera->isOfType(SoOrthographicCamera::getClassTypeId())) { return; }
 
   if (this->camera->isOfType(SoPerspectiveCamera::getClassTypeId())) {
     // Disallow negative and small near clipping plane distance.
@@ -905,8 +906,10 @@ So@Gui@ViewerP::setClippingPlanes(void)
     }
   }
   else {
-    nearval *= (1.0f - SLACK);
-    farval *= (1.0f + SLACK);
+    // For orthographic cameras also negative values nearval/farval
+    // are reasonable.
+    nearval *= (1.0f - (nearval>0?1:-1)*SLACK);
+    farval *= (1.0f + (farval>0?1:-1)*SLACK);
   }
 
   if (this->autoclipcb) {
