@@ -1,0 +1,53 @@
+#ifndef SO@GUI@_SPACENAVDEVICE_H
+#define SO@GUI@_SPACENAVDEVICE_H
+
+// @configure_input@
+
+/**************************************************************************\
+ *
+ *  This file is part of the SIM Voleon visualization library.
+ *  Copyright (C) by Kongsberg Oil & Gas Technologies.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  ("GPL") version 2 as published by the Free Software Foundation.
+ *  See the file LICENSE.GPL at the root directory of this source
+ *  distribution for additional information about the GNU GPL.
+ *
+ *  For using SIM Voleon with software that can not be combined with
+ *  the GNU GPL, and for taking advantage of the additional benefits
+ *  of our support services, please contact Kongsberg Oil & Gas
+ *  Technologies about acquiring a SIM Voleon Professional Edition
+ *  License.
+ *
+ *  See http://www.coin3d.org/ for more information.
+ *
+ *  Kongsberg Oil & Gas Technologies, Bygdoy Alle 5, 0257 Oslo, NORWAY.
+ *  http://www.sim.no/  sales@sim.no  coin-support@coin3d.org
+ *
+\**************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif // HAVE_CONFIG_H
+
+#include <Inventor/@Gui@/devices/So@Gui@Device.h>
+
+class SOWIN_DLL_API So@Gui@SpacenavDevice : public So@Gui@Device {
+  SOWIN_OBJECT_HEADER(So@Gui@SpacenavDevice, So@Gui@Device);
+
+ public:
+  So@Gui@SpacenavDevice();
+  virtual ~So@Gui@SpacenavDevice();
+
+  virtual void enable(HWND w, So@Gui@EventHandler * handler, void * closure);
+  virtual void disable(HWND w, So@Gui@EventHandler * handler, void * closure);
+  virtual const SoEvent * translateEvent(MSG * event);
+
+ private:
+  class So@Gui@SpacenavDeviceP * pimpl;
+  friend class So@Gui@SpacenavDeviceP;
+};
+
+
+#endif // !SO@GUI@_SPACENAVDEVICE_H
