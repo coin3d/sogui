@@ -178,6 +178,9 @@
 #ifdef HAVE_JOYSTICK_LINUX
 #include <Inventor/@Gui@/devices/So@Gui@LinuxJoystick.h>
 #endif // HAVE_JOYSTICK_LINUX
+#ifdef HAVE_SPACENAV_SUPPORT
+#include <Inventor/@Gui@/devices/So@Gui@SpacenavDevice.h>
+#endif // HAVE_SPACENAV_SUPPORT 
 
 #include <Inventor/@Gui@/So@Gui@GLWidgetP.h>
 #include <Inventor/@Gui@/SoAny.h>
@@ -220,6 +223,9 @@ public:
   struct {
     So@Gui@Keyboard * keyboard;
     So@Gui@Mouse * mouse;
+#ifdef HAVE_SPACENAV_SUPPORT
+    So@Gui@SpacenavDevice * spacenav;
+#endif // HAVE_SPACENAV_SUPPORT
   } devices;
 
   SbBool autoRedraw;
@@ -773,6 +779,10 @@ So@Gui@RenderAreaP::So@Gui@RenderAreaP(So@Gui@RenderArea * api)
 
   this->devices.mouse = NULL;
   this->devices.keyboard = NULL;
+#ifdef HAVE_SPACENAV_SUPPORT
+  this->devices.spacenav = NULL;
+#endif // HAVE_SPACENAV_SUPPORT
+
 }
 
 // Private class destructor.
@@ -970,6 +980,10 @@ So@Gui@RenderArea::afterRealizeHook(void)
     this->registerDevice(new So@Gui@LinuxJoystick);
 #endif // HAVE_JOYSTICK_LINUX
 
+#ifdef HAVE_SPACENAV_SUPPORT
+  PRIVATE(this)->devices.spacenav = new So@Gui@SpacenavDevice;
+  this->registerDevice(PRIVATE(this)->devices.spacenav);
+#endif // HAVE_SPACENAV_SUPPORT
 }
 
 /*!
