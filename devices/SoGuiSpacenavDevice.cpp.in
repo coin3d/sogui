@@ -52,19 +52,19 @@ So@Gui@SpacenavDevice::~So@Gui@SpacenavDevice()
 
 
 void
-So@Gui@SpacenavDevice::enable(HWND w, So@Gui@EventHandler * handler, void * closure)
+So@Gui@SpacenavDevice::enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure)
 {
 }
 
 
 void 
-So@Gui@SpacenavDevice::disable(HWND w, So@Gui@EventHandler * handler, void * closure)
+So@Gui@SpacenavDevice::disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure)
 {
 }
 
   
 const SoEvent * 
-So@Gui@SpacenavDevice::translateEvent(MSG * inevent)
+So@Gui@SpacenavDevice::translateEvent(@EVENT@ event)
 {
   return NULL;
 }

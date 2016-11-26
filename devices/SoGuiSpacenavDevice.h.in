@@ -41,16 +41,16 @@
 
 #include <Inventor/@Gui@/devices/So@Gui@Device.h>
 
-class SOWIN_DLL_API So@Gui@SpacenavDevice : public So@Gui@Device {
-  SOWIN_OBJECT_HEADER(So@Gui@SpacenavDevice, So@Gui@Device);
+class SO@GUI@_DLL_API So@Gui@SpacenavDevice : public So@Gui@Device {
+  SO@GUI@_OBJECT_HEADER(So@Gui@SpacenavDevice, So@Gui@Device);
 
  public:
   So@Gui@SpacenavDevice();
   virtual ~So@Gui@SpacenavDevice();
 
-  virtual void enable(HWND w, So@Gui@EventHandler * handler, void * closure);
-  virtual void disable(HWND w, So@Gui@EventHandler * handler, void * closure);
-  virtual const SoEvent * translateEvent(MSG * event);
+  virtual void enable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
+  virtual void disable(@WIDGET@ widget, So@Gui@EventHandler * handler, void * closure);
+  virtual const SoEvent * translateEvent(@EVENT@ event);
 
  private:
   class So@Gui@SpacenavDeviceP * pimpl;
