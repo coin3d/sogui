@@ -824,23 +824,27 @@ So@Gui@ViewerP::setClippingPlanes(void)
 
   SbXfBox3f xbox = this->autoclipbboxaction->getXfBoundingBox();
 
-  SbMatrix cammat;
-  SbMatrix inverse;
-  this->getCameraCoordinateSystem(this->camera, this->sceneroot, cammat, inverse);
-  xbox.transform(inverse);
-
-  SbMatrix mat;
-  mat.setTranslate(- this->camera->position.getValue());
-  xbox.transform(mat);
-  mat = this->camera->orientation.getValue().inverse();
-  xbox.transform(mat);
-  SbBox3f box = xbox.project();
-
   // Bounding box was calculated in camera space, so we need to "flip"
   // the box (because camera is pointing in the (0,0,-1) direction
   // from origo.
-  float nearval = -box.getMax()[2];
-  float farval = -box.getMin()[2];
+  float nearval = this->camera->nearDistance.getValue();
+  float farval = this->camera->farDistance.getValue();
+  if ( !xbox.isEmpty() ) {
+    SbMatrix cammat;
+    SbMatrix inverse;
+    this->getCameraCoordinateSystem(this->camera, this->sceneroot, cammat, inverse);
+    xbox.transform(inverse);
+  
+    SbMatrix mat;
+    mat.setTranslate(- this->camera->position.getValue());
+    xbox.transform(mat);
+    mat = this->camera->orientation.getValue().inverse();
+    xbox.transform(mat);
+    SbBox3f box = xbox.project();
+
+    nearval = -box.getMax()[2];
+    farval = -box.getMin()[2];
+  }
 
   // FIXME: what if we have a weird scale transform in the scenegraph?
   // Could we end up with nearval > farval then? Investigate, then
