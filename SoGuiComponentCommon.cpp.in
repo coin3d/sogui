@@ -450,21 +450,21 @@ So@Gui@Component::registerWidget(@WIDGET@ widget)
 
   // In case widget was already present.
   void * comp;
-  if (SoGuiComponentP::widget2compdict->find((unsigned long)widget, comp)) {
+  if (SoGuiComponentP::widget2compdict->find((uintptr_t)widget, comp)) {
     if (((So@Gui@Component *)comp) != this) {
 #if SO@GUI@_DEBUG
       SoDebugError::postWarning("So@Gui@Component::registerWidget",
                                 "widget %p already registered on a different "
                                 "component", widget);
 #endif // SO@GUI@_DEBUG
-      SoGuiComponentP::widget2compdict->remove((unsigned long)widget);
+      SoGuiComponentP::widget2compdict->remove((uintptr_t)widget);
     }
     else {
       return;
     }
   }
 
-  SoGuiComponentP::widget2compdict->enter((unsigned long)widget, (void *)this);
+  SoGuiComponentP::widget2compdict->enter((uintptr_t)widget, (void *)this);
 }
 
 /*!
@@ -485,7 +485,7 @@ So@Gui@Component::unregisterWidget(@WIDGET@ widget)
   // Ignore return value to allow a widget to be unregistered several
   // times (it doesn't matter, just as it doesn't matter if a widget
   // is registered multiple times).
-  (void)SoGuiComponentP::widget2compdict->remove((unsigned long)widget);
+  (void)SoGuiComponentP::widget2compdict->remove((uintptr_t)widget);
 }
 
 /*!
@@ -497,7 +497,7 @@ So@Gui@Component *
 So@Gui@Component::getComponent(@WIDGET@ widget)
 {
   void * comp;
-  if (!SoGuiComponentP::widget2compdict->find((unsigned long)widget, comp)) {
+  if (!SoGuiComponentP::widget2compdict->find((uintptr_t)widget, comp)) {
     return NULL;
   }
   return (So@Gui@Component *)comp;
