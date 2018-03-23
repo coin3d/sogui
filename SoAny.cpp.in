@@ -594,7 +594,8 @@ SoAny::listWin32ProcessModules(void)
 char *
 SoAny::strconcat(const char ** stringlist, const char * glue, SbBool glueend) // static
 {
-  int i, gluelen, buflen;
+  int i;
+  size_t gluelen, buflen;
   char * buffer, * ptr;
   assert(stringlist);
   gluelen = 0;
@@ -607,7 +608,7 @@ SoAny::strconcat(const char ** stringlist, const char * glue, SbBool glueend) //
   assert(buffer);
   ptr = buffer;
   for ( i = 0; stringlist[i] != NULL; i++ ) {
-    int len;
+    size_t len;
     len = strlen(stringlist[i]);
     memcpy(ptr, stringlist[i], len);
     ptr += len;

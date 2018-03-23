@@ -312,11 +312,12 @@ So@Gui@ViewerP::createSuperScene(void)
     NULL
   };
 
-  int i, bufsize;
-  for (i = bufsize = 0; superSceneGraph[i]; i++)
+  int i;
+  size_t bufsize;
+  for (i = 0, bufsize = 0; superSceneGraph[i]; i++)
     bufsize += strlen(superSceneGraph[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; superSceneGraph[i]; i++) {
+  for (i = 0, bufsize = 0; superSceneGraph[i]; i++) {
     strcpy(buf + bufsize, superSceneGraph[i]);
     bufsize += strlen(superSceneGraph[i]);
     buf[bufsize] = '\n';
@@ -440,7 +441,7 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
   
   SbRotation camrot = in->orientation.getValue();
 
-  float focaldist = in->height.getValue() / (2.0*tan(M_PI / 8.0));
+  float focaldist = in->height.getValue() / float(2.0*tan(M_PI / 8.0));
   
   SbVec3f offset(0,0,focaldist-in->focalDistance.getValue());
 
@@ -1234,7 +1235,7 @@ static unsigned char fps2dfont[][12] = {
 static void
 printString(const char * s)
 {
-  int i,n;
+  size_t i,n;
   n = strlen(s);
   for (i = 0; i < n; i++)
     glBitmap(8, 12, 0.0, 2.0, 10.0, 0.0, fps2dfont[s[i] - 32]);

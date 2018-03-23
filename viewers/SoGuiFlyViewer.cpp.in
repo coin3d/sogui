@@ -348,11 +348,12 @@ So@Gui@FlyViewerP::constructor(SbBool build)
     NULL
   };
 
-  int i, bufsize;
-  for (i = bufsize = 0; superimposed[i]; i++)
+  int i;
+  size_t bufsize;
+  for (i = 0, bufsize = 0; superimposed[i]; i++)
     bufsize += strlen(superimposed[i]) + 1;
   char * buf = new char [bufsize + 1];
-  for (i = bufsize = 0; superimposed[i]; i++) {
+  for (i = 0, bufsize = 0; superimposed[i]; i++) {
     strcpy(buf + bufsize, superimposed[i]);
     bufsize += strlen(superimposed[i]);
     buf[bufsize] = '\n';
@@ -826,7 +827,7 @@ void So@Gui@FlyViewerP::updateCurrentSpeed(double dt)
   this->currentspeed +=
     (((this->currentspeed +
        this->maxspeed * speedscale) / 2.0f) - 
-     this->currentspeed) * dt;
+     this->currentspeed) * float(dt);
 }
 
 void So@Gui@FlyViewerP::updateCameraPosition(SoCamera * camera, 
@@ -1237,12 +1238,12 @@ So@Gui@FlyViewer::actualRedraw(void)
               ( camera,
                 PRIVATE(this)->currentspeed*
                 PRIVATE(this)->speed_scaling_factor,
-                t );
+                float(t) );
             PRIVATE(this)->updateCameraOrientation
               ( camera, 
                 PRIVATE(this)->tilt_increment, 
                 PRIVATE(this)->pan_increment, 
-                t );
+                float(t) );
           }
         }
       }
