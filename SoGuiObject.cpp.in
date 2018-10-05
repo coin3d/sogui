@@ -47,6 +47,7 @@
 /*!
   \class So@Gui@Object Inventor/@Gui@/So@Gui@Object.h
   \brief The So@Gui@Object class is the common superclass for all So@Gui@ component classes.
+
   \ingroup misc
 
   The purpose of making this class the superclass of all So@Gui@

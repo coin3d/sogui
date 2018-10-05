@@ -39,6 +39,7 @@
 /*!
   \class So@Gui@GLWidget So@Gui@GLWidget.h Inventor/@Gui@/So@Gui@GLWidget.h
   \brief The So@Gui@GLWidget class manages OpenGL contexts.
+
   \ingroup components
 
   This is the basic, abstract component class which sets up an OpenGL

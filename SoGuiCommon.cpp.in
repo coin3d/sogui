@@ -46,6 +46,7 @@
 /*!
   \class So@Gui@ So@Gui@.h Inventor/@Gui@/So@Gui@.h
   \brief The So@Gui@ class takes care of @Gui@ initialization and event dispatching.
+
   \ingroup misc
 
   This is the "application-wide" class with solely static methods
@@ -102,7 +103,7 @@
   And voila:
 
   <center>
-  <img src="http://doc.coin3d.org/images/SoLibs/general/sogui-class-example.png">
+  <img src="sogui-class-example.png">
   </center>
 
   \sa So@Gui@Component

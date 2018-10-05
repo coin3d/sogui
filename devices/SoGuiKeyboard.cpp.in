@@ -35,6 +35,7 @@
 /*!
   \class So@Gui@Keyboard So@Gui@Keyboard.h Inventor/@Gui@/devices/So@Gui@Keyboard.h
   \brief The So@Gui@Keyboard class is the keyboard input device abstraction.
+
   \ingroup devices
 
   The So@Gui@Keyboard class is the glue between native keyboard

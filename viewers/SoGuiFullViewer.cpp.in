@@ -38,6 +38,7 @@
 /*!
   \class So@Gui@FullViewer So@Gui@FullViewer.h Inventor/@Gui@/viewers/So@Gui@FullViewer.h
   \brief The So@Gui@FullViewer class adds some user interface components to the viewer canvas.
+
   \ingroup components viewers
 
   The So@Gui@FullViewer is an abstract viewer class which extends it's

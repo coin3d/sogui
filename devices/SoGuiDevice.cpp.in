@@ -38,6 +38,7 @@
 /*!
   \class So@Gui@Device So@Gui@Device.h Inventor/@Gui@/devices/So@Gui@Device.h
   \brief The So@Gui@Device class is the base class for the translation devices.
+
   \ingroup devices
 
   The So@Gui@ device classes provide glue functionality for

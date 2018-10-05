@@ -40,6 +40,7 @@
 /*!
   \class So@Gui@Viewer Inventor/@Gui@/viewers/So@Gui@Viewer.h
   \brief The So@Gui@Viewer class is the top level base viewer class.
+
   \ingroup components viewers
 
   This is an abstract class, which adds the following features to it's

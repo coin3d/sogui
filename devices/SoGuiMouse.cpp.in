@@ -44,6 +44,7 @@
 /*!
   \class So@Gui@Mouse So@Gui@Mouse.h Inventor/@Gui@/devices/So@Gui@Mouse.h
   \brief The So@Gui@Mouse class is the mouse input device abstraction.
+
   \ingroup devices
 
   The So@Gui@Mouse class is the glue between native mouse handling and

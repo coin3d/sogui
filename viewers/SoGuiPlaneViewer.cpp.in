@@ -38,6 +38,7 @@
 /*!
   \class So@Gui@PlaneViewer Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h
   \brief The So@Gui@PlaneViewer class is for examining 3D models by moving the camera in orthogonal planes.
+
   \ingroup components viewers
 
   The So@Gui@PlaneViewer is a viewer that is useful for "CAD-style"
@@ -45,7 +46,7 @@
   the viewpoint set from one of the three principal axes.
 
   <center>
-  <img src="http://doc.coin3d.org/images/SoLibs/viewers/planeviewer.png">
+  <img src="planeviewer.png">
   </center>
 
 

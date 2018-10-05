@@ -48,6 +48,7 @@
 /*!
   \class So@Gui@RenderArea Inventor/@Gui@/So@Gui@RenderArea.h
   \brief The So@Gui@RenderArea class adds scenegraph handling and event management.
+
   \ingroup components viewers
 
   The So@Gui@RenderArea class is a component that adds scenegraph

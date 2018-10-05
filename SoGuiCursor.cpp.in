@@ -35,6 +35,7 @@
 /*!
   \class So@Gui@Cursor
   \brief The So@Gui@Cursor class is used to set cursors for GUI components.
+
   \ingroup misc
 
   The class provides both a set of pre-defined cursor shapes, aswell

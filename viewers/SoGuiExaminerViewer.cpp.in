@@ -40,6 +40,7 @@
 /*!
   \class So@Gui@ExaminerViewer So@Gui@ExaminerViewer.h Inventor/@Gui@/viewers/So@Gui@ExaminerViewer.h
   \brief The So@Gui@ExaminerViewer class is a 3D-model examination viewer.
+
   \ingroup components viewers
 
   This class is the viewer considered to be the most "general purpose"
@@ -48,7 +49,7 @@
   be better off with one of the other viewer classes).
 
   <center>
-  <img src="http://doc.coin3d.org/images/SoLibs/viewers/examinerviewer.png">
+  <img src="examinerviewer.png">
   </center>
 
   Here is a complete, stand-alone example that shows how to set up an

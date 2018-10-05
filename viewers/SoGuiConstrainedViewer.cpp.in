@@ -35,6 +35,7 @@
 /*!
   \class So@Gui@ConstrainedViewer Inventor/@Gui@/viewers/So@Gui@ConstrainedViewer.h
   \brief The So@Gui@ConstrainedViewer class is the superclass for viewers with constrains on the viewpoint.
+
   \ingroup components viewers
 
   This abstract viewer class adds new methods to keep the camera in an
