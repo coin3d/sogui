@@ -203,10 +203,8 @@ SoAny::cleanup_si(void)
 {
   delete single_instance;
   single_instance = NULL;
-  if (SoAny::finder) {
-    delete SoAny::finder;
-    SoAny::finder = NULL;
-  }
+  delete SoAny::finder;
+  SoAny::finder = NULL;
 }
 
 /*!  

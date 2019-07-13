@@ -223,8 +223,7 @@ So@Gui@FlyViewerP::So@Gui@FlyViewerP(So@Gui@FlyViewer * owner)
 
 So@Gui@FlyViewerP::~So@Gui@FlyViewerP(void)
 {
-  if ( this->searcher != NULL )
-    delete this->searcher;
+  delete this->searcher;
   delete this->lastrender;
 
   // superimposition unrefed in other destructor

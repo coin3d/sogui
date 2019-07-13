@@ -539,7 +539,7 @@ MaterialEditor::MaterialEditor(void)
 
 MaterialEditor::~MaterialEditor(void)
 {
-  if ( this->coloreditor_sensor ) delete this->coloreditor_sensor;
+  delete this->coloreditor_sensor;
 }
 
 void

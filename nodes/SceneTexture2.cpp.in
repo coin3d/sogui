@@ -101,9 +101,7 @@ SoGuiSceneTexture2::~SoGuiSceneTexture2(void)
 {
   delete PRIVATE(this)->size_sensor;
   delete PRIVATE(this)->render_sensor;
-  if ( PRIVATE(this)->renderer != NULL ) {
-    delete PRIVATE(this)->renderer;
-  }
+  delete PRIVATE(this)->renderer;
 }
 
 // We overload notify() because we need to know when the scene graph has

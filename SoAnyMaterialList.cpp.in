@@ -93,8 +93,7 @@ SoAnyMaterialList::~SoAnyMaterialList(
       delete (So@Gui@MaterialListCallbackInfo *) (*this->callbacks)[i];
     delete this->callbacks;
   }
-  if (this->dirpath)
-    delete [] this->dirpath;
+  delete [] this->dirpath;
   if (this->directory != NULL)
     this->freeMaterialDirectory();
 }

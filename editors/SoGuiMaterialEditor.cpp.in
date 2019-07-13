@@ -286,11 +286,8 @@ MaterialEditorComponent::MaterialEditorComponent(void)
 
 MaterialEditorComponent::~MaterialEditorComponent(void)
 {
-  if ( this->attachment != NULL ) {
-    delete this->attachment;
-  }
-  if ( this->callbacks != NULL )
-    delete this->callbacks;
+  delete this->attachment;
+  delete this->callbacks;
 }
 
 void

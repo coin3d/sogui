@@ -250,7 +250,7 @@ So@Gui@ViewerP::~So@Gui@ViewerP()
 
   delete[] this->stereostencilmask;
 
-  if ( this->superimpositions != NULL ) delete this->superimpositions;
+  delete this->superimpositions;
   delete this->searchaction;
   delete this->matrixaction;
 
