@@ -47,11 +47,11 @@
 
 /*!
   \class So@Gui@RenderArea Inventor/@Gui@/So@Gui@RenderArea.h
-  \brief The So@Gui@RenderArea class adds scenegraph handling and event management.
+  \brief The So@Gui@RenderArea class adds scene graph handling and event management.
 
   \ingroup components viewers
 
-  The So@Gui@RenderArea class is a component that adds scenegraph
+  The So@Gui@RenderArea class is a component that adds scene graph
   management and input device event handling to the So@Gui@GLWidget
   component.
 
@@ -61,20 +61,20 @@
 
   Native toolkit events are caught by So@Gui@RenderArea components,
   translated to Coin SoEvent instances and passed on to the
-  scenegraph, in case the user is doing interactive operations on for
+  scene graph, in case the user is doing interactive operations on for
   instance Coin geometry draggers.
 
 
-  So@Gui@RenderArea is the first non-abstract component in it's
+  So@Gui@RenderArea is the first non-abstract component in its
   inheritance hierarchy that you can use directly from client
-  application code to set up a scenegraph viewer canvas.
+  application code to set up a scene graph viewer canvas.
 
   For an So@Gui@RenderArea component to properly display your
-  scenegraph, it must contain an SoCamera-derived node and at least
-  one SoLight-derived lightsource node.
+  scene graph, it must contain an SoCamera-derived node and at least
+  one SoLight-derived light source node.
 
   Here's a complete, stand-alone example on how to set up an
-  So@Gui@RenderArea with a scenegraph:
+  So@Gui@RenderArea with a scene graph:
 
   \code
   #include <Inventor/@Gui@/So@Gui@.h>
@@ -87,7 +87,7 @@
   #include <Inventor/nodes/SoPerspectiveCamera.h>
   #include <Inventor/nodes/SoSeparator.h>
   
-  // Set up a simple scenegraph, just for demonstration purposes.
+  // Set up a simple scene graph, just for demonstration purposes.
   static SoSeparator *
   get_scene_graph(void)
   {
@@ -443,12 +443,12 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
 #if DEBUGGING_EGGS
   SbString info = "So@Gui@ version "; info += SO@GUI@_VERSION; info += "\n";
 #if SO@GUI@_MAKE_DLL
-  info += "Built as MSWindows DLL.\n";
+  info += "Built as Microsoft Windows DLL.\n";
 #endif // !SO@GUI@_MAKE_DLL
 
   // FIXME: include information about the underlying toolkit library,
-  // if possible, like we do for Qt below (ie Gtk version, Motif
-  // implementation, MSWindows version, ...).  20010927 mortene.
+  // if possible, like we do for Qt below (i.e. Gtk version, Motif
+  // implementation, Microsoft Windows version, ...).  20010927 mortene.
 
 #ifdef SOQT_INTERNAL
   // Qt implementation info.
@@ -462,9 +462,9 @@ So@Gui@RenderAreaP::showToolkitInformation(void)
   // FIXME: information about DLL path(s) (both for the So@Gui@ and
   // Coin/Inventor library) would be _extremely_ useful for debugging
   // "remote" applications, as application programmers (including
-  // ourselves) tend to spread those files around misc diskdrive
-  // directories -- especially on MSWindows platforms.  Mismatches for
-  // run-time binding and link-time binding then causes bugs which are
+  // ourselves) tend to spread those files around misc disk drive
+  // directories -- especially on Microsoft Windows platforms.  Mismatches for
+  // runtime binding and link-time binding then causes bugs which are
   // impossible to make sense of.
   //
   // I don't know if any platforms have enough introspection
@@ -524,7 +524,7 @@ So@Gui@RenderAreaP::dumpScenegraph(void)
   SoWriteAction wa(&out);
   wa.apply(this->normalManager->getSceneGraph());
   SoDebugError::postInfo("So@Gui@RenderAreaP::dumpScenegraph",
-                         "dumped scenegraph to '%s'", filename.getString());
+                         "dumped scene graph to '%s'", filename.getString());
 #endif // DEBUGGING_EGGS
 }
 
@@ -1025,11 +1025,11 @@ So@Gui@RenderArea::getSceneGraph(void)
   planes.
 
   It will automatically take care of setting up overplay planes in the
-  OpenGL canvas if the OpenGL hardware and driver supports it.
+  OpenGL canvas if the OpenGL hardware and driver support it.
 
   Important note: not all graphics hardware and / or drivers for
   graphics hardware support overlay planes, so application programmers
-  are adviced to find some other way of accomplishing what they want
+  are advised to find some other way of accomplishing what they want
   to do before resorting to using overlay planes.  Using overlay
   planes will in practice severely limit the portability of
   applications which depend on them being available.
@@ -1231,7 +1231,7 @@ So@Gui@RenderArea::getTransparencyType(void) const
 
   \a numPasses gives the number of re-renderings to do of the scene,
   blending together the results from slight "jitters" of the camera
-  view, into the OpenGL accumulation buffer. For further information,
+  view into the OpenGL accumulation buffer. For further information,
   see documentation of SoGLRenderAction::setNumPasses() and
   So@Gui@GLWidget::setAccumulationBuffer().
 */
@@ -1239,7 +1239,7 @@ void
 So@Gui@RenderArea::setAntialiasing(SbBool smoothing, int numPasses)
 {
   // FIXME: is this really necessary? I think we should either ignore
-  // the call or store values for later migration if the scenemanager
+  // the call or store values for later migration if the scene manager
   // instance(s) haven't been made yet. 20010331 mortene.
   assert(PRIVATE(this)->normalManager != NULL);
 
@@ -1277,9 +1277,9 @@ void
 So@Gui@RenderArea::getAntialiasing(SbBool & smoothing, int & numPasses) const
 {
   // FIXME: there's an API design flaw here, as it is assumed that the
-  // antialiasing setting for the renderaction in the "normal"
+  // antialiasing setting for the render action in the "normal"
   // rendering context always matches what is the case for the
-  // renderaction in the overlay manager. This is not necessarily
+  // render action in the overlay manager. This is not necessarily
   // true. Could be solved by an additional argument to
   // getAntialiasing(): a boolean indicator on whether or not we want
   // the overlay context with a default value (false) to keep API
@@ -1326,7 +1326,7 @@ So@Gui@RenderArea::isClearBeforeRender(void) const
 }
 
 /*!
-  This method returns whether the render buffer's Z buffer is cleared
+  This method returns whether the render buffer's z-buffer is cleared
   before each render.
 */
 SbBool
@@ -1358,10 +1358,10 @@ So@Gui@RenderArea::isClearBeforeOverlayRender(void) const
 
 /*!
   This method sets whether redrawing should be handled automatically
-  or not when data in the scenegraph changes.
+  or not when data in the scene graph changes.
 
-  The default setting causes the renderarea to automatically trigger a
-  redraw of the scenegraph contents.
+  The default setting causes the render area to automatically trigger a
+  redraw of the scene graph contents.
 */
 void
 So@Gui@RenderArea::setAutoRedraw(SbBool enable)
@@ -1437,7 +1437,7 @@ So@Gui@RenderArea::renderOverlay(void)
 
 /*!
   This method schedules a redraw to happen at a later time (when the
-  application has processed it's other events first).
+  application has processed its other events first).
 */
 void
 So@Gui@RenderArea::scheduleRedraw(void)
@@ -1485,7 +1485,7 @@ So@Gui@RenderAreaP::replaceSoSelectionMonitor(SoSelection * newsel,
 // the function documentation. 20001002 mortene.
 
 /*!
-  Do automatic redraw of the scenegraph when a selection under the
+  Do automatic redraw of the scene graph when a selection under the
   SoSelection node is changed.
 
   Pass \c NULL to deactivate.
@@ -1503,7 +1503,7 @@ So@Gui@RenderArea::redrawOnSelectionChange(SoSelection * selection)
 }
 
 /*!
-  Do automatic redraw of the scenegraph in the overlay planes when a
+  Do automatic redraw of the scene graph in the overlay planes when a
   selection under the SoSelection node is changed.
 
   Pass \c NULL to deactivate.
@@ -1531,7 +1531,7 @@ So@Gui@RenderArea::setEventCallback(So@Gui@RenderAreaEventCB * func,
 /*!
   This method sets the normal scene SoSceneManager object.
 
-  The previous set scene manager is deleted, and there is no way to
+  The previously set scene manager is deleted, and there is no way to
   currently avoid that.  This might change in the future.
 */
 void
@@ -1543,7 +1543,7 @@ So@Gui@RenderArea::setSceneManager(SoSceneManager * manager)
   // NOTE: Although deleting the previous scene manager here is correct
   // behaviour from a compatibility-POV, I think it is ugly and should
   // be addressed in some other way if possible. It is also inconsistent
-  // with overlay scenemanager management.  20061015 larsa
+  // with overlay scene manager management.  20061015 larsa
   delete PRIVATE(this)->normalManager;
 
   PRIVATE(this)->normalManager = manager;
@@ -1556,9 +1556,9 @@ So@Gui@RenderArea::setSceneManager(SoSceneManager * manager)
   This method returns the normal scene SoSceneManager object.
 
   Having a reference to the SoSceneManager instance is useful for
-  getting at the \e real root node of the rendering scenegraph,
-  including camera, headlight and miscellaneous drawstyle nodes.  The
-  getSceneGraph() method will only return the \e user scenegrah for
+  getting at the \e real root node of the rendering scene graph,
+  including camera, headlight and miscellaneous draw style nodes.  The
+  getSceneGraph() method will only return the \e user scene graph for
   So@Gui@RenderArea subclass So@Gui@Viewer and further subclasses. The
   reason this is not always what you want is because certain actions
   (like the SoRayPickAction) needs to traverse a valid camera if it
@@ -1578,7 +1578,7 @@ So@Gui@RenderArea::getSceneManager(void) const
 /*!
   This method sets the overlay scene SoSceneManager object.
 
-  The previous set scene manager is not freed and will leak unless
+  The previously set scene manager is not freed and will leak unless
   the user frees it.
 */
 void
@@ -1624,7 +1624,7 @@ So@Gui@RenderArea::getGLRenderAction(void) const
 
 /*!
   This method sets the SoGLRenderAction object for rendering the
-  overlay scenegraph.
+  overlay scene graph.
 */
 void
 So@Gui@RenderArea::setOverlayGLRenderAction(SoGLRenderAction * action)
@@ -1648,14 +1648,14 @@ So@Gui@RenderArea::getOverlayGLRenderAction(void) const
   This method is called from the render() method and takes care of
   setting up the context for OpenGL rendering (by making the OpenGL
   canvas the current context and specifying either the front or back
-  buffer for rendering, depending on whether we're in singlebuffer or
-  doublebuffer mode).
+  buffer for rendering, depending on whether we're in single buffer or
+  double buffer mode).
 
   After setting up the OpenGL context, it calls actualRedraw() for the
-  actual scenegraph rendering to take place.
+  actual scene graph rendering to take place.
 
   Finally, the OpenGL buffers are either swapped back-to-front (for
-  doublebuffering) or flushed (for singlebuffering), and our OpenGL
+  double buffering) or flushed (for single buffering), and our OpenGL
   context is unlocked.
 
   The application programmer may override this method if extreme
@@ -1697,11 +1697,11 @@ So@Gui@RenderArea::redraw(void)
 // Note: the following function documentation block will also be used
 // for all the miscellaneous viewer subclasses, so keep it general.
 /*!
-  This method instantly redraws the normal (non-overlay) scenegraph by
+  This method instantly redraws the normal (non-overlay) scene graph by
   calling SoSceneManager::render().
 
   Subclasses may override this method to add their own rendering
-  before or after Coin renders it's scenegraph.
+  before or after Coin renders its scene graph.
 
   The following is a complete example that demonstrates one way of
   adding both a background image and foreground (overlay) geometry to
@@ -1754,7 +1754,7 @@ So@Gui@RenderArea::redraw(void)
     this->setClearBeforeRender(FALSE, TRUE);
   
   
-    // Set up background scenegraph with image in it.
+    // Set up background scene graph with image in it.
   
     this->bckgroundroot = new SoSeparator;
     this->bckgroundroot->ref();
@@ -1774,7 +1774,7 @@ So@Gui@RenderArea::redraw(void)
     this->bckgroundroot->addChild(cam);
     this->bckgroundroot->addChild(img);
   
-    // Set up foreground, overlayed scenegraph.
+    // Set up foreground, overlaid scene graph.
   
     this->foregroundroot = new SoSeparator;
     this->foregroundroot->ref();
@@ -1837,18 +1837,18 @@ So@Gui@RenderArea::redraw(void)
     glClearColor(col[0], col[1], col[2], 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-    // Render our scenegraph with the image.
+    // Render our scene graph with the image.
     SoGLRenderAction * glra = this->getGLRenderAction();
     glra->apply(this->bckgroundroot);
   
   
-    // Render normal scenegraph.
+    // Render normal scene graph.
     So@Gui@ExaminerViewer::actualRedraw();
   
   
     // Increase arrow angle with 1/1000 ° every frame.
     arrowrotation->angle = arrowrotation->angle.getValue() + (0.001 / M_PI * 180);
-    // Render overlay front scenegraph.
+    // Render overlay front scene graph.
     glClear(GL_DEPTH_BUFFER_BIT);
     glra->apply(this->foregroundroot);
   }
@@ -1946,14 +1946,14 @@ So@Gui@RenderArea::initOverlayGraphic(void)
   SoSceneManager * mgr = this->getOverlaySceneManager();
   if (mgr) {
     mgr->reinitialize();
-    // FIXME: does overlays really _have_ to be in colorindex mode?
+    // FIXME: does overlays really _have_ to be in color index mode?
     // 20020916 mortene.
     mgr->setRGBMode(FALSE);
 
     SoGLRenderAction * renderaction = mgr->getGLRenderAction();
     SbBool isdirect = SoGuiGLWidgetP::isDirectRendering(this);
     renderaction->setRenderingIsRemote(!isdirect);
-    // FIXME: shouldn't we also setCacheContext() on the renderaction?
+    // FIXME: shouldn't we also setCacheContext() on the render action?
     // 20020916 mortene.
   }
   // FIXME: if not RGB mode, load colormap. pederb.
@@ -2115,15 +2115,15 @@ So@Gui@RenderArea::getDefaultIconTitle(void) const
 // *************************************************************************
 
 /*!
-  Toolkit-native events are attempted converted to Coin-generic events
+  Toolkit-native events are tried to convert to Coin-generic events
   in the So@Gui@RenderArea::processEvent() method.  If this succeeds,
   they are forwarded to this method.
 
-  This is a virtual method, and is overridden in it's subclasses to
+  This is a virtual method, and is overridden in its subclasses to
   catch events of particular interest to the viewer classes, for
   instance.
 
-  Return \c TRUE iff the event was processed. If not it should be
+  Return \c TRUE if the event was processed. If not it should be
   passed on further up in the inheritance hierarchy by the caller.
   This last point is extremely important to take note of if you are
   expanding the toolkit with your own viewer class.
@@ -2143,7 +2143,7 @@ So@Gui@RenderArea::processSoEvent(const SoEvent * const event)
 // *************************************************************************
 
 /*!
-  Overrides So@Gui@GLWidget::processEvent() to attempt to convert
+  Overrides So@Gui@GLWidget::processEvent() to try to convert
   toolkit-native events to Coin-generic events.  If this succeeds, the
   generic SoEvent is forwarded to So@Gui@RenderArea::processSoEvent().
  */

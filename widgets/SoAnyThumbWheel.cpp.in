@@ -61,7 +61,7 @@
 
 /*!
   \var int SoAnyThumbWheel::dirtyTables
-  If this flag is set, the internal tables needs to be recalculated.
+  If this flag is set, the internal tables need to be recalculated.
 */
 
 /*!
@@ -259,8 +259,8 @@ SoAnyThumbWheel::drawBitmap(
 // ************************************************************************
 
 /*!
-  This method calculates the thumb wheel value based on the users mouse
-  interaction.  origpos and origval is the mouseposition at the moment of
+  This method calculates the thumbwheel value based on the users mouse
+  interaction.  origpos and origval is the mouse position at the moment of
   pressing the button, and origval is the thumbwheels original value at
   that point.  deltapos is the number of pixels the mouse has moved since
   pressing the button.

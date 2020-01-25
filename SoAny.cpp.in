@@ -36,7 +36,7 @@
   \class SoAny SoAny.h
   \brief The SoAny class is a collection of common toolkit methods.
 
-  SoAny contains internal (ie not accessible to the application
+  SoAny contains internal (i.e. not accessible to the application
   programmer) functionality which needs to be "globally" visible to
   all parts of the toolkit.
 */
@@ -358,7 +358,7 @@ SoAny::invokeFatalErrorHandler(SbString errmsg, So@Gui@::FatalErrors errcode)
   Lets us register an internal callback to run when a fatal error is
   detected.
 
-  Internal clean-up functions is sometimes necessary because we set up
+  Internal clean-up functions are sometimes necessary because we set up
   external references to internal resources which may not be valid
   after a fatal error hits.
 */
@@ -373,12 +373,12 @@ SoAny::addInternalFatalErrorHandler(SoAny::InternalFatalErrorCB * cb,
 
 /**************************************************************************/
 
-/*** Singlelinked list for the environment variables. *********************/
+/*** Single linked list for the environment variables. ********************/
 
 /*
-  FIXME: should implement a generic (macro-based) singlelinked list
+  FIXME: should implement a generic (macro-based) single linked list
   abstraction in C (the following code could be a good starting
-  point). Then axe this code. Then move the various listhandling stuff
+  point). Then axe this code. Then move the various list handling stuff
   in the Coin library from the SbList<> template to the C-based one to
   aid any future transition to pure C. 20010821 mortene.
 
@@ -413,10 +413,10 @@ envlist_append(struct envvar_data * item)
 /**************************************************************************/
 
 /*
-  When working with MSWindows applications using the library as a DLL,
+  When working with Microsoft Windows applications using the library as a DLL,
   setenv() / getenv() will not work as expected, as the application
-  and the DLL has different instances of the C library with different
-  datastructures on different heaps. That's why we need this
+  and the DLL have different instances of the C library with different
+  data structures on different heaps. That's why we need this
   abstraction around the C-libs getenv() vs the Win32 API
   GetEnvironmentVariable() function.
 
@@ -428,9 +428,9 @@ envlist_append(struct envvar_data * item)
 const char *
 SoAny::getenv(const char * envname)
 {
-  /* Important note: this code is dulplicated in Coin, Coin-1,
+  /* Important note: this code is duplicated in Coin, Coin-1,
      So@Gui@/.../common/SoAny.cpp.in (and possibly stable forks of the
-     toolkits).  If you do bugfixes or whatever, keep them in sync! */
+     toolkits).  If you do bug fixes or whatever, keep them in sync! */
 #ifdef HAVE_GETENVIRONMENTVARIABLE
   int neededsize;
   neededsize = GetEnvironmentVariable(envname, NULL, 0);

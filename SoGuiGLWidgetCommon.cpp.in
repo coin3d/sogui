@@ -46,7 +46,7 @@
   canvas for its subclasses.
 
   Application programmers will normally not use this class directly,
-  but rather through the interface of either its direct descendent;
+  but rather through the interface of either its direct descendent,
   So@Gui@RenderArea, or through one of the "rapid application
   development"-style viewer subclasses.
 
@@ -55,7 +55,7 @@
   An important thing to know about embedding So@Gui@GLWidget derived
   components into other @Gui@ widgets is that you need to set up
   "focus proxying" to have events still be sent to the OpenGL canvas
-  widget. This is true for both the So@Gui@RenderArea aswell as all
+  widget. This is true for both the So@Gui@RenderArea as well as all
   the viewer components (like So@Gui@ExaminerViewer,
   So@Gui@PlaneViewer etc).
 
@@ -107,7 +107,7 @@
   \fn So@Gui@GLWidget::So@Gui@GLWidget(@WIDGET@ const parent, const char * const name, const SbBool embed, const int glmodes, const SbBool build)
 
   The constructor is protected, as this is an abstract class to only
-  be used by it's subclasses.
+  be used by its subclasses.
 */
 
 /*!
@@ -116,7 +116,7 @@
   Clean up all use of internal resources.
 
   The destructor is protected, as this is an abstract class to only be
-  used by it's subclasses.
+  used by its subclasses.
 */
 
 /*!
@@ -205,7 +205,7 @@
   when requested through this function, either because they are not
   available, or because they are only available in combination with
   other OpenGL context settings that are not wanted (like single
-  buffers, non-accellerated rendering, etc).
+  buffers, non-accelerated rendering, etc).
 
   If you try to enable accumulation buffers by using this function,
   you should therefore in succession use the
@@ -398,21 +398,21 @@
   canvas gets piped through this method.
 
   It is overridden in the subclasses to catch user interaction with
-  the render canvas in the viewers, aswell as forwarding relevant
-  events to the scenegraph.
+  the render canvas in the viewers, as well as forwarding relevant
+  events to the scene graph.
 */
 
 /*!
   \fn void So@Gui@GLWidget::glLockNormal(void)
 
-  This method calls make-current on the correct context and ups the
+  This method calls make-current on the correct context and increases the
   lock level.
 */
 
 /*!
   \fn void So@Gui@GLWidget::glUnlockNormal(void)
 
-  This method drops the lock level.
+  This method decreases the lock level.
 */
 
 /*!
@@ -429,14 +429,14 @@
 /*!
   \fn void So@Gui@GLWidget::glLockOverlay(void)
 
-  This method calls make-current on the correct context and ups the
+  This method calls make-current on the correct context and increases the
   lock level.
 */
 
 /*!
   \fn void So@Gui@GLWidget::glUnlockOverlay(void)
 
-  This method drops the lock level.
+  This method decreases the lock level.
 */
 
 /*!
@@ -571,7 +571,7 @@ So@Gui@GLWidget::getPointSizeLimits(SbVec2f & range, float & granularity)
 
   // Matthias Koenig reported on coin-discuss that the OpenGL
   // implementation on SGI Onyx 2 InfiniteReality returns 0 for the
-  // lowest pointsize, but it will still set the return value of
+  // lowest point size, but it will still set the return value of
   // glGetError() to GL_INVALID_VALUE if this size is attempted
   // used. So the boundary range fix in the next line of code is a
   // workaround for that OpenGL implementation bug.
@@ -608,7 +608,7 @@ So@Gui@GLWidget::getLineWidthLimits(SbVec2f & range, float & granularity)
 
   // Matthias Koenig reported on coin-discuss that the OpenGL
   // implementation on SGI Onyx 2 InfiniteReality returns 0 for the
-  // lowest linewidth, but it will still set the return value of
+  // lowest line width, but it will still set the return value of
   // glGetError() to GL_INVALID_VALUE if this size is attempted
   // used. This is a workaround for what looks like an OpenGL bug.
 
@@ -630,7 +630,7 @@ So@Gui@GLWidget::getLineWidthLimits(SbVec2f & range, float & granularity)
 //
 //  * max display list nesting
 //
-//  * max nr of clipplanes
+//  * max nr of clip planes
 //
 //  * max nr of light sources
 //

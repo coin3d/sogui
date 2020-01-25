@@ -90,7 +90,7 @@ define([matnum], m4_eval(matnum+1))dnl
 /*!
   \internal
 
-  This method fills in the So@Gui@MaterialDirectory structure with the builtin
+  This method fills in the So@Gui@MaterialDirectory structure with the built-in
   material data.
 */
 

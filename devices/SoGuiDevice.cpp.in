@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \**************************************************************************/
 
-// This file contains common sourcecode and documentation for the
+// This file contains common source code and documentation for the
 // So[Gui]Device classes, in template form.
 
 /*!
@@ -43,7 +43,7 @@
 
   The So@Gui@ device classes provide glue functionality for
   translating native GUI events from the underlying toolkit to
-  Inventor scenegraph SoEvent events.
+  Inventor scene graph SoEvent events.
 
   The device classes are mainly of interest to application programmers
   when writing extensions for new types of devices, and seldom in

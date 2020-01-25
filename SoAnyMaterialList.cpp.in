@@ -172,7 +172,7 @@ SoAnyMaterialList::invokeCallbacks(
 /*!
   \internal
 
-  This method frees up the memory used by the material-index data strucure.
+  This method frees up the memory used by the material-index data structure.
 */
 
 void

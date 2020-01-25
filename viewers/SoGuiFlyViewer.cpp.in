@@ -405,7 +405,7 @@ void
 So@Gui@FlyViewerP::dolly(const float delta) const
 {
   SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scene graph, for instance
 
   SbPlane walkplane(PUBLIC(this)->getUpDirection(), 
 		    camera->position.getValue());
@@ -457,7 +457,7 @@ So@Gui@FlyViewerP::processKeyboardEvent(const SoKeyboardEvent * const ke)
     case SoKeyboardEvent::U:
       do {
 	// either to switch to up-vector pick mode, or back to fly
-	// mode if pick-mode already activated (ie cancel the
+	// mode if pick-mode already activated (i.e. cancel the
 	// up-vector pick operation)
 	SbBool uppickmode =
 	  this->getMode() == So@Gui@FlyViewerP::WAITING_FOR_UP_PICK;
@@ -780,7 +780,7 @@ double So@Gui@FlyViewerP::calculateChangeInTime()
     this->lastrender->setValue(thisrender.getValue() - 0.01);
 
   // We've had a report on Coin-support that floats may have too low
-  // precision for the subtraction of these two values (ie it becomes
+  // precision for the subtraction of these two values (i.e. it becomes
   // zero), so don't cast to float.
   //
   // FIXME: it doesn't sound likely that this was the real cause of
@@ -1126,9 +1126,9 @@ So@Gui@FlyViewer::processSoEvent(const SoEvent * const event)
   // strategy as in So@Gui@ExaminerViewer, where the event-handler
   // only checks the state and the mode from that. 20021016 rolvs.
 
-  // We're in "interact" mode (ie *not* the camera modification mode),
+  // We're in "interact" mode (i.e. *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // the scene graph, or caught by So@Gui@Viewer::processSoEvent() if
   // it's an ESC and ALT press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(event); }
 
@@ -1222,7 +1222,7 @@ So@Gui@FlyViewer::actualRedraw(void)
 
       if (PRIVATE(this)->currentspeed != 0.0f) {
         // We've had a report on Coin-support that floats may have too
-        // low precision for the subtraction of these two values (ie
+        // low precision for the subtraction of these two values (i.e.
         // it becomes zero), so don't cast to float.
         // 
         // Note: there's some additional information about this, see

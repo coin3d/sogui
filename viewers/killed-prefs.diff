@@ -124,7 +124,7 @@ diff -u -w -r1.18 SoGuiFullViewer.cpp.in
  
  // ************************************************************************
  
--// Note: common documentation for all subclasses aswell.
+-// Note: common documentation for all subclasses as well.
 -/*!
 -  \fn void So@Gui@FullViewer::createPrefSheet(void)
 -
