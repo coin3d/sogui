@@ -39,7 +39,7 @@
   \ingroup devices
 
   The So@Gui@Keyboard class is the glue between native keyboard
-  handling and keyboard interaction with the Inventor scenegraph.
+  handling and keyboard interaction with the Inventor scene graph.
 
   All components derived from the So@Gui@RenderArea have got an
   So@Gui@Keyboard device attached by default.

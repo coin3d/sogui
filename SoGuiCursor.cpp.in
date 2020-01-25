@@ -38,7 +38,7 @@
 
   \ingroup misc
 
-  The class provides both a set of pre-defined cursor shapes, aswell
+  The class provides both a set of predefined cursor shapes, as well
   as the option to use custom bitmap graphics.
 
   Instances of this class is usually made for passing in to the
@@ -54,7 +54,7 @@
   \enum So@Gui@Cursor::Shape
 
   For enumerating built-in shape types, that can be used without
-  having to specify cursor graphics. These are mapped to pre-defined
+  having to specify cursor graphics. These are mapped to predefined
   cursor shapes from the underlying toolkit.
 */
 
@@ -63,7 +63,7 @@
   \var So@Gui@Cursor::Shape So@Gui@Cursor::CUSTOM_BITMAP
 
   Cursor is specified with our own bitmap graphics. The bitmap data
-  must be passed into the constructor.
+  must be passed to the constructor.
 */
 
 /*!
@@ -106,7 +106,7 @@
 /*!
   \var SbVec2s So@Gui@Cursor::CustomCursor::hotspot
 
-  Position of cursor hotspot, ie the pixel of the cursor which is
+  Position of cursor hotspot, i.e. the pixel of the cursor which is
   considered to be the "pick point" when interacting with the canvas
   or widgets.
 
@@ -276,7 +276,7 @@ So@Gui@Cursor::So@Gui@Cursor(void)
 
 /*!
   Constructor with Shape argument, for setting up the cursor with a
-  pre-defined shape from the underlying native toolkit.
+  predefined shape from the underlying native toolkit.
 */
 So@Gui@Cursor::So@Gui@Cursor(const Shape shape)
 { 
@@ -330,7 +330,7 @@ So@Gui@Cursor::~So@Gui@Cursor()
 }
 
 /*!
-  Equal operator.
+  Assignment operator.
 */
 So@Gui@Cursor & 
 So@Gui@Cursor::operator=(const So@Gui@Cursor & c)
@@ -385,7 +385,7 @@ So@Gui@Cursor::getZoomCursor(void)
 }
 
 /*!
-  Returns a cursor with "pan" graphics (ie for translation in the
+  Returns a cursor with "pan" graphics (i.e. for translation in the
   camera normal plane).
 */
 const So@Gui@Cursor &
@@ -404,8 +404,8 @@ So@Gui@Cursor::getRotateCursor(void)
 }
 
 /*!
-  Because all toolkits don't easily support setting up a blank cursor
-  from pre-defined shapes or API functions, we also provide a simple
+  Because not all toolkits do easily support setting up a blank cursor
+  from predefined shapes or API functions, we also provide a simple
   completely transparent cursor.
 */
 const So@Gui@Cursor &

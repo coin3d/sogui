@@ -67,7 +67,7 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@InputFocus);
 /*!
   \var So@Gui@InputFocus::Events So@Gui@InputFocus::ENTER_WINDOW
 
-  Maskbit for receiving events when focus comes to a widget.
+  Maskbit for receiving events when focus enters a widget.
 */
 
 /*!

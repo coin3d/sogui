@@ -78,7 +78,7 @@ void
 So@Gui@ConstrainedViewerP::rotateCamera(const float delta) const
 {
   SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scene graph, for instance
 
   camera->orientation = camera->orientation.getValue() *
     SbRotation(PUBLIC(this)->getUpDirection(), -delta);
@@ -201,7 +201,7 @@ void
 So@Gui@ConstrainedViewer::tiltCamera(float delta)
 {
   SoCamera * const camera = this->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scene graph, for instance
 
   SbVec3f camdir;
   camera->orientation.getValue().multVec(SbVec3f(0, 0, -1), camdir);
@@ -242,7 +242,7 @@ So@Gui@ConstrainedViewer::changeCameraValues(SoCamera * camera)
 // ************************************************************************
 
 /*!
-  Executes a raypick at the given mousepointer location and sets the
+  Executes a ray pick at the given mouse pointer location and sets the
   viewer's camera up-vector direction to the normal vector of the
   picked geometry.
 */
@@ -252,7 +252,7 @@ So@Gui@ConstrainedViewer::findUpDirection(SbVec2s mouselocation)
   SoRayPickAction rp(this->getViewportRegion());
   rp.setPoint(mouselocation);
 
-  // Use the full scenegraph, not just the user-set scenegraph (which
+  // Use the full scene graph, not just the user-set scene graph (which
   // is what So@Gui@ConstrainedViewer::getSceneGraph() would return).
   SoNode * realroot = this->getSceneManager()->getSceneGraph();
   rp.apply(realroot);

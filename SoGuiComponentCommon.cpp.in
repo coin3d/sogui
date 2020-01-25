@@ -83,14 +83,14 @@
   supply one, the name will default to something, depending on the
   inheritance hierarchy.
 
-  The \a embed argument tells wether the component should be embedded
+  The \a embed argument tells whether the component should be embedded
   in the \a parent widget or should create its own shell. This flag is
   only checked if the \a parent widget argument is specified (not
   \c NULL).
 
   If you create a non-embedded component, the component will create
-  its own shell, which will be a toplevelshell type. If you embed the
-  component, the component will create a formwidget type widget inside
+  its own shell, which will be a top level shell type. If you embed the
+  component, the component will create a form widget type widget inside
   the \a parent widget, which you can get the handle of by calling
   So@Gui@Component::getBaseWidget().
 */
@@ -141,7 +141,7 @@
 /*!
   \fn void So@Gui@Component::show(void)
 
-  This will show the widget, de-iconifiying and raising it if
+  This will show the widget, de-iconifying and raising it if
   necessary.
 
   \sa hide(), isVisible()
@@ -188,7 +188,7 @@
 /*!
   \fn SbBool So@Gui@Component::isTopLevelShell(void) const
 
-  Returns \c TRUE if this component is a toplevel shell, i.e. it has a
+  Returns \c TRUE if this component is a top level shell, i.e. it has a
   window representation on the desktop.
 
   \sa getShellWidget()
@@ -196,13 +196,13 @@
 
 /*!
   This method returns the shell widget of the component, but only if
-  it was created as a toplevel shell.  \c NULL will be returned for
+  it was created as a top level shell.  \c NULL will be returned for
   embedded components.
 
-  (The toplevel shell is the desktop window which contains the
+  (The top level shell is the desktop window which contains the
   component.)
 
-  To get the toplevel shell of embedded components, you can use the
+  To get the top level shell of embedded components, you can use the
   So@Gui@::getShellWidget() method.
 
   \sa isTopLevelShell(), getWidget()
@@ -220,7 +220,7 @@ So@Gui@Component::getShellWidget(void) const
 /*!
   \fn @WIDGET@ So@Gui@Component::getParentWidget(void) const
 
-  Returns the widget which is the parent (i.e. contains) this
+  Returns the widget which is the parent of (i.e. contains) this
   component's base widget.
 
   \sa getWidget(), baseWidget(), isTopLevelShell()
@@ -269,7 +269,7 @@ So@Gui@Component::getShellWidget(void) const
 /*!
   \fn const char * So@Gui@Component::getIconTitle(void) const
 
-  Returns the title the window has when iconfied.
+  Returns the title the window has when iconified.
 
   If an icon title has been set, that icon title is returned.  If no
   icon title has been set, the default icon title is returned.
@@ -306,7 +306,7 @@ So@Gui@Component::getDefaultWidgetName(void) const
   component.
 
   It should be overridden by derived non-abstract classes so the
-  window and popup menu will get a proper title.
+  window and pop-up menu will get a proper title.
 */
 const char *
 So@Gui@Component::getDefaultTitle(void) const
@@ -351,7 +351,7 @@ So@Gui@Component::getDefaultIconTitle(void) const
   \fn void So@Gui@Component::sizeChanged(const SbVec2s & size)
 
   Called internally from within the So@Gui@ library when the widget
-  embedded in a component changes it size, which is usually triggered
+  embedded in a component changes its size, which is usually triggered
   by end-user interaction.
 
   This method is then invoked to notify the component that the size
@@ -365,9 +365,9 @@ So@Gui@Component::getDefaultIconTitle(void) const
   \fn void So@Gui@Component::setWindowCloseCallback(So@Gui@ComponentCB * const func, void * const data)
 
   Set up a callback function to use when the component gets closed. A
-  component must be a toplevel shell for this to have any effect.
+  component must be a top level shell for this to have any effect.
 
-  For toplevel shells with no close callback set, the window will
+  For top level shells with no close callback set, the window will
   simply be hidden. The typical action to take in the callback would
   be to delete the component.
 
@@ -381,13 +381,13 @@ So@Gui@Component::getDefaultIconTitle(void) const
 
   Returns \c FALSE if operation failed.  This might happen if the
   toolkit doesn't support attempts at making the component cover the
-  complete screen or if the component is not a toplevel window.
+  complete screen or if the component is not a top level window.
 */
 
 /*!
   \fn SbBool So@Gui@Component::isFullScreen(void) const
 
-  Returns if this widget/component is in full screen mode.
+  Returns whether this widget/component is in full screen mode or not.
 */
 
 /*!
@@ -528,7 +528,7 @@ SoGuiComponentP::~SoGuiComponentP()
   SoGuiComponentP::nrofcomponents--;
   if (SoGuiComponentP::nrofcomponents == 0) {
 #if SO@GUI@_DEBUG
-    // Check to see if widgets were forgotten (ie missing
+    // Check to see if widgets were forgotten (i.e. missing
     // unregisterWidget() calls).
     SbPList keys, values;
     SoGuiComponentP::widget2compdict->makePList(keys, values);

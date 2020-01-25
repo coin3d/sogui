@@ -41,7 +41,7 @@
 
   \ingroup components viewers
 
-  The So@Gui@FullViewer is an abstract viewer class which extends it's
+  The So@Gui@FullViewer is an abstract viewer class which extends its
   superclass (the basic So@Gui@Viewer class) with two major user
   interface additions:
 
@@ -51,7 +51,7 @@
   thumbwheels to control camera interaction and various other aspects
   of model / scene viewing</li>
 
-  <li>a popup menu, invoked with the right mouse button, which
+  <li>a pop-up menu, invoked with the right mouse button, which
   controls yet more aspects of the rendering and the viewer</li>
 
   </ul>
@@ -71,7 +71,7 @@
   The non-abstract subclasses of the So@Gui@FullViewer class are
   viewer components often used as a test-bed for prototyping / rapid
   application development when doing quick testing of scenes,
-  stand-alone 3D-models, animation techniques, etc etc.
+  stand-alone 3D-models, animation techniques, etc.
 
 
   \sa So@Gui@ConstrainedViewer, So@Gui@ExaminerViewer, So@Gui@PlaneViewer
@@ -118,12 +118,12 @@
   C++):
 
   createViewerButtons() is called (indirectly) from the constructors
-  of the viewer classes. This means that you need to delay it's
+  of the viewer classes. This means that you need to delay its
   invocation until your own subclass's constructor is run, because
   otherwise your re-implementation won't have been added to the
   internal virtual function table yet.
 
-  Delaying a superclass viewer from building it's decorations is done
+  Delaying a superclass viewer from building its decorations is done
   by passing build==FALSE as the last argument of the protected
   constructors. You will then have to explicitly trigger the building
   in your own constructor.
@@ -181,7 +181,7 @@
 /*!
   \var So@Gui@FullViewer::BuildFlag So@Gui@FullViewer::BUILD_POPUP
 
-  Only build the popup menu. (Activated with the right mousebutton.)
+  Only build the pop-up menu. (Activated with the right mouse button.)
 */
 /*!
   \var So@Gui@FullViewer::BuildFlag So@Gui@FullViewer::BUILD_ALL
@@ -266,7 +266,7 @@
 
 /*!
   \var So@Gui@PopupMenu * So@Gui@FullViewer::prefmenu
-  Pointer to the popup menu instance.
+  Pointer to the pop-up menu instance.
 */
 
 /*!
@@ -305,7 +305,7 @@
   \fn void So@Gui@FullViewer::setPopupMenuEnabled(const SbBool enable)
 
   Decide whether or not if clicking with the right mouse button on
-  the OpenGL canvas should reveal a preferences popup menu when in
+  the OpenGL canvas should reveal a preferences pop-up menu when in
   viewing mode.
 
   \sa isPopupMenuEnabled()
@@ -314,7 +314,7 @@
 /*!
   \fn SbBool So@Gui@FullViewer::isPopupMenuEnabled(void) const
 
-  Return \c TRUE if the popup preferences menu is enabled,
+  Return \c TRUE if the pop-up preferences menu is enabled,
   otherwise \c FALSE.
 
   \sa setPopupMenuEnabled()
@@ -428,7 +428,7 @@
 /*!
   \fn void So@Gui@FullViewer::buildPopupMenu(void)
 
-  Make a popup menu with preferences settings.
+  Make a pop-up menu with preferences settings.
 
   One important note as for when you want to override this function in
   a subclass: be aware that it will usually be invoked (indirectly)
@@ -474,7 +474,7 @@
 // subclasses, so keep'em general.
 
 /*!
-  Called when the user start to drag the thumbwheel in the left
+  Called when the user starts to drag the thumbwheel in the left
   frame.  Override this method in subclassed viewers to provide your
   own functionality on the thumbwheel.
 
@@ -541,7 +541,7 @@ So@Gui@FullViewer::getLeftWheelValue(void) const
 }
 
 /*!
-  Called when the user start to drag the thumbwheel in the bottom
+  Called when the user starts to drag the thumbwheel in the bottom
   frame.  Override this method in subclassed viewers to provide your
   own functionality on the thumbwheel.
 
@@ -608,7 +608,7 @@ So@Gui@FullViewer::getBottomWheelValue(void) const
 }
 
 /*!
-  Called when the user start to drag the thumbwheel in the right
+  Called when the user starts to drag the thumbwheel in the right
   frame.  Override this method in subclassed viewers to provide your
   own functionality on the thumbwheel.
 
@@ -710,7 +710,7 @@ So@Gui@FullViewer::getBottomWheelLabelWidget(void) const
 // ************************************************************************
 
 /*!
-  Set title of popup menu.
+  Set title of pop-up menu.
 */
 void
 So@Gui@FullViewer::setPopupMenuString(const char * name)
@@ -724,15 +724,15 @@ So@Gui@FullViewer::setPopupMenuString(const char * name)
 SbBool
 So@Gui@FullViewer::processSoEvent(const SoEvent * const ev)
 {
-  // We're in "interact" mode (ie *not* the camera modification mode),
+  // We're in "interact" mode (i.e. *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // the scene graph, or caught by So@Gui@Viewer::processSoEvent() if
   // it's an ESC press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
 
   // Note: with the original SGI InventorXt, the popup menu is also
   // activated by RMB clicks in non-viewing mode. We want to allow RMB
-  // clicks to pass through to the scenegraph in non-viewing mode, so
+  // clicks to pass through to the scene graph in non-viewing mode, so
   // we don't copy that behavior.
 
   if (ev->getTypeId().isDerivedFrom(SoMouseButtonEvent::getClassTypeId())) {
@@ -1532,7 +1532,7 @@ SoGuiFullViewerP::pan(SoCamera * cam,
                       float aspectratio, const SbPlane & panningplane,
                       const SbVec2f & currpos, const SbVec2f & prevpos)
 {
-  if (cam == NULL) return; // can happen for empty scenegraph
+  if (cam == NULL) return; // can happen for empty scene graph
   if (currpos == prevpos) return; // useless invocation
 
 #if SO@GUI@_DEBUG && 0
@@ -1568,7 +1568,7 @@ SoGuiFullViewerP::pan(SoCamera * cam,
 void
 SoGuiFullViewerP::zoom(SoCamera * cam, const float diffvalue)
 {
-  if (cam == NULL) return; // can happen for empty scenegraph
+  if (cam == NULL) return; // can happen for empty scene graph
   SoType t = cam->getTypeId();
   SbName tname = t.getName();
 

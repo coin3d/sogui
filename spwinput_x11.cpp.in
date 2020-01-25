@@ -214,7 +214,7 @@ static int SPW_strLength = 0; /* length of the strData string */
  *    The window ID of the XCM window.
  *
  * Description:
- *     Finds the window named "sballd_XCM" and returns it's window ID
+ *     Finds the window named "sballd_XCM" and returns its window ID
  *
  * Notes:
  *     None.

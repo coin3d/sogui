@@ -91,7 +91,7 @@ private:
   static void cleanup_si(void);
 
   // (use SbPList instances to be able to compile properly on SGI /
-  // TGS Inventor aswell as Coin)
+  // TGS Inventor as well as Coin)
   SbPList cclist;
   SbPList internalfehandlers, internalfedata;
 

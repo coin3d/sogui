@@ -43,12 +43,12 @@
 
   \ingroup components viewers
 
-  This is an abstract class, which adds the following features to it's
+  This is an abstract class, which adds the following features to its
   So@Gui@RenderArea superclass: convenient methods for camera
   handling, an automatic headlight configuration.
 
-  As for the camera handling: when setting a new scenegraph for the
-  viewer, the scenegraph will automatically be scanned for a node
+  As for the camera handling: when setting a new scene graph for the
+  viewer, the scene graph will automatically be scanned for a node
   derived from SoCamera. If not found, the viewer will itself set up a
   camera for the scene. The camera can then be conveniently controlled
   by the application programmers in many aspects:
@@ -99,7 +99,7 @@
 
   So@Gui@Viewer-derived viewers all inherit the following keyboard
   controls from this class (but only when the viewer is in "examine
-  mode", ie So@Gui@Viewer::isViewing() returns \c TRUE):
+  mode", i.e. So@Gui@Viewer::isViewing() returns \c TRUE):
 
   <ul>
 
@@ -270,7 +270,7 @@ So@Gui@ViewerP::createSuperScene(void)
     "  pickCulling OFF",
     "  boundingBoxCaching OFF",
     
-    // Headlight. By inserting this before any scenegraph camera, the
+    // Headlight. By inserting this before any scene graph camera, the
     // light will always be pointing in the correct direction.
     "  DEF so@gui@->headlight DirectionalLight {",
     "    direction 1 -1 -10",
@@ -746,7 +746,7 @@ So@Gui@ViewerP::changeDrawStyle(So@Gui@Viewer::DrawStyle style)
   }
 
   // Set or unset complexity textureQuality override (the value of the
-  // override-field is always 0.0, ie signalling "textures off").
+  // override-field is always 0.0, i.e. signalling "textures off").
   switch (style) {
   case So@Gui@Viewer::VIEW_HIDDEN_LINE:
   case So@Gui@Viewer::VIEW_NO_TEXTURE:
@@ -848,7 +848,7 @@ So@Gui@ViewerP::setClippingPlanes(void)
     farval = -box.getMin()[2];
   }
 
-  // FIXME: what if we have a weird scale transform in the scenegraph?
+  // FIXME: what if we have a weird scale transform in the scene graph?
   // Could we end up with nearval > farval then? Investigate, then
   // either use an assert() (if it can't happen) or an So@Gui@Swap()
   // (to handle it). 20020116 mortene.
@@ -1382,7 +1382,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::BROWSER
 
-  If a user-supplied scenegraph passed into the setSceneGraph()
+  If a user-supplied scene graph passed into the setSceneGraph()
   function does not contain a camera, setting the viewer type to
   BROWSER will make the viewer in that case automatically set up a
   camera outside the scene, as part of the viewer's private and hidden
@@ -1391,13 +1391,13 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::Type So@Gui@Viewer::EDITOR
 
-  If a user-supplied scenegraph passed into the setSceneGraph()
+  If a user-supplied scene graph passed into the setSceneGraph()
   function does not contain a camera, setting the viewer type to
   EDITOR will make the viewer in that case automatically set up a
   camera \e in the user-supplied scene.
 
   So if you want to avoid having the So@Gui@Viewer class muck about
-  with your supplied scenegraph, set the type-flag to
+  with your supplied scene graph, set the type-flag to
   So@Gui@Viewer::BROWSER instead, which makes an inserted camera node
   go into the viewer's own "wrapper" scene graph instead.
 */
@@ -1432,7 +1432,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \enum So@Gui@Viewer::DrawStyle
 
-  Decides drawstyle for a scene with either a still camera or an
+  Decides draw style for a scene with either a still camera or an
   animating camera.
 
   \sa So@Gui@Viewer::setDrawStyle(), So@Gui@Viewer::DrawType
@@ -1440,7 +1440,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::DrawStyle So@Gui@Viewer::VIEW_AS_IS
 
-  Normal rendering, draws all scene geometry in it's original style.
+  Normal rendering, draws all scene geometry in its original style.
 */
 /*!
   \var So@Gui@Viewer::DrawStyle So@Gui@Viewer::VIEW_HIDDEN_LINE
@@ -1470,7 +1470,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
   rendering performance.
 
   "Complex shapes" in this context includes spheres, cones, cylinder,
-  NURBS surfaces, and others which are tesselated to polygons before
+  NURBS surfaces, and others which are tessellated to polygons before
   being rendered.
 */
 /*!
@@ -1508,7 +1508,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 /*!
   \var So@Gui@Viewer::DrawStyle So@Gui@Viewer::VIEW_SAME_AS_STILL
 
-  Always render a scene with an animating camera (ie
+  Always render a scene with an animating camera (i.e.
   So@Gui@Viewer::INTERACTIVE DrawType) in the same manner as scene
   with a still camera.
 */
@@ -1519,17 +1519,17 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 */
 /*!
   \var So@Gui@Viewer::BufferType So@Gui@Viewer::BUFFER_SINGLE
-  Change underlying OpenGL canvas to be single-buffered.
+  Change underlying OpenGL canvas to be single buffered.
 */
 /*!
   \var So@Gui@Viewer::BufferType So@Gui@Viewer::BUFFER_DOUBLE
-  Change underlying OpenGL canvas to be double-buffered.
+  Change underlying OpenGL canvas to be double buffered.
 */
 /*!
   \var So@Gui@Viewer::BufferType So@Gui@Viewer::BUFFER_INTERACTIVE
 
-  Set up so animation rendering is done in a double-buffered OpenGL
-  canvas, but ordinary rendering happens directly in the front-buffer.
+  Set up so animation rendering is done in a double buffered OpenGL
+  canvas, but ordinary rendering happens directly in the front buffer.
 
   This mode can be useful with absurdly large scenes, as the rendering
   will \e visibly progress, and one will avoid having the end user
@@ -1541,7 +1541,7 @@ SO@GUI@_OBJECT_ABSTRACT_SOURCE(So@Gui@Viewer);
 
 /*
   Return the parent node in the scene graph of the given \a node.
-  NB: this is just a quick'n'dirty thing for often executed code,
+  NB: this is just a quick and dirty thing for often executed code,
   and doesn't cover cases where nodes have multiple parents.
 */
 
@@ -1583,7 +1583,7 @@ So@Gui@ViewerP::getParentOfNode(SoNode * root, SoNode * node) const
   The \a t type setting hints about what context the viewer will be
   used in.  Usually not very interesting for the application
   programmer, but if you want to make sure the So@Gui@Viewer class
-  doesn't muck about with your supplied scenegraph, set the type-flag
+  doesn't muck about with your supplied scene graph, set the type-flag
   to So@Gui@Viewer::BROWSER.  (This "feature" of the viewer is
   included just to be compatible with the old SGI Inventor API.)
 
@@ -1686,7 +1686,7 @@ So@Gui@Viewer::~So@Gui@Viewer()
   the viewer controls.
 
   The camera passed in as an argument to this method \e must already
-  be part of the viewer's scenegraph.  You do \e not inject viewpoint
+  be part of the viewer's scene graph.  You do \e not inject viewpoint
   cameras to the viewer with this method.
 
   You should rather insert a camera into the scene graph first (if
@@ -1695,8 +1695,8 @@ So@Gui@Viewer::~So@Gui@Viewer()
 
   If the application code doesn't explicitly set up a camera through
   this method, the viewer will automatically scan through the
-  scenegraph to find a camera to use. If no camera is available in the
-  scenegraph at all, it will set up it's own camera.
+  scene graph to find a camera to use. If no camera is available in the
+  scene graph at all, it will set up its own camera.
 
   \sa getCamera()
 */
@@ -1729,10 +1729,10 @@ So@Gui@Viewer::setCamera(SoCamera * cam)
   viewpoint.
 
   It \e is possible that this function returns \c NULL, for instance
-  if there's no scenegraph present in the viewer.  (This is mostly
+  if there's no scene graph present in the viewer.  (This is mostly
   meant as a note for developers extending the So@Gui@ library, as
   application programmers usually controls if and when a viewer
-  contains a scenegraph, and therefore know in advance if this method
+  contains a scene graph, and therefore know in advance if this method
   will return a valid camera pointer.)
 
   \sa setCamera()
@@ -1862,7 +1862,7 @@ So@Gui@Viewer::setCameraType(SoType t)
   Returns camera type which will be used when the viewer has to make its
   own camera.
 
-  Note that this call does \e not return the current cameratype, as one
+  Note that this call does \e not return the current camera type, as one
   might expect. Use getCamera() and SoType::getTypeId() for that inquiry.
 
   \sa setCameraType()
@@ -2016,7 +2016,7 @@ So@Gui@Viewer::getHeadlight(void) const
 
 /*!
   Set up a drawing style. The \a type argument specifies if the given
-  \a style should be interpreted as the drawstyle during animation or
+  \a style should be interpreted as the draw style during animation or
   when the camera is static.
 
   Default values for the drawing style is to render the scene "as is"
@@ -2055,7 +2055,7 @@ So@Gui@Viewer::setDrawStyle(So@Gui@Viewer::DrawType type,
 // *************************************************************************
 
 /*!
-  Return current drawstyles for the given type (\a STILL or
+  Return current draw styles for the given type (\a STILL or
   \a INTERACTIVE).
 
   \sa setDrawStyle()
@@ -2083,7 +2083,7 @@ So@Gui@Viewer::getDrawStyle(const So@Gui@Viewer::DrawType type) const
   So@Gui@Viewer::BUFFER_INTERACTIVE.
 
   (With a buffer type of \c So@Gui@Viewer::BUFFER_INTERACTIVE, the
-  viewer will render with doublebuffering during user interaction and
+  viewer will render with double buffering during user interaction and
   with single buffering otherwise.)
 
   Default is \c So@Gui@Viewer::BUFFER_DOUBLE.
@@ -2137,7 +2137,7 @@ So@Gui@Viewer::getBufferingType(void) const
   If the view mode is on, user events will be caught and used to
   influence the camera position / orientation. If view mode is off,
   all events in the viewer canvas (like for instance keypresses or
-  mouseclicks and -movements) will be passed along to the scene graph.
+  mouse clicks and -movements) will be passed along to the scene graph.
 
   Default is to have the view mode active.
 
@@ -2301,7 +2301,7 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
 
 
   It is also possible to register a callback method \a cb, which will
-  then be invoked after the near and far clipping planes has been
+  then be invoked after the near and far clipping planes have been
   calculated by the So@Gui@Viewer code. The callback can then adjust
   the values for the distance to the near and far planes to exactly
   match the needs of the application (for instance at specific parts
@@ -2314,8 +2314,8 @@ So@Gui@Viewer::setAutoClipping(SbBool enable)
   \endcode
 
   The first argument is the \a cbuserdata passed in along with the
-  callback function pointer itself (ie the callback function's
-  closure). The second argument is the near and far clipping plane
+  callback function pointer itself (i.e. the callback function's
+  closure). The second argument are the near and far clipping plane
   distances from the camera position, as calculated internally by the
   viewer, including "slack".
 
@@ -2369,7 +2369,7 @@ So@Gui@Viewer::setAutoClippingStrategy(const AutoClippingStrategy strategy,
 // *************************************************************************
 
 /*!
-  Return value of the automatic near/far clipplane adjustment indicator.
+  Return value of the automatic near/far clip plane adjustment indicator.
 
   \sa setAutoClipping()
 */
@@ -2469,8 +2469,8 @@ So@Gui@Viewer::isStereoViewing(void) const
 /*!
   \var So@Gui@Viewer::StereoType So@Gui@Viewer::STEREO_INTERLEAVED_COLUMNS
 
-  Same basic technique as So@Gui@Viewer::STEREO_INTERLEAVED_ROWS, only
-  it is vertical lines that are interleaved / interlaced, instead of
+  Basically the same technique as So@Gui@Viewer::STEREO_INTERLEAVED_ROWS, but
+  vertical lines are interleaved / interlaced, instead of
   horizontal lines.
 */
 
@@ -2484,7 +2484,7 @@ So@Gui@Viewer::isStereoViewing(void) const
     http://astronomy.swin.edu.au/~pbourke/opengl/stereogl/
 
 
-  Note: it is prefered that one uses this function for control of
+  Note: it is preferred that one uses this function for control of
   which type of stereo rendering to use, instead of the older
   So@Gui@Viewer::setStereoViewing() and
   So@Gui@GLWidget::setQuadBufferStereo() functions.
@@ -2791,7 +2791,7 @@ void So@Gui@Viewer::setWireframeOverlayColor(const SbColor & color)
 
 /*!
   Returns the current color of the overlay wireframe. The default
-  color is [1,0,0], ie pure red.
+  color is [1,0,0], i.e. pure red.
 
   \sa setWireframeOverlayColor()
 */
@@ -2820,8 +2820,8 @@ So@Gui@Viewer::setDoubleBuffer(const SbBool on)
 // *************************************************************************
 
 /*!
-  Give the viewer a scenegraph to render and interact with. Overridden
-  from parent class so the viewer can add it's own nodes to control
+  Give the viewer a scene graph to render and interact with. Overridden
+  from parent class so the viewer can add its own nodes to control
   rendering in different styles, rendering with a headlight, etc.
 
   The \a root node will be inserted under the \e viewer's root node,
@@ -2902,19 +2902,19 @@ So@Gui@Viewer::setSceneGraph(SoNode * root)
     
     // If type==BROWSER, camera should be inserted in the private
     // viewer "supergraph", if it's equal to EDITOR it should be
-    // inserted in the user-supplied scenegraph.
+    // inserted in the user-supplied scene graph.
     if (PRIVATE(this)->type == So@Gui@Viewer::BROWSER) {
       PRIVATE(this)->sceneroot->insertChild(scenecamera, 1);
     }
     else { // PRIVATE(this)->type == So@Gui@Viewer::EDITOR
       if (PRIVATE(this)->scenegraph->isOfType(SoGroup::getClassTypeId())) {
         // At the uppermost leftmost position in the user-supplied
-        // scenegraph.
+        // scene graph.
         ((SoGroup *)PRIVATE(this)->scenegraph)->insertChild(scenecamera, 0);
       }
       else {
         // Make an extra depth level to fit the camera node into the
-        // user-scenegraph.
+        // user-scene graph.
         SoGroup * g = new SoGroup;
         g->addChild(scenecamera);
         g->addChild(PRIVATE(this)->scenegraph);
@@ -2982,7 +2982,7 @@ So@Gui@Viewer::setSeekMode(SbBool enable)
 
   (The actual animated translation will not occur until the end user
   really \e starts the seek operation, typically by clicking with the
-  left mousebutton.)
+  left mouse button.)
 
   \sa setSeekMode()
 */
@@ -3041,7 +3041,7 @@ So@Gui@Viewer::seekToPoint(const SbVec2s screenpos)
 }
 
 /*!
-  Call this method to initiate a seek action towards the give 3D world
+  Call this method to initiate a seek action towards the given 3D world
   coordinate point in the scene, \a scenepos.
 
   \since So@Gui@ 1.3.0
@@ -3527,7 +3527,7 @@ So@Gui@Viewer::setSeekDistance(const float distance)
 /*!
   Returns the current seek distance. Value given as an absolute scalar
   length or as a percentage value of the original distance between
-  the hitpoint and the camera starting position.
+  the hit point and the camera starting position.
 
   \sa setSeekDistance(), isSeekValueAsPercentage()
 */
@@ -3628,7 +3628,7 @@ So@Gui@Viewer::changeCameraValues(// virtual, protected
   if (!cam) {
     if (SO@GUI@_DEBUG) {
       SoDebugError::postWarning("So@Gui@Viewer::changeCameraValues",
-                                "no current camera in the scenegraph");
+                                "no current camera in the scene graph");
     }
     return;
   }
@@ -3675,7 +3675,7 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
       break;
 
     // Let the end-user toggle between camera-interaction mode
-    // ("viewing") and scenegraph-interaction mode with ALT key(s).
+    // ("viewing") and scene graph-interaction mode with ALT key(s).
     case SoKeyboardEvent::LEFT_ALT:
     case SoKeyboardEvent::RIGHT_ALT:
       if (!this->isViewing() && (keyevent->getState() == SoButtonEvent::DOWN)) {
@@ -3696,7 +3696,7 @@ So@Gui@Viewer::processSoEvent(const SoEvent * const event)
 
   // If not viewing, break off further handling and pass the event on
   // to the So@Gui@RenderArea, which will pass it on to the
-  // scenegraph.
+  // scene graph.
   if (!this->isViewing()) { return inherited::processSoEvent(event); }
 
 

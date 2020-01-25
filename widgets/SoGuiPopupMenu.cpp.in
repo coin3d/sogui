@@ -34,7 +34,7 @@
 
 /*!
   \class So@Gui@PopupMenu Inventor/@Gui@/widgets/So@Gui@PopupMenu.h
-  \brief The So@Gui@PopupMenu class implements a common interface for popup
+  \brief The So@Gui@PopupMenu class implements a common interface for pop-up
   menu management for all the Coin GUI toolkit libraries.
 
   The point of this class is to enable client code to be exactly the
@@ -62,9 +62,9 @@
 /*!
   \fn void So@Gui@PopupMenu::popUp(@WIDGET@ inside, int x, int y)
 
-  Invokes this popup menu instance.
+  Invokes this pop-up menu instance.
 
-  The coordinates for the popup will be used relative to the origo of
+  The coordinates for the pop-up will be used relative to the origo of
   the widget argument.
 */
 
@@ -90,7 +90,7 @@ public:
 
   So@Gui@PopupMenu is implemented with this "factory" method instead of
   a public constructor to provide a completely generic interface on
-  top of the toolkit's native popup menu implementation.
+  top of the toolkit's native pop-up menu implementation.
 */
 So@Gui@PopupMenu *
 So@Gui@PopupMenu::createInstance(void)

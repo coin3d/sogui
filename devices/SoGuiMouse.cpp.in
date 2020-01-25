@@ -48,7 +48,7 @@
   \ingroup devices
 
   The So@Gui@Mouse class is the glue between native mouse handling and
-  mouse interaction in the Inventor scenegraph.
+  mouse interaction in the Inventor scene graph.
 
   All components derived from the So@Gui@RenderArea have got an
   So@Gui@Mouse device attached by default.
@@ -89,25 +89,25 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Mouse);
 */
 /*!
   \var So@Gui@Mouse::Events So@Gui@Mouse::BUTTON_PRESS
-  Maskbit for mousebutton press events.
+  Maskbit for mouse button press events.
 */
 /*!
   \var So@Gui@Mouse::Events So@Gui@Mouse::BUTTON_RELEASE
-  Maskbit for mousebutton release events.
+  Maskbit for mouse button release events.
 */
 /*!
   \var So@Gui@Mouse::Events So@Gui@Mouse::POINTER_MOTION
-  Maskbit for mousepointer motion events.
+  Maskbit for mouse pointer motion events.
 */
 /*!
   \var So@Gui@Mouse::Events So@Gui@Mouse::BUTTON_MOTION
-  Maskbit for mousepointer motion events with one or more mousebuttons
+  Maskbit for mouse pointer motion events with one or more mouse buttons
   pressed.
 */
 /*!
   \var So@Gui@Mouse::Events So@Gui@Mouse::ALL_EVENTS
 
-  Mask which includes all the maskbits in the enum (ie use this to
+  Mask which includes all the maskbits in the enum (i.e. use this to
   signal interest in all kinds of events for the mouse device).
 */
 
@@ -134,20 +134,20 @@ SO@GUI@_OBJECT_SOURCE(So@Gui@Mouse);
   This is then returned in the form of an instance of a subclass of
   the Inventor API's SoEvent class, either an SoMouseButtonEvent or an
   SoLocation2Event, depending on whether the native event is a
-  mousebutton press / release, or a mousecursor movement event.
+  mouse button press / release, or a mouse cursor movement event.
 
-  The mapping of the mousebuttons upon generation of
+  The mapping of the mouse buttons upon generation of
   SoMouseButtonEvent events will be done as follows:
 
   <ul>
-  <li>left mousebutton: SoMouseButtonEvent::BUTTON1</li>
-  <li>right mousebutton: SoMouseButtonEvent::BUTTON2</li>
-  <li>middle mousebutton, if available: SoMouseButtonEvent::BUTTON3</li>
+  <li>left mouse button: SoMouseButtonEvent::BUTTON1</li>
+  <li>right mouse button: SoMouseButtonEvent::BUTTON2</li>
+  <li>middle mouse button, if available: SoMouseButtonEvent::BUTTON3</li>
   <li>forward motion on a wheel mouse: SoMouseButtonEvent::BUTTON4</li>
   <li>backward motion on a wheel mouse: SoMouseButtonEvent::BUTTON5</li>
   </ul>
 
-  Note that the rightmost mousebutton will always map to
+  Note that the rightmost mouse button will always map to
   SoMouseButtonEvent::BUTTON2, even on a 3-button mouse.
 */
 

@@ -439,7 +439,7 @@ So@Gui@ColorEditor::isWYSIWYG(void) const
 }
 
 /*!
-  Sets which if the slider sets is to be used.
+  Sets which of the slider sets are to be used.
 
   \sa So@Gui@ColorEditor::Sliders
 */
@@ -452,7 +452,7 @@ So@Gui@ColorEditor::setCurrentSliders(So@Gui@ColorEditor::Sliders which)
 }
 
 /*!
-  Returns which slider sets is being used.
+  Returns which slider sets are being used.
 
   \sa So@Gui@ColorEditor::Sliders
 */

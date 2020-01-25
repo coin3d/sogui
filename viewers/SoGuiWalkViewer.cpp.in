@@ -33,7 +33,7 @@
 \**************************************************************************/
 
 // This file contains the generic, "templatize-able" parts of the
-// So*WalkViewer sourcecode.
+// So*WalkViewer source code.
 
 // *************************************************************************
 
@@ -82,7 +82,7 @@ void
 SoGuiWalkViewerP::dollyCamera(const float delta) const
 {
   SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scene graph, for instance
 
   SbPlane walkplane(PUBLIC(this)->getUpDirection(), camera->position.getValue());
   SbVec3f campos = camera->position.getValue();
@@ -103,7 +103,7 @@ void
 SoGuiWalkViewerP::elevateCamera(const float delta) const
 {
   SoCamera * const camera = PUBLIC(this)->getCamera();
-  if (camera == NULL) { return; } // if there's no scenegraph, for instance
+  if (camera == NULL) { return; } // if there's no scene graph, for instance
 
   SbVec3f up = PUBLIC(this)->getUpDirection();
   up.normalize();

@@ -97,7 +97,7 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 #endif /* SO@GUI@_DLL_API */
 
 /*
-  On MSWindows platforms, one of these defines must always be set when
+  On Microsoft Windows platforms, one of these defines must always be set when
   building application programs:
 
    - "SO@GUI@_DLL", when the application programmer is using the
@@ -107,8 +107,8 @@ inline void So@Gui@Swap(Type & a, Type & b) {
      library in the form of a static object library (LIB)
 
   Note that either SO@GUI@_DLL or SO@GUI@_NOT_DLL _must_ be defined by
-  the application programmer on MSWindows platforms, or else the
-  #error statement will hit. Set up one or the other of these two
+  the application programmer on Microsoft Windows platforms, otherwise the
+  #error statement will be hit. Set up one or the other of these two
   defines in your compiler environment according to how the library
   was built -- as a DLL (use "SO@GUI@_DLL") or as a LIB (use
   "SO@GUI@_NOT_DLL").
@@ -118,7 +118,7 @@ inline void So@Gui@Swap(Type & a, Type & b) {
   line (for command-line build processes), or by adding the define to
   the list of preprocessor symbols in your IDE GUI (in the MSVC IDE,
   this is done from the "Project"->"Settings" menu, choose the "C/C++"
-  tab, then "Preprocessor" from the dropdown box and add the
+  tab, then "Preprocessor" from the drop down list and add the
   appropriate define)).
 
   It is extremely important that the application programmer uses the
@@ -141,7 +141,7 @@ inline void So@Gui@Swap(Type & a, Type & b) {
 # endif /* !SO@GUI@_MAKE_DLL */
 #endif /* Microsoft Windows */
 
-/* Empty define to avoid errors when _not_ compiling an MSWindows DLL. */
+/* Empty define to avoid errors when _not_ compiling an Microsoft Windows DLL. */
 #ifndef SO@GUI@_DLL_API
 # define SO@GUI@_DLL_API
 #endif /* !SO@GUI@_DLL_API */

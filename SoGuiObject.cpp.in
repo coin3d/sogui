@@ -51,14 +51,14 @@
   \ingroup misc
 
   The purpose of making this class the superclass of all So@Gui@
-  device, component and viewer classes is to be able to do run-time
+  device, component and viewer classes is to be able to do runtime
   type checking of the So@Gui@ objects.
 
 
   You can place the macro SO@GUI@_OBJECT_HEADER(classname,parentname)
   within a class definition header for So@Gui@ extension components to
-  automatically make the necessary definitions for setting up a
-  run-time type system for your extension classes:
+  automatically provide the necessary definitions for setting up a
+  runtime type system for your extension classes:
 
   \code
   #ifndef MYSPECIALVIEWER_H
@@ -73,8 +73,8 @@
   \endcode
 
   Then put the SO@GUI@_OBJECT_SOURCE(classname) macro within the
-  actual implementation sourcecode file to include the necessary
-  code for the run-time type system:
+  actual implementation source code file to include the necessary
+  code for the runtime type system:
 
   \code
   #include <MySpecialViewer.h>
@@ -94,7 +94,7 @@
   \fn SoType So@Gui@Object::getTypeId
 
   Returns the type identification of an object derived from a class
-  inheriting So@Gui@Object.  This is used for run-time type checking
+  inheriting So@Gui@Object.  This is used for runtime type checking
   and "downward" casting.
 
   Usage example:

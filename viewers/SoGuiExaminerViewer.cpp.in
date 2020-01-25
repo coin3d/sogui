@@ -45,7 +45,7 @@
 
   This class is the viewer considered to be the most "general purpose"
   viewer, and it is often used in rapid prototyping to examine simple
-  models aswell as complete scenes (although for the latter, you might
+  models as well as complete scenes (although for the latter, you might
   be better off with one of the other viewer classes).
 
   <center>
@@ -108,26 +108,26 @@
 
   So@Gui@ExaminerViewer has a convenient interface for repositioning
   and reorientation of the camera, by panning, rotating and zooming
-  it's position. The following controls can be used:
+  its position. The following controls can be used:
 
   <ul>
 
-  <li>hold down left mousebutton and move mouse pointer to rotate the
-  camera around it's current focal point (the focal point can be
+  <li>hold down left mouse button and move mouse pointer to rotate the
+  camera around its current focal point (the focal point can be
   changed by doing a seek operation)</li>
 
-  <li>hold middle mousebutton to pan (or a CTRL-key plus left
-  mousebutton, or a SHIFT-key plus left mousebutton)</li>
+  <li>hold middle mouse button to pan (or a CTRL-key plus left
+  mouse button, or a SHIFT-key plus left mouse button)</li>
 
-  <li>hold down left + middle mousebutton to zoom / dolly, or CTRL +
-  middle mousebutton, or CTRL + SHIFT + the left mousebutton</li>
+  <li>hold down left + middle mouse button to zoom / dolly, or CTRL +
+  middle mouse button, or CTRL + SHIFT + the left mouse button</li>
 
-  <li>click 's', then pick with the left mousebutton to seek</li>
+  <li>click 's', then pick with the left mouse button to seek</li>
 
-  <li>right mousebutton opens the popup menu</li>
+  <li>right mouse button opens the pop-up menu</li>
 
   <li>click 'ESC' key to switch to and from 'camera interaction' mode
-  and 'scenegraph interaction' mode (see setViewing()
+  and 'scene graph interaction' mode (see setViewing()
   documentation)</li>
 
   <!-- 
@@ -135,7 +135,7 @@
     20050202 larsa below.
       
   <li>hold down the 'ALT' key to temporary toggle from
-  camera-interaction mode to scenegraph-interaction mode</li>
+  camera-interaction mode to scene graph-interaction mode</li>
 
   //-->
 
@@ -149,7 +149,7 @@
   right decoration border.
 
   It also inherits the decoration buttons from the So@Gui@FullViewer:
-  the arrow for switching to "scenegraph interaction" mode, the hand
+  the arrow for switching to "scene graph interaction" mode, the hand
   for setting back to "camera interaction" mode, the house for "reset
   camera to home position", the blueprint house for "set new camera
   home position", the eye for "zoom camera out to view full scene" and
@@ -157,12 +157,12 @@
 
   Note that a common faulty assumption about all the viewer-classes is
   that user interaction (in the "examine"-mode, not the
-  scenegraph-interaction mode) influences the model or 3D-scene in the
+  scene graph-interaction mode) influences the model or 3D-scene in the
   view. This is not correct, as it is always the viewer's \e camera
   that is translated and rotated.
 
   The initial position of the camera is placed such that all of the
-  scenegraph's geometry fits within it's view.
+  scene graph's geometry fits within its view.
 
   \sa So@Gui@FlyViewer, So@Gui@PlaneViewer
 */
@@ -330,7 +330,7 @@ So@Gui@ExaminerViewer::isFeedbackVisible(void) const
 // ************************************************************************
 
 /*!
-  Set the size of the feedback axiscross.  The value is interpreted as
+  Set the size of the feedback axis cross.  The value is interpreted as
   an approximate percentage chunk of the dimensions of the total
   canvas.
 
@@ -378,9 +378,9 @@ So@Gui@ExaminerViewer::processSoEvent(const SoEvent * const ev)
                           ev->getTypeId().getName().getString());
 #endif // debug
 
-  // We're in "interact" mode (ie *not* the camera modification mode),
+  // We're in "interact" mode (i.e. *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // the scene graph, or caught by So@Gui@Viewer::processSoEvent() if
   // it's an ESC or ALT press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
     
@@ -846,7 +846,7 @@ float
 SoGuiExaminerViewerP::rotXWheelMotion(float value, float oldvalue)
 {
   SoCamera * cam = PUBLIC(this)->getCamera();
-  if (cam == NULL) return 0.0f; // can happen for empty scenegraph
+  if (cam == NULL) return 0.0f; // can happen for empty scene graph
 
   SoGuiExaminerViewerP::rotateCamera(cam, SbVec3f(-1, 0, 0), value - oldvalue);
   return value;
@@ -859,7 +859,7 @@ float
 SoGuiExaminerViewerP::rotYWheelMotion(float value, float oldvalue)
 {
   SoCamera * cam = PUBLIC(this)->getCamera();
-  if (cam == NULL) return 0.0f; // can happen for empty scenegraph
+  if (cam == NULL) return 0.0f; // can happen for empty scene graph
 
   SoGuiExaminerViewerP::rotateCamera(cam, SbVec3f(0, -1, 0), value - oldvalue);
   return value;
@@ -895,7 +895,7 @@ SoGuiExaminerViewerP::setMode(const ViewerMode newmode)
       // coordinates should stay the same during the whole pan
       // operation, so we should calculate this value here.
       SoCamera * cam = PUBLIC(this)->getCamera();
-      if (cam == NULL) { // can happen for empty scenegraph
+      if (cam == NULL) { // can happen for empty scene graph
         this->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
       }
       else {
@@ -944,7 +944,7 @@ SoGuiExaminerViewerP::setMode(const ViewerMode newmode)
 void
 SoGuiExaminerViewerP::drawAxisCross(void)
 {
-  // FIXME: convert this to a superimposition scenegraph instead of
+  // FIXME: convert this to a superimposition scene graph instead of
   // OpenGL calls. 20020603 mortene.
 
   // Store GL state.
@@ -1169,7 +1169,7 @@ SoGuiExaminerViewerP::spin(const SbVec2f & pointerpos)
 
   this->spinsamplecounter++;
   acc_angle /= this->spinsamplecounter;
-  // FIXME: accumulate and average axis vectors aswell? 19990501 mortene.
+  // FIXME: accumulate and average axis vectors as well? 19990501 mortene.
   this->spinincrement.setValue(newaxis, acc_angle);
 
   // Don't carry too much baggage, as that'll give unwanted results

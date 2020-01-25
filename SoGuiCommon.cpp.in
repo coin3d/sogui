@@ -71,7 +71,7 @@
     @WIDGET@ mainwin = So@Gui@::init(argc, argv, argv[0]);
   
     // Make a dead simple scene graph, only containing a single
-    // yellow cone under the scenegraph root.
+    // yellow cone under the scene graph root.
     SoSeparator * root = new SoSeparator;
     root->ref();
 
@@ -162,7 +162,7 @@ SoGuiP::commonCleanup(void)
   Inventor API. The latter is done by calling \a SoDB::init(), \a
   SoNodeKit::init() and \a SoInteraction::init().
 
-  The returned @WIDGET@ is a toplevel shell widget for the
+  The returned @WIDGET@ is a top level shell widget for the
   application, which can be used as a shell for the main component.
 
   This method is provided for easier porting / compatibility with the
@@ -206,7 +206,7 @@ So@Gui@::init(const char * appname, const char * classname)
   Creates an application framework and constructs and returns a main
   widget for you.
 
-  The returned @WIDGET@ is a toplevel shell widget for the
+  The returned @WIDGET@ is a top level shell widget for the
   application, which can be used as a shell for the main component.
 */
 
@@ -239,7 +239,7 @@ So@Gui@::init(const char * appname, const char * classname)
   (Even then it is usually not necessary to call this method, as the
   operating system should take care of cleaning up resource use when
   an application exits. This method is mainly provided as a manner to
-  be able to clean up in "unusual" run-time environments, for instance
+  be able to clean up in "unusual" runtime environments, for instance
   if So@Gui@ is used as a component in a browser plug-in.)
   -->
 
@@ -279,7 +279,7 @@ So@Gui@::init(const char * appname, const char * classname)
 
   \e Deleting a component after mainLoop() returns is allowed, though,
   and also necessary to avoid getting reports of possible memory leaks
-  from memleak checkers.
+  from memory leak checkers.
   -->
 */
 
@@ -364,7 +364,7 @@ So@Gui@::getVersionToolkitString(void)
   caller thread invokes So@Gui@::unlockGL().
 
   It is meant to protect several threads invoking OpenGL calls in
-  parallell, in case the underlying OpenGL implementation is not
+  parallel, in case the underlying OpenGL implementation is not
   multi-thread safe.
 
   For convenience, the function can be invoked through the
@@ -424,7 +424,7 @@ So@Gui@::unlockGL(void)
   \var So@Gui@::FatalErrors So@Gui@::INTERNAL_ASSERT
 
   An internal error condition that should never happen was
-  detected. The most likely cause of this is programmering errors
+  detected. The most likely cause of this are programming errors
   within the So@Gui@ library itself.
 */
 /*!
@@ -435,7 +435,7 @@ So@Gui@::unlockGL(void)
 */
 
 /*!
-  Set up a callback to invoke in the case of unexpected fatal error
+  Set up a callback to be invoked in the case of unexpected fatal error
   conditions within the So@Gui@ library.
 
   Almost any error condition within the library is handled in a robust
@@ -530,7 +530,7 @@ So@Gui@::isCompatible(unsigned int major, unsigned int minor)
 */
 /*!
   \var So@Gui@::ABIType So@Gui@::UNKNOWN
-  The So@Gui@ introspection mechanisms can not decide how the library
+  The So@Gui@ introspection mechanisms cannot decide how the library
   was built.
 */
 
@@ -622,7 +622,7 @@ So@Gui@::getABIType(void)
 // Abort the application due to some kind of mismatch in the ABI
 // settings / configuration. This should hopefully help application
 // programmers avoid shooting themselves in the foot by controlling
-// certain run-time parameters in the client application versus what
+// certain runtime parameters in the client application versus what
 // is expected by the So@Gui@ library.
 //
 // If you're an application programmer, it is very likely that you
@@ -678,6 +678,6 @@ SoGuiP::abort(SoGuiP::ABIError error)
   \a title is the title of the dialog box. \a string1 and \a string2
   contains the text which will be shown in the dialog box.
 
-  There will only be a single "Ok" button for the user to press and
+  There will only be a single "OK" button for the user to press and
   continue with the application.
 */

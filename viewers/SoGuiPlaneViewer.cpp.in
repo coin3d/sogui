@@ -33,7 +33,7 @@
 \**************************************************************************/
 
 // This file contains the generic, "templatize-able" parts of the
-// So*PlaneViewer sourcecode.
+// So*PlaneViewer source code.
 
 /*!
   \class So@Gui@PlaneViewer Inventor/@Gui@/viewers/So@Gui@PlaneViewer.h
@@ -53,28 +53,28 @@
   Controls:
   <ul>
 
-  <li>hold down left mousebutton and move mouse pointer to dolly (or
-  hold both left and middle mousebuttons)</li>
+  <li>hold down left mouse button and move mouse pointer to dolly (or
+  hold both left and middle mouse buttons)</li>
 
-  <li>hold middle mousebutton to pan (or a CTRL-key plus left
-  mousebutton, or a SHIFT-key plus left mousebutton)</li>
+  <li>hold middle mouse button to pan (or a CTRL-key plus left
+  mouse button, or a SHIFT-key plus left mouse button)</li>
 
-  <li>hold down CTRL + middle mousebutton to rotate (or CTRL + SHIFT +
-  the left mousebutton)</li>
+  <li>hold down CTRL + middle mouse button to rotate (or CTRL + SHIFT +
+  the left mouse button)</li>
 
-  <li>click 's', then pick with the left mousebutton to seek</li>
+  <li>click 's', then pick with the left mouse button to seek</li>
 
-  <li>right mousebutton open the popup menu</li>
+  <li>right mouse button open the pop-up menu</li>
 
   <li>click 'ESC' key to switch to and from 'view' mode and
-  'scenegraph interaction' mode (see setViewing() documentation)</li>
+  'scene graph interaction' mode (see setViewing() documentation)</li>
 
   <!-- 
     FIXME: This functionality has been disabled. See FIXME comment
     20050202 larsa below.
 
   <li>hold down the 'ALT' key to temporary toggle from  
-      camera-interaction mode to scenegraph-interaction mode</li>  
+      camera-interaction mode to scene graph-interaction mode</li>  
 
   //-->
 
@@ -82,7 +82,7 @@
 
   Hitting any of the X, Y or Z buttons in the panel on the right side
   of the render canvas will "flip" the current camera direction around
-  it's focal point to point along the selected axis (towards negative
+  its focal point to point along the selected axis (towards negative
   infinity).
 
   The So@Gui@PlaneViewer also provides a user decoration's button for
@@ -91,7 +91,7 @@
   right decoration border.
 
   It also inherits the decoration buttons from the So@Gui@FullViewer:
-  the arrow for switching to "scenegraph interaction" mode, the hand
+  the arrow for switching to "scene graph interaction" mode, the hand
   for setting back to "camera interaction" mode, the house for "reset
   camera to home position", the blueprint house for "set new camera
   home position", the eye for "zoom camera out to view full scene" and
@@ -99,12 +99,12 @@
 
   Note that a common faulty assumption about all the viewer-classes is
   that user interaction (in the "examine"-mode, not the
-  scenegraph-interaction mode) influences the model or 3D-scene in the
+  scene graph-interaction mode) influences the model or 3D-scene in the
   view. This is not correct, as it is always the viewer's \e camera
   that is translated and rotated.
 
   The initial position of the camera is placed such that all of the
-  scenegraph's geometry fits within it's view.
+  scene graph's geometry fits within its view.
 */
 
 // *************************************************************************
@@ -211,9 +211,9 @@ So@Gui@PlaneViewer::processSoEvent(const SoEvent * const ev)
                          PRIVATE(this)->mode);
 #endif // debug
 
-  // We're in "interact" mode (ie *not* the camera modification mode),
+  // We're in "interact" mode (i.e. *not* the camera modification mode),
   // so don't handle the event here. It should either be forwarded to
-  // the scenegraph, or caught by So@Gui@Viewer::processSoEvent() if
+  // the scene graph, or caught by So@Gui@Viewer::processSoEvent() if
   // it's an ESC and ALT press (to switch modes).
   if (!this->isViewing()) { return inherited::processSoEvent(ev); }
     
@@ -687,7 +687,7 @@ SoGuiPlaneViewerP::commonConstructor(void)
   SoInput * input = new SoInput;
   input->setBuffer((void *)superimposed, strlen(superimposed));
   SbBool ok = SoDB::read(input, this->superimposition);
-  assert(ok && "error in superimposed scenegraph");
+  assert(ok && "error in superimposed scene graph");
   delete input;
   this->superimposition->ref();
 
@@ -830,7 +830,7 @@ SoGuiPlaneViewerP::getPointerOrigoMotionAngle(void) const
   return (float)(nowradval - thenradval);
 }
 
-// This method updates the contents of the scenegraph which renders
+// This method updates the contents of the scene graph which renders
 // the rotate-"anchor".
 void
 SoGuiPlaneViewerP::updateAnchorScenegraph(void) const
@@ -969,7 +969,7 @@ SoGuiPlaneViewerP::changeMode(PlaneViewerMode newmode)
     // coordinates should stay the same during the whole pan
     // operation, so we should calculate this value here.
     SoCamera * cam = PUBLIC(this)->getCamera();
-    if (cam == NULL) { // can happen for empty scenegraph
+    if (cam == NULL) { // can happen for empty scene graph
       this->panningplane = SbPlane(SbVec3f(0, 0, 1), 0);
     }
     else {
