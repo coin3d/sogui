@@ -1,4 +1,5 @@
 # Support GitHub linguist library to display right repository language
+*.cpp.in linguist-language=C++
+*.h.in linguist-language=C++
 libm4.m4 linguist-generated
 Makefile.common linguist-generated
-CMakeLists.txt linguist-generated
