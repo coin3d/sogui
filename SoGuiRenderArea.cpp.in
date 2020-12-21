@@ -162,7 +162,6 @@
 #endif // HAVE_CONFIG_H
 
 #if SOQT_DEBUG // For the "soinfo" debugging backdoor.
-#include <qgl.h>
 #include <qapplication.h>
 #endif // SOQT_DEBUG
 
