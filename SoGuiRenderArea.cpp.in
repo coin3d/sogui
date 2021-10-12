@@ -708,7 +708,7 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   };
 
   for (unsigned int i = 0; i < (sizeof(keyseq) / sizeof(keyseq[0])); i++) {
-    const int ml = strlen(keyseq[i]);
+    const int ml = (int)strlen(keyseq[i]);
     if (cl >= ml && this->currentinput.getSubString(cl - ml) == keyseq[i]) {
       return id[i];
     }
@@ -1845,7 +1845,7 @@ So@Gui@RenderArea::redraw(void)
     So@Gui@ExaminerViewer::actualRedraw();
   
   
-    // Increase arrow angle with 1/1000 ° every frame.
+    // Increase arrow angle with 1/1000 degree every frame.
     arrowrotation->angle = arrowrotation->angle.getValue() + (0.001 / M_PI * 180);
     // Render overlay front scene graph.
     glClear(GL_DEPTH_BUFFER_BIT);
