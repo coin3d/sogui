@@ -708,7 +708,7 @@ So@Gui@RenderAreaP::checkMagicSequences(const char c)
   };
 
   for (unsigned int i = 0; i < (sizeof(keyseq) / sizeof(keyseq[0])); i++) {
-    const int ml = strlen(keyseq[i]);
+    const int ml = (int)strlen(keyseq[i]);
     if (cl >= ml && this->currentinput.getSubString(cl - ml) == keyseq[i]) {
       return id[i];
     }

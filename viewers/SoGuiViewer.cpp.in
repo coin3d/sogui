@@ -452,7 +452,7 @@ So@Gui@ViewerP::convertOrtho2Perspective(const SoOrthographicCamera * in,
   out->focalDistance.setValue(focaldist);
   
   // 45 degrees is the default value of this field in SoPerspectiveCamera.
-    out->heightAngle = (float)(M_PI / 4.0);
+  out->heightAngle = (float)(M_PI / 4.0);
 
 #if SO@GUI@_DEBUG && 0 // debug
   SoDebugError::postInfo("So@Gui@ViewerP::convertOrtho2Perspective",
