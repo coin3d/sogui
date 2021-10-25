@@ -199,11 +199,6 @@ public:
   virtual void setSceneGraph(SoNode * root);
   virtual SoNode * getSceneGraph(void);
 
-  // Moving the following method to public scope for Magic Lantern
-  // Mark Millard, 6/1/20
-  virtual void setSeekMode(SbBool enable);
-  SbBool isSeekMode(void) const;
-  
 protected:
   So@Gui@Viewer(@WIDGET@ parent,
                 const char * name,
@@ -213,8 +208,8 @@ protected:
   ~So@Gui@Viewer();
 
   virtual void sizeChanged(const SbVec2s & size);
-  //virtual void setSeekMode(SbBool enable);
-  //SbBool isSeekMode(void) const;
+  virtual void setSeekMode(SbBool enable);
+  SbBool isSeekMode(void) const;
   SbBool seekToPoint(const SbVec2s screenpos);
   void seekToPoint(const SbVec3f & scenepos);
   virtual void computeSeekFinalOrientation(void);

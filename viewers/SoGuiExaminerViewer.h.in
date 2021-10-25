@@ -74,10 +74,6 @@ public:
   virtual void setCamera(SoCamera * camera);
   virtual void setCursorEnabled(SbBool enable);
 
-  // Moving the following method to public scope for Magic Lantern
-  // Mark Millard, 6/1/20
-  virtual void setSeekMode(SbBool enable);
-
 protected:
   So@Gui@ExaminerViewer(@WIDGET@ parent,
                         const char * name,
@@ -97,7 +93,7 @@ protected:
   virtual const char * getDefaultIconTitle(void) const;
 
   virtual SbBool processSoEvent(const SoEvent * const event);
-  //virtual void setSeekMode(SbBool enable);
+  virtual void setSeekMode(SbBool enable);
   virtual void actualRedraw(void);
 
   virtual void afterRealizeHook(void);
