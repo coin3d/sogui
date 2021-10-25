@@ -433,7 +433,7 @@ SoAny::getenv(const char * envname)
      toolkits).  If you do bug fixes or whatever, keep them in sync! */
 #ifdef HAVE_GETENVIRONMENTVARIABLE
   int neededsize;
-  neededsize = GetEnvironmentVariable(envname, NULL, 0);
+  neededsize = GetEnvironmentVariableA(envname, NULL, 0);
   /* neededsize includes the \0-terminating character */
   if ( neededsize >= 1 ) {
     int resultsize;
@@ -445,7 +445,7 @@ SoAny::getenv(const char * envname)
          to reuse it (much work for a non-100% solution).  20030205 larsa */
       return NULL;
     }
-    resultsize = GetEnvironmentVariable(envname, valbuf, neededsize);
+    resultsize = GetEnvironmentVariableA(envname, valbuf, neededsize);
     if ( resultsize != (neededsize - 1) ) {
       /* Augh. Could we handle this any better? */
       /* How about looping to top and trying again (in case the reason is mt
@@ -528,8 +528,8 @@ SoAny::listWin32ProcessModules(void)
 {
   BOOL ok;
 
-  HINSTANCE kernel32dll = LoadLibrary("kernel32.dll");
-  assert(kernel32dll && "LoadLibrary(''kernel32.dll'') failed");
+  HINSTANCE kernel32dll = LoadLibraryA("kernel32.dll");
+  assert(kernel32dll && "LoadLibraryA(''kernel32.dll'') failed");
 
   funCreateToolhelp32Snapshot = (CreateToolhelp32Snapshot_t)
     GetProcAddress(kernel32dll, "CreateToolhelp32Snapshot");
