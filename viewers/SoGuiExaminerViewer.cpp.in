@@ -130,14 +130,8 @@
   and 'scene graph interaction' mode (see setViewing()
   documentation)</li>
 
-  <!-- 
-    FIXME: This functionality has been disabled. See FIXME comment
-    20050202 larsa below.
-      
   <li>hold down the 'ALT' key to temporary toggle from
   camera-interaction mode to scene graph-interaction mode</li>
-
-  //-->
 
   <li>'q' quits the application</li>
 
