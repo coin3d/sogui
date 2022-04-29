@@ -718,7 +718,7 @@ So@Gui@ExaminerViewer::bottomWheelMotion(float value)
 }
 
 // Documented in superclass. Overridden to provide the examiner viewer
-// functionality on the left thumbwheel (dolly/zoom).
+// functionality on the right thumbwheel (dolly/zoom).
 void
 So@Gui@ExaminerViewer::rightWheelMotion(float value)
 {
