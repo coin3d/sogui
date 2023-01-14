@@ -50,6 +50,9 @@ class QWidget;
 #ifdef __COIN_SOWIN__
 #include <windows.h>
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOWW__
+#include <wx/wx.h>
+#endif // __COIN_SOWW__
 
 
 class So@Gui@Component;
