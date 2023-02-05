@@ -60,6 +60,10 @@ typedef gint So@Gui@EventHandler(@WIDGET@, @EVENT@, gpointer);
 #include <windows.h>
 typedef LRESULT So@Gui@EventHandler(@WIDGET@, UINT, WPARAM, LPARAM);
 #endif // __COIN_SOWIN__
+#ifdef __COIN_SOWX__
+#include <wx/wx.h>
+typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
+#endif // __COIN_SOWX__
 
 // *************************************************************************
 
