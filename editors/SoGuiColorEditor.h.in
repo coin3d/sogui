@@ -45,7 +45,7 @@ class SoSFColor;
 class SoMFColor;
 class SoMFUInt32;
 
-class So@Gui@ColorEditor : public So@Gui@RenderArea {
+class SO@GUI@_DLL_API So@Gui@ColorEditor : public So@Gui@RenderArea {
   SO@GUI@_OBJECT_HEADER(So@Gui@ColorEditor, So@Gui@RenderArea);
 
 public:
