@@ -187,7 +187,12 @@ SceneTexture2::render_cb(void * closure, SoSensor * sensor)
     me->renderer->render(scene);
     unsigned char * renderbuffer = me->renderer->getBuffer();
     unsigned char * imagebytes = PUBLIC(me)->image.startEditing(size, nc);
-    memcpy(imagebytes, renderbuffer, size[0] * size[1] * nc);
+    if(renderbuffer != 0) {
+      memcpy(imagebytes, renderbuffer, size[0] * size[1] * nc);
+    } else {
+      SoDebugError::postWarning("SceneTexture2::render_cb",
+                                "render buffer is null");
+    }
     PUBLIC(me)->image.finishEditing();
   } else {
     unsigned char * imagebytes = PUBLIC(me)->image.startEditing(size, nc);
