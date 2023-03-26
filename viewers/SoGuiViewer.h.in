@@ -49,7 +49,7 @@
 // Include this first, as a workaround for building on top of SGI and
 // TGS Inventor on some Linux distributions. (The bug is in SGI/TGS
 // Inventor.)
-#include <math.h>
+#include <cmath>
 
 #include <Inventor/SbTime.h>
 #include <Inventor/SoType.h>

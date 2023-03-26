@@ -60,7 +60,7 @@
 
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider1.h>
-#include <assert.h>
+#include <cassert>
 
 // *************************************************************************
 

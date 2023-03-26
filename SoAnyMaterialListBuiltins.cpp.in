@@ -45,8 +45,8 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/SoAnyMaterialList.h>

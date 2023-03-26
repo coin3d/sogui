@@ -41,7 +41,7 @@
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/fields/SoSFBool.h>        
 #include <Inventor/fields/SoSFTime.h>
-#include <assert.h>
+#include <cassert>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

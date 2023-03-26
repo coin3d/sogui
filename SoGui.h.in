@@ -57,7 +57,7 @@
 // Fetch stdlib.h, so NULL is defined before glib.h is (indirectly)
 // included. Otherwise we get a compile error with KCC on some
 // systems.
-#include <stdlib.h>
+#include <cstdlib>
 #include <gtk/gtk.h>
 class SoGtkComponent;
 class SbPList;

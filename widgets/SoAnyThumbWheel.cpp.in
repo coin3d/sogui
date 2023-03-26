@@ -36,9 +36,9 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Object.h> // for __COIN_SOQT__

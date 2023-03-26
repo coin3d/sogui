@@ -52,11 +52,11 @@ SPW_TranslateEventX11(void *, void *, SPW_InputEvent *)
 
 #else /* HAVE_X11_AVAILABLE */
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>

@@ -60,7 +60,7 @@
 #include <Inventor/SbLinear.h>
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/nodes/SoCamera.h>
-#include <assert.h>
+#include <cassert>
 #include <so@gui@defs.h>
 
 #define PRIVATE(ptr) ptr->pimpl

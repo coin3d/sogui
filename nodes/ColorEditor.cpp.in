@@ -52,7 +52,7 @@
 #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiColorEditor.h>
-#include <assert.h>
+#include <cassert>
 
 /*!
   \class SoGuiColorEditor Inventor/@Gui@/editors/SoGuiColorEditor.h

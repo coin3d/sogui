@@ -80,7 +80,7 @@
 
 // *************************************************************************
 
-#include <float.h>
+#include <cfloat>
 
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewer.h>
 #include <Inventor/@Gui@/viewers/So@Gui@FullViewerP.h>

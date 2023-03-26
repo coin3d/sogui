@@ -36,7 +36,7 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-#include <math.h>
+#include <cmath>
 
 #include <Inventor/errors/SoDebugError.h>
 #include <Inventor/actions/SoGLRenderAction.h>
@@ -64,7 +64,7 @@
 
 #include <Inventor/@Gui@/nodes/SoGuiPane.h>
 #include <Inventor/@Gui@/nodes/SoGuiSlider2.h>
-#include <assert.h>
+#include <cassert>
 
 // *************************************************************************
 
