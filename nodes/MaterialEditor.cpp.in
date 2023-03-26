@@ -36,7 +36,7 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <assert.h>
+#include <cassert>
 
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/sensors/SoFieldSensor.h>

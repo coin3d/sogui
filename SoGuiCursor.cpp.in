@@ -48,7 +48,7 @@
 
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
 #include <Inventor/@Gui@/SoAny.h>
-#include <assert.h>
+#include <cassert>
 
 /*!
   \enum So@Gui@Cursor::Shape

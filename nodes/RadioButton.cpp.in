@@ -41,7 +41,7 @@
 
 #include <Inventor/@Gui@/SoAny.h>
 #include <Inventor/@Gui@/nodes/SoGuiRadioButton.h>
-#include <assert.h>
+#include <cassert>
 
 // *************************************************************************
 

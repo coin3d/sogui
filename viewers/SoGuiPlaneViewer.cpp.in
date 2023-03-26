@@ -109,8 +109,8 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include <Inventor/@Gui@/common/gl.h>
 #include <Inventor/@Gui@/So@Gui@Cursor.h>

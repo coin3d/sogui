@@ -84,8 +84,8 @@
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoHandleEventAction.h>
 #include <Inventor/actions/SoGetBoundingBoxAction.h>
-#include <string.h> // strlen() etc
-#include <stdlib.h> // abs() 
+#include <cstring> // strlen() etc
+#include <cstdlib> // abs() 
 #include <Inventor/@Gui@/So@Gui@Cursor.h>
 
 

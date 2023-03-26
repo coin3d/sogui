@@ -155,7 +155,7 @@
 
 #include <Inventor/@Gui@/So@Gui@RenderArea.h>
 
-#include <string.h> // strchr()
+#include <cstring> // strchr()
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -167,7 +167,6 @@
 
 #include <Inventor/@Gui@/common/gl.h> // glDrawBuffer()
 
-#include <Inventor/SoSceneManager.h>
 #include <Inventor/actions/SoSearchAction.h>
 #include <Inventor/actions/SoWriteAction.h>
 #include <Inventor/errors/SoDebugError.h>
@@ -177,7 +176,6 @@
 #include <Inventor/nodes/SoCamera.h>
 #include <Inventor/nodes/SoSelection.h>
 #include <Inventor/SoOffscreenRenderer.h>
-#include <Inventor/SbColor4f.h>
 
 #include <so@gui@defs.h>
 #include <Inventor/@Gui@/So@Gui@Basic.h>
@@ -302,8 +300,8 @@ So@Gui@RenderAreaP::showOpenGLDriverInformation(void)
   // (the extra parentheses in the while-expression kills a gcc warning)
   while ((p = strchr(exts.getString(), ' '))) {
     const char * start = exts.getString();
-    info += exts.getSubString(0, p - start);
-    exts.deleteSubString(0, p - start);
+    info += exts.getSubString(0, int(p - start));
+    exts.deleteSubString(0, int(p - start));
     count++;
     if (count == 4) { // number of extensions listed on each line
       info += "\n   ";
@@ -1074,13 +1072,33 @@ const SbColor &
 So@Gui@RenderArea::getBackgroundColor(void) const
 {
   assert(PRIVATE(this)->normalManager != NULL);
-#if HAVE_SBCOLOR4F_GETBACKGROUNDCOLOR
-  SbColor4f bgcol = PRIVATE(this)->normalManager->getBackgroundColor();
-  return SbColor(bgcol[0], bgcol[1], bgcol[2]);
-#else
   return PRIVATE(this)->normalManager->getBackgroundColor();
-#endif
 }
+
+#if HAVE_SOSCENEMANAGER_GETBACKGROUNDCOLORRGBA
+
+/*!
+  This method sets the RGBA background color of the scene.
+*/
+void
+So@Gui@RenderArea::setBackgroundColorRGBA(const SbColorRGBA & color)
+{
+  assert(PRIVATE(this)->normalManager != NULL);
+  PRIVATE(this)->normalManager->setBackgroundColorRGBA(color);
+  this->scheduleRedraw();
+}
+
+/*!
+  This method returns the RGBA background color for the scene.
+*/
+const SbColorRGBA &
+So@Gui@RenderArea::getBackgroundColorRGBA(void) const
+{
+  assert(PRIVATE(this)->normalManager != NULL);
+  return PRIVATE(this)->normalManager->getBackgroundColorRGBA();
+}
+
+#endif
 
 // *************************************************************************
 

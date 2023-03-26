@@ -149,10 +149,10 @@
 #include <config.h>
 #endif // HAVE_CONFIG_H
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <float.h> // FLT_MAX
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+#include <cfloat> // FLT_MAX
 
 #include <Inventor/SbLinear.h>
 #include <Inventor/SoDB.h>
@@ -179,8 +179,10 @@
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
-#include <Inventor/SbColor4f.h>
 #include <Inventor/sensors/SoTimerSensor.h>
+#if HAVE_SOSCENEMANAGER_GETBACKGROUNDCOLORRGBA
+#include <Inventor/SbColorRGBA.h>
+#endif
 
 #ifdef HAVE_SOPOLYGONOFFSET
 #include <Inventor/nodes/SoPolygonOffset.h>
@@ -3275,10 +3277,14 @@ So@Gui@Viewer::actualRedraw(void)
   const So@Gui@Viewer::StereoType stereotype = this->getStereoType();
 
   if (stereotype != So@Gui@Viewer::STEREO_NONE) {
-#if HAVE_SBCOLOR4F_GETBACKGROUNDCOLOR
-    const SbColor4f bgcol = this->getSceneManager()->getBackgroundColor();
+    SbColor bgcol;
+    float bgalpha;
+#if HAVE_SOSCENEMANAGER_GETBACKGROUNDCOLORRGBA
+    const SbColorRGBA bkgcol = this->getSceneManager()->getBackgroundColorRGBA();
+    bgcol[0] = bkgcol[0]; bgcol[1] = bkgcol[1]; bgcol[2] = bkgcol[2]; bgalpha = bkgcol[3];
 #else
-    const SbColor4f bgcol(this->getSceneManager()->getBackgroundColor(), 0.0f);
+    bgcol = this->getSceneManager()->getBackgroundColor();
+    bgalpha = 0.0f;
 #endif
     SoCamera * camera = this->getCamera();
     So@Gui@ViewerP::StereoData tmpstorage;
@@ -3290,7 +3296,7 @@ So@Gui@Viewer::actualRedraw(void)
     switch (stereotype) {
     case So@Gui@Viewer::STEREO_ANAGLYPH:
       glDrawBuffer(this->isDoubleBuffer() ? GL_BACK : GL_FRONT);
-      glClearColor(bgcol[0], bgcol[1], bgcol[2], 0.0f);
+      glClearColor(bgcol[0], bgcol[1], bgcol[2], bgalpha);
       glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
       glColorMask(PRIVATE(this)->stereoanaglyphmask[0][0] ? GL_TRUE : GL_FALSE,
                   PRIVATE(this)->stereoanaglyphmask[0][1] ? GL_TRUE : GL_FALSE,

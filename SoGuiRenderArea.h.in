@@ -39,6 +39,9 @@
 #include <Inventor/SbViewportRegion.h>
 #include <Inventor/actions/SoGLRenderAction.h>
 #include <Inventor/SoSceneManager.h>
+#if HAVE_SOSCENEMANAGER_GETBACKGROUNDCOLORRGBA
+#include <Inventor/SbColorRGBA.h>
+#endif
 
 #include <Inventor/@Gui@/So@Gui@GLWidget.h>
 
@@ -74,6 +77,10 @@ public:
 
   void setBackgroundColor(const SbColor & color);
   const SbColor & getBackgroundColor(void) const;
+#if HAVE_SOSCENEMANAGER_GETBACKGROUNDCOLORRGBA
+  void setBackgroundColorRGBA(const SbColorRGBA & color);
+  const SbColorRGBA & getBackgroundColorRGBA(void) const;
+#endif
   void setBackgroundIndex(int idx);
   int getBackgroundIndex(void) const;
   void setOverlayBackgroundIndex(int idx);

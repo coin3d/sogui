@@ -48,7 +48,7 @@
 #include <Inventor/SbColor.h>
 
 #include <Inventor/@Gui@/nodes/SoGuiClickCounter.h>
-#include <assert.h>
+#include <cassert>
 
 //  SO_KIT_CATALOG_ENTRY_HEADER(topSeparator);
 //  SO_KIT_CATALOG_ENTRY_HEADER(surfaceMaterial);

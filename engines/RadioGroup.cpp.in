@@ -33,7 +33,7 @@
 \**************************************************************************/
 
 #include <Inventor/@Gui@/engines/SoGuiRadioGroup.h>
-#include <assert.h>
+#include <cassert>
 
 SO_ENGINE_SOURCE(SoGuiRadioGroup);
 
