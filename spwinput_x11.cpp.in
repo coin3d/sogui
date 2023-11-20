@@ -225,7 +225,7 @@ FindXCMWindow (Display *display)
 {
   Window root;      /* the root window for the display */
   Window parent;    /* parent window in the search tree */
-  Window *children;  /* children windows of the parrent window */
+  Window *children;  /* children windows of the parent window */
   unsigned int  nChildren; /* number of children the parent window has */
   int i;         /* counter */
 
@@ -360,7 +360,7 @@ static void StringFlush (Display *display, Window win)
  *    None.
  *
  * Description:
- *    This function sends string to the XCM window and flushs the
+ *    This function sends string to the XCM window and flushes the
  *    internal buffer.
  *
  * Notes:
@@ -467,7 +467,7 @@ void SPW_InputResetSpaceball (Display *display)
  *    None.
  *
  * Description:
- *    This function closes all comunication with the Spaceball XIE driver.
+ *    This function closes all communication with the Spaceball XIE driver.
  *
  * Notes:
  *    When the XIE driver is closed the Spaceball may lose power.
@@ -972,7 +972,7 @@ int SPW_InputCheckForSpaceball (Display *display,
           window, product);
 #endif
 
-  /* check to make sure the corect parameters were passed */
+  /* check to make sure the correct parameters were passed */
   if ((display == NULL) || (window == 0)) {
       return 0;
   }
@@ -1024,7 +1024,7 @@ int SPW_InputCheckForSpaceball (Display *display,
  * Args:
  *    display (r/o)  The display the Spaceball is attached to
  *    event   (r/o)  The event that we want to check
- *    spwev   (w/o)  The spaceball return structure contaning the spaceball data
+ *    spwev   (w/o)  The spaceball return structure containing the spaceball data
  *
  * Return Value:
  *     True if the event is a spaceball event, False if not.
@@ -1050,7 +1050,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
                                         from daemon? */
   static int have_tune = 0; /* do we have the tune data yet */
   static float sbtune[6];      /* the tune multipliers */
-  char *scaleVar;                   /* environment variable containg
+  char *scaleVar;                   /* environment variable containing
                                        tune data */
   int  i;                           /* counter */
 
@@ -1244,7 +1244,7 @@ int SPW_InputIsSpaceballEvent (Display *display, XEvent *event,
    *  Tuning:  we want to have the option to tune an application without
    *  having to recompile it each time.  We will do this by setting the
    *  SBALL_TUNING variable and scaling the data by it.  This should only
-   *  be used to get the constants to acutally put into the application.
+   *  be used to get the constants to actually put into the application.
    */
 
   if (spwev->type == SPW_InputMotionEvent) {
@@ -1489,7 +1489,7 @@ int SPW_InputXPending (Display *display, int delay)
 #endif
 
   /*
-   * if there are already event waiting or we have exceded the delay
+   * if there are already event waiting or we have exceeded the delay
    *  return the number of events on the queue
    */
   if ((numevents > 0) || (delay <= 0)) {
@@ -1551,9 +1551,9 @@ void SPW_InputInitDispatchStruct (SPW_InputDispatchStruct * ds)
  * Description:
  *   Determines what type of event has been returned by the Spaceball and calls
  *   the appropriate dispatch routine.
- *   SPW_InputMotionEventHandler - called if a motion event occured
- *   SPW_InputButtonEventHandler - called if a button event occured
- *   SPW_InputOtherEventHandler - called if a non-spaceball event occured
+ *   SPW_InputMotionEventHandler - called if a motion event occurred
+ *   SPW_InputButtonEventHandler - called if a button event occurred
+ *   SPW_InputOtherEventHandler - called if a non-spaceball event occurred
  *
  * Notes:
  *   if SPW_InputOtherEventHandler return a non-zero SPW_InputDispatch
@@ -1765,15 +1765,15 @@ int SPW_InputDispatch (SPW_InputDispatchStruct *ds)
  * Description:
  *   Determines what type of event has been returned by the Spaceball and calls
  *   the appropriate dispatch routine.
- *   SPW_InputMotionEventHandler - called if a motion event occured
- *   SPW_InputButtonEventHandler - called if a button event occured
- *   SPW_InputOtherEventHandler - called if a non-spaceball event occured
+ *   SPW_InputMotionEventHandler - called if a motion event occurred
+ *   SPW_InputButtonEventHandler - called if a button event occurred
+ *   SPW_InputOtherEventHandler - called if a non-spaceball event occurred
  *
  * Notes:
  *   An optimized and more cooperative version of SPW_InputDispatch().
  *   if SPW_InputOtherEventHandler returns non-zero, SPW_InputDispatchEx
  *   will dispose of the event and continue compressing motion events.
- *   If zero is returned, this function will dump all accumalated motion
+ *   If zero is returned, this function will dump all accumulated motion
  *   events (unlike its predecessor) and quickly return control back to 
  *   the app.  Also, the standard Xlib call XPending() is used instead of
  *   SPW_InputXPending().

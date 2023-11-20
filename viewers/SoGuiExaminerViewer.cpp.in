@@ -677,7 +677,7 @@ So@Gui@ExaminerViewer::actualRedraw(void)
 
   if (this->isFeedbackVisible()) { PRIVATE(this)->drawAxisCross(); }
 
-  // Immediately reschedule to get continous spin animation.
+  // Immediately reschedule to get continuous spin animation.
   if (this->isAnimating()) { this->scheduleRedraw(); }
 }
 

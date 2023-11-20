@@ -123,7 +123,7 @@ public:
   float currentspeed;
   
   // Maximum speed, target for currentspeed during
-  // acceleration/decceleration.
+  // acceleration/deceleration.
   float maxspeed; 
 
   // Scales speed. Calculated in updateSpeedScalingFactor.
@@ -888,7 +888,7 @@ So@Gui@FlyViewerP::updateSpeedScalingFactor(void)
   float bbox_diagonal = (bbox.getMax() - bbox.getMin()).length();
 
   // FIXME: It should be possible to create a simple scaling function,
-  // based on some logaritmic evaluation. 20021017 rolvs.
+  // based on some logarithmic evaluation. 20021017 rolvs.
   if (bbox_diagonal > 100)
     this->speed_scaling_factor = 1.0f; // log(bbox_diagonal);
   else if (bbox_diagonal > 10 && bbox_diagonal < 100)

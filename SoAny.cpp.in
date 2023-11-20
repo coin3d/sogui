@@ -461,7 +461,7 @@ SoAny::getenv(const char * envname)
       getenv() function.  We therefore have to do bookkeeping and maintain
       this linked list of allocated buffers that should be cleaned up on exit
       (atexit()).  We don't keep it for lookup of values - we actually can't
-      use the valus as value caches in case they have been changed from other
+      use the values as value caches in case they have been changed from other
       parts of the application.  We only keep them so we can free them later.
     */
 

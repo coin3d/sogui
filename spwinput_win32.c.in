@@ -172,7 +172,7 @@ void SPW_disableSpaceBallWin32(void)
  *---------------------------------------------------------------------------*/
 int __SiAppInitialize(void)
 {
-   enum InitResult nResult;      /* intialization result code */
+   enum InitResult nResult;      /* initialization result code */
    enum ErrorCode nErrorCode;    /* function return code */
 
    /* attempt to load the DLL */

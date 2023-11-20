@@ -24,16 +24,16 @@ THE WISH LIST
   So*ExaminerViewer, and likewise for the other viewer classes.
 
 
-* Doubleclick handling
+* Double-click handling
   2002-01-16  Morten Eriksen  <mortene@sim.no>
 
-  The So*Mouse device class has no notion of doubleclick events, which
+  The So*Mouse device class has no notion of double-click events, which
   complicates matters for application programmers who wants to offer
   those to the end-user for interaction. They can of course just
   compare timings between single clicks, but those numbers will then
   have to be compared to the murky details of the underlying GUI
   toolkit manually to make it blend in with the rest (end-users tend
-  to configure their OS doubleclick interval setting to wildly
+  to configure their OS double-click interval setting to wildly
   differing values, in my experience).
 
   To fix this API deficiency, we would probably also need to add to

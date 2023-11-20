@@ -440,10 +440,10 @@ SoAnyMaterialList::getMaterialDirectory(
           sprintf(buf, "%s/%s", subdirname, files[file]);
           this->directory->groups[subdir]->materials[file]->data = buf;
         }
-        delete [] files; // actual strings are transfered, don't delete them!
+        delete [] files; // actual strings are transferred, don't delete them!
         delete [] subdirname;
       }
-      delete [] subdirs; // actual strings are transfered, don't delete them!
+      delete [] subdirs; // actual strings are transferred, don't delete them!
     }
   }
 

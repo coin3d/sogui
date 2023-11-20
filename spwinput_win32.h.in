@@ -164,7 +164,7 @@ typedef enum
    } SiDevType;
 
 /*
- *  These defintions of device classes are left in for legacy applications.
+ *  These definitions of device classes are left in for legacy applications.
  */
 #define SI_HIGH_END           63
 #define SI_MED_END            62

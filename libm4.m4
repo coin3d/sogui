@@ -269,7 +269,7 @@ define([m4_match],
 # ------------------
 # This macro invokes all its arguments (in sequence, of course).  It is
 # useful for making your macros more structured and readable by dropping
-# unecessary dnl's and have the macros indented properly.
+# unnecessary dnl's and have the macros indented properly.
 
 define([m4_do],
   [ifelse($#, 0, [],

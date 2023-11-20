@@ -65,7 +65,7 @@ public:
   void rotateCamera(const float delta) const;
 
   SbVec3f upvechome;
-  SbVec3f upvector; // The camera's "up" vector is contrained to be in this direction.
+  SbVec3f upvector; // The camera's "up" vector is constrained to be in this direction.
 
 private:
   So@Gui@ConstrainedViewer * publ;

@@ -133,7 +133,7 @@ NOTE: see also So@Gui@/BUGS.txt.
 =====================================================================
 
 006 Static building of the So* libraries under Windows linking with a
-    staticly built Coin causes Coin to be included within the So*
+    statically built Coin causes Coin to be included within the So*
     lib-file.
 
     This will typically cause multiple Coin instances in the final

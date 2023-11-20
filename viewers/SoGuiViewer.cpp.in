@@ -918,7 +918,7 @@ So@Gui@ViewerP::setClippingPlanes(void)
     nearval = this->camera->nearDistance.getValue();
     farval *= (1.0f + SLACK); 
     if (farval <= nearval) {
-      // nothing is visible, so just set farval to som value > nearval.
+      // nothing is visible, so just set farval to some value > nearval.
       farval = nearval + 10.0f;
     }
   }
@@ -1322,7 +1322,7 @@ Draw2DString(const char * str, SbVec2s glsize, SbVec2f position)
 // also include the time stalling on glFlush() upon releasing the
 // OpenGL context after traversal (glFlush() stalls until the GPU
 // completes all OpenGL commands), and any application-code processing
-// inbetween rendering.
+// in between rendering.
 //
 // There is by the way a useful "trick" to improve application
 // performance implied in that last paragraph above: if
