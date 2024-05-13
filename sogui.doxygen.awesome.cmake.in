@@ -217,7 +217,7 @@ HTML_EXTRA_FILES       = @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxyg
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen-awesome/doxygen-awesome-paragraph-link.js \
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen-awesome/doxygen-custom/toggle-alternative-theme.js \
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen-awesome/doxygen-awesome-interactive-toc.js \
-                         @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen-awesome/doxygen-awesome-tabs.js
+                         @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen-awesome/doxygen-awesome-tabs.js \
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen/Coin_logo.png \
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen/examinerviewer.png \
                          @CMAKE_SOURCE_DIR@/src/Inventor/@Gui@/common/docs/doxygen/planeviewer.png \
