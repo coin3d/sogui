@@ -68,6 +68,9 @@ class SbPList;
 #ifdef __COIN_SOWX__
 #include <wx/wx.h>
 #endif // __COIN_SOWX__
+#ifdef __COIN_SOFL__
+#include <FL/Fl.H>
+#endif // __COIN_SOFL__
 
 #include <Inventor/SbBasic.h>
 #include <Inventor/SbLinear.h>

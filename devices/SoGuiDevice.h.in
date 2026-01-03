@@ -64,6 +64,10 @@ typedef LRESULT So@Gui@EventHandler(@WIDGET@, UINT, WPARAM, LPARAM);
 #include <wx/wx.h>
 typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
 #endif // __COIN_SOWX__
+#ifdef __COIN_SOFL__
+#include <FL/Fl.H>
+typedef void So@Gui@EventHandler(@WIDGET@, void *, @EVENT@, bool *);
+#endif // __COIN_SOFL__
 
 // *************************************************************************
 
